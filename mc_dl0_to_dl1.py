@@ -25,9 +25,6 @@ import shutil
 import random
 
 
-DL0_DATA_DIR = sys.argv[1]
-
-
 ### global variables - do not change unless you know what you are doing
 BASE_DIR = '/fefs/aswg/'
 PROD_ID = 'v00'
@@ -101,37 +98,51 @@ def get_metadata_from_mc_data_path(data_path):
 def check_data_path(data_path):
     if not os.path.exists(data_path):
         raise ValueError("The input directory must exist")
-    if len(get_input_filelist(data_path)) == 0:
+    if get_input_filelist(data_path) == []:
         raise ValueError("The input directory is empty")
     if not data_path.startswith(BASE_DIR):
         raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
 
 
-def make_output_data_dirs(data_path):
+# def make_output_data_dirs(data_path):
 
-    check_data_path(data_path=data_path)
-    for i in [1, 2, 3]:
-        new_path = data_path.replaces('dl0', 'dl{}'.format(i))
-        new_path = os.path.join(new_path, PROD_ID)
-        os.makedirs(new_path, exist_ok=True)
+#     check_data_path(data_path=data_path)
+#     for i in [1, 2, 3]:
+#         new_path = data_path.replace('dl0', 'dl{}'.format(i))
+#         new_path = os.path.join(new_path, PROD_ID)
+#         os.makedirs(new_path, exist_ok=True)
 
-def make_dl1_output_dir(data_path):
-    new_path = data_path.replaces('dl0', 'dl{}'.format(i))
-    new_path = os.path.join(new_path, PROD_ID)
-    os.makedirs(new_path, exist_ok=True)
+# def make_dl1_output_dir(data_path):
+#     new_path = data_path.replace('dl0', 'dl{}'.format(i))
+#     new_path = os.path.join(new_path, PROD_ID)
+#     os.makedirs(new_path, exist_ok=True)
 
 
 def get_input_filelist(data_path):
-    return [os.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(f)]
+    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+
+
+def check_and_make_dir(dir):
+    if os.path.exists(dir) and os.listdir(dir)==[]:
+        clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?".format(dir), default='yes')
+        if clean:
+            shutil.rmtree(dir)
+        os.makedirs(dir, exist_ok=True)
+
 
 
 if __name__ == '__main__':
 
+    DL0_DATA_DIR = sys.argv[1]
+
+    print("Working on DL0 files in {}".format(DL0_DATA_DIR))
+    
     check_data_path(DL0_DATA_DIR)
 
     # make_output_data_dirs(DL0_DATA_DIR)
-    DL1_DATA_DIR = os.path.join(DL0_DATA_DIR.replaces('dl0', 'dl1'), PROD_ID)
-    os.makedirs(DL1_DATA_DIR)
+    DL1_DATA_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1'), PROD_ID)
+    # ADD CLEAN QUESTION
+    os.makedirs(DL1_DATA_DIR, exist_ok=True)
 
     raw_files_list = get_input_filelist(DL0_DATA_DIR)
     random.seed(RANDOM_SEED)
@@ -153,30 +164,27 @@ if __name__ == '__main__':
             newfile.write(f)
             newfile.write('\n')
 
-    with open('testing.list', 'w+') as testfile:
+    with open('testing.list', 'w+') as newfile:
         for f in testing_list:
             newfile.write(f)
             newfile.write('\n')
 
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replaces('DL0', 'running_analysis'), PROD_ID)
-    # LOG_DIR = os.path.join(DL0_DATA_DIR.replaces('DL0', 'analysis_logs'), PROD_ID) - this one should be handled by the cleaning script
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+
+    # LOG_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'analysis_logs'), PROD_ID) - this one should be handled by the cleaning script
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
 
-    def check_and_make_dir(dir):
-        if os.path.exists(dir) and os.listdir(dir)==[]:
-            clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?", default='yes')
-            if clean:
-                shutil.rmtree(dir)
-        os.makedirs(dir, exist_ok=True)
-
-    for dir in [DL1_DATA_DIR, RUNNING_DIR, JOB_LOGS]:
-        check_and_make_dir(dir)
-
-
     NFILES_PER_DL1 = 10
 
+    
+    print("RUNNING_DIR: ", RUNNING_DIR)
+    print("JOB_LOGS DIR: ", JOB_LOGS)
+    print("DL1 DATA DIR: ", DL1_DATA_DIR)
+    
+    for dir in [DL1_DATA_DIR, RUNNING_DIR, JOB_LOGS]:
+        check_and_make_dir(dir)
 
     ## dumping the training and testing lists and spliting them in sublists for parallel jobs
 
@@ -193,7 +201,9 @@ if __name__ == '__main__':
 
         number_of_sublists = len(list)//NFILES_PER_DL1+int(len(list)%NFILES_PER_DL1>0)
         for i in range(number_of_sublists):
-            output_file = os.path.join(dir_lists, '/{}.list'.format(i))
+            output_file = os.path.join(dir_lists, '{}_{}.list'.format(l, i))
+            print("dir_lists:", dir_lists)
+            print(output_file)
             with open(output_file, 'w+') as out:
                 for line in list[i*NFILES_PER_DL1:NFILES_PER_DL1*(i+1)]:
                     out.write(line)
@@ -217,7 +227,9 @@ if __name__ == '__main__':
         print(cmd)
         counter+=1
 
-        shutil.copyfile(sys.argv[0], RUNNING_DIR)
+    print(sys.argv[0])
+    print("END")
+#         shutil.copyfile(sys.argv[0], RUNNING_DIR)
 
 
 
