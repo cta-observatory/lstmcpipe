@@ -1,0 +1,106 @@
+## library of functions used for LST analysis data management
+
+## Thomas Vuillaume, 12/09/2019
+
+import sys
+import os
+from distutils.util import strtobool
+import shutil
+import random
+
+
+
+
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        else:
+            try:
+                return bool(strtobool(choice))
+            except:
+                sys.stdout.write("Please respond with 'yes' or 'no' "
+                                 "(or 'y' or 'n').\n")
+
+
+def get_metadata_from_mc_data_path(data_path):
+    '''
+    A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
+
+    Returns
+    -------
+    dict
+    '''
+
+    if not data_path.startswith(BASE_DIR):
+        data_path = os.path.join(BASE_DIR, data_path)
+    if not os.path.exists(BASE_DIR):
+        raise ValueError("The input path does not exists")
+
+    split = data_path.split('/')
+    if split[-5] != 'mc':
+        raise ValueError("The path structure does not correspond to the intended one")
+
+    dic = {
+        'pointing': split[-1],
+        'particle_type': split[-2],
+        'date': split[-3],
+        'data_level': split[-4],
+    }
+    return dic
+
+
+def check_data_path(data_path):
+    if not os.path.exists(data_path):
+        raise ValueError("The input directory must exist")
+    if get_input_filelist(data_path) == []:
+        raise ValueError("The input directory is empty")
+    if not data_path.startswith(BASE_DIR):
+        raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
+
+
+def get_input_filelist(data_path):
+    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+
+
+def check_and_make_dir(dir):
+    if os.path.exists(dir) and os.listdir(dir)==[]:
+        clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?".format(dir), default='yes')
+        if clean:
+            shutil.rmtree(dir)
+    os.makedirs(dir, exist_ok=True)
+
+    
+def check_job_logs(job_logs_dir):
+    job_logs = [os.path.join(job_logs_dir, f) for f in os.listdir(job_logs_dir) if f.endswith('.e')]
+    logs_with_error = []
+    for log_filename in job_logs:
+        with open(log_filename) as log_file:
+            for line in log_file.readlines():
+                if 'Warning' in line:
+                    logs_with_error.append(os.path.basename(log_filename))
+                    break
+    if not logs_with_error == []:
+        query_yes_no("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")

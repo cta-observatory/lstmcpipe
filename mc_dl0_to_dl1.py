@@ -23,6 +23,7 @@ import os
 from distutils.util import strtobool
 import shutil
 import random
+from .data_management import *
 
 
 ### global variables - do not change unless you know what you are doing
@@ -31,103 +32,6 @@ PROD_ID = 'v00'
 TRAIN_TEST_RATIO = 0.25
 RANDOM_SEED = 42
 
-
-
-
-def query_yes_no(question, default="yes"):
-    """Ask a yes/no question via raw_input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    "default" is the presumed answer if the user just hits <Enter>.
-        It must be "yes" (the default), "no" or None (meaning
-        an answer is required of the user).
-
-    The "answer" return value is True for "yes" or False for "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
-    if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
-
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = input().lower()
-        if default is not None and choice == '':
-            return valid[default]
-        else:
-            try:
-                return bool(strtobool(choice))
-            except:
-                sys.stdout.write("Please respond with 'yes' or 'no' "
-                                 "(or 'y' or 'n').\n")
-
-
-def get_metadata_from_mc_data_path(data_path):
-    '''
-    A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
-
-    Returns
-    -------
-    dict
-    '''
-
-    if not data_path.startswith(BASE_DIR):
-        data_path = os.path.join(BASE_DIR, data_path)
-    if not os.path.exists(BASE_DIR):
-        raise ValueError("The input path does not exists")
-
-    split = data_path.split('/')
-    if split[-5] != 'mc':
-        raise ValueError("The path structure does not correspond to the intended one")
-
-    dic = {
-        'pointing': split[-1],
-        'particle_type': split[-2],
-        'date': split[-3],
-        'data_level': split[-4],
-    }
-    return dic
-
-
-def check_data_path(data_path):
-    if not os.path.exists(data_path):
-        raise ValueError("The input directory must exist")
-    if get_input_filelist(data_path) == []:
-        raise ValueError("The input directory is empty")
-    if not data_path.startswith(BASE_DIR):
-        raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
-
-
-# def make_output_data_dirs(data_path):
-
-#     check_data_path(data_path=data_path)
-#     for i in [1, 2, 3]:
-#         new_path = data_path.replace('dl0', 'dl{}'.format(i))
-#         new_path = os.path.join(new_path, PROD_ID)
-#         os.makedirs(new_path, exist_ok=True)
-
-# def make_dl1_output_dir(data_path):
-#     new_path = data_path.replace('dl0', 'dl{}'.format(i))
-#     new_path = os.path.join(new_path, PROD_ID)
-#     os.makedirs(new_path, exist_ok=True)
-
-
-def get_input_filelist(data_path):
-    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
-
-
-def check_and_make_dir(dir):
-    if os.path.exists(dir) and os.listdir(dir)==[]:
-        clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?".format(dir), default='yes')
-        if clean:
-            shutil.rmtree(dir)
-        os.makedirs(dir, exist_ok=True)
 
 
 
@@ -140,9 +44,6 @@ if __name__ == '__main__':
     check_data_path(DL0_DATA_DIR)
 
     # make_output_data_dirs(DL0_DATA_DIR)
-    DL1_DATA_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1'), PROD_ID)
-    # ADD CLEAN QUESTION
-    os.makedirs(DL1_DATA_DIR, exist_ok=True)
 
     raw_files_list = get_input_filelist(DL0_DATA_DIR)
     random.seed(RANDOM_SEED)
@@ -175,6 +76,8 @@ if __name__ == '__main__':
     # LOG_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'analysis_logs'), PROD_ID) - this one should be handled by the cleaning script
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
+    DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
+    # ADD CLEAN QUESTION
 
     NFILES_PER_DL1 = 10
 
@@ -183,7 +86,7 @@ if __name__ == '__main__':
     print("JOB_LOGS DIR: ", JOB_LOGS)
     print("DL1 DATA DIR: ", DL1_DATA_DIR)
     
-    for dir in [DL1_DATA_DIR, RUNNING_DIR, JOB_LOGS]:
+    for dir in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
         check_and_make_dir(dir)
 
     ## dumping the training and testing lists and spliting them in sublists for parallel jobs
@@ -194,7 +97,8 @@ if __name__ == '__main__':
         else:
             list = testing_list
         dir_lists = os.path.join(RUNNING_DIR, 'file_lists_'+l)
-        output_dir = os.path.join(RUNNING_DIR, l)
+        output_dir = os.path.join(RUNNING_DIR, 'DL1')
+        output_dir = os.path.join(output_dir, l)
         check_and_make_dir(dir_lists)
         check_and_make_dir(output_dir)
         print("output dir: ", output_dir)
@@ -211,25 +115,26 @@ if __name__ == '__main__':
             print('{} files generated for {} list'.format(number_of_sublists, l))
 
 
-    ### LSTCHAIN ###
-    counter = 0
+        ### LSTCHAIN ###
+        counter = 0
 
-    for file in os.listdir(dir_lists):
-        jobo = os.path.join(JOB_LOGS, "job{}.o".format(counter))
-        jobe = os.path.join(JOB_LOGS, "job{}.e".format(counter))
-        cmd = 'sbatch -e {} -o {} lstchain_core.sh {} {}'.format(
-            jobe,
-            jobo,
-            os.path.join(dir_lists, file),
-            DL1_DATA_DIR,
-        )
-        # os.system(cmd)
-        print(cmd)
-        counter+=1
+        for file in os.listdir(dir_lists):
+            jobo = os.path.join(JOB_LOGS, "job{}.o".format(counter))
+            jobe = os.path.join(JOB_LOGS, "job{}.e".format(counter))
+            cmd = 'sbatch -e {} -o {} lstchain_core.sh {} {}'.format(
+                jobe,
+                jobo,
+                os.path.join(dir_lists, file),
+                output_dir,
+            )
+            # os.system(cmd)
+            print(cmd)
+            counter+=1
 
-    print(sys.argv[0])
-    print("END")
-#         shutil.copyfile(sys.argv[0], RUNNING_DIR)
+    shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, sys.argv[0]))
+    shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
+    shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
+    print("END of {} script".format(sys.argv[0]))        
 
 
 
