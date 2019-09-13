@@ -23,16 +23,13 @@ import os
 from distutils.util import strtobool
 import shutil
 import random
+from master import *
 
 
 DL0_DATA_DIR = sys.argv[1]
 
 
-### global variables - do not change unless you know what you are doing
-BASE_DIR = '/fefs/aswg/'
-PROD_ID = 'v00'
-TRAIN_TEST_RATIO = 0.25
-RANDOM_SEED = 42
+
 
 
 
