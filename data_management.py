@@ -45,31 +45,31 @@ def query_yes_no(question, default="yes"):
                                  "(or 'y' or 'n').\n")
 
 
-def get_metadata_from_mc_data_path(data_path):
-    '''
-    A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
-
-    Returns
-    -------
-    dict
-    '''
-
-    if not data_path.startswith(BASE_DIR):
-        data_path = os.path.join(BASE_DIR, data_path)
-    if not os.path.exists(BASE_DIR):
-        raise ValueError("The input path does not exists")
-
-    split = data_path.split('/')
-    if split[-5] != 'mc':
-        raise ValueError("The path structure does not correspond to the intended one")
-
-    dic = {
-        'pointing': split[-1],
-        'particle_type': split[-2],
-        'date': split[-3],
-        'data_level': split[-4],
-    }
-    return dic
+# def get_metadata_from_mc_data_path(data_path):
+#     '''
+#     A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
+#
+#     Returns
+#     -------
+#     dict
+#     '''
+#
+#     if not data_path.startswith(BASE_DIR):
+#         data_path = os.path.join(BASE_DIR, data_path)
+#     if not os.path.exists(BASE_DIR):
+#         raise ValueError("The input path does not exists")
+#
+#     split = data_path.split('/')
+#     if split[-5] != 'mc':
+#         raise ValueError("The path structure does not correspond to the intended one")
+#
+#     dic = {
+#         'pointing': split[-1],
+#         'particle_type': split[-2],
+#         'date': split[-3],
+#         'data_level': split[-4],
+#     }
+#     return dic
 
 
 def check_data_path(data_path):
@@ -77,8 +77,8 @@ def check_data_path(data_path):
         raise ValueError("The input directory must exist")
     if get_input_filelist(data_path) == []:
         raise ValueError("The input directory is empty")
-    if not data_path.startswith(BASE_DIR):
-        raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
+    # if not data_path.startswith(BASE_DIR):
+    #     raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
 
 
 def get_input_filelist(data_path):
