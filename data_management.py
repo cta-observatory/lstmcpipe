@@ -10,7 +10,6 @@ import random
 
 
 
-
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
 
@@ -44,7 +43,18 @@ def query_yes_no(question, default="yes"):
                 sys.stdout.write("Please respond with 'yes' or 'no' "
                                  "(or 'y' or 'n').\n")
 
-
+                
+def query_continue(question, default="no"):
+    """
+    Ask a question and if the answer is no, exit the program
+    """
+    answer = query_yes_no(question, default=default)
+    if not answer:
+        sys.exit("Program stopped by user")
+    else:
+        return answer
+        
+    
 # def get_metadata_from_mc_data_path(data_path):
 #     '''
 #     A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
@@ -86,7 +96,7 @@ def get_input_filelist(data_path):
 
 
 def check_and_make_dir(dir):
-    if os.path.exists(dir) and os.listdir(dir)==[]:
+    if os.path.exists(dir) and os.listdir(dir)!=[]:
         clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?".format(dir), default='yes')
         if clean:
             shutil.rmtree(dir)
@@ -99,8 +109,11 @@ def check_job_logs(job_logs_dir):
     for log_filename in job_logs:
         with open(log_filename) as log_file:
             for line in log_file.readlines():
-                if 'Warning' in line:
+                if 'Error' in line:
                     logs_with_error.append(os.path.basename(log_filename))
                     break
     if not logs_with_error == []:
-        query_yes_no("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")
+        answer = query_continue("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")
+
+        
+        

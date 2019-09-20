@@ -35,8 +35,15 @@ DL0_DATA_DIR = sys.argv[1]
 
 if __name__ == '__main__':
 
+    BASE_DIR = '/fefs/aswg/'
+    PROD_ID = 'v00'
+    TRAIN_TEST_RATIO = 0.25
+    RANDOM_SEED = 42
+    
     DL0_DATA_DIR = sys.argv[1]
 
+    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
     
     check_data_path(DL0_DATA_DIR)
@@ -105,7 +112,6 @@ if __name__ == '__main__':
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, '{}_{}.list'.format(l, i))
             print("dir_lists:", dir_lists)
-            print(output_file)
             with open(output_file, 'w+') as out:
                 for line in list[i*NFILES_PER_DL1:NFILES_PER_DL1*(i+1)]:
                     out.write(line)
@@ -125,15 +131,17 @@ if __name__ == '__main__':
                 os.path.join(dir_lists, file),
                 output_dir,
             )
-            # os.system(cmd)
+            os.system(cmd)
             print(cmd)
             counter+=1
 
+        print("{} jobs submitted".format(counter))
+        
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, sys.argv[0]))
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
-    print("END of {} script".format(sys.argv[0]))        
-
+    
+    print("\n ==== END {} ==== \n".format(sys.argv[0]))       
 
 
 
