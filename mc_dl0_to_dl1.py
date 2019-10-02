@@ -35,8 +35,19 @@ DL0_DATA_DIR = sys.argv[1]
 
 if __name__ == '__main__':
 
+    BASE_DIR = '/fefs/aswg/'
+    PROD_ID = '20190923'
+    TRAIN_TEST_RATIO = 0.25
+    RANDOM_SEED = 42
+    NFILES_PER_DL1 = 0  # IF 0, the number of files per DL1 is computed based on the size of the DL0 files and the expected reduction factor of 50. Else, use fixed number of files.
+    
+    DESIRED_DL1_SIZE_MB = 100
+    
+    
     DL0_DATA_DIR = sys.argv[1]
-
+    
+    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
     
     check_data_path(DL0_DATA_DIR)
@@ -44,6 +55,13 @@ if __name__ == '__main__':
     # make_output_data_dirs(DL0_DATA_DIR)
 
     raw_files_list = get_input_filelist(DL0_DATA_DIR)
+    
+    if NFILES_PER_DL1 == 0:
+        size_dl0 = os.stat(raw_files_list[0]).st_size/1e6
+        reduction_dl0_dl1 = 50
+        size_dl1 = size_dl0/reduction_dl0_dl1
+        NFILES_PER_DL1 = max(1, int(DESIRED_DL1_SIZE_MB/size_dl1))
+    
     random.seed(RANDOM_SEED)
     random.shuffle(raw_files_list)
 
@@ -76,9 +94,6 @@ if __name__ == '__main__':
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
     # ADD CLEAN QUESTION
-
-    NFILES_PER_DL1 = 10
-
     
     print("RUNNING_DIR: ", RUNNING_DIR)
     print("JOB_LOGS DIR: ", JOB_LOGS)
@@ -105,7 +120,6 @@ if __name__ == '__main__':
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, '{}_{}.list'.format(l, i))
             print("dir_lists:", dir_lists)
-            print(output_file)
             with open(output_file, 'w+') as out:
                 for line in list[i*NFILES_PER_DL1:NFILES_PER_DL1*(i+1)]:
                     out.write(line)
@@ -125,36 +139,16 @@ if __name__ == '__main__':
                 os.path.join(dir_lists, file),
                 output_dir,
             )
-            # os.system(cmd)
+            os.system(cmd)
             print(cmd)
             counter+=1
 
+        print("{} jobs submitted".format(counter))
+        
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, sys.argv[0]))
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
-    print("END of {} script".format(sys.argv[0]))        
+    
+    print("\n ==== END {} ==== \n".format(sys.argv[0]))       
 
 
-
-
-## protons ##
-# raw_data_dir="/fefs/aswg/data/mc/DL0/20190415/proton/south_pointing"
-# output_dir_base="/fefs/aswg/data/mc/DL1/20190822/proton/south_pointing"
-# nfiles_per_job="10"
-
-## gamma diffuse ##
-# raw_data_dir="/fefs/aswg/data/mc/DL0/20190415/gamma-diffuse/south_pointing"
-# output_dir_base="/fefs/aswg/data/mc/DL1/20190822/gamma-diffuse/south_pointing"
-# nfiles_per_job="10"
-
-
-## gamma ps ##
-# raw_data_dir = "/fefs/aswg/data/mc/DL0/20190415/gamma/south_pointing"
-# output_dir_base = "/fefs/aswg/data/mc/DL1/20190822/gamma/south_pointing"
-# nfiles_per_job = "2"
-#
-# inv_test_ratio = 2  # the train/test split ratio is 1/inv_test_ratio
-#
-# #######################################################################################
-#
-#
