@@ -42,7 +42,7 @@ parser.add_argument('--random_seed', '-seed', action='store', type=str,
 parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
                     dest='n_files_per_dl1',
                     help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based '
-                         'on the size of the DL0 files and the expected reduction factor of 50 '
+                         'on the size of the DL0 files and the expected reduction factor of 5 '
                          'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
                     default=0,
                     )
