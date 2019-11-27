@@ -8,10 +8,7 @@ Install
 
 You can install this as an independant package. This will give you the possibility to run ``onsite_`` commands from
 anywhere.
-This is not mandartory though and you can simply run the scripts as
-``
-python onsite_***
-``
+This is not mandartory though and you can simply run the scripts as ``python onsite_*** ``
 
 
 
