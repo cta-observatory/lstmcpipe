@@ -62,7 +62,7 @@ args = parser.parse_args()
 if __name__ == '__main__':
 
     PROD_ID = args.prod_id
-    TRAIN_TEST_RATIO = args.train_test_ratio
+    TRAIN_TEST_RATIO = float(args.train_test_ratio)
     RANDOM_SEED = args.random_seed
     NFILES_PER_DL1 = args.n_files_per_dl1
     
