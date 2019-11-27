@@ -6,7 +6,7 @@ Scripts to ease the reduction of MC data on the LST cluster at La Palma.
 Install
 -------
 
-You can install this as an independant package. This will give you the possibility to run `onsite_` commands from
+You can install this as an independant package. This will give you the possibility to run ```onsite_``` commands from
 anywhere.
 This is not mandartory though and you can simply run the scripts as
 ```
