@@ -1,8 +1,22 @@
-# LST scripts
+LST scripts
+===========
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
 
-## Steps
+Install
+-------
+
+You can install this as an independant package. This will give you the possibility to run `onsite_` commands from
+anywhere.
+This is not mandartory though and you can simply run the scripts as
+```
+python onsite_***
+```
+
+
+
+Steps
+-----
 
 - `onsite_mc_r0_to_dl1.py`
     - mandatory input: directory you want to analyse. e.g. 
@@ -19,6 +33,7 @@ Scripts to ease the reduction of MC data on the LST cluster at La Palma.
 - `onsite_mc_perf.py` (TBD)
         
     
-### Real Data analysis
+Real Data analysis
+------------------
 
 Real data analysis is not supposed to be supported by these scripts.    
