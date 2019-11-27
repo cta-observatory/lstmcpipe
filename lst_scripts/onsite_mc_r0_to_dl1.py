@@ -156,8 +156,8 @@ if __name__ == '__main__':
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
             cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-            os.system(cmd)
-#             print(cmd)
+#             os.system(cmd)
+            print(cmd)
             counter+=1
 
         print("{} jobs submitted".format(counter))
