@@ -13,7 +13,7 @@
 
 import os
 import sys
-from .data_management import *
+from data_management import *
 from lstchain.io import smart_merge_h5files
 
 
