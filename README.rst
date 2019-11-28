@@ -2,6 +2,9 @@ LST scripts
 ===========
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
+Contact:
+Thomas Vuillaume, thomas.vuillaume [at] lapp.in2p3.fr
+
 
 Install
 -------
@@ -30,8 +33,12 @@ Steps
 - `onsite_mc_train.py`
 - `onsite_mc_perf.py` (TBD)
         
-    
+
+Note: by default, some (job heavy) scripts only print the commands instead of executing them for double check.
+Edit them and uncomment `os.system(cmd)` to execute all.
+
+
 Real Data analysis
 ------------------
 
-Real data analysis is not supposed to be supported by these scripts.    
+Real data analysis is not supposed to be supported by these scripts. Use at your own risk.
