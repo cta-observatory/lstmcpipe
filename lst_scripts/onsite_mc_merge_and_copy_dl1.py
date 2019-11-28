@@ -97,7 +97,7 @@ for t in ['testing', 'training']:
     output_filename += t
     output_filename += '.h5'
 
-    filelist = [os.path.join(running_DL1_dir, f) for f in os.listdir(os.path.join(running_DL1_dir, t))]
+    filelist = [os.path.join(os.path.join(running_DL1_dir, t), f) for f in os.listdir(os.path.join(running_DL1_dir, t))]
     smart_merge_h5files(filelist, output_filename)
 
 
