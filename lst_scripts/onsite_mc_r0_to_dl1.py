@@ -66,7 +66,7 @@ if __name__ == '__main__':
     RANDOM_SEED = args.random_seed
     NFILES_PER_DL1 = args.n_files_per_dl1
     
-    DESIRED_DL1_SIZE_MB = 100
+    DESIRED_DL1_SIZE_MB = 1000
     
     DL0_DATA_DIR = args.input_dir
     
