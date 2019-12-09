@@ -13,7 +13,7 @@
 
 import os
 import sys
-from lstchain.io.data_management import *
+from data_management import *
 from lstchain.io import smart_merge_h5files
 
 
@@ -85,19 +85,23 @@ if not len(os.listdir(DL1_training_dir)) == len(readlines(training_filelist)):
 if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
     tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
     if tf != []:
-        query_continue("{} files from the testing list are not in the `DL1/training` directory:\n{} "
+        query_continue("{} files from the testing list are not in the `DL1/testing` directory:\n{} "
                      "Continue ?".format(len(tf), tf))
 
 # 3. merge DL1 files
+print("merging starts")
 for t in ['testing', 'training']:
+    tdir = os.path.join(running_DL1_dir, t)
     output_filename = 'dl1_'
     for i in [-4, -3, -2, -1]:
         output_filename += running_DL1_dir.split('/')[i]
         output_filename += '_'
     output_filename += t
     output_filename += '.h5'
+    output_filename = os.path.join(running_DL1_dir, output_filename)
+    print(f"merge output: {output_filename}")
 
-    filelist = [running_DL1_dir + f for f in os.listdir(os.path.join(running_DL1_dir, t))]
+    filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
     smart_merge_h5files(filelist, output_filename)
 
 
