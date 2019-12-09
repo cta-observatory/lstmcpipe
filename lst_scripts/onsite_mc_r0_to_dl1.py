@@ -66,7 +66,7 @@ if __name__ == '__main__':
     RANDOM_SEED = args.random_seed
     NFILES_PER_DL1 = args.n_files_per_dl1
     
-    DESIRED_DL1_SIZE_MB = 100
+    DESIRED_DL1_SIZE_MB = 1000
     
     DL0_DATA_DIR = args.input_dir
     
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
             cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-#             os.system(cmd)
+            # os.system(cmd)
             print(cmd)
             counter+=1
 

@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
-
+# script to reduce all MC production to DL1 at once.
+# To be edited to change parameters.
 
 config_file="lstchain_standard_config.json"
 train_test_ratio="0.5"
