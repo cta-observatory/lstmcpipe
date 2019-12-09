@@ -117,3 +117,6 @@ def check_job_logs(job_logs_dir):
 
         
         
+
+if __name__ == '__main__':
+    pass
