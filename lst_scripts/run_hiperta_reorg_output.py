@@ -50,7 +50,7 @@ def main():
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
-    if not args.keep_files:
+    if not args.keep_file:
         os.remove(output_hiperta_filename)
 
     print("\nDone.")
