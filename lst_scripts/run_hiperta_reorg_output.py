@@ -42,11 +42,11 @@ def main():
 
     os.makedirs(args.outdir, exist_ok=True)
 
-    output_hiperta_filename = os.path.join(args.outdir + "dl1_" + os.path.basename(args.infile))
+    output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
     cmd_hiperta = f'hiperta_r1_dl1 -i {args.infile} -c {args.config} -o {args.outdir} -k {args.keep_file}'
     os.system(cmd_hiperta)
 
-    output_reorganized_filename = os.path.join(args.outdir + "dl1_reorganized_" + os.path.basename(args.infile))
+    output_reorganized_filename = os.path.join(args.outdir, "dl1_reorganized_" + os.path.basename(args.infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
