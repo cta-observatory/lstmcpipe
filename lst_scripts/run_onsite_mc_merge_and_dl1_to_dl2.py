@@ -28,7 +28,7 @@ PARTICLE_LIST = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 OUTDIRFILE = '/fefs/aswg/workspace/enrique.garcia/rta_dl1_to_dl2/merge_dl1_rta/dl1_{}_20deg_180deg___cta-prod3-demo-2147m-LaPalma-baseline-mono_{}.h5'
 
 
-def add_disp_to_parameters_table(dl1_file, table_path, focal):
+def add_disp_to_parameters_table(dl1_file, table_path):
     """
     Reconstruct the disp parameters and source position from a DL1 parameters table and write the result in the file
 
@@ -41,15 +41,15 @@ def add_disp_to_parameters_table(dl1_file, table_path, focal):
         - mc_az_tel
 
     table_path: path to the parameters table in the file
-    focal: focal of the telescope
     """
     with tables.open_file(dl1_file) as hfile:
         run_array_dir = copy.copy(hfile.root.simulation.run_config.col('run_array_direction')[0])
+        focal = copy.copy(hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0])
 
     df = pd.read_hdf(dl1_file, key=table_path)
     source_pos_in_camera = sky_to_camera(df.mc_alt.values * u.rad,
                                          df.mc_az.values * u.rad,
-                                         focal,
+                                         focal * u.m,
                                          run_array_dir[1] * u.rad,
                                          run_array_dir[0] * u.rad,
                                          )
@@ -155,15 +155,14 @@ def main():
     proton_train = PATH_FILES.format(PARTICLE_LIST[3], 'train')
 
     #     # add disp_* and mc_type parameters to table
-    focal = 28 * u.m
-    add_disp_to_parameters_table(electron_test, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(electron_train, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(gamma_test, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(gamma_train, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(gamma_diff_test, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(gamma_diff_train, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(proton_test, dl1_params_lstcam_key, focal)
-    add_disp_to_parameters_table(proton_train, dl1_params_lstcam_key, focal)
+    add_disp_to_parameters_table(electron_test, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(electron_train, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(gamma_test, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(gamma_train, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(gamma_diff_test, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(gamma_diff_train, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(proton_test, dl1_params_lstcam_key)
+    add_disp_to_parameters_table(proton_train, dl1_params_lstcam_key)
 
     print(electron_test, '\n', electron_train, '\n', gamma_test, '\n', gamma_train, '\n', gamma_diff_test, '\n',
           gamma_diff_train, '\n', proton_test, '\n', proton_train)
