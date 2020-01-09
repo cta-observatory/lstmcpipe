@@ -2,7 +2,7 @@
 #
 # DL2 to DL3 onsite (La Palma cluster)
 #
-# usage `sbatch --wrap="python run_onsite_mc_merge_and_dl1_to_dl2.py"`
+# usage `sbatch --wrap="python run_onsite_hiperta_mc_merge_and_dl1_to_dl2.py"`
 #
 #
 # WORKING VERSION  @ LaPALMA. Temportal version until the the dl1 convertor is updated.
