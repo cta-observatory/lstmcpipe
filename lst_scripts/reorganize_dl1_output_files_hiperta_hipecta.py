@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 #
+# Reorganize the DL1 output files of the HiPeRTA and HiPeCTA r0_to_dl1 codes to reach the agreed
+# file structure for DL1 files
+#
 # Usage :
 # $ python reorganize_dl1_file -i input.h5 [-o outname.h5]
 
 import os
 import argparse
 import tables
-from lstchain.io.io import dl1_params_lstcam_key, dl1_images_lstcam_key
+from lstchain.io.io import dl1_params_lstcam_key, dl1_images_lstcam_key, add_column_table
 from astropy.table import join, Table, vstack, Column
+import astropy.units as u
 import numpy as np
-#from lstchain.io import auto_merge_h5files
+import pandas as pd
+import copy
+from lstchain.reco import disp
+from lstchain.reco.utils import sky_to_camera
 
 
 def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
@@ -46,6 +53,75 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     hfile_out.close()
 
 
+def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
+    """
+    HARDCODED function obtained from `lstchain.reco.dl0_to_dl1` because `mc_alt_tel` and `mc_az_tel` are zipped within
+    `run_array_direction`.
+    1. Reconstruct the disp parameters and source position from a DL1 parameters table and write the result in the file.
+    2. Computes mc_type from the name of the file.
+
+
+    Parameters
+    ----------
+    dl1_file: HDF5 DL1 file containing the required field in `table_path`:
+        - mc_alt
+        - mc_az
+        - mc_alt_tel
+        - mc_az_tel
+
+    table_path: path to the parameters table in the file
+
+    Returns
+    -------
+        None
+    """
+    with tables.open_file(dl1_file) as hfile:
+        run_array_dir = copy.copy(hfile.root.simulation.run_config.col('run_array_direction')[0])
+        focal = copy.copy(hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0])
+
+    df = pd.read_hdf(dl1_file, key=table_path)
+    source_pos_in_camera = sky_to_camera(df.mc_alt.values * u.rad,
+                                         df.mc_az.values * u.rad,
+                                         focal * u.m,
+                                         run_array_dir[1] * u.rad,
+                                         run_array_dir[0] * u.rad,
+                                         )
+
+    disp_parameters = disp.disp(df.x.values * u.m,
+                                df.y.values * u.m,
+                                source_pos_in_camera.x,
+                                source_pos_in_camera.y)
+
+    with tables.open_file(dl1_file, mode="a") as file:
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'disp_dx', disp_parameters[0].value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'disp_dy', disp_parameters[1].value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'disp_norm', disp_parameters[2].value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'disp_angle', disp_parameters[3].value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'disp_sign', disp_parameters[4])
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'src_x', source_pos_in_camera.x.value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'src_y', source_pos_in_camera.y.value)
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'mc_alt_tel', np.ones(len(df)) * run_array_dir[1])
+        tab = file.root[table_path]
+        add_column_table(tab, tables.Float32Col, 'mc_az_tel', np.ones(len(df)) * run_array_dir[0])
+        if 'gamma' in dl1_file:
+            tab = file.root[table_path]
+            add_column_table(tab, tables.Float32Col, 'mc_type', np.zeros(len(df)))
+        if 'electron' in dl1_file:
+            tab = file.root[table_path]
+            add_column_table(tab, tables.Float32Col, 'mc_type', np.ones(len(df)))
+        if 'proton' in dl1_file:
+            tab = file.root[table_path]
+            add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
+
+
 def modify_params_table(table, position_iterator):
     """
     Modify column names and compute missing parameters
@@ -60,7 +136,7 @@ def modify_params_table(table, position_iterator):
         None
     """
     # Create the column tel_id
-    # TODO : it can be done more 'classly' in the case of hiperta by reading `hfile_rta.root.dl1.Tel_1.telId.read()`
+    # TODO : it can be done more 'classy' in the case of hiperta by reading `hfile_rta.root.dl1.Tel_1.telId.read()`
     # however, hipecta does NOT have this option.
     tel_id = Column(np.full(table.columns[0].size,
                             int(position_iterator + 1)  # TODO : A bit hardcoded. Just valid for LSTs
@@ -168,6 +244,9 @@ def reorganize_dl1(input_filename, output_filename):
 
     create_final_h5(hfile, _hfile_param, _hfile_imgas, output_filename)
 
+    # Add disp_* and mc_type to the parameters table
+    add_disp_and_mc_type_to_parameters_table(output_filename, dl1_params_lstcam_key)
+
     # Close and erase
     _hfile_param.close()
     _hfile_imgas.close()
@@ -178,7 +257,7 @@ def reorganize_dl1(input_filename, output_filename):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Re-organize the dl1 `standar` output file from either the "
+    parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                                  "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the agreed DL1 structure")
 
     parser.add_argument('--infile', '-i',
