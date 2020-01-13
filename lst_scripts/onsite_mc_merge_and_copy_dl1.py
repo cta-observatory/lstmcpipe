@@ -111,7 +111,7 @@ move_dir_content(running_DL1_dir, final_DL1_dir)
 print("DL1 files have been moved in {}".format(final_DL1_dir))
 
 # copy lstchain config file there too
-config_files = [os.path.join(running_DL1_dir, f) for f in os.listdir(running_DL1_dir) if f.endswith('.json')]
+config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
 for file in config_files:
     shutil.copyfile(file,  os.path.join(final_DL1_dir, os.path.basename(file)))
 
