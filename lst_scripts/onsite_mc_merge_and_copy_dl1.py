@@ -102,7 +102,9 @@ for t in ['testing', 'training']:
     print(f"merge output: {output_filename}")
 
     filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
-    smart_merge_h5files(filelist, output_filename)
+    cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
+    os.system(cmd)
+    # smart_merge_h5files(filelist, output_filename)
 
 
 # 4. move DL1 files in final place
