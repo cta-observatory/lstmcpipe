@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Reorganize the DL1 output files of the HiPeRTA and HiPeCTA r0_to_dl1 codes to reach the agreed
+# Reorganize the DL1 output files of the HiPeRTA and HiPeCTA r0_to_dl1 codes to reach the lstchain
 # file structure for DL1 files
 #
 # Usage :
@@ -258,7 +258,7 @@ def reorganize_dl1(input_filename, output_filename):
 
 def main():
     parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
-                                                 "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the agreed DL1 structure")
+                                                 "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
 
     parser.add_argument('--infile', '-i',
                         type=str,
