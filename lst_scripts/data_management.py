@@ -97,7 +97,7 @@ def get_input_filelist(data_path):
 
 def check_and_make_dir(dir):
     if os.path.exists(dir) and os.listdir(dir)!=[]:
-        clean = query_yes_no("The directory {} is not empty. Do you want to remove its content?".format(dir), default='yes')
+        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(dir), default='no')
         if clean:
             shutil.rmtree(dir)
     os.makedirs(dir, exist_ok=True)
