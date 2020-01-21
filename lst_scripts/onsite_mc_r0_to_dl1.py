@@ -3,9 +3,6 @@
 ## Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
 
-import sys
-import os
-import shutil
 import random
 import argparse
 import calendar
@@ -16,7 +13,6 @@ from lstchain.io.data_management import *
 def main():
 
     parser = argparse.ArgumentParser(description="MC R0 to DL1")
-
 
     parser.add_argument('input_dir', type=str,
                         help='path to the files directory to analyse',
@@ -42,13 +38,11 @@ def main():
 
     parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
                         dest='n_files_per_dl1',
-                        help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based '
-                             'on the size of the DL0 files and the expected reduction factor of 5 '
+                        help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
+                             'based on the size of the DL0 files and the expected reduction factor of 5 '
                              'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
                         default=0,
                         )
-
-
 
     parser.add_argument('--prod_id', action='store', type=str,
                         dest='prod_id',
@@ -94,9 +88,9 @@ def main():
     training_list = raw_files_list[:ntrain]
     testing_list = raw_files_list[ntrain:]
 
-    print("{} raw files".format(number_files))
-    print("{} files in training dataset".format(ntrain))
-    print("{} files in test dataset".format(ntest))
+    print("\t{} raw files".format(number_files))
+    print("\t{} files in training dataset".format(ntrain))
+    print("\t{} files in test dataset".format(ntest))
 
     with open('training.list', 'w+') as newfile:
         for f in training_list:
@@ -115,51 +109,65 @@ def main():
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
     # ADD CLEAN QUESTION
 
-    print("RUNNING_DIR: ", RUNNING_DIR)
-    print("JOB_LOGS DIR: ", JOB_LOGS)
-    print("DL1 DATA DIR: ", DL1_DATA_DIR)
+    print("\tRUNNING_DIR: \t", RUNNING_DIR)
+    print("\tJOB_LOGS DIR: \t", JOB_LOGS)
+    print("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
 
-    for dir in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
-        check_and_make_dir(dir)
+    for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
+        check_and_make_dir(directory)
 
-    ## dumping the training and testing lists and spliting them in sublists for parallel jobs
+    # dumping the training and testing lists and spliting them in sublists for parallel jobs
 
-    for l in 'training', 'testing':
-        if l == 'training':
+    for set_type in 'training', 'testing':
+        if set_type == 'training':
             list = training_list
         else:
             list = testing_list
-        dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + l)
+        dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
         output_dir = os.path.join(RUNNING_DIR, 'DL1')
-        output_dir = os.path.join(output_dir, l)
+        output_dir = os.path.join(output_dir, set_type)
         check_and_make_dir(dir_lists)
         check_and_make_dir(output_dir)
-        print("output dir: ", output_dir)
+        print("\toutput dir: \t", output_dir)
 
         number_of_sublists = len(list) // NFILES_PER_DL1 + int(len(list) % NFILES_PER_DL1 > 0)
         for i in range(number_of_sublists):
-            output_file = os.path.join(dir_lists, '{}_{}.list'.format(l, i))
+            output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
             with open(output_file, 'w+') as out:
                 for line in list[i * NFILES_PER_DL1:NFILES_PER_DL1 * (i + 1)]:
                     out.write(line)
                     out.write('\n')
-        print('{} files generated for {} list'.format(number_of_sublists, l))
+        print('\t{} files generated for {} list'.format(number_of_sublists, set_type))
 
         ### LSTCHAIN ###
         counter = 0
-
+        jobid2cmd = {}
+        jobid2outfile = {}
+        jobid2errfile = {}
         for file in os.listdir(dir_lists):
-            jobo = os.path.join(JOB_LOGS, "job{}.o".format(counter))
-            jobe = os.path.join(JOB_LOGS, "job{}.e".format(counter))
+            if set_type == 'training':
+                jobo = os.path.join(JOB_LOGS, "job{}_train.o".format(counter))
+                jobe = os.path.join(JOB_LOGS, "job{}_train.e".format(counter))
+            else:
+                jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
+                jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
             cc = ' -conf {}'.format(args.config_file) if args.config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
-            cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+            cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-            # os.system(cmd)
-            print(cmd)
+            # the command os.popen() INDEED runs the command !
+            jobid = os.popen(cmd).read()
+
+            # Fill the dictionaries
+            jobid2cmd[jobid] = cmd
+            jobid2outfile[jobid] = jobo
+            jobid2errfile[jobid] = jobe
+
+            # If you want to see the submitted jobs
+            print(f'\t\tSubmitted batch job {jobid}')
             counter += 1
 
-        print("{} jobs submitted".format(counter))
+        print("\n\t{} jobs submitted".format(counter))
 
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
@@ -172,7 +180,6 @@ def main():
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
 
     print("\n ==== END {} ==== \n".format(sys.argv[0]))
-
 
 
 if __name__ == '__main__':
