@@ -11,12 +11,11 @@ from lstchain.io.data_management import *
 
 
 def main():
-
     parser = argparse.ArgumentParser(description="MC R0 to DL1")
 
     parser.add_argument('input_dir', type=str,
                         help='path to the files directory to analyse',
-                       )
+                        )
 
     parser.add_argument('--config_file', '-conf', action='store', type=str,
                         dest='config_file',
@@ -144,6 +143,8 @@ def main():
         jobid2cmd = {}
         jobid2outfile = {}
         jobid2errfile = {}
+        jobid2partype = {}
+
         for file in os.listdir(dir_lists):
             if set_type == 'training':
                 jobo = os.path.join(JOB_LOGS, "job{}_train.o".format(counter))
@@ -156,12 +157,13 @@ def main():
             cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
             # the command os.popen() INDEED runs the command !
-            jobid = os.popen(cmd).read()
+            jobid = os.popen(cmd).read().split('\n')
 
             # Fill the dictionaries
             jobid2cmd[jobid] = cmd
             jobid2outfile[jobid] = jobo
             jobid2errfile[jobid] = jobe
+            jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
 
             # If you want to see the submitted jobs
             print(f'\t\tSubmitted batch job {jobid}')
@@ -181,7 +183,17 @@ def main():
 
     print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
+    # create log dictionary and return it
+    jobid2log = {}
+    for key in jobid2cmd.keys():
+        jobid2log[key] = {}
+        jobid2log[key]['particle'] = jobid2partype
+        jobid2log[key]['sbatch_command'] = jobid2cmd[key]
+        jobid2log[key]['jobe_path'] = jobid2errfile[key]
+        jobid2log[key]['jobo_path'] = jobid2outfile[key]
+
+    return jobid2log
+
 
 if __name__ == '__main__':
     main()
-
