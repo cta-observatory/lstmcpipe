@@ -10,33 +10,18 @@
 # 4. merge DL1 files
 # 5. move running_dir 
 
-
-import os
-import sys
-from data_management import *
+import argparse
+from .data_management import *
 from lstchain.io import smart_merge_h5files
 
 
-input_dir = sys.argv[1]
-
-JOB_LOGS = os.path.join(input_dir, 'job_logs')
-training_filelist = os.path.join(input_dir, 'training.list')
-testing_filelist = os.path.join(input_dir, 'testing.list')
-running_DL1_dir = os.path.join(input_dir, 'DL1')
-DL1_training_dir = os.path.join(running_DL1_dir, 'training')
-DL1_testing_dir = os.path.join(running_DL1_dir, 'testing')
-final_DL1_dir = input_dir.replace('running_analysis', 'DL1')
-logs_destination_dir = input_dir.replace('running_analysis', 'analysis_logs')
-
-
-
-def check_files_in_dir_from_file(dir, file):
+def check_files_in_dir_from_file(directory, file):
     """
     Check that a list of files from a file exist in a dir
 
     Parameters
     ----------
-    dir
+    directory
     file
 
     Returns
@@ -46,7 +31,7 @@ def check_files_in_dir_from_file(dir, file):
     with open(file) as f:
         lines = f.readlines()
 
-    files_in_dir = os.listdir(dir)
+    files_in_dir = os.listdir(directory)
     files_not_in_dir = []
     for line in lines:
         filename = os.path.basename(line.rstrip('\n'))
@@ -61,65 +46,94 @@ def readlines(file):
         lines = [line.rstrip('\n') for line in f]
     return lines
 
+
 def move_dir_content(src, dest):
     files = os.listdir(src)
     for f in files:
-        shutil.move(os.path.join(src,f), dest)
+        shutil.move(os.path.join(src, f), dest)
     os.rmdir(src)
-    
-
-print("\n ==== START {} ==== \n".format(sys.argv[0]))
-
-# 1. check job logs
-check_job_logs(JOB_LOGS)
 
 
-# 2. check that all files have been created in DL1 based on training and testing lists
-## just check number of files first:
-if not len(os.listdir(DL1_training_dir)) == len(readlines(training_filelist)):
-    tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
-    if  tf != []:
-        query_continue("{} files from the training list are not in the `DL1/training` directory:\n{} "
-                     "Continue ?".format(len(tf),tf))
-        
-if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
-    tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
-    if tf != []:
-        query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
-                     "Continue ?".format(len(tf), tf))
+def main():
+    parser = argparse.ArgumentParser(description="Merge and copy DL1 data after production. \n"
+                                                 " 1. check job_logs \n"
+                                                 " 2. check that all files have been created in DL1 based on training "
+                                                 "and testing lists \n"
+                                                 " 3. move DL1 files in final place \n"
+                                                 " 4. merge DL1 files \n"
+                                                 " 5. move running_dir ")
 
-# 3. merge DL1 files
-print("merging starts")
-for t in ['testing', 'training']:
-    tdir = os.path.join(running_DL1_dir, t)
-    output_filename = 'dl1_'
-    for i in [-4, -3, -2, -1]:
-        output_filename += running_DL1_dir.split('/')[i]
-        output_filename += '_'
-    output_filename += t
-    output_filename += '.h5'
-    output_filename = os.path.join(running_DL1_dir, output_filename)
-    print(f"merge output: {output_filename}")
+    parser.add_argument('input_dir', type=str,
+                        help='path to the DL1 files directory to merge, copy and move',
+                        )
 
-    filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
-    cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
-    os.system(cmd)
-    # smart_merge_h5files(filelist, output_filename)
+    args = parser.parse_args()
+
+    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+
+    input_dir = args.input_Dir
+
+    JOB_LOGS = os.path.join(input_dir, 'job_logs')
+    training_filelist = os.path.join(input_dir, 'training.list')
+    testing_filelist = os.path.join(input_dir, 'testing.list')
+    running_DL1_dir = os.path.join(input_dir, 'DL1')
+    DL1_training_dir = os.path.join(running_DL1_dir, 'training')
+    DL1_testing_dir = os.path.join(running_DL1_dir, 'testing')
+    final_DL1_dir = input_dir.replace('running_analysis', 'DL1')
+    logs_destination_dir = input_dir.replace('running_analysis', 'analysis_logs')
+
+    # 1. check job logs
+    check_job_logs(JOB_LOGS)
+
+    # 2. check that all files have been created in DL1 based on training and testing lists
+    # just check number of files first:
+    if not len(os.listdir(DL1_training_dir)) == len(readlines(training_filelist)):
+        tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
+        if tf != []:
+            query_continue("{} files from the training list are not in the `DL1/training` directory:\n{} "
+                           "Continue ?".format(len(tf), tf))
+
+    if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
+        tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
+        if tf != []:
+            query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
+                           "Continue ?".format(len(tf), tf))
+
+    # 3. merge DL1 files
+    print("merging starts")
+    for t in ['testing', 'training']:
+        tdir = os.path.join(running_DL1_dir, t)
+        output_filename = 'dl1_'
+        for i in [-4, -3, -2, -1]:
+            output_filename += running_DL1_dir.split('/')[i]
+            output_filename += '_'
+        output_filename += t
+        output_filename += '.h5'
+        output_filename = os.path.join(running_DL1_dir, output_filename)
+        print(f"merge output: {output_filename}")
+
+        filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
+        cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
+        os.system(cmd)
+        # smart_merge_h5files(filelist, output_filename)
+
+    # 4. move DL1 files in final place
+    check_and_make_dir(final_DL1_dir)
+    move_dir_content(running_DL1_dir, final_DL1_dir)
+    print("DL1 files have been moved in {}".format(final_DL1_dir))
+
+    # copy lstchain config file there too
+    config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
+    for file in config_files:
+        shutil.copyfile(file, os.path.join(final_DL1_dir, os.path.basename(file)))
+
+    # 5. move running_dir as logs
+    check_and_make_dir(logs_destination_dir)
+    move_dir_content(input_dir, logs_destination_dir)
+    print("LOGS have been moved to {}".format(logs_destination_dir))
+
+    print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
 
-# 4. move DL1 files in final place
-check_and_make_dir(final_DL1_dir)
-move_dir_content(running_DL1_dir, final_DL1_dir)
-print("DL1 files have been moved in {}".format(final_DL1_dir))
-
-# copy lstchain config file there too
-config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
-for file in config_files:
-    shutil.copyfile(file,  os.path.join(final_DL1_dir, os.path.basename(file)))
-
-# 5. move running_dir as logs
-check_and_make_dir(logs_destination_dir)
-move_dir_content(input_dir, logs_destination_dir)
-print("LOGS have been moved to {}".format(logs_destination_dir))
-
-print("\n ==== END {} ==== \n".format(sys.argv[0]))
+if __name__ == '__main__':
+    main()
