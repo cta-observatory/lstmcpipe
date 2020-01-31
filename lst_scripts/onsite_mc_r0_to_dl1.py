@@ -1,7 +1,8 @@
 #!/usr//bin/env python
 
-## Code to reduce R0 data to DL1 onsite (La Palma cluster)
-
+# T. Vuillaume,
+# Modifications by E. Garcis
+# Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
 import random
 import argparse
@@ -9,59 +10,68 @@ import calendar
 import lstchain
 from lstchain.io.data_management import *
 
+parser = argparse.ArgumentParser(description="MC R0 to DL1")
 
-def main():
-    parser = argparse.ArgumentParser(description="MC R0 to DL1")
+parser.add_argument('input_dir', type=str,
+                    help='path to the files directory to analyse',
+                    )
 
-    parser.add_argument('input_dir', type=str,
-                        help='path to the files directory to analyse',
-                        )
+parser.add_argument('--config_file', '-conf', action='store', type=str,
+                    dest='config_file',
+                    help='Path to a configuration file. If none is given, a standard configuration is applied',
+                    default=None
+                    )
 
-    parser.add_argument('--config_file', '-conf', action='store', type=str,
-                        dest='config_file',
-                        help='Path to a configuration file. If none is given, a standard configuration is applied',
-                        default=None
-                        )
+parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
+                    dest='train_test_ratio',
+                    help='Ratio of training data',
+                    default=0.25
+                    )
 
-    parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
-                        dest='train_test_ratio',
-                        help='Ratio of training data',
-                        default=0.25
-                        )
+parser.add_argument('--random_seed', '-seed', action='store', type=str,
+                    dest='random_seed',
+                    help='Random seed for random processes',
+                    default=42,
+                    )
 
-    parser.add_argument('--random_seed', '-seed', action='store', type=str,
-                        dest='random_seed',
-                        help='Random seed for random processes',
-                        default=42,
-                        )
+parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
+                    dest='n_files_per_dl1',
+                    help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
+                         'based on the size of the DL0 files and the expected reduction factor of 5 '
+                         'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
+                    default=0,
+                    )
 
-    parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
-                        dest='n_files_per_dl1',
-                        help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
-                             'based on the size of the DL0 files and the expected reduction factor of 5 '
-                             'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
-                        default=0,
-                        )
+parser.add_argument('--prod_id', action='store', type=str,
+                    dest='prod_id',
+                    help="Production ID. If None, _v00 will be used, indicating an official base production",
+                    default=None,
+                    )
 
-    parser.add_argument('--prod_id', action='store', type=str,
-                        dest='prod_id',
-                        help="Production ID. If None, _v00 will be used, indicating an official base production",
-                        default=None,
-                        )
+parser.add_argument('--flag_workflow_mode', '-flag', type=str,
+                    dest='flag_workflow_mode',
+                    help='Flag to indicate if the code is run within the r0_to_dl2 full workflow, and thus some '
+                         'arguments must be returned for the following steps.',
+                    default=False
+                    )
 
-    args = parser.parse_args()
+
+def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_files_per_dl1=0,
+         prod_id=None, flag_workflow_mode=False):
+
+    flag_full_workflow = flag_workflow_mode
 
     today = calendar.datetime.date.today()
     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
+    suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
     PROD_ID = base_prod_id + suffix_id
-    TRAIN_TEST_RATIO = float(args.train_test_ratio)
-    RANDOM_SEED = args.random_seed
-    NFILES_PER_DL1 = args.n_files_per_dl1
+    TRAIN_TEST_RATIO = float(train_test_ratio)
+    RANDOM_SEED = random_seed
+    NFILES_PER_DL1 = n_files_per_dl1
 
     DESIRED_DL1_SIZE_MB = 1000
 
-    DL0_DATA_DIR = args.input_dir
+    DL0_DATA_DIR = input_dir
 
     print("\n ==== START {} ==== \n".format(sys.argv[0]))
 
@@ -152,18 +162,19 @@ def main():
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            cc = ' -conf {}'.format(args.config_file) if args.config_file is not None else ' '
+            cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
             cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
             # the command os.popen() INDEED runs the command !
             jobid = os.popen(cmd).read().split('\n')
 
-            # Fill the dictionaries
-            jobid2cmd[jobid] = cmd
-            jobid2outfile[jobid] = jobo
-            jobid2errfile[jobid] = jobe
-            jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
+            # Fill the dictionaries if IN workflow mode
+            if flag_full_workflow:
+                jobid2cmd[jobid] = cmd
+                jobid2outfile[jobid] = jobo
+                jobid2errfile[jobid] = jobe
+                jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
 
             # If you want to see the submitted jobs
             print(f'\t\tSubmitted batch job {jobid}')
@@ -174,8 +185,8 @@ def main():
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
     # copy config file into logs
-    if args.config_file is not None:
-        shutil.copy(args.config_file, os.path.join(RUNNING_DIR, os.path.basename(args.config_file)))
+    if config_file is not None:
+        shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
@@ -183,17 +194,26 @@ def main():
 
     print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
-    # create log dictionary and return it
-    jobid2log = {}
-    for key in jobid2cmd.keys():
-        jobid2log[key] = {}
-        jobid2log[key]['particle'] = jobid2partype
-        jobid2log[key]['sbatch_command'] = jobid2cmd[key]
-        jobid2log[key]['jobe_path'] = jobid2errfile[key]
-        jobid2log[key]['jobo_path'] = jobid2outfile[key]
+    # create log dictionary and return it if IN workflow mode
+    if flag_full_workflow:
+        jobid2log = {}
+        for key in jobid2cmd.keys():
+            jobid2log[key] = {}
+            jobid2log[key]['particle'] = jobid2partype[key]
+            jobid2log[key]['sbatch_command'] = jobid2cmd[key]
+            jobid2log[key]['jobe_path'] = jobid2errfile[key]
+            jobid2log[key]['jobo_path'] = jobid2outfile[key]
 
-    return jobid2log
+        return jobid2log
 
 
 if __name__ == '__main__':
-    main()
+    args = parser.parse_args()
+    main(args.input_dir,
+         args.config_file,
+         args.train_test_ratio,
+         args.random_seed,
+         args.n_files_per_dl1,
+         args.prod_id,
+         args.flag_workflow_mode
+         )
