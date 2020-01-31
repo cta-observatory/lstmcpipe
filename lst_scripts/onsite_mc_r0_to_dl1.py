@@ -1,7 +1,7 @@
 #!/usr//bin/env python
 
 # T. Vuillaume,
-# Modifications by E. Garcis
+# Modifications by E. Garcia
 # Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
 import random
