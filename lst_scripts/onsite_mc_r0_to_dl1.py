@@ -177,6 +177,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
                 jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
 
             # If you want to see the submitted jobs
+            # print(f'\t\t{cmd}')
             print(f'\t\tSubmitted batch job {jobid}')
             counter += 1
 
