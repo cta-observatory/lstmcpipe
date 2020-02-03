@@ -10,7 +10,7 @@ import calendar
 import lstchain
 from lstchain.io.data_management import *
 
-parser = argparse.ArgumentParser(description="MC R0 to DL1")
+parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
 parser.add_argument('input_dir', type=str,
                     help='path to the files directory to analyse',
@@ -48,18 +48,56 @@ parser.add_argument('--prod_id', action='store', type=str,
                     default=None,
                     )
 
-parser.add_argument('--flag_workflow_mode', '-flag', type=str,
-                    dest='flag_workflow_mode',
-                    help='Flag to indicate if the code is run within the r0_to_dl2 full workflow, and thus some '
-                         'arguments must be returned for the following steps.',
-                    default=False
-                    )
-
 
 def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_files_per_dl1=0,
-         prod_id=None, flag_workflow_mode=False):
+         prod_id=None, flag_full_workflow=False):
+    """
+    R0 to DL1 MC onsite conversion.
 
-    flag_full_workflow = flag_workflow_mode
+
+    Parameters
+    ----------
+    input_dir : str
+        path to the files directory to analyse
+    config_file :str
+        Path to a configuration file. If none is given, a standard configuration is applied
+    train_test_ratio :int
+        Ratio of training data. Default = 0.25
+    random_seed : int
+        Random seed for random processes. Default = 42
+    n_files_per_dl1 : int
+        Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
+        of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
+        number of files. Default = 0
+    prod_id :str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+    flag_full_workflow : bool
+        Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+
+    Returns
+    -------
+
+        jobid2log : dict (if flag_full_workflow is True)
+
+            A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
+            only the each jobid that the scripts has batched.
+
+                dict[jobid] = information
+
+            The second layer contains, organized by jobid,
+                 - the kind of particle that corresponded to the jobid
+                 - the command that was run to batch the job into the server
+                 - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
+                     when the job was send to the cluster
+
+                 dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
+
+                 ****  otherwise : (if flag_full_workflow is False, by default) ****
+                None is returned
+
+        _ # TODO V0.2 --> job management.
+
+    """
 
     today = calendar.datetime.date.today()
     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -164,21 +202,28 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
             cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
-            cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-            # the command os.popen() INDEED runs the command !
-            jobid = os.popen(cmd).read().split('\n')
+            # recover or not the jobid depending of the workflow mode
+            if not flag_full_workflow:
+                cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-            # Fill the dictionaries if IN workflow mode
-            if flag_full_workflow:
+                print(cmd)
+                # os.system(cmd)
+
+            else:  # flag_full_workflow == True !
+                cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+
+                jobid = os.popen(cmd).read().split('\n')
+
+                # Fill the dictionaries if IN workflow mode
                 jobid2cmd[jobid] = cmd
                 jobid2outfile[jobid] = jobo
                 jobid2errfile[jobid] = jobe
                 jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
 
-            # If you want to see the submitted jobs
-            # print(f'\t\t{cmd}')
-            print(f'\t\tSubmitted batch job {jobid}')
+                # print(f'\t\t{cmd}')
+                print(f'\t\tSubmitted batch job {jobid}')
+
             counter += 1
 
         print("\n\t{} jobs submitted".format(counter))
@@ -215,6 +260,5 @@ if __name__ == '__main__':
          args.train_test_ratio,
          args.random_seed,
          args.n_files_per_dl1,
-         args.prod_id,
-         args.flag_workflow_mode
+         args.prod_id
          )
