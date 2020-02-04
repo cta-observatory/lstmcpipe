@@ -105,9 +105,11 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         os.system(cmd)
 
     else:  # flag_full_workflow == True !
-
-        cmd = 'sbatch --parsable --dependency=afterok:{} -e {} -o {} --wrap="{}" '.format(wait_ids_proton_and_gammas,
-                                                                                          jobe, jobo, base_cmd)
+        # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
+        cmd = 'sbatch --parsable'
+        if wait_ids_proton_and_gammas != '':
+            cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
+        cmd += ' -e {} -o {} --wrap="{}" '.format(jobe, jobo, base_cmd)
 
         jobid_train = os.popen(cmd).read().split('\n')
         log_train[jobid_train] = cmd

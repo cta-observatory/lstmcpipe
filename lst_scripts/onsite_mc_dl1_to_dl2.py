@@ -92,8 +92,12 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
         else:  # flag_full_workflow == True !
             # TODO missing too the job.e and job.o for this stage
+            # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
+            batch_cmd = 'sbatch --parsable'
+            if wait_ids_proton_and_gammas != '':
+                batch_cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
+            batch_cmd += ' --wrap="{}"'.format(cmd)
 
-            batch_cmd = f'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().split('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd

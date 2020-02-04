@@ -179,9 +179,14 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         else:  # flag_full_workflow == True !
             # TODO missing the job.o and job.e for the sbatch of the merge and copy
+            # cmd = f'sbatch --parsable --dependency=afterok:{wait_r0_dl1_jobs} ' \
+            #       f'--wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"'
 
-            cmd = f'sbatch --parsable --dependency=afterok:{wait_r0_dl1_jobs} ' \
-                  f'--wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"'
+            cmd = 'sbatch --parsable'
+            if wait_r0_dl1_jobs != '':
+                cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
+            cmd += ' --wrap="lstchain_merge_hdf5_files -d {} -o {}"'.format(tdir, output_filename)
+
             jobid_merge = os.popen(cmd).read().split('\n')
             log_merge[particle][jobid_merge] = cmd
 
