@@ -31,6 +31,10 @@ OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
+# source env onsite - can be changed for custom install
+# source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta;'  # By default
+source_env = 'source home/enrique.garcia/.bashrc; conda activate cta-dev;'
+
 # run and batch all the steps of the code (see above)
 DO_r0_to_r1 = True
 DO_merge_and_copy = True
@@ -38,9 +42,9 @@ DO_TRAIN_PIPE = True
 DO_dl1_to_dl2 = True
 DO_dl2_to_dl3 = True
 
+#######################################################################################################################
+#######################################################################################################################
 
-#######################################################################################################################
-#######################################################################################################################
 
 def save_log_to_file(dictionary, output_file):
     """
@@ -58,8 +62,8 @@ def save_log_to_file(dictionary, output_file):
         None
     """
     with open(output_file, 'a+') as fout:
-        fout.write('\n\n  *******************************************')
-        fout.write(f'   *** Log from the {output_file} log ')
+        fout.write('\n\n  *******************************************\n')
+        fout.write(f'   *** Log from the {output_file} log \n')
         fout.write('  *******************************************\n')
         fout.write(pprint.pformat(dictionary))
 
@@ -110,15 +114,16 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobs_from_training):
     return log_batch_dl1_to_dl2, jobid_4_dl2_to_dl3
 
 
-def batch_train_pipe(dl1_directory, config_file, jobs_from_merge):
+def batch_train_pipe(log_from_merge, config_file, jobs_from_merge):
     """
     Function to batch the lstchain train_pipe once the proton and gamma-diffuse merge_and_copy_dl1 batched jobs have
     finished.
 
     Parameters
     ----------
-    dl1_directory : str
-         Directory to dl1 files to retrieve the gamma and proton dl1 files
+    log_from_merge : dict
+        dictionary containing the output name and abs path to the DL1 files, derived in merge_and_copy and saved
+        through the log
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
     jobs_from_merge : str
@@ -134,14 +139,16 @@ def batch_train_pipe(dl1_directory, config_file, jobs_from_merge):
 
     """
 
-    gamma_dl1_train_file = glob.glob(os.path.join(dl1_directory.format('gamma-diffuse'), '*training*.h5'))[0]
-    proton_dl1_train_file = glob.glob(os.path.join(dl1_directory.format('proton'), '*training*.h5'))[0]
+    gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']
+    proton_dl1_train_file = log_from_merge['proton']['training']
 
     log_train, jobid_4_dl1_to_dl2 = train_pipe(gamma_dl1_train_file,
                                                proton_dl1_train_file,
                                                config_file=config_file,
+                                               source_environment=source_env,
                                                flag_full_workflow=True,
-                                               wait_ids_proton_and_gammas=jobs_from_merge)
+                                               wait_ids_proton_and_gammas=jobs_from_merge
+                                               )
 
     return log_train, jobid_4_dl1_to_dl2
 
@@ -254,14 +261,16 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
     ids_by_particle_ok = []
 
     for particle in ALL_PARTICLES:
-        log = r0_to_dl1(input_dir.format(particle),
-                        conf_file,
-                        prod_id)
+        log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
+                                            config_file=conf_file,
+                                            prod_id=prod_id,
+                                            flag_full_workflow=True
+                                            )
 
         # Create jobid to full log information dictionary
         # And the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
-        full_log[particle] = [f for f in log.keys()]
+        full_log[particle] = jobids_by_particle
 
         # TODO in V0.2 - Job management
         # jobid_summary = check_job_output_logs(full_log[particle])  # full_log is a dict of dicts
@@ -274,10 +283,6 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow")
-
-    # parser.add_argument('input_dir', type=str,
-    #                     help='path to the r0 files directory to analyse'
-    #                     )
 
     parser.add_argument('--config_file', '-conf', action='store', type=str,
                         dest='config_file',
@@ -303,7 +308,7 @@ if __name__ == '__main__':
     PROD_ID = base_prod_id + suffix_id
     RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
     ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
-    DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING, PROD_ID)
+    DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
     DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
     print(f'The full r0 to dl3 workflow is going to be run at \n {DL0_DATA_DIR}')
@@ -314,21 +319,30 @@ if __name__ == '__main__':
     if DO_r0_to_r1:  # TODO V0.2 Job management : _ jobids to check if they have finished without erros
         log_batch_r0_dl1, _ = batch_r0_to_dl1(DL0_DATA_DIR,
                                               args.config_file,
-                                              suffix_id)
+                                              args.prod_id)
 
+        # First time opening the log --> erase
+        if os.path.exists(log_file):
+            os.remove(log_file)
         save_log_to_file(log_batch_r0_dl1, log_file)
 
     if DO_merge_and_copy:
         # TODO log_batch_r0_dl1 depends also in the job management
-        log_batch_merge_and_copy, jobs_4_train = batch_merge_and_copy_dl1(DL1_DATA_DIR,
+        log_batch_merge_and_copy, jobs_4_train = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR,
                                                                           log_batch_r0_dl1)
 
         save_log_to_file(log_batch_merge_and_copy, log_file)
     else:
         jobs_4_train = ''
+        # Create just the needed dictionary inputs as generic
+        log_batch_merge_and_copy = {'gamma-diffuse': {'training': {}}}
+        log_batch_merge_and_copy['gamma-diffuse']['training'] = glob.glob(
+            os.path.join(DL1_DATA_DIR.format('gamma-diffuse'), '*training*.h5'))[0]
+        log_batch_merge_and_copy['proton']['training'] = glob.glob(
+            os.path.join(DL1_DATA_DIR.format('proton'), '*training*.h5'))[0]
 
     if DO_TRAIN_PIPE:
-        log_batch_train_pipe, jobs_4_dl1_to_dl2 = batch_train_pipe(DL1_DATA_DIR,
+        log_batch_train_pipe, jobs_4_dl1_to_dl2 = batch_train_pipe(log_batch_merge_and_copy,
                                                                    args.config_file,
                                                                    jobs_4_train)
 

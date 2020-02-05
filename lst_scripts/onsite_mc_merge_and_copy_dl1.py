@@ -118,8 +118,10 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         log_merge = {particle: {}}
         log_merge[particle]['logs_script_test'] = []
         log_merge[particle]['logs_script_train'] = []
+        log_merge[particle]['test_output'] = []
+        log_merge[particle]['train_output'] = []
 
-        wait_r0_dl1_jobs = ','.join(map(str, particle2jobs_dict[particle].keys()))
+        wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
 
     print("\n ==== START {} ==== \n".format(sys.argv[0]))
 
@@ -170,6 +172,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         output_filename = os.path.join(running_DL1_dir, output_filename)
         print(f"\t\tmerge output: {output_filename}")
 
+        log_merge[particle][set_type] = output_filename
+
     # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the whole workflow
         filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
         if not flag_full_workflow:
@@ -187,7 +191,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
             cmd += ' --wrap="lstchain_merge_hdf5_files -d {} -o {}"'.format(tdir, output_filename)
 
-            jobid_merge = os.popen(cmd).read().split('\n')
+            jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][jobid_merge] = cmd
 
             # print(f'\t\t{cmd}')

@@ -95,7 +95,11 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
                  ****  otherwise : (if flag_full_workflow is False, by default) ****
                 None is returned
 
-        _ # TODO V0.2 --> job management.
+        jobids_r0_dl1
+
+            A list of all the jobs sent by particle (including test and train set types).
+
+            _ # TODO V0.2 --> job management.
 
     """
 
@@ -165,6 +169,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
     # dumping the training and testing lists and spliting them in sublists for parallel jobs
 
+    jobid2log = {}
+    jobids_r0_dl1 = []
+
     for set_type in 'training', 'testing':
         if set_type == 'training':
             list = training_list
@@ -188,10 +195,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
         ### LSTCHAIN ###
         counter = 0
-        jobid2cmd = {}
-        jobid2outfile = {}
-        jobid2errfile = {}
-        jobid2partype = {}
 
         for file in os.listdir(dir_lists):
             if set_type == 'training':
@@ -213,13 +216,16 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
             else:  # flag_full_workflow == True !
                 cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-                jobid = os.popen(cmd).read().split('\n')
+                jobid = os.popen(cmd).read().strip('\n')
+                jobids_r0_dl1.append(jobid)
 
                 # Fill the dictionaries if IN workflow mode
-                jobid2cmd[jobid] = cmd
-                jobid2outfile[jobid] = jobo
-                jobid2errfile[jobid] = jobe
-                jobid2partype[jobid] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
+                jobid2log[jobid] = {}
+                jobid2log[jobid]['particle'] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
+                jobid2log[jobid]['set_type'] = set_type
+                jobid2log[jobid]['jobe_path'] = jobe
+                jobid2log[jobid]['jobo_path'] = jobo
+                jobid2log[jobid]['sbatch_command'] = cmd
 
                 # print(f'\t\t{cmd}')
                 print(f'\t\tSubmitted batch job {jobid}')
@@ -242,15 +248,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
-        jobid2log = {}
-        for key in jobid2cmd.keys():
-            jobid2log[key] = {}
-            jobid2log[key]['particle'] = jobid2partype[key]
-            jobid2log[key]['sbatch_command'] = jobid2cmd[key]
-            jobid2log[key]['jobe_path'] = jobid2errfile[key]
-            jobid2log[key]['jobo_path'] = jobid2outfile[key]
 
-        return jobid2log
+        return jobid2log, jobids_r0_dl1
 
 
 if __name__ == '__main__':

@@ -98,7 +98,7 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
                 batch_cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
             batch_cmd += ' --wrap="{}"'.format(cmd)
 
-            jobid_dl1_to_dl2 = os.popen(batch_cmd).read().split('\n')
+            jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
 

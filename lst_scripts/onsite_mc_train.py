@@ -43,7 +43,8 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
     source_environment : str
-        path to lstanalyzer .bashrc file to activate a certain conda environment. By default : `conda activate cta`
+        path to the lstanalyzer .bashrc file (or an alternative .bashrc file for custom runs) to activate a
+        certain conda environment. By default : `conda activate cta`
     flag_full_workflow :  bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     wait_ids_proton_and_gammas : str
@@ -111,7 +112,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
             cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
         cmd += ' -e {} -o {} --wrap="{}" '.format(jobe, jobo, base_cmd)
 
-        jobid_train = os.popen(cmd).read().split('\n')
+        jobid_train = os.popen(cmd).read().strip('\n')
         log_train[jobid_train] = cmd
 
         return log_train, jobid_train
