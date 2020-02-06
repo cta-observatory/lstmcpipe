@@ -46,6 +46,37 @@ DO_dl2_to_dl3 = True
 #######################################################################################################################
 
 
+def create_dict_with_filenames(dl1_directory):
+    """
+    Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
+    in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow
+    it is not run from the start.
+
+    Parameters
+    ----------
+    dl1_directory: str
+        path to the dl1 directory files
+
+    Returns
+    -------
+    dl1_filename_directory : dict
+        dictionary with the name (and absolute path) of the dl1 files with the name of the particles set as key of the
+        dictionary
+
+             dl1_filename_directory[particle].keys() = ['train_path_and_outname_dl1', 'test_path_and_outname_dl1']
+    """
+    dl1_filename_directory = {}
+
+    for particle in ALL_PARTICLES:
+        dl1_filename_directory[particle] = {}
+        dl1_filename_directory[particle]['train_path_and_outname_dl1'] = glob.glob(os.path.join(
+            dl1_directory.format(particle), '*training*.h5'))[0]
+        dl1_filename_directory[particle]['test_path_and_outname_dl1'] = glob.glob(os.path.join(
+            dl1_directory.format(particle), '*testing*.h5'))[0]
+
+    return dl1_filename_directory
+
+
 def save_log_to_file(dictionary, output_file):
     """
     Dumps a dictionary (log) to a file
@@ -72,7 +103,7 @@ def batch_dl2_to_dl3():
     pass
 
 
-def batch_dl1_to_dl2(dl1_directory, config_file, jobs_from_training):
+def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_from_merge, dict_with_dl1_paths):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
@@ -82,9 +113,14 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobs_from_training):
         Path to the dl1 directory
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-    jobs_from_training : str
-        string containing the jobids from the jobs batched in the train_pipe stage, to be passed to the
+    jobid_from_training : str
+        string containing the jobid from the jobs batched in the train_pipe stage, to be passed to the
         dl1_to_dl2 function (as a slurm dependency)
+    jobids_from_merge : str
+        string containing the jobid from the jobs batched in the merge_and_copy_dl1 stage,
+        to be passed to the dl1_to_dl2 function (as a slurm dependency)
+    dict_with_dl1_paths : dict
+        Indeed the log of the merge_and_copy stage, where the final names of the dl1 files were stored
 
     Returns
     -------
@@ -99,11 +135,14 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobs_from_training):
     jobid_4_dl2_to_dl3 = []
 
     for particle in ALL_PARTICLES:
+
         log, jobid = dl1_to_dl2(dl1_directory.format(particle),
                                 config_file=config_file,
                                 flag_full_workflow=True,
-                                wait_ids_proton_and_gammas=jobs_from_training,
-                                particle=particle
+                                particle=particle,
+                                wait_jobid_train_pipe=jobid_from_training,
+                                wait_jobids_merge=jobids_from_merge,
+                                dictionary_with_dl1_paths=dict_with_dl1_paths[particle]
                                 )
 
         log_dl1_to_dl2.update(log)
@@ -114,7 +153,7 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobs_from_training):
     return log_batch_dl1_to_dl2, jobid_4_dl2_to_dl3
 
 
-def batch_train_pipe(log_from_merge, config_file, jobs_from_merge):
+def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     """
     Function to batch the lstchain train_pipe once the proton and gamma-diffuse merge_and_copy_dl1 batched jobs have
     finished.
@@ -126,28 +165,29 @@ def batch_train_pipe(log_from_merge, config_file, jobs_from_merge):
         through the log
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-    jobs_from_merge : str
-        string containing the jobids from the jobs batched in the merge_and_copy_dl1 stage, to be passed to the
-        train_pipe function (as a slurm dependency)
+    jobids_from_merge : str
+        string containing the jobids (***ONLY from proton and gamma-diffuse***) from the jobs batched in the
+         merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency)
 
     Returns
     -------
         log_train : dict
             Dictionary containing the log of the batched train_pipe jobs
         jobid_4_dl1_to_dl2 : str
-            string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+            string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
+            For the next stage, however, it will be needed TRAIN + MERGED jobs
 
     """
 
-    gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']
-    proton_dl1_train_file = log_from_merge['proton']['training']
+    gamma_dl1_train_file = log_from_merge['gamma-diffuse']['train_path_and_outname_dl1']
+    proton_dl1_train_file = log_from_merge['proton']['train_path_and_outname_dl1']
 
     log_train, jobid_4_dl1_to_dl2 = train_pipe(gamma_dl1_train_file,
                                                proton_dl1_train_file,
                                                config_file=config_file,
                                                source_environment=source_env,
                                                flag_full_workflow=True,
-                                               wait_ids_proton_and_gammas=jobs_from_merge
+                                               wait_ids_proton_and_gammas=jobids_from_merge
                                                )
 
     return log_train, jobid_4_dl1_to_dl2
@@ -220,8 +260,7 @@ def check_job_output_logs(dict_particle_jobid):
 
     jobid_dependecies = ','.join(map(str, dict_particle_jobid.keys()))
     cmd = f'sbatch --parsable ---dependency=afterok:{jobid_dependecies} --wrap="python  THE_CODE_TO_PARSE_OUTPUT.py"'
-    # TODO V0.2 - Job management
-    # TODO THE_CODE_TO_PARSE_OUTPUT.py
+    # TODO V0.2 - Job management & THE_CODE_TO_PARSE_OUTPUT.py
 
     ids_single_particle_ok = os.popen(cmd).read().split('\n')
 
@@ -327,33 +366,33 @@ if __name__ == '__main__':
         save_log_to_file(log_batch_r0_dl1, log_file)
 
     if DO_merge_and_copy:
-        # TODO log_batch_r0_dl1 depends also in the job management
-        log_batch_merge_and_copy, jobs_4_train = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR,
+        # TODO log_batch_r0_dl1 take place also in the job management
+        log_batch_merge_and_copy, jobs_from_merge = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR,
                                                                           log_batch_r0_dl1)
 
         save_log_to_file(log_batch_merge_and_copy, log_file)
     else:
-        jobs_4_train = ''
-        # Create just the needed dictionary inputs as generic
-        log_batch_merge_and_copy = {'gamma-diffuse': {'training': {}}}
-        log_batch_merge_and_copy['gamma-diffuse']['training'] = glob.glob(
-            os.path.join(DL1_DATA_DIR.format('gamma-diffuse'), '*training*.h5'))[0]
-        log_batch_merge_and_copy['proton']['training'] = glob.glob(
-            os.path.join(DL1_DATA_DIR.format('proton'), '*training*.h5'))[0]
+        # Create just the needed dictionary inputs (d)
+        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR)
+        jobs_from_merge = ''
 
     if DO_TRAIN_PIPE:
-        log_batch_train_pipe, jobs_4_dl1_to_dl2 = batch_train_pipe(log_batch_merge_and_copy,
-                                                                   args.config_file,
-                                                                   jobs_4_train)
+        log_batch_train_pipe, job_from_train_pipe = batch_train_pipe(log_batch_merge_and_copy,
+                                                                     args.config_file,
+                                                                     jobs_from_merge)
 
         save_log_to_file(log_batch_train_pipe, log_file)
     else:
-        jobs_4_dl1_to_dl2 = ''
+        job_from_train_pipe = ''
+        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR)
 
     if DO_dl1_to_dl2:
         log_batch_dl1_to_dl2, jobs_4_dl2_to_dl3 = batch_dl1_to_dl2(DL1_DATA_DIR,
                                                                    args.config_file,
-                                                                   jobs_4_dl1_to_dl2)
+                                                                   job_from_train_pipe,  # Single jobid from train
+                                                                   jobs_from_merge,  # jobids by particle
+                                                                   log_batch_merge_and_copy  # finale dl1 names
+                                                                   )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file)
 

@@ -115,7 +115,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
     DL0_DATA_DIR = input_dir
 
-    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    if not flag_full_workflow:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    else:
+        print("\n ==== START {} ==== \n".format('r0_to_dl1_workflow'))
 
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
@@ -244,12 +247,14 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
 
-    print("\n ==== END {} ==== \n".format(sys.argv[0]))
-
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
 
+        print("\n ==== END {} ==== \n".format('r0_to_dl1_workflow'))
         return jobid2log, jobids_r0_dl1
+
+    else:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
 
 if __name__ == '__main__':

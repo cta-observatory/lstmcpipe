@@ -71,10 +71,12 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
     """
 
-    print("\n ==== START {} ==== \n".format(sys.argv[0]))
-
     if flag_full_workflow:
         log_train = {}
+        print("\n ==== START {} ==== \n".format('mc_train_workflow'))
+
+    else:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
 
     dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
@@ -123,7 +125,10 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     if config_file is not None:
         shutil.copy(config_file, os.path.join(models_dir, os.path.basename(config_file)))
 
-    print("\n ==== END {} ==== \n".format(sys.argv[0]))
+    if flag_full_workflow:
+        print("\n ==== START {} ==== \n".format('mc_train_workflow'))
+    else:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
 
 if __name__ == '__main__':

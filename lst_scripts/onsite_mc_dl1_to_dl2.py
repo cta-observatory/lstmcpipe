@@ -27,8 +27,8 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
                     )
 
 
-def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False,
-         wait_ids_proton_and_gammas=None, particle=None):
+def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False, particle=None,
+         wait_jobid_train_pipe=None, wait_jobids_merge=None, dictionary_with_dl1_paths=None):
     """
     Convert onsite files from dl1 to dl2"
 
@@ -42,13 +42,19 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         Path to a configuration file. If none is given, a standard configuration is applied
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
-    wait_ids_proton_and_gammas : str
-        a string (of chained jobids separated by ',' and without spaces between each element), to indicate the
-        dependencies of the job to be batched
-        COMPULSORY argument when flag_full_workflow is set to True.
     particle : str
         Type of particle used to create the log and dictionary
-        COMPULSORY argument when flag_full_workflow is set to True.
+            ! COMPULSORY argument when flag_full_workflow is set to True.
+    wait_jobid_train_pipe : str
+        a string with the batched jobid from the train stage to indicate the
+        dependencies of the job to be batched
+            ! COMPULSORY argument when flag_full_workflow is set to True.
+    wait_jobids_merge : str
+        string with merge_and_copy jobids
+            ! COMPULSORY argument when flag_full_workflow is set to True.
+    dictionary_with_dl1_paths : dict
+        Dictionary with 'particles' as keys containing final outnames of dl1 files.
+            ! COMPULSORY argument when flag_full_workflow is set to True.
 
     Returns
     -------
@@ -68,18 +74,36 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
     """
 
-    if flag_full_workflow:
-        log_dl1_to_dl2 = {particle: {}}
-
     output_dir = input_dir.replace('DL1', 'DL2')
 
     check_and_make_dir(output_dir)
 
     print(f"Output dir: {output_dir}")
 
-    file_list = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.startswith('dl1_')]
+    if flag_full_workflow:
+        print("\n ==== START {} ==== \n".format('dl1_to_dl2_workflow'))
 
-    query_continue(f"{len(file_list)} jobs,  ok?")
+        log_dl1_to_dl2 = {particle: {}}
+
+        # path to dl1 files by particle type
+        # file_list = [file for file in dictionary_with_dl1_paths[particle].values()]
+        file_list = [dictionary_with_dl1_paths[particle]['train_path__and_outname_dl1'],
+                     dictionary_with_dl1_paths[particle]['test_path__and_outname_dl1']]
+
+        if wait_jobid_train_pipe == '':
+            wait_jobs = wait_jobids_merge
+        elif wait_jobids_merge == '':
+            wait_jobs = wait_jobid_train_pipe
+        elif wait_jobids_merge == '' and wait_jobid_train_pipe == '':
+            wait_jobs = ''
+        else:
+            wait_jobs = ','.join([wait_jobid_train_pipe, wait_jobids_merge])
+
+    else:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        file_list = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.startswith('dl1_')]
+
+        query_continue(f"{len(file_list)} jobs,  ok?")
 
     for file in file_list:
         cmd = f'lstchain_mc_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}'
@@ -94,8 +118,8 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
             # TODO missing too the job.e and job.o for this stage
             # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
             batch_cmd = 'sbatch --parsable'
-            if wait_ids_proton_and_gammas != '':
-                batch_cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
+            if wait_jobs != '':
+                batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
             batch_cmd += ' --wrap="{}"'.format(cmd)
 
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')

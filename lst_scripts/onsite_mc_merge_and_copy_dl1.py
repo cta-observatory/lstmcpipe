@@ -100,14 +100,15 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             dictionary of dictionaries containing the log information of this script and the jobid of the batched job,
             separated by particle
 
-             - log_merge[particle].keys() = ['logs_script_test', 'logs_script_train']
+             - log_merge[particle].keys() = ['logs_script_test', 'logs_script_train', 'train_path__and_outname_dl1',
+                                             'test_path__and_outname_dl1', 'jobid']
 
             ****  otherwise : (if flag_full_workflow is False, by default) ****
             None is returned
 
         jobid_merge : str (if flag_full_workflow is True)
             jobid of the batched job to be send (for dependencies purposes) to the next stage of the workflow
-            (train_pipe)
+            (train_pipe), by particle
 
             ****  otherwise : (if flag_full_workflow is False, by default)
             None is returned
@@ -116,14 +117,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
     if flag_full_workflow:
         log_merge = {particle: {}}
-        log_merge[particle]['logs_script_test'] = []
-        log_merge[particle]['logs_script_train'] = []
-        log_merge[particle]['test_output'] = []
-        log_merge[particle]['train_output'] = []
 
         wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
 
-    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
+
+    else:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
 
     JOB_LOGS = os.path.join(input_dir, 'job_logs')
     training_filelist = os.path.join(input_dir, 'training.list')
@@ -147,7 +147,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         elif tf != [] and flag_full_workflow:
             to_log = "\t{} files from the training list are not in the `DL1/training` directory:\n{} " \
                      "\tCannot stop workflow. CHECK LATER !".format(len(tf), tf)
-            log_merge[particle]['logs_script_train'].append(to_log)
+            log_merge[particle]['logs_script_train'] = to_log
 
     if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
         tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
@@ -157,7 +157,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         elif tf != [] and flag_full_workflow:
             to_log = "\t{} files from the testing list are not in the `DL1/testing directory:\n{} " \
                      "\tCannot stop workflow. CHECK LATER !".format(len(tf), tf)
-            log_merge[particle]['logs_script_test'].append(to_log)
+            log_merge[particle]['logs_script_test'] = to_log
 
     # 3. merge DL1 files
     print("\tmerging starts")
@@ -172,7 +172,10 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         output_filename = os.path.join(running_DL1_dir, output_filename)
         print(f"\t\tmerge output: {output_filename}")
 
-        log_merge[particle][set_type] = output_filename
+        if set_type == 'training':
+            log_merge[particle]['train_path__and_outname_dl1'] = output_filename
+        else:
+            log_merge[particle]['test_path_and_outname_dl1'] = output_filename
 
     # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the whole workflow
         filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
@@ -212,10 +215,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
     move_dir_content(input_dir, logs_destination_dir)
     print("\tLOGS have been moved to {}".format(logs_destination_dir))
 
-    print("\n ==== END {} ==== \n".format(sys.argv[0]))
-
     if flag_full_workflow:
+        print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
+
         return log_merge, jobid_merge
+
+    else:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
 
 if __name__ == '__main__':
