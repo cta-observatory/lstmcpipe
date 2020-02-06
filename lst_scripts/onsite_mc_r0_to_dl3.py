@@ -26,7 +26,8 @@ from .data_management import *
 
 #######################################################################################################################
 #######################################################################################################################
-BASE_PATH = '/fefs/aswg/data/mc'
+# BASE_PATH = '/fefs/aswg/data/mc'
+BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2'
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
@@ -142,7 +143,7 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_fro
                                 particle=particle,
                                 wait_jobid_train_pipe=jobid_from_training,
                                 wait_jobids_merge=jobids_from_merge,
-                                dictionary_with_dl1_paths=dict_with_dl1_paths[particle]
+                                dictionary_with_dl1_paths=dict_with_dl1_paths
                                 )
 
         log_dl1_to_dl2.update(log)
@@ -150,7 +151,7 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_fro
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_4_dl2_to_dl3)
 
-    return log_batch_dl1_to_dl2, jobid_4_dl2_to_dl3
+    return log_dl1_to_dl2, jobid_4_dl2_to_dl3
 
 
 def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):

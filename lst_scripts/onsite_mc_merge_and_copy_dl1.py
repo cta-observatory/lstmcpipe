@@ -173,7 +173,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         print(f"\t\tmerge output: {output_filename}")
 
         if set_type == 'training':
-            log_merge[particle]['train_path__and_outname_dl1'] = output_filename
+            log_merge[particle]['train_path_and_outname_dl1'] = output_filename
         else:
             log_merge[particle]['test_path_and_outname_dl1'] = output_filename
 
