@@ -7,6 +7,8 @@
 
 conda activate cta
 
+# source /home/enrique.garcia/.bashrc
+# conda activate cta-dev
 
 CMD=$1
 filelist=$2
