@@ -58,19 +58,19 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
     Returns
     -------
-        log_dl1_to_dl2 : dict
-            dictionary of dictionaries containing the jobid of the batched job as key and the run command (the
-            lstchain_mc_dl1_to_dl2 command with all its corresponding arguments) as value.
+    log_dl1_to_dl2 : dict
+        dictionary of dictionaries containing the jobid of the batched job as key and the run command (the
+        lstchain_mc_dl1_to_dl2 command with all its corresponding arguments) as value.
 
-            ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default) ****
+        None is returned
 
-        jobid_dl1_to_dl2 : str
-            jobid of the batched job to be send (for dependencies purposes) to the next stage of the
-            workflow (#TODO dl2_to_dl3 ??)
+    jobid_dl1_to_dl2 : str
+        jobid of the batched job to be send (for dependencies purposes) to the next stage of the
+        workflow (#TODO dl2_to_dl3 ??)
 
-            ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default) ****
+        None is returned
 
     """
 
@@ -87,8 +87,10 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
         # path to dl1 files by particle type
         # file_list = [file for file in dictionary_with_dl1_paths[particle].values()]
-        file_list = [dictionary_with_dl1_paths[particle]['train_path_and_outname_dl1'],
-                     dictionary_with_dl1_paths[particle]['test_path_and_outname_dl1']]
+        file_list = [dictionary_with_dl1_paths[particle]['training']['train_path_and_outname_dl1'],
+                     dictionary_with_dl1_paths[particle]['testing']['test_path_and_outname_dl1']]
+
+        return_jobids = []
 
         if wait_jobid_train_pipe == '':
             wait_jobs = wait_jobids_merge
@@ -125,8 +127,15 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
+            return_jobids.append(jobid_dl1_to_dl2)
 
-            return log_dl1_to_dl2, jobid_dl1_to_dl2
+    if not flag_full_workflow:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+    else:
+        print("\n ==== END {} ==== \n".format('dl1_to_dl2_workflow'))
+        return_jobids = ','.join(return_jobids)
+
+        return log_dl1_to_dl2, return_jobids
 
 
 if __name__ == '__main__':

@@ -69,10 +69,10 @@ def create_dict_with_filenames(dl1_directory):
     dl1_filename_directory = {}
 
     for particle in ALL_PARTICLES:
-        dl1_filename_directory[particle] = {}
-        dl1_filename_directory[particle]['train_path_and_outname_dl1'] = glob.glob(os.path.join(
+        dl1_filename_directory[particle] = {'training': {}, 'testing': {}}
+        dl1_filename_directory[particle]['training']['train_path_and_outname_dl1'] = glob.glob(os.path.join(
             dl1_directory.format(particle), '*training*.h5'))[0]
-        dl1_filename_directory[particle]['test_path_and_outname_dl1'] = glob.glob(os.path.join(
+        dl1_filename_directory[particle]['testing']['test_path_and_outname_dl1'] = glob.glob(os.path.join(
             dl1_directory.format(particle), '*testing*.h5'))[0]
 
     return dl1_filename_directory
@@ -189,8 +189,8 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     """
     debug_log = {}
 
-    gamma_dl1_train_file = log_from_merge['gamma-diffuse']['train_path_and_outname_dl1']
-    proton_dl1_train_file = log_from_merge['proton']['train_path_and_outname_dl1']
+    gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
+    proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
 
     log_train, jobid_4_dl1_to_dl2 = train_pipe(gamma_dl1_train_file,
                                                proton_dl1_train_file,
@@ -241,18 +241,20 @@ def batch_merge_and_copy_dl1(dl1_directory, log_jobs_from_r0_to_dl1):
     debug_log = {}
 
     for particle in ALL_PARTICLES:
-        log, jobid = merge_and_copy_dl1(dl1_directory.format(particle),
+        log, jobid, jobid_debug = merge_and_copy_dl1(dl1_directory.format(particle),
                                         flag_full_workflow=True,
                                         particle2jobs_dict=log_jobs_from_r0_to_dl1,
                                         particle=particle
                                         )
+        # TODO jobid_debug
 
         log_merge_and_copy.update(log)
         if particle is 'gamma-diffuse' or particle is 'proton':
             jobid_4_train.append(jobid)
 
-        debug_log[jobid] = f'{particle} job from merge_and_copy_dl1. Depends on ' \
-                           f'{log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs'
+        debug_log[jobid_debug] = f'{particle} jobs from merge_and_copy_dl1. Depends on ' \
+                           f'{log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
+        debug_log[jobid] = f'{particle} train job from merge_and_copy_dl1 to be passed to mege_pipe.'
 
     jobid_4_train = ','.join(jobid_4_train)
 

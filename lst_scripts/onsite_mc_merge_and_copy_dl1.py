@@ -96,31 +96,36 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
     Returns
     -------
 
-        log_merge : dict (if flag_full_workflow is True)
-            dictionary of dictionaries containing the log information of this script and the jobid of the batched job,
-            separated by particle
+    log_merge : dict (if flag_full_workflow is True)
+        dictionary of dictionaries containing the log information of this script and the jobid of the batched job,
+        separated by particle
 
-             - log_merge[particle][set_type].keys() = ['logs_script_test or logs_script_train',
-                                            'train_path_and_outname_dl1 or test_path_and_outname_dl1', 'jobid']
+         - log_merge[particle][set_type].keys() = ['logs_script_test or logs_script_train',
+                                        'train_path_and_outname_dl1 or test_path_and_outname_dl1', 'jobid']
 
-            ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default) ****
+        None is returned
 
-        jobid_merge : str (if flag_full_workflow is True)
-            jobid of the batched job to be send (for dependencies purposes) to the next stage of the workflow
-            (train_pipe), by particle
+    jobid_merge : str (if flag_full_workflow is True)
+        jobid of the batched job to be send (for dependencies purposes) to the next stage of the workflow
+        (train_pipe), by particle
 
-            ****  otherwise : (if flag_full_workflow is False, by default)
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default)
+        None is returned
+
+    return_jobids_debug ; debug purpose.
 
     """
 
     if flag_full_workflow:
-        log_merge = {particle: {}}
+        log_merge = {particle: {'training': {}, 'testing': {}}}
 
         wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
 
         print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
+
+        return_jobids_train = []
+        return_jobids_debug = []
 
     else:
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
@@ -144,21 +149,12 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         if tf != [] and not flag_full_workflow:
             query_continue("{} files from the training list are not in the `DL1/training` directory:\n{} "
                            "Continue ?".format(len(tf), tf))
-        # elif tf != [] and flag_full_workflow:
-            # TODO nonsense, files are never gonna be there. Just passed the output filename
-            # to_log = "\t{} files from the training list are not in the `DL1/training` directory:\n{} " \
-            #          "\tCannot stop workflow. CHECK LATER !".format(len(tf), tf)
-            # log_merge[particle]['logs_script_train'] = to_log
 
     if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
         tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
         if tf != [] and not flag_full_workflow:
             query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
                            "Continue ?".format(len(tf), tf))
-        # elif tf != [] and flag_full_workflow:
-        #     to_log = "\t{} files from the testing list are not in the `DL1/testing directory:\n{} " \
-        #              "\tCannot stop workflow. CHECK LATER !".format(len(tf), tf)
-        #     log_merge[particle]['logs_script_test'] = to_log
 
     # 3. merge DL1 files
     print("\tmerging starts")
@@ -173,7 +169,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         output_filename = os.path.join(running_DL1_dir, output_filename)
         print(f"\t\tmerge output: {output_filename}")
 
-    # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the whole workflow
+        # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the
+        # whole workflow
         filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
         if not flag_full_workflow:
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
@@ -195,14 +192,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             move_dir_content(input_dir, logs_destination_dir)
             print("\tLOGS have been moved to {}".format(logs_destination_dir))
 
-            print("\n ==== END {} ==== \n".format(sys.argv[0]))
-
         else:  # flag_full_workflow == True !
             # TODO missing the job.o and job.e for the sbatch of the merge and copy
             # cmd = f'sbatch --parsable --dependency=afterok:{wait_r0_dl1_jobs} ' \
             #       f'--wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"'
 
-            log_merge[particle] = {set_type: {}}
             if set_type == 'training':
                 log_merge[particle][set_type]['train_path_and_outname_dl1'] = output_filename
             else:
@@ -217,29 +211,50 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # log_merge[particle][set_type][jobid_merge] = cmd
 
             # print(f'\t\t{cmd}')
-            print(f'\t\tSubmitted batch job {jobid_merge}')
+            print(f'\t\tSubmitted batch job {jobid_merge} -- {particle}, {set_type}')
 
-            # 4. & 5. in the case of the full workflow are done in a separate job - otherwise cannot be batched
+            # 4. & 5. in the case of the full workflow are done in a separate job to wait merge
             # 4 --> move DL1 files in final place
             # 5 --> move running_dir as logs
+
             check_and_make_dir(final_DL1_dir)
             check_and_make_dir(logs_destination_dir)
 
-            cmd2 = f'sbatch --parsable --dependency=afterok:{jobid_merge} ./utils/copy_dl1_when_in_workflow.py' \
-                   f' --dl1_dir {final_DL1_dir} --run_dl1 {running_DL1_dir} --logs_dir {logs_destination_dir} ' \
-                   f'--indir {input_dir}'
-            jobid_move = os.popen(cmd2).read().strip('\n')
+            print("\tDL1 files will be moved to {}".format(final_DL1_dir))
+            cmd_move_dl1 = f'sbatch --parsable --dependency=afterok:{jobid_merge} --wrap="' \
+                           f'move_dir_content({running_DL1_dir}, {final_DL1_dir})"'
+            cmd_move_log = f'sbatch --parsable --dependency=afterok:{jobid_merge} --wrap="' \
+                           f'move_dir_content({input_dir}, {logs_destination_dir})"'
 
-            print(f'\t\tSubmitted batch job {jobid_move}. It will move dl1 files when {jobid_merge} finishes.')
+            jobid_move_dl1 = os.popen(cmd_move_dl1).read().strip('\n')
+            jobid_move_log = os.popen(cmd_move_log).read().strip('\n')
 
-            log_merge[particle][set_type][jobid_move] = cmd
+            # Will return only 1 job per particle, the training one.
+            if set_type == 'training':
+                return_jobids_train.append(jobid_move_dl1)
+            # Store all jobids for debug
+            return_jobids_debug.append(jobid_merge)
 
-            print("\tDL1 files have been moved to {}".format(final_DL1_dir))
-            print("\tLOGS have been moved to {}".format(logs_destination_dir))
+            print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {jobid_merge} finishes.')
+            print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {jobid_merge} finishes.')
 
-            print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
+            print("\tLOGS will be moved to {}".format(logs_destination_dir))
 
-            return log_merge, jobid_move  #, jobid_merge
+            # Little 'astuce' (it will not be clear in log). These keys are stored here for 2 purposes:
+            # 1 - In train_pipe recover final dl1 names and path.
+            # 2 - In dl1_to_dl2 recover the jobids of the merged dl1 files; (all dl1 files MUST be merged and moved
+            # to dl1_dir), so instead of storing the jobid that merges all the *particle*_dl1 (jobid_merge), it will
+            # be store the jobid that move the dl1 final file to dl1_dior
+            log_merge[particle][set_type][jobid_move_dl1] = cmd_move_dl1
+
+    if not flag_full_workflow:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+    else:
+        print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
+
+        return_jobids_debug = ','.join(return_jobids_debug)
+
+        return log_merge, return_jobids_train, return_jobids_debug  # , jobid_merge
 
 
 if __name__ == '__main__':

@@ -55,19 +55,19 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
     Returns
     -------
-        log_train : dict (if flag_full_workflow is True)
-            dictionary containing the jobid of the batched job as key and the run command (the lstchain_mc_train
-            command with all its corresponding arguments) as value.
+    log_train : dict (if flag_full_workflow is True)
+        dictionary containing the jobid of the batched job as key and the run command (the lstchain_mc_train
+        command with all its corresponding arguments) as value.
 
-            ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default) ****
+        None is returned
 
-        jobid_train : str (if flag_full_workflow is True)
-            jobid of the batched job to be send (for dependencies purposes) to the next stage of the
-            workflow (onsite_mc_dl1_to_dl2)
+    jobid_train : str (if flag_full_workflow is True)
+        jobid of the batched job to be send (for dependencies purposes) to the next stage of the
+        workflow (onsite_mc_dl1_to_dl2)
 
-            ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+        ****  otherwise : (if flag_full_workflow is False, by default) ****
+        None is returned
 
     """
 
@@ -125,10 +125,10 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     if config_file is not None:
         shutil.copy(config_file, os.path.join(models_dir, os.path.basename(config_file)))
 
-    if flag_full_workflow:
-        print("\n ==== START {} ==== \n".format('mc_train_workflow'))
-    else:
+    if not flag_full_workflow:
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
+    else:
+        print("\n ==== END {} ==== \n".format('mc_train_workflow'))
 
 
 if __name__ == '__main__':
