@@ -105,10 +105,11 @@ for t in ['testing', 'training']:
     print(f"merge output: {output_filename}")
 
     filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
-    
+
     cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} "
     cmd += "--no-image True"
     os.system(cmd)
+
 
 
 # 4. move DL1 files in final place

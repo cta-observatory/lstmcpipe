@@ -43,7 +43,7 @@ def main():
 
 #     check_prod_id(dl1_gamma_dir, dl1_proton_dir)
 
-    models_dir = dl1_proton_dir.replace('/mc/dl1', '/models')
+    models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
     print(f"Models will be placed in {models_dir}")
