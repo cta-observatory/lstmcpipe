@@ -88,6 +88,9 @@ if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
         query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
                      "Continue ?".format(len(tf), tf))
 
+        
+print(DL1_training_dir)
+
 # 3. merge DL1 files
 print("merging starts")
 for t in ['testing', 'training']:
@@ -102,7 +105,10 @@ for t in ['testing', 'training']:
     print(f"merge output: {output_filename}")
 
     filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
-    smart_merge_h5files(filelist, output_filename)
+    
+    cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} "
+    cmd += "--no-image True"
+    os.system(cmd)
 
 
 # 4. move DL1 files in final place
@@ -111,7 +117,7 @@ move_dir_content(running_DL1_dir, final_DL1_dir)
 print("DL1 files have been moved in {}".format(final_DL1_dir))
 
 # copy lstchain config file there too
-config_files = [os.path.join(running_DL1_dir, f) for f in os.listdir(running_DL1_dir) if f.endswith('.json')]
+config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
 for file in config_files:
     shutil.copyfile(file,  os.path.join(final_DL1_dir, os.path.basename(file)))
 
