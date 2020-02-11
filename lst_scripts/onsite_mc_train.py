@@ -11,6 +11,7 @@ import os
 import shutil
 import argparse
 from lstchain.io.data_management import *
+# from data_management import *
 
 parser = argparse.ArgumentParser(description="Train models onsite")
 
@@ -40,11 +41,12 @@ def main():
     dl1_gamma_dir = os.path.dirname(os.path.abspath(args.gamma_dl1_training_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(args.proton_dl1_training_file))
 
-    check_prod_id(dl1_gamma_dir, dl1_proton_dir)
+#     check_prod_id(dl1_gamma_dir, dl1_proton_dir)
 
     models_dir = dl1_proton_dir.replace('/mc/dl1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
+    print(f"Models will be placed in {models_dir}")
     check_and_make_dir(models_dir)
 
     base_cmd = ''
@@ -62,7 +64,8 @@ def main():
     cmd = 'sbatch -e {} -o {} --wrap "{}" '.format(jobe, jobo, base_cmd)
 
     print(cmd)
-    os.system(cmd)
+#     os.system(cmd)
+    os.system(base_cmd)
 
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(models_dir, os.path.basename(sys.argv[0])))
