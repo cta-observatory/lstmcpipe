@@ -101,6 +101,12 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         else:
             wait_jobs = ','.join([wait_jobid_train_pipe, wait_jobids_merge])
 
+        job_name = {'electron': 'e_dl1-dl2',
+                    'gamma': 'g_dl1-dl2',
+                    'gamma-diffuse': 'gd_dl1-dl2',
+                    'proton': 'p_dl1-dl2'
+                    }
+
     else:
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
         file_list = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.startswith('dl1_')]
@@ -122,7 +128,7 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
             batch_cmd = 'sbatch --parsable'
             if wait_jobs != '':
                 batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
-            batch_cmd += ' --wrap="{}"'.format(cmd)
+            batch_cmd += ' -J {} --wrap="{}"'.format(job_name[particle], cmd)
 
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 

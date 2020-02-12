@@ -77,29 +77,29 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
     Returns
     -------
 
-        jobid2log : dict (if flag_full_workflow is True)
+    jobid2log : dict (if flag_full_workflow is True)
 
-            A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
-            only the each jobid that the scripts has batched.
+        A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
+        only the each jobid that the scripts has batched.
 
-                dict[jobid] = information
+            dict[jobid] = information
 
-            The second layer contains, organized by jobid,
-                 - the kind of particle that corresponded to the jobid
-                 - the command that was run to batch the job into the server
-                 - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
-                     when the job was send to the cluster
+        The second layer contains, organized by jobid,
+             - the kind of particle that corresponded to the jobid
+             - the command that was run to batch the job into the server
+             - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
+                 when the job was send to the cluster
 
-                 dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
+             dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
 
-                 ****  otherwise : (if flag_full_workflow is False, by default) ****
-                None is returned
+             ****  otherwise : (if flag_full_workflow is False, by default) ****
+            None is returned
 
-        jobids_r0_dl1
+    jobids_r0_dl1
 
-            A list of all the jobs sent by particle (including test and train set types).
+        A list of all the jobs sent by particle (including test and train set types).
 
-            _ # TODO V0.2 --> job management.
+        _ # TODO V0.2 --> job management.
 
     """
 
@@ -217,14 +217,23 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
                 # os.system(cmd)
 
             else:  # flag_full_workflow == True !
-                cmd = 'sbatch --parsable -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+                job_name = {'electron': 'e_r0-dl1',
+                            'gamma': 'g_r0-dl1',
+                            'gamma-diffuse': 'gd_r0-dl1',
+                            'proton': 'p_r0-dl1'
+                            }
+
+                particle_type = DL0_DATA_DIR.split('/')[-2]
+
+                cmd = 'sbatch --parsable -e {} -o {} {} -J {} {}'.format(jobe, jobo, base_cmd, job_name[particle_type],
+                                                                         os.path.join(dir_lists, file))
 
                 jobid = os.popen(cmd).read().strip('\n')
                 jobids_r0_dl1.append(jobid)
 
                 # Fill the dictionaries if IN workflow mode
                 jobid2log[jobid] = {}
-                jobid2log[jobid]['particle'] = DL0_DATA_DIR.split('/')[-2]  # Hardcoded, maybe if with 4 elif s ?
+                jobid2log[jobid]['particle'] = particle_type
                 jobid2log[jobid]['set_type'] = set_type
                 jobid2log[jobid]['jobe_path'] = jobe
                 jobid2log[jobid]['jobo_path'] = jobo
