@@ -200,6 +200,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         move_dir_content(input_dir, logs_destination_dir)
         print("\tLOGS have been moved to {}".format(logs_destination_dir))
 
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+
     else:  # flag_full_workflow == True !
 
         # 3. merge DL1 files
@@ -289,9 +291,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                                         running_DL1_dir,
                                                                         final_DL1_dir)
 
-    if not flag_full_workflow:
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
-    else:
         print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
         return_jobids4train = ','.join(return_jobids4train)
