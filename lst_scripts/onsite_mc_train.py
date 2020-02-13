@@ -6,6 +6,7 @@
 
 import argparse
 from lstchain.io.data_management import *
+# from data_management import *
 
 parser = argparse.ArgumentParser(description="Train models onsite")
 
@@ -87,6 +88,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
+    print(f"Models will be placed in {models_dir}")
     check_and_make_dir(models_dir)
 
     base_cmd = ''
@@ -117,8 +119,6 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         jobid_train = os.popen(cmd).read().strip('\n')
         log_train[jobid_train] = cmd
 
-        return log_train, jobid_train
-
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(models_dir, os.path.basename(sys.argv[0])))
     # copy config file into logs
@@ -129,6 +129,8 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
     else:
         print("\n ==== END {} ==== \n".format('mc_train_workflow'))
+
+        return log_train, jobid_train
 
 
 if __name__ == '__main__':

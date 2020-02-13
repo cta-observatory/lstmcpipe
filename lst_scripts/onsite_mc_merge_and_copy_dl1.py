@@ -143,8 +143,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
+            cmd += "--no-image True"
             os.system(cmd)
-            # smart_merge_h5files(filelist, output_filename)
 
         # 4. move DL1 files in final place
         check_and_make_dir(final_DL1_dir)
