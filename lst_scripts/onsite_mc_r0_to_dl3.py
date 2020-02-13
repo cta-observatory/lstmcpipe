@@ -143,7 +143,6 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_fro
     debug_log = {}
 
     for particle in ALL_PARTICLES:
-
         log, jobid = dl1_to_dl2(dl1_directory.format(particle),
                                 config_file=config_file,
                                 flag_full_workflow=True,
@@ -157,7 +156,7 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_fro
         jobid_4_dl2_to_dl3.append(jobid)
 
         debug_log[jobid] = f'{particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} training ' \
-                           f'jobs AND  from {jobids_from_merge[particle]} merge_and_copy jobs'
+                           f'jobs AND  from {jobids_from_merge} merge_and_copy jobs'
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_4_dl2_to_dl3)
 
@@ -232,32 +231,37 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
 
     jobid_4_train : str
          string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+    all_merge : str
+        string containing all the jobs to indicate that all the dl1 are correctly finished (for dl1_to_dl2)
     debug_log : dict
         Debug purposes
 
     """
     log_merge_and_copy = {}
     jobid_4_train = []
+    all_merge = []
     debug_log = {}
 
     for particle in ALL_PARTICLES:
         log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
-                                        flag_full_workflow=True,
-                                        particle2jobs_dict=log_jobs_from_r0_to_dl1,
-                                        particle=particle
-                                        )
+                                                     flag_full_workflow=True,
+                                                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                                                     particle=particle
+                                                     )
 
         log_merge_and_copy.update(log)
+        all_merge.append(jobid)
         if particle is 'gamma-diffuse' or particle is 'proton':
             jobid_4_train.append(jobid)
 
-        debug_log[jobid] = f'{particle} merge jobs to train_pipe. Thet depend on {log_jobs_from_r0_to_dl1[particle]} ' \
+        debug_log[jobid] = f'{particle} merge jobs to train_pipe. The depend on {log_jobs_from_r0_to_dl1[particle]} ' \
                            f'r0_t0_dl1 jobs.'
         debug_log[jobid_debug] = f'All the {particle} jobs that have been launched in  merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
+    all_merge = ','.join(all_merge)
 
-    return log_merge_and_copy, jobid_4_train, debug_log
+    return log_merge_and_copy, jobid_4_train, all_merge, debug_log
 
 
 def check_job_output_logs(dict_particle_jobid):
@@ -378,8 +382,8 @@ if __name__ == '__main__':
     DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
     DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
-    print(f'The full r0 to dl3 workflow is going to be run at \n '
-          f'{DL0_DATA_DIR.format("electron/gamma/gamma-diff/protons")}.\n'
+    print(f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
+          f'{DL0_DATA_DIR.format("{electron/gamma/gamma-diff/protons}")}.\n\n'
           f'All the subdirectories will be overwritten , i.e., all the previous runs (with a same PROD_ID) !')
 
     query_continue('Are you sure ?')
@@ -389,8 +393,8 @@ if __name__ == '__main__':
 
     if DO_r0_to_r1:  # TODO V0.2 Job management : _ jobids to check if they have finished without erros
         log_batch_r0_dl1, _, debug = batch_r0_to_dl1(DL0_DATA_DIR,
-                                              args.config_file,
-                                              args.prod_id)
+                                                     args.config_file,
+                                                     args.prod_id)
 
         # First time opening the log --> erase
         if os.path.exists(log_file):
@@ -402,20 +406,21 @@ if __name__ == '__main__':
 
     if DO_merge_and_copy:
         # TODO log_batch_r0_dl1 take place also in the job management
-        log_batch_merge_and_copy, jobs_from_merge, debug = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR,
-                                                                          log_batch_r0_dl1)
+        log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, \
+        debug = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR, log_batch_r0_dl1)
 
         save_log_to_file(log_batch_merge_and_copy, log_file, 'merge_and_copy_dl1')
         save_log_to_file(debug, debug_file, 'merge_and_copy_dl1')
     else:
         # Create just the needed dictionary inputs (Although dl1 files must exist !)
         log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR)
-        jobs_from_merge = ''
+        jobs_to_train = ''
+        jobs_all_dl1_finished = ''
 
     if DO_TRAIN_PIPE:
         log_batch_train_pipe, job_from_train_pipe, debug = batch_train_pipe(log_batch_merge_and_copy,
-                                                                     args.config_file,
-                                                                     jobs_from_merge)
+                                                                            args.config_file,
+                                                                            jobs_to_train)
 
         save_log_to_file(log_batch_train_pipe, log_file, 'train_pipe')
         save_log_to_file(debug, debug_file, 'train_pipe')
@@ -425,11 +430,11 @@ if __name__ == '__main__':
 
     if DO_dl1_to_dl2:
         log_batch_dl1_to_dl2, jobs_4_dl2_to_dl3, debug = batch_dl1_to_dl2(DL1_DATA_DIR,
-                                                                   args.config_file,
-                                                                   job_from_train_pipe,  # Single jobid from train
-                                                                   jobs_from_merge,  # jobids by particle
-                                                                   log_batch_merge_and_copy  # finale dl1 names
-                                                                   )
+                                                                          args.config_file,
+                                                                          job_from_train_pipe,  # Single jobid frm train
+                                                                          jobs_all_dl1_finished,  # jobids from merge
+                                                                          log_batch_merge_and_copy  # finale dl1 names
+                                                                          )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, 'dl1_to_dl2')
         save_log_to_file(debug, debug_file, 'dl1_to_dl2')
