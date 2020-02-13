@@ -225,8 +225,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]
 
-                cmd = 'sbatch --parsable -e {} -o {} {} -J {} {}'.format(jobe, jobo, base_cmd, job_name[particle_type],
-                                                                         os.path.join(dir_lists, file))
+                cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
+                                                                         jobe, jobo,
+                                                                         base_cmd, os.path.join(dir_lists, file))
 
                 jobid = os.popen(cmd).read().strip('\n')
                 jobids_r0_dl1.append(jobid)

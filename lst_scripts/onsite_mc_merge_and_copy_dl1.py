@@ -28,45 +28,6 @@ parser.add_argument('input_dir', type=str,
                     )
 
 
-def check_files_in_dir_from_file(directory, file):
-    """
-    Check that a list of files from a file exist in a dir
-
-    Parameters
-    ----------
-    directory
-    file
-
-    Returns
-    -------
-
-    """
-    with open(file) as f:
-        lines = f.readlines()
-
-    files_in_dir = os.listdir(directory)
-    files_not_in_dir = []
-    for line in lines:
-        filename = os.path.basename(line.rstrip('\n'))
-        if filename not in files_in_dir:
-            files_not_in_dir.append(filename)
-
-    return files_not_in_dir
-
-
-def readlines(file):
-    with open(file) as f:
-        lines = [line.rstrip('\n') for line in f]
-    return lines
-
-
-def move_dir_content(src, dest):
-    files = os.listdir(src)
-    for f in files:
-        shutil.move(os.path.join(src, f), dest)
-    os.rmdir(src)
-
-
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None):
     """
     Merge and copy DL1 data after production.
@@ -253,8 +214,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print("\tDL1 files will be moved to {}".format(final_DL1_dir))
 
-        base_cmd = 'sbatch --parsable -J {} --dependency=afterok:{} --wrap=\'python -c \"\"\"from ' \
-                   'onsite_mc_merge_and_copy_dl1 import move_dir_content ; move_dir_content(\"{}\", \"{}\")\"\"\"\''
+        # base_cmd = 'sbatch --parsable -J {} --dependency=afterok:{} --wrap=\'python -c \"\"\"from ' \
+        #            'onsite_mc_merge_and_copy_dl1 import move_dir_content ; move_dir_content(\"{}\", \"{}\")\"\"\"\''
+
+        base_cmd = 'sbatch --parsable -J {} --dependency=afterok:{} ' \
+                   '--wrap="python batch_dl1_utils-merge_and_copy.py -s {} -d {}"'
 
         wait_both_merges = ','.join(wait_both_merges)
 
@@ -275,8 +239,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         return_jobids_debug.append(jobid_move_dl1)
         return_jobids_debug.append(jobid_move_log)
 
-        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finishe.')
-        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish')
+        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish.')
 
         print("\tLOGS will be moved to {}".format(logs_destination_dir))
 

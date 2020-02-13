@@ -9,7 +9,6 @@ import shutil
 import random
 
 
-
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
 
@@ -115,7 +114,44 @@ def check_job_logs(job_logs_dir):
     if not logs_with_error == []:
         answer = query_continue("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")
 
-        
+
+def check_files_in_dir_from_file(directory, file):
+    """
+    Check that a list of files from a file exist in a dir
+
+    Parameters
+    ----------
+    directory
+    file
+
+    Returns
+    -------
+
+    """
+    with open(file) as f:
+        lines = f.readlines()
+
+    files_in_dir = os.listdir(directory)
+    files_not_in_dir = []
+    for line in lines:
+        filename = os.path.basename(line.rstrip('\n'))
+        if filename not in files_in_dir:
+            files_not_in_dir.append(filename)
+
+    return files_not_in_dir
+
+
+def readlines(file):
+    with open(file) as f:
+        lines = [line.rstrip('\n') for line in f]
+    return lines
+
+
+def move_dir_content(src, dest):
+    files = os.listdir(src)
+    for f in files:
+        shutil.move(os.path.join(src, f), dest)
+    os.rmdir(src)
         
 
 if __name__ == '__main__':
