@@ -200,9 +200,10 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         # This MUST be out of the set_type loop !
 
-        # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge, both:
+        # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge, the three steps:
         # 4 --> move DL1 files in final place
         # 5 --> move running_dir as logs
+        # copy lstchain config file in final_dir too
 
         print("\tDL1 files will be moved to {}".format(final_DL1_dir))
 
@@ -218,7 +219,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                   )
                                   ).read().strip('\n')
 
-        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finishes.')
 
         jobid_move_log = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
                                                   wait_both_merges,
@@ -227,16 +228,24 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                   )
                                   ).read().strip('\n')
 
-        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish.')
+        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finishes.')
 
-        # copy lstchain config file in final_dir too
-        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
-        for file in config_files:
-            shutil.copyfile(file, os.path.join(final_DL1_dir, os.path.basename(file)))
+        base_cmd = base_cmd[:-1] + ' --copy_conf True"'
+        jobid_copy_conf = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_cp_conf',
+                                                   jobid_move_dl1,
+                                                   input_dir,
+                                                   final_DL1_dir
+                                                   )
+                                   ).read().strip('\n')
+
+        print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} '
+              f'finishes.')
 
         return_jobids4train.append(jobid_move_dl1)
+
         return_jobids_debug.append(jobid_move_dl1)
         return_jobids_debug.append(jobid_move_log)
+        return_jobids_debug.append(jobid_copy_conf)
 
         print("\tLOGS will be moved to {}".format(logs_destination_dir))
 
