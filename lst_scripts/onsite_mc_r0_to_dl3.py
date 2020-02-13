@@ -129,12 +129,12 @@ def batch_dl1_to_dl2(dl1_directory, config_file, jobid_from_training, jobids_fro
 
     Returns
     -------
-        log_batch_dl1_to_dl2 : dict
-            Dictionary containing the log of the batched dl1_to_dl2 jobs
-        jobid_4_dl2_to_dl3 : str
-            string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
-        debug_log : dict
-            Debug purposes
+    log_batch_dl1_to_dl2 : dict
+        Dictionary containing the log of the batched dl1_to_dl2 jobs
+    jobid_4_dl2_to_dl3 : str
+        string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+    debug_log : dict
+        Debug purposes
 
     """
 
@@ -182,13 +182,13 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
 
     Returns
     -------
-        log_train : dict
-            Dictionary containing the log of the batched train_pipe jobs
-        jobid_4_dl1_to_dl2 : str
-            string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
-            For the next stage, however, it will be needed TRAIN + MERGED jobs
-        debug_log : dict
-            Debug purposes
+    log_train : dict
+        Dictionary containing the log of the batched train_pipe jobs
+    jobid_4_dl1_to_dl2 : str
+        string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
+        For the next stage, however, it will be needed TRAIN + MERGED jobs
+    debug_log : dict
+        Debug purposes
 
     """
     debug_log = {}
@@ -215,6 +215,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
 
+    Batch 8 merge_and_copy_dl1 jobs ([train, test] x particle) + the move_dl1 and move_dir jobs (2 per particle).
+
     Parameters
     ----------
     running_analysis_dir : str
@@ -225,21 +227,15 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
 
     Returns
     -------
-        log_merge_and_copy : dict
-            Dictionary containing the log of the batched merge_and_copy_dl1 jobs
+    log_merge_and_copy : dict
+        Dictionary containing the log of the batched merge_and_copy_dl1 jobs
 
-        jobid_4_train : str
-             string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
-        debug_log : dict
-            Debug purposes
+    jobid_4_train : str
+         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+    debug_log : dict
+        Debug purposes
 
     """
-    # TODO :
-    # Take 4 job ids from check_jo_output_logs, that would have already check that they are no errors in
-    #  the output files.
-
-    # This function will only batch 4 merge_and_copy jobs.
-
     log_merge_and_copy = {}
     jobid_4_train = []
     debug_log = {}

@@ -6,7 +6,6 @@ import sys
 import os
 from distutils.util import strtobool
 import shutil
-import random
 
 
 def query_yes_no(question, default="yes"):
@@ -91,12 +90,14 @@ def check_data_path(data_path):
 
 
 def get_input_filelist(data_path):
-    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if
+            os.path.isfile(os.path.join(data_path, f))]
 
 
 def check_and_make_dir(dir):
     if os.path.exists(dir) and os.listdir(dir)!=[]:
-        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(dir), default='no')
+        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(dir),
+                               default='no')
         if clean:
             shutil.rmtree(dir)
     os.makedirs(dir, exist_ok=True)
@@ -112,7 +113,8 @@ def check_job_logs(job_logs_dir):
                     logs_with_error.append(os.path.basename(log_filename))
                     break
     if not logs_with_error == []:
-        answer = query_continue("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")
+        answer = query_continue("There are errors in the following log files:\n {}\n "
+                                "Are you sure you want to continue?".format(logs_with_error), default="no")
 
 
 def check_files_in_dir_from_file(directory, file):

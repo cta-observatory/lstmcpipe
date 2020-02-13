@@ -99,8 +99,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
 
         A list of all the jobs sent by particle (including test and train set types).
 
-        _ # TODO V0.2 --> job management.
-
     """
 
     today = calendar.datetime.date.today()

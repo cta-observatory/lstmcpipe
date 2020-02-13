@@ -140,7 +140,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
             # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the
             # whole workflow
-            filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
+            # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
             cmd += "--no-image True"
@@ -178,20 +178,17 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             output_filename = os.path.join(running_DL1_dir, output_filename)
             print(f"\t\tmerge output: {output_filename}")
 
-            # TODO missing the job.o and job.e for the sbatch of the merge and copy
-            # cmd = f'sbatch --parsable --dependency=afterok:{wait_r0_dl1_jobs} ' \
-            #       f'--wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"'
-
             if set_type == 'training':
                 log_merge[particle][set_type]['train_path_and_outname_dl1'] = output_filename
             else:
                 log_merge[particle][set_type]['test_path_and_outname_dl1'] = output_filename
 
+            # TODO missing the job.o and job.e for the sbatch of the merge and copy
             cmd = 'sbatch --parsable'
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {}"'.format(job_name[particle],
-                                                                                  tdir, output_filename)
+            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True"'.format(job_name[particle],
+                                                                                                  tdir, output_filename)
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
@@ -201,21 +198,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             wait_both_merges.append(jobid_merge)
             return_jobids_debug.append(jobid_merge)
 
-        #
         # This MUST be out of the set_type loop !
-        #
 
-        # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge
+        # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge, both:
         # 4 --> move DL1 files in final place
         # 5 --> move running_dir as logs
 
-        check_and_make_dir(final_DL1_dir)
-        check_and_make_dir(logs_destination_dir)
-
         print("\tDL1 files will be moved to {}".format(final_DL1_dir))
-
-        # base_cmd = 'sbatch --parsable -J {} --dependency=afterok:{} --wrap=\'python -c \"\"\"from ' \
-        #            'onsite_mc_merge_and_copy_dl1 import move_dir_content ; move_dir_content(\"{}\", \"{}\")\"\"\"\''
 
         base_cmd = 'sbatch --parsable -J {} --dependency=afterok:{} ' \
                    '--wrap="python batch_dl1_utils-merge_and_copy.py -s {} -d {}"'
@@ -228,6 +217,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                   final_DL1_dir
                                                   )
                                   ).read().strip('\n')
+
+        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+
         jobid_move_log = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
                                                   wait_both_merges,
                                                   input_dir,
@@ -235,12 +227,16 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                   )
                                   ).read().strip('\n')
 
+        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish.')
+
+        # copy lstchain config file in final_dir too
+        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
+        for file in config_files:
+            shutil.copyfile(file, os.path.join(final_DL1_dir, os.path.basename(file)))
+
         return_jobids4train.append(jobid_move_dl1)
         return_jobids_debug.append(jobid_move_dl1)
         return_jobids_debug.append(jobid_move_log)
-
-        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
-        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish.')
 
         print("\tLOGS will be moved to {}".format(logs_destination_dir))
 
@@ -260,7 +256,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         return_jobids4train = ','.join(return_jobids4train)
         return_jobids_debug = ','.join(return_jobids_debug)
 
-        return log_merge, return_jobids4train, return_jobids_debug  # , jobid_merge
+        return log_merge, return_jobids4train, return_jobids_debug
 
 
 if __name__ == '__main__':
