@@ -9,6 +9,7 @@ import argparse
 import calendar
 import lstchain
 from lstchain.io.data_management import *
+from .data_management import check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
@@ -166,7 +167,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
     print("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
 
     for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
-        check_and_make_dir(directory)
+        if flag_full_workflow:
+            check_and_make_dir_without_verification(directory)
+        else:
+            check_and_make_dir(directory)
 
     # dumping the training and testing lists and spliting them in sublists for parallel jobs
 
@@ -181,8 +185,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
         dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
         output_dir = os.path.join(RUNNING_DIR, 'DL1')
         output_dir = os.path.join(output_dir, set_type)
-        check_and_make_dir(dir_lists)
-        check_and_make_dir(output_dir)
+        if flag_full_workflow:
+            check_and_make_dir_without_verification(dir_lists)
+            check_and_make_dir_without_verification(output_dir)
+        else:
+            check_and_make_dir(dir_lists)
+            check_and_make_dir(output_dir)
         print("\toutput dir: \t", output_dir)
 
         number_of_sublists = len(list) // NFILES_PER_DL1 + int(len(list) % NFILES_PER_DL1 > 0)

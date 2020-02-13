@@ -6,7 +6,7 @@
 
 import argparse
 from lstchain.io.data_management import *
-# from data_management import *
+from .data_management import check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="Train models onsite")
 
@@ -89,7 +89,10 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     models_dir = models_dir.replace('/proton/', '/')
 
     print(f"Models will be placed in {models_dir}")
-    check_and_make_dir(models_dir)
+    if flag_full_workflow:
+        check_and_make_dir_without_verification(models_dir)
+    else:
+        check_and_make_dir(models_dir)
 
     base_cmd = ''
     base_cmd += source_environment

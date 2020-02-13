@@ -378,7 +378,10 @@ if __name__ == '__main__':
     DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
     DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
-    print(f'The full r0 to dl3 workflow is going to be run at \n {DL0_DATA_DIR}')
+    print(f'The full r0 to dl3 workflow is going to be run at \n '
+          f'{DL0_DATA_DIR.format("electron/gamma/gamma-diff/protons")}.\n'
+          f'All the subdirectories will be overwritten , i.e., all the previous runs (with a same PROD_ID) !')
+
     query_continue('Are you sure ?')
 
     log_file = './log_onsite_mc_r0_to_dl2.txt'

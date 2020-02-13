@@ -7,6 +7,7 @@
 
 import argparse
 from lstchain.io.data_management import *
+from .data_management import check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 
@@ -76,17 +77,15 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
     output_dir = input_dir.replace('DL1', 'DL2')
 
-    check_and_make_dir(output_dir)
-
-    print(f"Output dir: {output_dir}")
-
     if flag_full_workflow:
         print("\n ==== START {} ==== \n".format('dl1_to_dl2_workflow'))
+
+        check_and_make_dir_without_verification(output_dir)
+        print(f"Output dir: {output_dir}")
 
         log_dl1_to_dl2 = {particle: {}}
 
         # path to dl1 files by particle type
-        # file_list = [file for file in dictionary_with_dl1_paths[particle].values()]
         file_list = [dictionary_with_dl1_paths[particle]['training']['train_path_and_outname_dl1'],
                      dictionary_with_dl1_paths[particle]['testing']['test_path_and_outname_dl1']]
 
@@ -109,6 +108,10 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
     else:
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
+
+        check_and_make_dir(output_dir)
+        print(f"Output dir: {output_dir}")
+
         file_list = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.startswith('dl1_')]
 
         query_continue(f"{len(file_list)} jobs,  ok?")
@@ -125,6 +128,7 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         else:  # flag_full_workflow == True !
             # TODO missing too the job.e and job.o for this stage
             # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
+
             batch_cmd = 'sbatch --parsable'
             if wait_jobs != '':
                 batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
