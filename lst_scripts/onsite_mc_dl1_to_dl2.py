@@ -64,14 +64,11 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         lstchain_mc_dl1_to_dl2 command with all its corresponding arguments) as value.
 
         ****  otherwise : (if flag_full_workflow is False, by default) ****
-        None is returned
+        None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
 
     jobid_dl1_to_dl2 : str
         jobid of the batched job to be send (for dependencies purposes) to the next stage of the
-        workflow (#TODO dl2_to_dl3 ??)
-
-        ****  otherwise : (if flag_full_workflow is False, by default) ****
-        None is returned
+        workflow (#TODO dl2_to_dl3 )
 
     """
 
@@ -100,10 +97,10 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         else:
             wait_jobs = ','.join([wait_jobid_train_pipe, wait_jobids_merge])
 
-        job_name = {'electron': 'e_dl1-dl2',
-                    'gamma': 'g_dl1-dl2',
-                    'gamma-diffuse': 'gd_dl1-dl2',
-                    'proton': 'p_dl1-dl2'
+        job_name = {'electron': 'dl1-2_e',
+                    'gamma': 'dl1-2_g',
+                    'gamma-diffuse': 'dl1-2_gd',
+                    'proton': 'dl1-2_p'
                     }
 
     else:

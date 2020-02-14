@@ -94,7 +94,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
              dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
 
              ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned
+            None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
 
     jobids_r0_dl1
 
@@ -223,10 +223,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
                 # os.system(cmd)
 
             else:  # flag_full_workflow == True !
-                job_name = {'electron': 'e_r0-dl1',
-                            'gamma': 'g_r0-dl1',
-                            'gamma-diffuse': 'gd_r0-dl1',
-                            'proton': 'p_r0-dl1'
+                job_name = {'electron': 'r0dl1_e',
+                            'gamma': 'r0dl1_g',
+                            'gamma-diffuse': 'r0dl1_gd',
+                            'proton': 'r0dl1_p'
                             }
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]

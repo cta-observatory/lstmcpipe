@@ -65,16 +65,14 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                         'train_path_and_outname_dl1 or test_path_and_outname_dl1', 'jobid']
 
         ****  otherwise : (if flag_full_workflow is False, by default) ****
-        None is returned
+        None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
 
     return_jobids4train : str (if flag_full_workflow is True)
         jobid of the batched job to be send (for dependencies purposes) to the next stage of the workflow
         (train_pipe), by particle
 
-        ****  otherwise : (if flag_full_workflow is False, by default)
-        None is returned
-
-    return_jobids_debug ; debug purpose.
+    return_jobids_debug ; str
+        jobids to store in log_reduced.txt - Mainly debug purposes.
 
     """
 
@@ -175,13 +173,15 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 output_filename += '_'
             output_filename += set_type
             output_filename += '.h5'
+            base_filename = output_filename
             output_filename = os.path.join(running_DL1_dir, output_filename)
             print(f"\t\tmerge output: {output_filename}")
 
+            # After the workflow the files will be moved, will not stay at output_filename
             if set_type == 'training':
-                log_merge[particle][set_type]['train_path_and_outname_dl1'] = output_filename
+                log_merge[particle][set_type]['train_path_and_outname_dl1'] = os.path.join(final_DL1_dir, base_filename)
             else:
-                log_merge[particle][set_type]['test_path_and_outname_dl1'] = output_filename
+                log_merge[particle][set_type]['test_path_and_outname_dl1'] = os.path.join(final_DL1_dir, base_filename)
 
             # TODO missing the job.o and job.e for the sbatch of the merge and copy
             cmd = 'sbatch --parsable'
@@ -233,16 +233,14 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
         # 5 --> move running_dir as logs
-        wait_merge_and_copy = wait_both_merges + jobid_copy_conf
-        wait_merge_and_copy = ','.join(wait_merge_and_copy)
         jobid_move_log = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
-                                                  wait_merge_and_copy,
+                                                  jobid_copy_conf,
                                                   input_dir,
                                                   logs_destination_dir, 'False'
                                                   )
                                   ).read().strip('\n')
 
-        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {wait_both_merges} finish.')
+        print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
 
         return_jobids4train.append(jobid_move_dl1)
 
@@ -258,8 +256,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # to dl1_dir), so instead of storing the jobid that merges all the *particle*_dl1 (jobid_merge), it will
         # be store the jobid that move the dl1 final file to dl1_dir. Until this step is not finished, the workflow
         # cannot continue.
-        log_merge[particle][set_type][jobid_move_dl1] = base_cmd.format(job_name[particle]+'_mv_dl1',
-                                                                        wait_both_merges,
+        log_merge[particle][set_type][jobid_move_log] = base_cmd.format(job_name[particle]+'_mv_dl1',
+                                                                        wait_both_merges+' up to ' + jobid_move_log,
                                                                         running_DL1_dir,
                                                                         final_DL1_dir, 'False')
 

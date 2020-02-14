@@ -61,14 +61,14 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         command with all its corresponding arguments) as value.
 
         ****  otherwise : (if flag_full_workflow is False, by default) ****
-        None is returned
+        None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
 
     jobid_train : str (if flag_full_workflow is True)
         jobid of the batched job to be send (for dependencies purposes) to the next stage of the
         workflow (onsite_mc_dl1_to_dl2)
 
-        ****  otherwise : (if flag_full_workflow is False, by default) ****
-        None is returned
+    models_dir : str
+        Path with the directory where the models are stored
 
     """
 
@@ -133,7 +133,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     else:
         print("\n ==== END {} ==== \n".format('mc_train_workflow'))
 
-        return log_train, jobid_train
+        return log_train, jobid_train, models_dir
 
 
 if __name__ == '__main__':
