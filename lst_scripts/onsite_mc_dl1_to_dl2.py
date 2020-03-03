@@ -7,7 +7,7 @@
 
 import argparse
 from lstchain.io.data_management import *
-from .data_management import check_and_make_dir_without_verification
+from data_management import check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 

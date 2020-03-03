@@ -5,6 +5,7 @@
 #  the right env
 # source /local/home/lstanalyzer/.bashrc
 
+source /fefs/aswg/software/virtual_env/.bashrc
 conda activate cta
 
 # source /home/enrique.garcia/.bashrc

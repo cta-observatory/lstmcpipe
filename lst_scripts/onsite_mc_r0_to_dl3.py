@@ -18,23 +18,24 @@ import calendar
 import lstchain
 import glob
 import pprint
-from .onsite_mc_r0_to_dl1 import main as r0_to_dl1
-from .onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
-from .onsite_mc_train import main as train_pipe
-from .onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
-from .data_management import *
+from onsite_mc_r0_to_dl1 import main as r0_to_dl1
+from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
+from onsite_mc_train import main as train_pipe
+from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
+from data_management import *
 
 #######################################################################################################################
 #######################################################################################################################
-# BASE_PATH = '/fefs/aswg/data/mc'
-BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2'
+BASE_PATH = '/fefs/aswg/data/mc'
+# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2'
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
 # source env onsite - can be changed for custom install
 # source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta;'  # By default
-source_env = 'source /home/enrique.garcia/.bashrc; conda activate cta-dev;'
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'
+# source_env = 'source /home/enrique.garcia/.bashrc; conda activate cta-dev;'
 
 # run and batch all the steps of the code (see above)
 DO_r0_to_r1 = True

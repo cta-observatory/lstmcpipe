@@ -9,7 +9,7 @@ import argparse
 import calendar
 import lstchain
 from lstchain.io.data_management import *
-from .data_management import check_and_make_dir_without_verification
+from data_management import check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
@@ -26,7 +26,7 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
 parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
                     dest='train_test_ratio',
                     help='Ratio of training data',
-                    default=0.25
+                    default=0.5
                     )
 
 parser.add_argument('--random_seed', '-seed', action='store', type=str,
@@ -219,8 +219,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
             if not flag_full_workflow:
                 cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-                print(cmd)
-                # os.system(cmd)
+                # print(cmd)
+                os.system(cmd)
 
             else:  # flag_full_workflow == True !
                 job_name = {'electron': 'r0dl1_e',

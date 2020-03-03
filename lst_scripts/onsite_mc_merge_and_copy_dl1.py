@@ -12,7 +12,7 @@
 # 5. move running_dir 
 
 import argparse
-from .data_management import *
+from data_management import *
 # from lstchain.io import smart_merge_h5files
 
 parser = argparse.ArgumentParser(description="Merge and copy DL1 data after production. \n"
