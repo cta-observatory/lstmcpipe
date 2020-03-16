@@ -261,9 +261,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
         if particle == 'gamma-diffuse' or particle == 'proton':
             jobid_4_train.append(jobid)
 
-        debug_log[jobid] = f'{particle} merge jobs to dl1_to_dl2. The depend on {log_jobs_from_r0_to_dl1[particle]} ' \
-                           f'r0_t0_dl1 jobs.'
-        debug_log[jobid_debug] = f'All the {particle} jobs that have been launched in  merge_and_copy_dl1.'
+        debug_log[jobid] = f'{particle} merge_and_copy-jobs that will go to dl1_to_dl2. They depend on the following ' \
+                           f'{log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
+        debug_log[jobid_debug] = f'All the {particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
     all_merge = ','.join(all_merge)
