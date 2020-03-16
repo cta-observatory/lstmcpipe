@@ -50,7 +50,7 @@ parser.add_argument('--prod_id', action='store', type=str,
                     )
 
 
-def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_files_per_dl1=0,
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0,
          prod_id=None, flag_full_workflow=False):
     """
     R0 to DL1 MC onsite conversion.
@@ -63,7 +63,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.25, random_seed=42, n_f
     config_file :str
         Path to a configuration file. If none is given, a standard configuration is applied
     train_test_ratio :int
-        Ratio of training data. Default = 0.25
+        Ratio of training data. Default = 0.5
     random_seed : int
         Random seed for random processes. Default = 42
     n_files_per_dl1 : int

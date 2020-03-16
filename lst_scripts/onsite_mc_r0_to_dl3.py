@@ -3,15 +3,17 @@
 # E. Garcia, Jan '20
 #
 # Full workflow from r0 to dl3.
-#  wrapps single-command version of
+#  wraps together the individual scripts of
 #   - onsite_mc_r0_to_dl1
 #   - onsite_mc_merge_and_copy_dl1
 #   - onsite_mc_train
 #   - onsite_mc_dl1_to_dl2
 #   - TODO onsite_mc_dl2_to_dl3
 #
-# usage python onsite_mc_r0_to_dl3.py [-conf CONFIG_FILE] [--prod_id PROD_ID]
+# usage:
+# > python onsite_mc_r0_to_dl3.py [-conf CONFIG_FILE] [--prod_id PROD_ID]
 #
+#   The input_dir is set in the global variable `DL0_DATA_DIR`
 
 import argparse
 import calendar
@@ -27,15 +29,13 @@ from data_management import *
 #######################################################################################################################
 #######################################################################################################################
 BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2'
+
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
 # source env onsite - can be changed for custom install
-# source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta;'  # By default
-source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'
-# source_env = 'source /home/enrique.garcia/.bashrc; conda activate cta-dev;'
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
 DO_r0_to_r1 = True
