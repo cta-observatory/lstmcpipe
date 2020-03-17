@@ -1,76 +1,123 @@
 #!/usr//bin/env python
 
-## Code to reduce R0 data to DL1 onsite (La Palma cluster)
+# T. Vuillaume,
+# Modifications by E. Garcia
+# Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
-
-import sys
-import os
-import shutil
 import random
 import argparse
 import calendar
 import lstchain
 from lstchain.io.data_management import *
+from data_management import check_and_make_dir_without_verification
+
+parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
+
+parser.add_argument('input_dir', type=str,
+                    help='path to the files directory to analyse',
+                    )
+
+parser.add_argument('--config_file', '-conf', action='store', type=str,
+                    dest='config_file',
+                    help='Path to a configuration file. If none is given, a standard configuration is applied',
+                    default=None
+                    )
+
+parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
+                    dest='train_test_ratio',
+                    help='Ratio of training data',
+                    default=0.5
+                    )
+
+parser.add_argument('--random_seed', '-seed', action='store', type=str,
+                    dest='random_seed',
+                    help='Random seed for random processes',
+                    default=42,
+                    )
+
+parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
+                    dest='n_files_per_dl1',
+                    help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
+                         'based on the size of the DL0 files and the expected reduction factor of 5 '
+                         'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
+                    default=0,
+                    )
+
+parser.add_argument('--prod_id', action='store', type=str,
+                    dest='prod_id',
+                    help="Production ID. If None, _v00 will be used, indicating an official base production",
+                    default=None,
+                    )
 
 
-def main():
-
-    parser = argparse.ArgumentParser(description="MC R0 to DL1")
-
-
-    parser.add_argument('input_dir', type=str,
-                        help='path to the files directory to analyse',
-                       )
-
-    parser.add_argument('--config_file', '-conf', action='store', type=str,
-                        dest='config_file',
-                        help='Path to a configuration file. If none is given, a standard configuration is applied',
-                        default=None
-                        )
-
-    parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
-                        dest='train_test_ratio',
-                        help='Ratio of training data',
-                        default=0.25
-                        )
-
-    parser.add_argument('--random_seed', '-seed', action='store', type=str,
-                        dest='random_seed',
-                        help='Random seed for random processes',
-                        default=42,
-                        )
-
-    parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
-                        dest='n_files_per_dl1',
-                        help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based '
-                             'on the size of the DL0 files and the expected reduction factor of 5 '
-                             'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
-                        default=0,
-                        )
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0,
+         prod_id=None, flag_full_workflow=False):
+    """
+    R0 to DL1 MC onsite conversion.
 
 
+    Parameters
+    ----------
+    input_dir : str
+        path to the files directory to analyse
+    config_file :str
+        Path to a configuration file. If none is given, a standard configuration is applied
+    train_test_ratio :int
+        Ratio of training data. Default = 0.5
+    random_seed : int
+        Random seed for random processes. Default = 42
+    n_files_per_dl1 : int
+        Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
+        of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
+        number of files. Default = 0
+    prod_id :str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+    flag_full_workflow : bool
+        Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
 
-    parser.add_argument('--prod_id', action='store', type=str,
-                        dest='prod_id',
-                        help="Production ID. If None, _v00 will be used, indicating an official base production",
-                        default=None,
-                        )
+    Returns
+    -------
 
-    args = parser.parse_args()
+    jobid2log : dict (if flag_full_workflow is True)
+
+        A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
+        only the each jobid that the scripts has batched.
+
+            dict[jobid] = information
+
+        The second layer contains, organized by jobid,
+             - the kind of particle that corresponded to the jobid
+             - the command that was run to batch the job into the server
+             - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
+                 when the job was send to the cluster
+
+             dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
+
+             ****  otherwise : (if flag_full_workflow is False, by default) ****
+            None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
+
+    jobids_r0_dl1
+
+        A list of all the jobs sent by particle (including test and train set types).
+
+    """
 
     today = calendar.datetime.date.today()
     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
+    suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
     PROD_ID = base_prod_id + suffix_id
-    TRAIN_TEST_RATIO = float(args.train_test_ratio)
-    RANDOM_SEED = args.random_seed
-    NFILES_PER_DL1 = args.n_files_per_dl1
+    TRAIN_TEST_RATIO = float(train_test_ratio)
+    RANDOM_SEED = random_seed
+    NFILES_PER_DL1 = n_files_per_dl1
 
     DESIRED_DL1_SIZE_MB = 1000
 
-    DL0_DATA_DIR = args.input_dir
+    DL0_DATA_DIR = input_dir
 
-    print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    if not flag_full_workflow:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+    else:
+        print("\n ==== START {} ==== \n".format('r0_to_dl1_workflow'))
 
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
@@ -94,9 +141,9 @@ def main():
     training_list = raw_files_list[:ntrain]
     testing_list = raw_files_list[ntrain:]
 
-    print("{} raw files".format(number_files))
-    print("{} files in training dataset".format(ntrain))
-    print("{} files in test dataset".format(ntest))
+    print("\t{} raw files".format(number_files))
+    print("\t{} files in training dataset".format(ntrain))
+    print("\t{} files in test dataset".format(ntest))
 
     with open('training.list', 'w+') as newfile:
         for f in training_list:
@@ -115,66 +162,123 @@ def main():
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
     # ADD CLEAN QUESTION
 
-    print("RUNNING_DIR: ", RUNNING_DIR)
-    print("JOB_LOGS DIR: ", JOB_LOGS)
-    print("DL1 DATA DIR: ", DL1_DATA_DIR)
+    print("\tRUNNING_DIR: \t", RUNNING_DIR)
+    print("\tJOB_LOGS DIR: \t", JOB_LOGS)
+    print("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
 
-    for dir in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
-        check_and_make_dir(dir)
+    for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
+        if flag_full_workflow:
+            check_and_make_dir_without_verification(directory)
+        else:
+            check_and_make_dir(directory)
 
-    ## dumping the training and testing lists and spliting them in sublists for parallel jobs
+    # dumping the training and testing lists and spliting them in sublists for parallel jobs
 
-    for l in 'training', 'testing':
-        if l == 'training':
+    jobid2log = {}
+    jobids_r0_dl1 = []
+
+    for set_type in 'training', 'testing':
+        if set_type == 'training':
             list = training_list
         else:
             list = testing_list
-        dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + l)
+        dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
         output_dir = os.path.join(RUNNING_DIR, 'DL1')
-        output_dir = os.path.join(output_dir, l)
-        check_and_make_dir(dir_lists)
-        check_and_make_dir(output_dir)
-        print("output dir: ", output_dir)
+        output_dir = os.path.join(output_dir, set_type)
+        if flag_full_workflow:
+            check_and_make_dir_without_verification(dir_lists)
+            check_and_make_dir_without_verification(output_dir)
+        else:
+            check_and_make_dir(dir_lists)
+            check_and_make_dir(output_dir)
+        print("\toutput dir: \t", output_dir)
 
         number_of_sublists = len(list) // NFILES_PER_DL1 + int(len(list) % NFILES_PER_DL1 > 0)
         for i in range(number_of_sublists):
-            output_file = os.path.join(dir_lists, '{}_{}.list'.format(l, i))
+            output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
             with open(output_file, 'w+') as out:
                 for line in list[i * NFILES_PER_DL1:NFILES_PER_DL1 * (i + 1)]:
                     out.write(line)
                     out.write('\n')
-        print('{} files generated for {} list'.format(number_of_sublists, l))
+        print('\t{} files generated for {} list'.format(number_of_sublists, set_type))
 
         ### LSTCHAIN ###
         counter = 0
 
         for file in os.listdir(dir_lists):
-            jobo = os.path.join(JOB_LOGS, "job{}.o".format(counter))
-            jobe = os.path.join(JOB_LOGS, "job{}.e".format(counter))
-            cc = ' -conf {}'.format(args.config_file) if args.config_file is not None else ' '
+            if set_type == 'training':
+                jobo = os.path.join(JOB_LOGS, "job{}_train.o".format(counter))
+                jobe = os.path.join(JOB_LOGS, "job{}_train.e".format(counter))
+            else:
+                jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
+                jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
+            cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
-            cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
 
-            # os.system(cmd)
-            print(cmd)
+            # recover or not the jobid depending of the workflow mode
+            if not flag_full_workflow:
+                cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+
+                # print(cmd)
+                os.system(cmd)
+
+            else:  # flag_full_workflow == True !
+                job_name = {'electron': 'r0dl1_e',
+                            'gamma': 'r0dl1_g',
+                            'gamma-diffuse': 'r0dl1_gd',
+                            'proton': 'r0dl1_p'
+                            }
+
+                particle_type = DL0_DATA_DIR.split('/')[-2]
+
+                cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
+                                                                         jobe, jobo,
+                                                                         base_cmd, os.path.join(dir_lists, file))
+
+                jobid = os.popen(cmd).read().strip('\n')
+                jobids_r0_dl1.append(jobid)
+
+                # Fill the dictionaries if IN workflow mode
+                jobid2log[jobid] = {}
+                jobid2log[jobid]['particle'] = particle_type
+                jobid2log[jobid]['set_type'] = set_type
+                jobid2log[jobid]['jobe_path'] = jobe
+                jobid2log[jobid]['jobo_path'] = jobo
+                jobid2log[jobid]['sbatch_command'] = cmd
+
+                # print(f'\t\t{cmd}')
+                print(f'\t\tSubmitted batch job {jobid}')
+
             counter += 1
 
-        print("{} jobs submitted".format(counter))
+        print("\n\t{} jobs submitted".format(counter))
 
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
     # copy config file into logs
-    if args.config_file is not None:
-        shutil.copy(args.config_file, os.path.join(RUNNING_DIR, os.path.basename(args.config_file)))
+    if config_file is not None:
+        shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
 
-    print("\n ==== END {} ==== \n".format(sys.argv[0]))
+    # create log dictionary and return it if IN workflow mode
+    if flag_full_workflow:
 
+        print("\n ==== END {} ==== \n".format('r0_to_dl1_workflow'))
+        return jobid2log, jobids_r0_dl1
+
+    else:
+        print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
 
 if __name__ == '__main__':
-    main()
-
+    args = parser.parse_args()
+    main(args.input_dir,
+         args.config_file,
+         args.train_test_ratio,
+         args.random_seed,
+         args.n_files_per_dl1,
+         args.prod_id
+         )

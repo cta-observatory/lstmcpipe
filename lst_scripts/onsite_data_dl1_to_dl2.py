@@ -1,10 +1,6 @@
 # DL1 to DL2 onsite (La Palma cluster)
 
 
-import sys
-import os
-import shutil
-import random
 import argparse
 import calendar
 import lstchain
@@ -43,8 +39,7 @@ args = parser.parse_args()
 def main():
 
     input_dir = args.input_dir
-    output_dir = input_dir.replace('dl1', 'DL2')
-    output_dir = output_dir.replace('DM_01', '')  # specific - to be removed
+    output_dir = input_dir.replace('DL1', 'DL2')
     output_dir = os.path.join(output_dir, args.prod_id)
     
     job_logs = os.path.join(output_dir, 'JOB_LOGS')
@@ -55,7 +50,7 @@ def main():
     print(f"Output dir: {output_dir}")
 
 #     file_list = [os.path.join(input_dir, f) for f in os.listdir(args.input_dir) if f.startswith('dl1_')]
-    file_list = [os.path.join(input_dir, f) for f in os.listdir(args.input_dir) if 'merged' in f ]
+    file_list = [os.path.join(input_dir, f) for f in os.listdir(args.input_dir)]
 
     query_continue(f"{len(file_list)} jobs,  ok?")
 
@@ -63,12 +58,12 @@ def main():
         base_cmd = 'conda activate cta; '
         base_cmd += f'lstchain_mc_dl1_to_dl2 -f {file} -p {args.path_models} -o {output_dir}'
         if args.config_file is not None:
-            base_cmd += f'-conf {args.config_file}'
+            base_cmd += f' -conf {args.config_file}'
         jobe = os.path.join(job_logs, f'job{ii}.e')
         jobo = os.path.join(job_logs, f'job{ii}.o')
 
         cmd = f'sbatch -e {jobe} -o {jobo} --wrap "{base_cmd}"' 
-#         print(cmd)
+        # print(cmd)
         os.system(cmd)
 
 

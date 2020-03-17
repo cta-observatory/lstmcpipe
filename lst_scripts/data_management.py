@@ -6,8 +6,6 @@ import sys
 import os
 from distutils.util import strtobool
 import shutil
-import random
-
 
 
 def query_yes_no(question, default="yes"):
@@ -43,7 +41,7 @@ def query_yes_no(question, default="yes"):
                 sys.stdout.write("Please respond with 'yes' or 'no' "
                                  "(or 'y' or 'n').\n")
 
-                
+
 def query_continue(question, default="no"):
     """
     Ask a question and if the answer is no, exit the program
@@ -53,8 +51,8 @@ def query_continue(question, default="no"):
         sys.exit("Program stopped by user")
     else:
         return answer
-        
-    
+
+
 # def get_metadata_from_mc_data_path(data_path):
 #     '''
 #     A mc data path is always `/BASE_DIR/data/mc/dlx/<date>/particle_type/pointing/`
@@ -92,17 +90,25 @@ def check_data_path(data_path):
 
 
 def get_input_filelist(data_path):
-    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if
+            os.path.isfile(os.path.join(data_path, f))]
 
 
 def check_and_make_dir(dir):
-    if os.path.exists(dir) and os.listdir(dir)!=[]:
-        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(dir), default='no')
+    if os.path.exists(dir) and os.listdir(dir) != []:
+        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(dir),
+                               default='no')
         if clean:
             shutil.rmtree(dir)
     os.makedirs(dir, exist_ok=True)
 
-    
+
+def check_and_make_dir_without_verification(dir):
+    if os.path.exists(dir) and os.listdir(dir) != []:
+        shutil.rmtree(dir)
+    os.makedirs(dir, exist_ok=True)
+
+
 def check_job_logs(job_logs_dir):
     job_logs = [os.path.join(job_logs_dir, f) for f in os.listdir(job_logs_dir) if f.endswith('.e')]
     logs_with_error = []
@@ -113,10 +119,48 @@ def check_job_logs(job_logs_dir):
                     logs_with_error.append(os.path.basename(log_filename))
                     break
     if not logs_with_error == []:
-        answer = query_continue("There are errors in the following log files:\n {}\n Are you sure you want to continue?".format(logs_with_error), default="no")
+        answer = query_continue("There are errors in the following log files:\n {}\n "
+                                "Are you sure you want to continue?".format(logs_with_error), default="no")
 
-        
-        
+
+def check_files_in_dir_from_file(directory, file):
+    """
+    Check that a list of files from a file exist in a dir
+
+    Parameters
+    ----------
+    directory
+    file
+
+    Returns
+    -------
+
+    """
+    with open(file) as f:
+        lines = f.readlines()
+
+    files_in_dir = os.listdir(directory)
+    files_not_in_dir = []
+    for line in lines:
+        filename = os.path.basename(line.rstrip('\n'))
+        if filename not in files_in_dir:
+            files_not_in_dir.append(filename)
+
+    return files_not_in_dir
+
+
+def readlines(file):
+    with open(file) as f:
+        lines = [line.rstrip('\n') for line in f]
+    return lines
+
+
+def move_dir_content(src, dest):
+    files = os.listdir(src)
+    for f in files:
+        shutil.move(os.path.join(src, f), dest)
+    os.rmdir(src)
+
 
 if __name__ == '__main__':
     pass
