@@ -394,8 +394,14 @@ if __name__ == '__main__':
     # #################################################
 
     print(f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
-          f'{DL0_DATA_DIR.format("{electron/gamma/gamma-diff/protons}")}.\n\n'
-          f'All the subdirectories will be overwritten , i.e., all the previous runs (with a same PROD_ID) !')
+          f'\t{DL0_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n\n'
+          f'The following directories and all the information within them will be either created or overwritten:\n'
+          f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
+          f'\t{RUNNING_ANALYSIS_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
+          f'\t{DL1_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
+          f'\t{DL1_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}""")).replace("DL1", "DL2")}\n'
+          f'\t{ANALYSIS_LOG_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
+          )
 
     query_continue('Are you sure ?')
 
