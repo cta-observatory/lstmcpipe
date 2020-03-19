@@ -38,6 +38,20 @@ parser.add_argument('--keep_file', '-k',
                     default=False
                     )
 
+parser.add_argument('--flag_full_workflow', '-fw',
+                    type=lambda x: bool(strtobool(x)),
+                    dest='flag_full_workflow',
+                    help='',
+                    default=False
+                    )
+
+parser.add_argument('--flag_full_workflow', '-fw',
+                    type=lambda x: bool(strtobool(x)),
+                    dest='flag_full_workflow',
+                    help='Boolean flag to indicate if the script is run as part of a larger workflow',
+                    default=False
+                    )
+
 
 def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_file=False, flag_full_workflow=False):
     """
@@ -93,5 +107,6 @@ if __name__ == '__main__':
     main(args.infile,
          args.outdir,
          args.config,
-         args.keep_file
+         args.keep_file,
+         args.flag_full_workflow
          )
