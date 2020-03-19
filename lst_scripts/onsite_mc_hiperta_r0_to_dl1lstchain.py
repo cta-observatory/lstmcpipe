@@ -13,7 +13,7 @@ import calendar
 from lstchain.io.data_management import *
 from data_management import check_and_make_dir_without_verification
 
-parser = argparse.ArgumentParser(description="MC R0 to DL1")
+parser = argparse.ArgumentParser(description="MC R0 to DL1 - HiPeRTA version")
 
 parser.add_argument('input_dir', type=str,
                     help='path to the files directory to analyse',
@@ -65,12 +65,16 @@ parser.add_argument('--flag_full_workflow', '-fw',
                     default=False
                     )
 
+# source env onsite - can be changed for custom install
+# source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta; '
+source_env = 'source /home/enrique.garcia/.bashrc; conda activate hipe-prod; '
+
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, prod_id=None,
-         keep_rta_file=False, flag_full_workflow=False):
+         keep_rta_file=False, source_environment=source_env, flag_full_workflow=False):
 
     today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{"RTA"}'
+    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
     suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
     PROD_ID = base_prod_id + suffix_id
     TRAIN_TEST_RATIO = float(train_test_ratio)
@@ -81,10 +85,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     DL0_DATA_DIR = input_dir
 
+    ##############################################################################
+
     if not flag_full_workflow:
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
     else:
-        print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1'))
+        print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
@@ -122,7 +128,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1_RTA'), PROD_ID)
+    # TODO Make the change of the dir used when ready, not now
+    # RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1_RTA'), PROD_ID)
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -150,7 +158,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         else:
             list = testing_list
         dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
-        output_dir = os.path.join(RUNNING_DIR, 'DL1/')
+        output_dir = os.path.join(RUNNING_DIR, 'DL1')
         output_dir = os.path.join(output_dir, set_type)
         if flag_full_workflow:
             check_and_make_dir_without_verification(dir_lists)
@@ -181,11 +189,14 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
             # TODO manage None config file in hiperta_r0_to_dl1lstchain /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-            base_cmd = f'core_list_hipecta.sh "/home/thomas.vuillaume/software/LST_scripts/lst_scripts/' \
-                       f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} -fw {flag_full_workflow} {cc}"'
+            base_cmd = ''
+            base_cmd += source_environment
+            base_cmd += f'core_list_hipecta.sh "/home/thomas.vuillaume/software/LST_scripts/lst_scripts/' \
+                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
+
                 cmd = f'sbatch -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 # print(cmd)
@@ -202,9 +213,11 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
                 cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
                                                                          jobe, jobo,
-                                                                         base_cmd, os.path.join(dir_lists, file))
+                                                                         base_cmd,
+                                                                         os.path.join(dir_lists, file))
 
                 jobid = os.popen(cmd).read().strip('\n')
+
                 jobids_RTA_r0_dl1_reorganized.append(jobid)
 
                 # Fill the dictionaries if IN workflow mode
@@ -220,7 +233,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
             counter += 1
 
-        print("{} jobs submitted".format(counter))
+        print("\n\t{} jobs submitted".format(counter))
 
     # copy this script itself into logs
     shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
@@ -235,7 +248,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
 
-        print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1'))
+        print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
         return jobid2log, jobids_RTA_r0_dl1_reorganized
 
     else:
