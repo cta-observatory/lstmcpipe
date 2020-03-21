@@ -65,13 +65,9 @@ parser.add_argument('--flag_full_workflow', '-fw',
                     default=False
                     )
 
-# source env onsite - can be changed for custom install
-# source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta; '
-source_env = 'source /home/enrique.garcia/.bashrc; conda activate hipe-prod; '
-
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, prod_id=None,
-         keep_rta_file=False, source_environment=source_env, flag_full_workflow=False):
+         keep_rta_file=False, flag_full_workflow=False):
 
     today = calendar.datetime.date.today()
     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
@@ -189,10 +185,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
             # TODO manage None config file in hiperta_r0_to_dl1lstchain /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-            base_cmd = ''
-            base_cmd += source_environment
-            base_cmd += f'core_list_hipecta.sh "/home/thomas.vuillaume/software/LST_scripts/lst_scripts/' \
-                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
+            base_cmd = f'core_list_hipecta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
+                       f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
