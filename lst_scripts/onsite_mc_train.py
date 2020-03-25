@@ -27,7 +27,7 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
                     )
 
 # source env onsite - can be changed for custom install
-source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta;'
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'
 
 
 def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_environment=source_env,
@@ -85,7 +85,9 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     # TODO develop and add check_prod_id function --> @Thomas
     # check_prod_id(dl1_gamma_dir, dl1_proton_dir)
 
-    models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
+    #models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
+    # TODO mark for to date version of workflow-rta
+    models_dir = dl1_proton_dir.replace('/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
     print(f"Models will be placed in {models_dir}")

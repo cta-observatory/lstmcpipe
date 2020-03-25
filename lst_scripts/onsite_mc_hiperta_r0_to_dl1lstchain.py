@@ -124,9 +124,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    # TODO Make the change of the dir used when ready, not now
+    # TODO mark for to date version of workflow-rta
     # RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1_RTA'), PROD_ID)
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+    #RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -183,7 +184,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            # TODO manage None config file in hiperta_r0_to_dl1lstchain /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
+            # TODO manage None config file in hiperta_r0_to_dl1lstchain
+            #  previous path : /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
             base_cmd = f'core_list_hipecta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'

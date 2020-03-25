@@ -27,14 +27,15 @@ from data_management import *
 
 #######################################################################################################################
 #######################################################################################################################
-BASE_PATH = '/fefs/aswg/data/mc'
+#BASE_PATH = '/fefs/aswg/data/mc'
+# TODO mark for to date version of workflow-rta
+BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/'
 
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
-# source env onsite - can be changed for custom install
-# source_env = 'source /home/enrique.garcia/.bashrc; conda activate hipe-prod; '
+# source env onsite - can be changed for custom install - Used at 'r0_dl1' (inside the onsite_*) and 'train' stages
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 
@@ -183,7 +184,6 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
         log, jobids_by_particle = r0_to_dl1_rta(input_dir.format(particle),
                                                 config_file=conf_file,
                                                 prod_id=prod_id,
-                                                source_environment=source_env,
                                                 flag_full_workflow=True
                                                 )
 
@@ -199,7 +199,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow")
+    parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow - HiPeCTA r0_to_dl1 version !!")
 
     parser.add_argument('--config_file', '-conf', action='store', type=str,
                         dest='config_file',
@@ -225,7 +225,10 @@ if __name__ == '__main__':
     PROD_ID = base_prod_id + suffix_id
     RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
     ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
-    DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
+    # DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
+    #
+    # TODO mark for to date version of workflow-rta
+    DL0_DATA_DIR = os.path.join(BASE_PATH, 'R1', OBS_DATE, '{}', POINTING)
     DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
     # #################################################
@@ -256,7 +259,7 @@ if __name__ == '__main__':
     # r0 to dl1 - RTA version
     log_batch_r0_dl1, debug_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
                                                          args.config_file,
-                                                         args.prod_if
+                                                         args.prod_id
                                                          )
     save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1_vRTA')
     save_log_to_file(debug_r0_dl1, debug_file, 'r0_to_dl1_vRTA')

@@ -187,8 +187,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             cmd = 'sbatch --parsable'
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True"'.format(job_name[particle],
-                                                                                                  tdir, output_filename)
+
+            # TODO mark for to date version of workflow-rta
+            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True --smart False"'.format(
+                job_name[particle],
+                tdir,
+                output_filename
+            )
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
