@@ -11,7 +11,7 @@
 #   - TODO onsite_mc_dl2_to_dl3
 #
 # usage:
-# > python onsite_mc_r0_to_dl3_hiperta.py [-conf CONFIG_FILE] [--prod_id PROD_ID]
+# > python onsite_mc_r0_to_dl3_hiperta.py [-conf_rta CONFIG_FILE_RTA] [-conf_lst CONFIG_FILE_LST] [--prod_id PROD_ID]
 #
 #   The input_dir is set in the global variable `DL0_DATA_DIR`
 
@@ -41,6 +41,19 @@ source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta
 
 #######################################################################################################################
 #######################################################################################################################
+
+def check_and_load_configs(config_rta, config_lst):
+    if config_rta is None:
+        config_rta = os.path.join(os.path.dirname(__file__), "./hipecta_standard_config.txt")
+    else:
+        pass
+
+    if config_lst is None:
+        config_lst = os.path.join(os.path.dirname(__file__), "./lstchain_standard_config.json")
+    else:
+        pass
+
+    return config_rta, config_lst
 
 
 def create_dict_with_filenames(dl1_directory):
@@ -201,9 +214,16 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow - HiPeCTA r0_to_dl1 version !!")
 
-    parser.add_argument('--config_file', '-conf', action='store', type=str,
-                        dest='config_file',
-                        help='Path to a configuration file. If none is given, a standard configuration is applied',
+    parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
+                        dest='config_file_rta',
+                        help='Path to a hipeCTA-like configuration file.',
+                        default=None
+                        )
+
+    parser.add_argument('--config_file_lst', '-conf_lst', action='store', type=str,
+                        dest='config_file_lst',
+                        help='Path to a lstchain-like configuration file. '
+                             'RF classifier and regressor arguments must be declared here !',
                         default=None
                         )
 
@@ -256,9 +276,14 @@ if __name__ == '__main__':
     if os.path.exists(debug_file):
         os.remove(debug_file)
 
+    # check and load standard configs if None
+    rta_config, lst_config = check_and_load_configs(args.config_file_rta,
+                                                    args.config_file_lst
+                                                    )
+
     # r0 to dl1 - RTA version
     log_batch_r0_dl1, debug_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
-                                                         args.config_file,
+                                                         rta_config,
                                                          args.prod_id
                                                          )
     save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1_vRTA')
@@ -274,7 +299,7 @@ if __name__ == '__main__':
 
     # Train pipe
     log_batch_train_pipe, job_to_dl1_dl2, model_dir, debug_train_pipe = batch_train_pipe(log_batch_merge_and_copy,
-                                                                                         args.config_file,
+                                                                                         lst_config,
                                                                                          jobs_to_train
                                                                                          )
     save_log_to_file(log_batch_train_pipe, log_file, 'train_pipe')
@@ -283,7 +308,7 @@ if __name__ == '__main__':
     # dl1 to dl2
     log_batch_dl1_to_dl2, jobs_to_dl2_dl3, debug_dl1_dl2 = batch_dl1_to_dl2(DL1_DATA_DIR,
                                                                             model_dir,
-                                                                            args.config_file,
+                                                                            lst_config,
                                                                             job_to_dl1_dl2,
                                                                             jobs_all_dl1_finished,
                                                                             log_batch_merge_and_copy
