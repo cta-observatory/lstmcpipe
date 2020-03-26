@@ -44,8 +44,9 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
     source_environment : str
-        path to the lstanalyzer .bashrc file (or an alternative .bashrc file for custom runs) to activate a
-        certain conda environment. By default : `conda activate cta`
+        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
+        certain conda environment. By default : `conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
     flag_full_workflow :  bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     wait_ids_proton_and_gammas : str

@@ -29,7 +29,8 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
 
 
 def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False, particle=None,
-         wait_jobid_train_pipe=None, wait_jobids_merge=None, dictionary_with_dl1_paths=None):
+         wait_jobid_train_pipe=None, wait_jobids_merge=None, dictionary_with_dl1_paths=None,
+         source_environment=None):
     """
     Convert onsite files from dl1 to dl2"
 
@@ -56,6 +57,10 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
     dictionary_with_dl1_paths : dict
         Dictionary with 'particles' as keys containing final outnames of dl1 files.
             ! COMPULSORY argument when flag_full_workflow is set to True.
+    source_environment : str
+        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
+        certain conda environment. By default : `conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
 
     Returns
     -------
@@ -114,7 +119,12 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         query_continue(f"{len(file_list)} jobs,  ok?")
 
     for file in file_list:
-        cmd = f'lstchain_mc_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}'
+
+        cmd = ''
+        if source_environment is not None:
+            cmd += source_environment
+        cmd += f'lstchain_mc_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}'
+
         if config_file is not None:
             cmd += f' -conf {config_file}'
 

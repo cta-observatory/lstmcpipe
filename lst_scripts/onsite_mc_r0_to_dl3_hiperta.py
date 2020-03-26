@@ -36,6 +36,7 @@ POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
 # source env onsite - can be changed for custom install - Used at 'r0_dl1' (inside the onsite_*) and 'train' stages
+# This env MUST be the same for training and dl1_to_dl2 !
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 
@@ -127,7 +128,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                 particle=particle,
                                 wait_jobid_train_pipe=jobid_from_training,
                                 wait_jobids_merge=jobids_from_merge,
-                                dictionary_with_dl1_paths=dict_with_dl1_paths
+                                dictionary_with_dl1_paths=dict_with_dl1_paths,
+                                source_environment=source_env
                                 )
 
         log_dl1_to_dl2.update(log)
