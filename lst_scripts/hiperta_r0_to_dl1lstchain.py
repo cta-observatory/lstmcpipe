@@ -6,7 +6,8 @@
 import os
 import argparse
 from distutils.util import strtobool
-from hipecta.programs.reorganize_dl1_files import reorganize_dl1
+#from hipecta.programs.reorganize_dl1_files import reorganize_dl1
+from reorganize_dl1_output_files_hiperta_hipecta import reorganize_dl1
 
 
 parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1_files")
@@ -33,6 +34,7 @@ parser.add_argument('--config', '-c',
 
 parser.add_argument('--keep_file', '-k',
                     type=lambda x: bool(strtobool(x)),
+                    dest='keep_file',
                     help='Keep output of hiperta. Set by default to False',
                     default=False
                     )
@@ -64,7 +66,7 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     """
     os.makedirs(outdir, exist_ok=True)
 
-    cmd_hiperta = f'hiperta_r1_dl1 -i {infile} -c {config} -o {outdir} -k {keep_file}'
+    cmd_hiperta = f'hiperta_r1_dl1 -i {infile} -c {config} -o {outdir}'
     os.system(cmd_hiperta)
 
     # We know in advance the name of the output
