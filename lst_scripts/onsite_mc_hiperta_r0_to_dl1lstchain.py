@@ -187,7 +187,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             # TODO manage None config file in hiperta_r0_to_dl1lstchain
             #  previous path : /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-            base_cmd = f'core_list_hipecta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
+            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode

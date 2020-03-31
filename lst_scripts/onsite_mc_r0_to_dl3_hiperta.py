@@ -45,7 +45,7 @@ source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta
 
 def check_and_load_configs(config_rta, config_lst):
     if config_rta is None:
-        config_rta = os.path.join(os.path.dirname(__file__), "./hipecta_standard_config.txt")
+        config_rta = os.path.join(os.path.dirname(__file__), "./hiperta_standard_config.txt")
     else:
         pass
 
