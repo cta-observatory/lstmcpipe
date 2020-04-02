@@ -9,7 +9,7 @@
         hillasThresholdSignalTel = 30; # First cut, in ph electron
         keepIsolatedPixels = 0;        # 0 No, 1 Yes
         minNumberNeighboursPixels = 2; #
-        cleaningType = 0;              # 0 wavelet_cleaning; 1 tailcut_cleaning
+        cleaningType = 1;              # 0 wavelet_cleaning; 1 tailcut_cleaning
         waveletThreshold = 4;          #
         nbSingularValueKeep = 0;       # (NOT USED)
         hillasThresholdCenter = 6;     # tailcut_cleaning param
