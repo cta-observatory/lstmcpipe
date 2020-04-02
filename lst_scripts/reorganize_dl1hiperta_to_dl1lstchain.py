@@ -68,6 +68,9 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     hfile_out.copy_node(hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter)
     hfile_out.copy_node(hfile_tmp.root.dl1, newparent=hfile_out.root, recursive=True)
     hfile_out.copy_children(hfile_tmp2.root.dl1.event.telescope, hfile_out.root.dl1.event.telescope, recursive=True)
+
+    # Move the telescope table from /instrument/subarray to /instrument (lstchain output file dl1 format)
+    hfile_out.move_node('/instrument/subarray/telescope', newparent='/instrument', createparents=True)
     hfile_out.close()
 
 
@@ -95,7 +98,8 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
     """
     with tables.open_file(dl1_file) as hfile:
         run_array_dir = copy.copy(hfile.root.simulation.run_config.col('run_array_direction')[0])
-        focal = copy.copy(hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0])
+        # Remember that /telescope has been moved previously
+        focal = copy.copy(hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0])
 
     df = pd.read_hdf(dl1_file, key=table_path)
     source_pos_in_camera = sky_to_camera(df.mc_alt.values * u.rad,
@@ -161,6 +165,9 @@ def modify_params_table(table, position_iterator):
                             ))
     table.add_column(tel_id, name='tel_id')
 
+    # Rename `leakage_intensity2` --> `leakage`
+    table.rename_column('leakage_intensity2', 'leakage')
+
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -169,9 +176,9 @@ def modify_params_table(table, position_iterator):
         table.add_column(table['width'] / table['length'], name='wl')
 
     if position_iterator == 0:
-        print(" Runtime Warnings have been ignored to avoid repeated stdout prints.")
-        print(" RuntimeWarnings due to invalid values and divide by zero in `log10(intensity)`")
-        print("    operations and divide by zero in `wl` divisions.")
+        print("\n\tRuntime Warnings have been ignored to avoid repeated stdout prints.")
+        print("\tRuntimeWarnings due to invalid values and divide by zero in `log10(intensity)`")
+        print("\t operations and divide by zero in `wl` divisions.")
 
 
 def stack_by_telid(dl1_pointer):
@@ -181,6 +188,7 @@ def stack_by_telid(dl1_pointer):
         - Calibrated images and pulse_times into another table
 
     TODO : Make a walk node in the future ? --> will need to change most of the code :-/
+    TODO : Code just valid for Tel_1 to Tel_4.
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
@@ -213,9 +221,10 @@ def stack_by_telid(dl1_pointer):
 
     for i, imag in enumerate(imags):
         try:
+            #  HiPeCTA case
             imag.rename_column('eventId', 'event_id')
         except KeyError:
-            #print("RTA case")
+            #  HiPeRTA case
             pass
 
         if i == 0:
@@ -228,11 +237,14 @@ def stack_by_telid(dl1_pointer):
 
 def reorganize_dl1(input_filename, output_filename):
     """
+    Reorganize the output dl1 files of hiperta/hipecta codes to reach the same structure found in lstchain dl1 files.
 
     Parameters
     ----------
-        input_filename: [str] Input filename
-        output_filename: [str] Output filename
+        input_filename: str
+            Input filename
+        output_filename: str
+            Output filename
     Returns
     -------
         None. It dumps the final hdf5 file with the correct structure.
@@ -245,8 +257,10 @@ def reorganize_dl1(input_filename, output_filename):
     mc_event = Table(hfile.root.simulation.mc_event.read())
 
     # Temporal names for temporal files, later erased
-    _param = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_prams_tmp_' + str(os.path.basename(input_filename))
-    _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(os.path.basename(input_filename))
+    _param = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_prams_tmp_' + str(
+        os.path.basename(input_filename))
+    _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
+        os.path.basename(input_filename))
 
     table_dl1, table_imags = stack_by_telid(dl1)
 
@@ -254,20 +268,22 @@ def reorganize_dl1(input_filename, output_filename):
     table_dl1 = join(table_dl1, mc_event, keys='event_id')
     table_dl1.add_column(np.log10(table_dl1['mc_energy']), name='log_mc_energy')
 
+    # write tmp files
     table_dl1.write(_param, format='hdf5', path=dl1_params_lstcam_key, overwrite=True)
     table_imags.write(_images, format='hdf5', path=dl1_images_lstcam_key, overwrite=True)
 
+    # open tmp files
     _hfile_param = tables.open_file(_param, 'r')
-    _hfile_imgas = tables.open_file(_images, 'r')
+    _hfile_imags = tables.open_file(_images, 'r')
 
-    create_final_h5(hfile, _hfile_param, _hfile_imgas, output_filename)
+    create_final_h5(hfile, _hfile_param, _hfile_imags, output_filename)
 
     # Add disp_* and mc_type to the parameters table
     add_disp_and_mc_type_to_parameters_table(output_filename, dl1_params_lstcam_key)
 
     # Close and erase
     _hfile_param.close()
-    _hfile_imgas.close()
+    _hfile_imags.close()
     os.remove(_param)
     os.remove(_images)
 
