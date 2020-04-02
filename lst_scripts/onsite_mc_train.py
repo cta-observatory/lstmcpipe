@@ -27,7 +27,7 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
                     )
 
 # source env onsite - can be changed for custom install
-source_env = 'source /local/home/lstanalyzer/.bashrc; conda activate cta;'
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'
 
 
 def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_environment=source_env,
@@ -44,8 +44,9 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
     source_environment : str
-        path to the lstanalyzer .bashrc file (or an alternative .bashrc file for custom runs) to activate a
-        certain conda environment. By default : `conda activate cta`
+        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
+        certain conda environment. By default : `conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
     flag_full_workflow :  bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     wait_ids_proton_and_gammas : str
@@ -138,4 +139,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    main(args.gamma_dl1_train, args.proton_dl1_trainm, args.config_file, source_environment=source_env)
+    main(args.gamma_dl1_train,
+         args.proton_dl1_trainm,
+         args.config_file,
+         source_environment=source_env)

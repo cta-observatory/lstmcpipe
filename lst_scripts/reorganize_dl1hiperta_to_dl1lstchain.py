@@ -18,6 +18,24 @@ import copy
 from lstchain.reco import disp
 from lstchain.reco.utils import sky_to_camera
 
+parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
+                                             "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
+
+parser.add_argument('--infile', '-i',
+                    type=str,
+                    dest='infile',
+                    help='dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script '
+                         'to be re-organized',
+                    default=None
+                    )
+
+parser.add_argument('--outfile', '-o',
+                    type=str,
+                    dest='outfile',
+                    help='Output filename. dl1_reorganized.h5 by default.',
+                    default='./dl1_reorganized.h5'
+                    )
+
 
 def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     """
@@ -256,28 +274,7 @@ def reorganize_dl1(input_filename, output_filename):
     hfile.close()
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
-                                                 "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
-
-    parser.add_argument('--infile', '-i',
-                        type=str,
-                        dest='infile',
-                        help='dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script '
-                             'to be re-organized',
-                        default=None
-                        )
-
-    parser.add_argument('--outfile', '-o',
-                        type=str,
-                        dest='outfile',
-                        help='Output filename. dl1_reorganized.h5 by default.',
-                        default='./dl1_reorganized.h5'
-                        )
-    args = parser.parse_args()
-
-    reorganize_dl1(args.infile, args.outfile)
-
-
 if __name__ == '__main__':
-    main()
+    args = parser.parse_args()
+    reorganize_dl1(args.infile,
+                   args.outfile)
