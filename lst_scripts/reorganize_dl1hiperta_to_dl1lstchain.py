@@ -187,8 +187,6 @@ def stack_by_telid(dl1_pointer):
         - LST telescopes' parameters into a table
         - Calibrated images and pulse_times into another table
 
-    TODO : Make a walk node in the future ? --> will need to change most of the code :-/
-    TODO : Code just valid for Tel_1 to Tel_4.
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
@@ -198,41 +196,21 @@ def stack_by_telid(dl1_pointer):
         Two tables [obj, astropy.table.table.Table] containing the parameters, and the images and pulse_times int their
             respective path
     """
-    t1 = Table(dl1_pointer.Tel_1.parameters.read())
-    t2 = Table(dl1_pointer.Tel_2.parameters.read())
-    t3 = Table(dl1_pointer.Tel_3.parameters.read())
-    t4 = Table(dl1_pointer.Tel_4.parameters.read())
-    tabs = [t1, t2, t3, t4]
 
-    for i, tab in enumerate(tabs):
-        modify_params_table(tab, i)
+    tabs = [Table(tel.parameters.read()) for tel in dl1_pointer]
+    stacked_param = vstack(tabs)
 
-        if i == 0:
-            stacked_param = tab
-        else:
-            stacked_param = vstack((stacked_param, tab))
+    images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
+    stacked_images = vstack(images)
 
-    # Image
-    imag1 = Table(dl1_pointer.Tel_1.calib_pic.read())
-    imag2 = Table(dl1_pointer.Tel_2.calib_pic.read())
-    imag3 = Table(dl1_pointer.Tel_3.calib_pic.read())
-    imag4 = Table(dl1_pointer.Tel_4.calib_pic.read())
-    imags = [imag1, imag2, imag3, imag4]
+    try:
+        #  HiPeCTA case
+        stacked_images.rename_column('eventId', 'event_id')
+    except KeyError:
+        #  HiPeRTA case
+        pass
 
-    for i, imag in enumerate(imags):
-        try:
-            #  HiPeCTA case
-            imag.rename_column('eventId', 'event_id')
-        except KeyError:
-            #  HiPeRTA case
-            pass
-
-        if i == 0:
-            stack_imag = imag
-        else:
-            stack_imag = vstack((stack_imag, imag))
-
-    return stacked_param, stack_imag
+    return stacked_param, stacked_images
 
 
 def reorganize_dl1(input_filename, output_filename):
