@@ -144,7 +144,7 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
 
 
-def modify_params_table(table, position_iterator):
+def modify_params_table(table, tel_id):
     """
     Modify column names and compute missing parameters
 
@@ -158,11 +158,7 @@ def modify_params_table(table, position_iterator):
         None
     """
     # Create the column tel_id
-    # TODO : it can be done more 'classy' in the case of hiperta by reading `hfile_rta.root.dl1.Tel_1.telId.read()`
-    # however, hipecta does NOT have this option.
-    tel_id = Column(np.full(table.columns[0].size,
-                            int(position_iterator + 1)  # TODO : A bit hardcoded. Just valid for LSTs
-                            ))
+
     table.add_column(tel_id, name='tel_id')
 
     # Rename `leakage_intensity2` --> `leakage`
@@ -198,19 +194,17 @@ def stack_by_telid(dl1_pointer):
         Two tables [obj, astropy.table.table.Table] containing the parameters, and the images and pulse_times int their
             respective path
     """
-    t1 = Table(dl1_pointer.Tel_1.parameters.read())
-    t2 = Table(dl1_pointer.Tel_2.parameters.read())
-    t3 = Table(dl1_pointer.Tel_3.parameters.read())
-    t4 = Table(dl1_pointer.Tel_4.parameters.read())
-    tabs = [t1, t2, t3, t4]
 
-    for i, tab in enumerate(tabs):
-        modify_params_table(tab, i)
+    tels_params = [tel.parameters.read() for tel in dl1_pointer]
+    try:
+        tel_ids = [tel['telId'] for tel in tels_params]
+    except:
+        # if the tel_id column does not exist, we assign tel ids by simple iteration
+        tel_ids = [i+1 for i in range(len(tels_params))]
 
-        if i == 0:
-            stacked_param = tab
-        else:
-            stacked_param = vstack((stacked_param, tab))
+    tabs = [Table(tel) for tel in tels_params]
+
+    stacked_param = vstack(tabs)
 
     # Image
     imag1 = Table(dl1_pointer.Tel_1.calib_pic.read())
