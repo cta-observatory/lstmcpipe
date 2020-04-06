@@ -43,9 +43,7 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     It copies /instruments and /simulations nodes from the output of hipecta_hdf5_r1_to_dl1.py,
         - and /dl1/event from the created table.
         - and includes the image and pulse_time within the correct path, i.e., /dl1/event/telescope/
-
     TODO: Define somehow the paths globally so that it can be used .get_node()
-
     Parameters
     ----------
         hfile: [obj, astropy.table.table.Table] output file
@@ -54,11 +52,9 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
         hfile_tmp2: [obj, astropy.table.table.Table] hdf5 file with images and pulse_time. path:
                     `dl1/event/telescope/image/LST_LSTCam`
         output_filename: [str] name of output file
-
     Returns
     -------
         None
-
     """
     # The complevel MUST be set to zero, otherwise this version of libhdf5 does NOT accept the copy_node()
     filter = tables.Filters(complevel=0, complib='blosc:zstd', shuffle=False, bitshuffle=False, fletcher32=False)
@@ -80,8 +76,6 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
     `run_array_direction`.
     1. Reconstruct the disp parameters and source position from a DL1 parameters table and write the result in the file.
     2. Computes mc_type from the name of the file.
-
-
     Parameters
     ----------
     dl1_file: HDF5 DL1 file containing the required field in `table_path`:
@@ -89,9 +83,7 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         - mc_az
         - mc_alt_tel
         - mc_az_tel
-
     table_path: path to the parameters table in the file
-
     Returns
     -------
         None
@@ -147,12 +139,10 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
 def modify_params_table(table, position_iterator):
     """
     Modify column names and compute missing parameters
-
     Parameters
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
         position_iterator: [int] iterator to include in the modifications
-
     Returns
     -------
         None
@@ -186,59 +176,34 @@ def stack_by_telid(dl1_pointer):
     Stack :
         - LST telescopes' parameters into a table
         - Calibrated images and pulse_times into another table
-
-    TODO : Make a walk node in the future ? --> will need to change most of the code :-/
-    TODO : Code just valid for Tel_1 to Tel_4.
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
-
     Returns
     -------
         Two tables [obj, astropy.table.table.Table] containing the parameters, and the images and pulse_times int their
             respective path
     """
-    t1 = Table(dl1_pointer.Tel_1.parameters.read())
-    t2 = Table(dl1_pointer.Tel_2.parameters.read())
-    t3 = Table(dl1_pointer.Tel_3.parameters.read())
-    t4 = Table(dl1_pointer.Tel_4.parameters.read())
-    tabs = [t1, t2, t3, t4]
 
-    for i, tab in enumerate(tabs):
-        modify_params_table(tab, i)
+    tabs = [Table(tel.parameters.read()) for tel in dl1_pointer]
+    stacked_param = vstack(tabs)
 
-        if i == 0:
-            stacked_param = tab
-        else:
-            stacked_param = vstack((stacked_param, tab))
+    images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
+    stacked_images = vstack(images)
 
-    # Image
-    imag1 = Table(dl1_pointer.Tel_1.calib_pic.read())
-    imag2 = Table(dl1_pointer.Tel_2.calib_pic.read())
-    imag3 = Table(dl1_pointer.Tel_3.calib_pic.read())
-    imag4 = Table(dl1_pointer.Tel_4.calib_pic.read())
-    imags = [imag1, imag2, imag3, imag4]
+    try:
+        #  HiPeCTA case
+        stacked_images.rename_column('eventId', 'event_id')
+    except KeyError:
+        #  HiPeRTA case
+        pass
 
-    for i, imag in enumerate(imags):
-        try:
-            #  HiPeCTA case
-            imag.rename_column('eventId', 'event_id')
-        except KeyError:
-            #  HiPeRTA case
-            pass
-
-        if i == 0:
-            stack_imag = imag
-        else:
-            stack_imag = vstack((stack_imag, imag))
-
-    return stacked_param, stack_imag
+    return stacked_param, stacked_images
 
 
 def reorganize_dl1(input_filename, output_filename):
     """
     Reorganize the output dl1 files of hiperta/hipecta codes to reach the same structure found in lstchain dl1 files.
-
     Parameters
     ----------
         input_filename: str
@@ -248,7 +213,6 @@ def reorganize_dl1(input_filename, output_filename):
     Returns
     -------
         None. It dumps the final hdf5 file with the correct structure.
-
     """
     hfile = tables.open_file(input_filename, 'r')
 
