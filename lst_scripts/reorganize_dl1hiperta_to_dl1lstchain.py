@@ -159,7 +159,7 @@ def modify_params_table(table, tel_id):
     """
     # Create the column tel_id
 
-    table.add_column(tel_id, name='tel_id')
+    table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name='tel_id')
 
     # Rename `leakage_intensity2` --> `leakage`
     table.rename_column('leakage_intensity2', 'leakage')
@@ -171,10 +171,6 @@ def modify_params_table(table, tel_id):
     with np.errstate(invalid='ignore'):
         table.add_column(table['width'] / table['length'], name='wl')
 
-    if position_iterator == 0:
-        print("\n\tRuntime Warnings have been ignored to avoid repeated stdout prints.")
-        print("\tRuntimeWarnings due to invalid values and divide by zero in `log10(intensity)`")
-        print("\t operations and divide by zero in `wl` divisions.")
 
 
 def stack_by_telid(dl1_pointer):
@@ -193,19 +189,19 @@ def stack_by_telid(dl1_pointer):
             respective path
     """
 
-    tels_params = [tel.parameters.read() for tel in dl1_pointer]
+    tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
     try:
-        tel_ids = [tel['telId'][0] for tel in tels_params]
+        tel_ids = [tel['telId'][0] for tel in dl1_pointer]
     except:
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i+1 for i in range(len(tels_params))]
 
-    tabs = [Table(tel) for tel in tels_params]
-
-    for tab, tel_id in zip(tabs, tel_ids):
+    for tab, tel_id in zip(tels_params, tel_ids):
         modify_params_table(tab, tel_id)
 
-    stacked_param = vstack(tabs)
+    # tabs = [Table(tel) for tel in tels_params]
+
+    stacked_param = vstack(tels_params)
 
     images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
     stacked_images = vstack(images)
