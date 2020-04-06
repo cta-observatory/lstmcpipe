@@ -204,7 +204,14 @@ def stack_by_telid(dl1_pointer):
     stacked_param = vstack(tels_params)
 
     images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
+
+    # adding stupid tel_id to the image table as well
+    for image_tab, tel_id in zip(images, tel_ids):
+        image_tab.add_column(Column(tel_id * np.ones(len(image_tab)), dtype=int), name='tel_id')
+
     stacked_images = vstack(images)
+    if 'event_id' not in stacked_images.columns:
+        stacked_images.add_column(stacked_param['event_id'])
 
     try:
         #  HiPeCTA case
