@@ -183,8 +183,6 @@ def stack_by_telid(dl1_pointer):
         - LST telescopes' parameters into a table
         - Calibrated images and pulse_times into another table
 
-    TODO : Make a walk node in the future ? --> will need to change most of the code :-/
-    TODO : Code just valid for Tel_1 to Tel_4.
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
@@ -197,7 +195,7 @@ def stack_by_telid(dl1_pointer):
 
     tels_params = [tel.parameters.read() for tel in dl1_pointer]
     try:
-        tel_ids = [tel['telId'] for tel in tels_params]
+        tel_ids = [tel['telId'][0] for tel in tels_params]
     except:
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i+1 for i in range(len(tels_params))]
