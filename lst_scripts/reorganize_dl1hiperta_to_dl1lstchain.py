@@ -200,8 +200,6 @@ def stack_by_telid(dl1_pointer):
     tabs = [Table(tel.parameters.read()) for tel in dl1_pointer]
     stacked_param = vstack(tabs)
 
-    # Image
-
     images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
     stacked_images = vstack(images)
 
