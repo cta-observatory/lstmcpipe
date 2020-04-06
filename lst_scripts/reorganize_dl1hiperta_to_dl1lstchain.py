@@ -204,6 +204,9 @@ def stack_by_telid(dl1_pointer):
 
     tabs = [Table(tel) for tel in tels_params]
 
+    for tab, tel_id in zip(tabs, tel_ids):
+        modify_params_table(tab, tel_id)
+
     stacked_param = vstack(tabs)
 
     # Image
