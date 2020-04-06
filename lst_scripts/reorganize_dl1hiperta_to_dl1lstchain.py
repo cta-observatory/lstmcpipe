@@ -204,35 +204,24 @@ def stack_by_telid(dl1_pointer):
     t4 = Table(dl1_pointer.Tel_4.parameters.read())
     tabs = [t1, t2, t3, t4]
 
-    for i, tab in enumerate(tabs):
-        modify_params_table(tab, i)
-
-        if i == 0:
-            stacked_param = tab
-        else:
-            stacked_param = vstack((stacked_param, tab))
+    stacked_param = vstack(tabs)
 
     # Image
     imag1 = Table(dl1_pointer.Tel_1.calib_pic.read())
     imag2 = Table(dl1_pointer.Tel_2.calib_pic.read())
     imag3 = Table(dl1_pointer.Tel_3.calib_pic.read())
     imag4 = Table(dl1_pointer.Tel_4.calib_pic.read())
-    imags = [imag1, imag2, imag3, imag4]
+    images = [imag1, imag2, imag3, imag4]
 
-    for i, imag in enumerate(imags):
-        try:
-            #  HiPeCTA case
-            imag.rename_column('eventId', 'event_id')
-        except KeyError:
-            #  HiPeRTA case
-            pass
+    stacked_images = vstack(images)
+    try:
+        #  HiPeCTA case
+        stacked_images.rename_column('eventId', 'event_id')
+    except KeyError:
+        #  HiPeRTA case
+        pass
 
-        if i == 0:
-            stack_imag = imag
-        else:
-            stack_imag = vstack((stack_imag, imag))
-
-    return stacked_param, stack_imag
+    return stacked_param, stacked_images
 
 
 def reorganize_dl1(input_filename, output_filename):
