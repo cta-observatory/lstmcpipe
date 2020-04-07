@@ -10,6 +10,7 @@
 import random
 import argparse
 import calendar
+import lstchain
 from lstchain.io.data_management import *
 from data_management import check_and_make_dir_without_verification
 
@@ -70,7 +71,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
          keep_rta_file=False, flag_full_workflow=False):
 
     today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
+    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_RTA_v00_lstchain_v{lstchain.__version__}'
     suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
     PROD_ID = base_prod_id + suffix_id
     TRAIN_TEST_RATIO = float(train_test_ratio)
