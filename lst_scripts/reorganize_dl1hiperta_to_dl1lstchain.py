@@ -167,7 +167,7 @@ def modify_params_table(table, tel_id, focal=28):
 
     # X and Y in meters
     table['x'] *= focal
-    tables['y'] *= focal
+    table['y'] *= focal
 
 
     # mc_energy must be computed after merging
