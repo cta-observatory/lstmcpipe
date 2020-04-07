@@ -166,10 +166,8 @@ def modify_params_table(table, tel_id):
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
-    with np.errstate(divide='ignore', invalid='ignore'):
-        table.add_column(np.log10(table['intensity']), name='log_intensity')
-    with np.errstate(invalid='ignore'):
-        table.add_column(table['width'] / table['length'], name='wl')
+    table.add_column(np.log10(table['intensity']), name='log_intensity')
+    table.add_column(table['width'] / table['length'], name='wl')
 
 
 
