@@ -43,7 +43,9 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     It copies /instruments and /simulations nodes from the output of hipecta_hdf5_r1_to_dl1.py,
         - and /dl1/event from the created table.
         - and includes the image and pulse_time within the correct path, i.e., /dl1/event/telescope/
+
     TODO: Define somehow the paths globally so that it can be used .get_node()
+
     Parameters
     ----------
         hfile: [obj, astropy.table.table.Table] output file
@@ -52,9 +54,11 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
         hfile_tmp2: [obj, astropy.table.table.Table] hdf5 file with images and pulse_time. path:
                     `dl1/event/telescope/image/LST_LSTCam`
         output_filename: [str] name of output file
+
     Returns
     -------
         None
+
     """
     # The complevel MUST be set to zero, otherwise this version of libhdf5 does NOT accept the copy_node()
     filter = tables.Filters(complevel=0, complib='blosc:zstd', shuffle=False, bitshuffle=False, fletcher32=False)
@@ -76,6 +80,8 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
     `run_array_direction`.
     1. Reconstruct the disp parameters and source position from a DL1 parameters table and write the result in the file.
     2. Computes mc_type from the name of the file.
+
+
     Parameters
     ----------
     dl1_file: HDF5 DL1 file containing the required field in `table_path`:
@@ -83,7 +89,9 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         - mc_az
         - mc_alt_tel
         - mc_az_tel
+
     table_path: path to the parameters table in the file
+
     Returns
     -------
         None
@@ -136,60 +144,77 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
 
 
-def modify_params_table(table, position_iterator):
+def modify_params_table(table, tel_id, focal=28):
     """
     Modify column names and compute missing parameters
+
     Parameters
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
         position_iterator: [int] iterator to include in the modifications
+        focal: [float] focal length in meters
+
     Returns
     -------
         None
     """
     # Create the column tel_id
-    # TODO : it can be done more 'classy' in the case of hiperta by reading `hfile_rta.root.dl1.Tel_1.telId.read()`
-    # however, hipecta does NOT have this option.
-    tel_id = Column(np.full(table.columns[0].size,
-                            int(position_iterator + 1)  # TODO : A bit hardcoded. Just valid for LSTs
-                            ))
-    table.add_column(tel_id, name='tel_id')
+
+    table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name='tel_id')
 
     # Rename `leakage_intensity2` --> `leakage`
     table.rename_column('leakage_intensity2', 'leakage')
 
+    # X and Y in meters
+    table['x'] *= focal
+    tables['y'] *= focal
+
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
-    with np.errstate(divide='ignore', invalid='ignore'):
-        table.add_column(np.log10(table['intensity']), name='log_intensity')
-    with np.errstate(invalid='ignore'):
-        table.add_column(table['width'] / table['length'], name='wl')
-
-    if position_iterator == 0:
-        print("\n\tRuntime Warnings have been ignored to avoid repeated stdout prints.")
-        print("\tRuntimeWarnings due to invalid values and divide by zero in `log10(intensity)`")
-        print("\t operations and divide by zero in `wl` divisions.")
+    table.add_column(np.log10(table['intensity']), name='log_intensity')
+    table.add_column(table['width'] / table['length'], name='wl')
 
 
-def stack_by_telid(dl1_pointer):
+def stack_by_telid(dl1_pointer, focal=28):
     """
     Stack :
         - LST telescopes' parameters into a table
         - Calibrated images and pulse_times into another table
+
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
+        focal: [int] focal of the telescope.
+
     Returns
     -------
         Two tables [obj, astropy.table.table.Table] containing the parameters, and the images and pulse_times int their
             respective path
     """
 
-    tabs = [Table(tel.parameters.read()) for tel in dl1_pointer]
-    stacked_param = vstack(tabs)
+    tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
+    try:
+        tel_ids = [tel['telId'][0] for tel in dl1_pointer]
+    except:
+        # if the tel_id column does not exist, we assign tel ids by simple iteration
+        tel_ids = [i+1 for i in range(len(tels_params))]
+
+    for tab, tel_id in zip(tels_params, tel_ids):
+        modify_params_table(tab, tel_id, focal=focal)
+
+    # tabs = [Table(tel) for tel in tels_params]
+
+    stacked_param = vstack(tels_params)
 
     images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
+
+    # adding stupid tel_id to the image table as well
+    for image_tab, tel_id in zip(images, tel_ids):
+        image_tab.add_column(Column(tel_id * np.ones(len(image_tab)), dtype=int), name='tel_id')
+
     stacked_images = vstack(images)
+    if 'event_id' not in stacked_images.columns:
+        stacked_images.add_column(stacked_param['event_id'])
 
     try:
         #  HiPeCTA case
@@ -204,6 +229,7 @@ def stack_by_telid(dl1_pointer):
 def reorganize_dl1(input_filename, output_filename):
     """
     Reorganize the output dl1 files of hiperta/hipecta codes to reach the same structure found in lstchain dl1 files.
+
     Parameters
     ----------
         input_filename: str
@@ -213,6 +239,7 @@ def reorganize_dl1(input_filename, output_filename):
     Returns
     -------
         None. It dumps the final hdf5 file with the correct structure.
+
     """
     hfile = tables.open_file(input_filename, 'r')
 
@@ -226,7 +253,8 @@ def reorganize_dl1(input_filename, output_filename):
     _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
         os.path.basename(input_filename))
 
-    table_dl1, table_imags = stack_by_telid(dl1)
+    focal = hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0]
+    table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
     table_dl1 = join(table_dl1, mc_event, keys='event_id')
