@@ -144,7 +144,7 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
 
 
-def modify_params_table(table, tel_id):
+def modify_params_table(table, tel_id, focal=28):
     """
     Modify column names and compute missing parameters
 
@@ -152,6 +152,7 @@ def modify_params_table(table, tel_id):
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
         position_iterator: [int] iterator to include in the modifications
+        focal: [float] focal length in meters
 
     Returns
     -------
@@ -164,6 +165,11 @@ def modify_params_table(table, tel_id):
     # Rename `leakage_intensity2` --> `leakage`
     table.rename_column('leakage_intensity2', 'leakage')
 
+    # X and Y in meters
+    table['x'] *= focal
+    tables['y'] *= focal
+
+
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
     table.add_column(np.log10(table['intensity']), name='log_intensity')
@@ -171,7 +177,7 @@ def modify_params_table(table, tel_id):
 
 
 
-def stack_by_telid(dl1_pointer):
+def stack_by_telid(dl1_pointer, focal=28):
     """
     Stack :
         - LST telescopes' parameters into a table
@@ -194,8 +200,9 @@ def stack_by_telid(dl1_pointer):
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i+1 for i in range(len(tels_params))]
 
+
     for tab, tel_id in zip(tels_params, tel_ids):
-        modify_params_table(tab, tel_id)
+        modify_params_table(tab, tel_id, focal=focal)
 
     # tabs = [Table(tel) for tel in tels_params]
 
@@ -248,7 +255,8 @@ def reorganize_dl1(input_filename, output_filename):
     _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
         os.path.basename(input_filename))
 
-    table_dl1, table_imags = stack_by_telid(dl1)
+    focal = hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0]
+    table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
     table_dl1 = join(table_dl1, mc_event, keys='event_id')
