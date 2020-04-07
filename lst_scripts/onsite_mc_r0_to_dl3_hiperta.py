@@ -240,7 +240,7 @@ if __name__ == '__main__':
     # Global variables
 
     today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_RTA_v00_lstchain_{lstchain.__version__}'
+    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_RTA_v00_lstchain_v{lstchain.__version__}'
     suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
 
     # Missing global variables, some dependent of args.
