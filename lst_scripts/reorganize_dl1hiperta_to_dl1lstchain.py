@@ -254,6 +254,7 @@ def reorganize_dl1(input_filename, output_filename):
         os.path.basename(input_filename))
 
     # File has not been reorganized yet ! Thus, the path for optics is inside /instrument/subarray/telescope
+    # only valid for LSTs !
     focal = hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0]
     table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
