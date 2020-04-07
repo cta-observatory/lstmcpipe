@@ -172,14 +172,12 @@ def modify_params_table(table, tel_id, focal=28):
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
-    with np.errstate(divide='ignore', invalid='ignore'):
-        table.add_column(np.log10(table['intensity']), name='log_intensity')
-    with np.errstate(invalid='ignore'):
-        table.add_column(table['width'] / table['length'], name='wl')
+    table.add_column(np.log10(table['intensity']), name='log_intensity')
+    table.add_column(table['width'] / table['length'], name='wl')
 
 
 
-def stack_by_telid(dl1_pointer):
+def stack_by_telid(dl1_pointer, focal=28):
     """
     Stack :
         - LST telescopes' parameters into a table
@@ -202,8 +200,9 @@ def stack_by_telid(dl1_pointer):
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i+1 for i in range(len(tels_params))]
 
+
     for tab, tel_id in zip(tels_params, tel_ids):
-        modify_params_table(tab, tel_id)
+        modify_params_table(tab, tel_id, focal=focal)
 
     # tabs = [Table(tel) for tel in tels_params]
 
@@ -256,7 +255,8 @@ def reorganize_dl1(input_filename, output_filename):
     _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
         os.path.basename(input_filename))
 
-    table_dl1, table_imags = stack_by_telid(dl1)
+    focal = hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0]
+    table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
     table_dl1 = join(table_dl1, mc_event, keys='event_id')
