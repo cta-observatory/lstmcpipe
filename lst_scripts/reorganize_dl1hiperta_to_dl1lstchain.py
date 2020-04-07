@@ -255,7 +255,8 @@ def reorganize_dl1(input_filename, output_filename):
     _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
         os.path.basename(input_filename))
 
-    focal = hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0]
+    ## ONLY FOR LST files !
+    focal = hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0]
     table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
