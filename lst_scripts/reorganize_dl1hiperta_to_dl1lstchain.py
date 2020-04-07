@@ -144,7 +144,7 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
 
 
-def modify_params_table(table, position_iterator):
+def modify_params_table(table, tel_id):
     """
     Modify column names and compute missing parameters
 
@@ -158,27 +158,17 @@ def modify_params_table(table, position_iterator):
         None
     """
     # Create the column tel_id
-    # TODO : it can be done more 'classy' in the case of hiperta by reading `hfile_rta.root.dl1.Tel_1.telId.read()`
-    # however, hipecta does NOT have this option.
-    tel_id = Column(np.full(table.columns[0].size,
-                            int(position_iterator + 1)  # TODO : A bit hardcoded. Just valid for LSTs
-                            ))
-    table.add_column(tel_id, name='tel_id')
+
+    table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name='tel_id')
 
     # Rename `leakage_intensity2` --> `leakage`
     table.rename_column('leakage_intensity2', 'leakage')
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
-    with np.errstate(divide='ignore', invalid='ignore'):
-        table.add_column(np.log10(table['intensity']), name='log_intensity')
-    with np.errstate(invalid='ignore'):
-        table.add_column(table['width'] / table['length'], name='wl')
+    table.add_column(np.log10(table['intensity']), name='log_intensity')
+    table.add_column(table['width'] / table['length'], name='wl')
 
-    if position_iterator == 0:
-        print("\n\tRuntime Warnings have been ignored to avoid repeated stdout prints.")
-        print("\tRuntimeWarnings due to invalid values and divide by zero in `log10(intensity)`")
-        print("\t operations and divide by zero in `wl` divisions.")
 
 
 def stack_by_telid(dl1_pointer):
@@ -197,11 +187,29 @@ def stack_by_telid(dl1_pointer):
             respective path
     """
 
-    tabs = [Table(tel.parameters.read()) for tel in dl1_pointer]
-    stacked_param = vstack(tabs)
+    tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
+    try:
+        tel_ids = [tel['telId'][0] for tel in dl1_pointer]
+    except:
+        # if the tel_id column does not exist, we assign tel ids by simple iteration
+        tel_ids = [i+1 for i in range(len(tels_params))]
+
+    for tab, tel_id in zip(tels_params, tel_ids):
+        modify_params_table(tab, tel_id)
+
+    # tabs = [Table(tel) for tel in tels_params]
+
+    stacked_param = vstack(tels_params)
 
     images = [Table(tel.calib_pic.read()) for tel in dl1_pointer]
+
+    # adding stupid tel_id to the image table as well
+    for image_tab, tel_id in zip(images, tel_ids):
+        image_tab.add_column(Column(tel_id * np.ones(len(image_tab)), dtype=int), name='tel_id')
+
     stacked_images = vstack(images)
+    if 'event_id' not in stacked_images.columns:
+        stacked_images.add_column(stacked_param['event_id'])
 
     try:
         #  HiPeCTA case
