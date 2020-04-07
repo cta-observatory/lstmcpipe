@@ -144,7 +144,7 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
 
 
-def modify_params_table(table, tel_id):
+def modify_params_table(table, tel_id, focal=28):
     """
     Modify column names and compute missing parameters
 
@@ -152,6 +152,7 @@ def modify_params_table(table, tel_id):
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
         position_iterator: [int] iterator to include in the modifications
+        focal: [float] focal length in meters
 
     Returns
     -------
@@ -163,6 +164,11 @@ def modify_params_table(table, tel_id):
 
     # Rename `leakage_intensity2` --> `leakage`
     table.rename_column('leakage_intensity2', 'leakage')
+
+    # X and Y in meters
+    table['x'] *= focal
+    tables['y'] *= focal
+
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
