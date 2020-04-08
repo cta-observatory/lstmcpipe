@@ -3,9 +3,10 @@
 # T. Vuillaime,
 # Code adapted by E. Garcia 03/20
 # Code to reduce R0 data to DL1 onsite (La Palma cluster) - HiPeRTA version
-
-# !!!!!!
-# r0 to dl1 for a whole DIRECTORY, managing test and train jobs, as well as sbatch jobs in case of full workflow
+#
+# usage:
+# python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
+#  [-nfdl1 n_files_per_dl1] [--prod_id prod_id] [-k keep_rta_output_file]
 
 import random
 import argparse
@@ -13,7 +14,7 @@ import calendar
 from lstchain.io.data_management import *
 from data_management import check_and_make_dir_without_verification
 
-parser = argparse.ArgumentParser(description="MC R0 to DL1 - HiPeRTA version")
+parser = argparse.ArgumentParser(description="MC R0 to DL1 - MC onsite conversion")
 
 parser.add_argument('input_dir', type=str,
                     help='path to the files directory to analyse',
@@ -58,21 +59,21 @@ parser.add_argument('--keep_rta_file', '-k',
                     default=False
                     )
 
-parser.add_argument('--flag_full_workflow', '-fw',
-                    type=lambda x: bool(strtobool(x)),
-                    dest='flag_full_workflow',
-                    help='Boolean flag to indicate if the script is run as part of a larger workflow',
-                    default=False
-                    )
-
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, prod_id=None,
          keep_rta_file=False, flag_full_workflow=False):
 
-    today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
-    suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
-    PROD_ID = base_prod_id + suffix_id
+    if not flag_full_workflow:
+        # This formatting should be the same as in `onsite_mc_r0_to_dl3_hiperta.py`
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        today = calendar.datetime.date.today()
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
+        suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
+        PROD_ID = base_prod_id + suffix_id
+    else:
+        # Full prod_id is passed as argument
+        PROD_ID = prod_id
+
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
     NFILES_PER_DL1 = int(n_files_per_dl1)
@@ -82,11 +83,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     DL0_DATA_DIR = input_dir
 
     ##############################################################################
-
-    if not flag_full_workflow:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
-    else:
-        print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
@@ -124,10 +120,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    # TODO mark for to date version of workflow-rta
-    # RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'DL1_RTA'), PROD_ID)
-    #RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)  #
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -184,8 +177,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            # TODO manage None config file in hiperta_r0_to_dl1lstchain
-            #  previous path : /home/thomas.vuillaume/software/LST_scripts/lst_scripts/default_PConfigCut.txt
+
+            # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  #
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
             base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
@@ -243,8 +236,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
-
-        print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
         return jobid2log, jobids_RTA_r0_dl1_reorganized
 
     else:
@@ -259,6 +250,5 @@ if __name__ == '__main__':
          args.random_seed,
          args.n_files_per_dl1,
          args.prod_id,
-         args.keep_rta_file,
-         args.flag_full_workflow
+         args.keep_rta_file
          )

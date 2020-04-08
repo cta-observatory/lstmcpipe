@@ -3,6 +3,10 @@
 # T. Vuillaume,
 # Modifications by E. Garcia
 # Code to reduce R0 data to DL1 onsite (La Palma cluster)
+#
+# usage:
+# python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
+#  [-nfdl1 n_files_per_dl1] [--prod_id prod_id]
 
 import random
 import argparse
@@ -101,11 +105,17 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         A list of all the jobs sent by particle (including test and train set types).
 
     """
+    if not flag_full_workflow:
+        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
+        today = calendar.datetime.date.today()
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+        suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
+        PROD_ID = base_prod_id + suffix_id
+    else:
+        # Full prod_id is passed as argument
+        PROD_ID = prod_id
 
-    today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
-    PROD_ID = base_prod_id + suffix_id
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
     NFILES_PER_DL1 = n_files_per_dl1
@@ -114,10 +124,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     DL0_DATA_DIR = input_dir
 
-    if not flag_full_workflow:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
-    else:
-        print("\n ==== START {} ==== \n".format('r0_to_dl1_workflow'))
+    ##############################################################################
 
     print("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
@@ -265,8 +272,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
-
-        print("\n ==== END {} ==== \n".format('r0_to_dl1_workflow'))
         return jobid2log, jobids_r0_dl1
 
     else:

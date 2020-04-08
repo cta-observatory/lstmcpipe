@@ -192,8 +192,36 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
 
 
 def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
+    """
+    Function to batch the r0_to_dl1 jobs by particle type, using the HiPeRTA code. Files in input_dir MUST had been
+     previously converted to *.h5
+
+    It will also create, arrange and return a dictionary with all the log of this stage.
+
+    Parameters
+    ----------
+    input_dir : str
+        Path to the R1 (h5 !) files
+    conf_file : str
+        Path to a configuration file. If none is given, a standard configuration is applied
+    prod_id : str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+
+
+    Returns
+    -------
+    full_log : dict
+        Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
+        4 more keys (one by particle) with all the jobs associated with each particle.
+
+    debug_log : dict
+            dictionary containing minimum information - jobids -  for log_reduced.txt
+
+    """
     full_log = {'jobid_log': {}}
     debug_log = {}
+
+    print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
     for particle in ALL_PARTICLES:
         log, jobids_by_particle = r0_to_dl1_rta(input_dir.format(particle),
@@ -209,6 +237,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+
+    print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
     return full_log, debug_log
 
@@ -247,10 +277,7 @@ if __name__ == '__main__':
     PROD_ID = base_prod_id + suffix_id
     RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
     ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
-    # DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
-    #
-    # TODO mark for to date version of workflow-rta
-    DL0_DATA_DIR = os.path.join(BASE_PATH, 'R1', OBS_DATE, '{}', POINTING)
+    DL0_DATA_DIR = os.path.join(BASE_PATH, 'R1', OBS_DATE, '{}', POINTING)  #
     DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
     # #################################################
@@ -286,7 +313,7 @@ if __name__ == '__main__':
     # r0 to dl1 - RTA version
     log_batch_r0_dl1, debug_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
                                                          rta_config,
-                                                         args.prod_id
+                                                         PROD_ID
                                                          )
     save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1_vRTA')
     save_log_to_file(debug_r0_dl1, debug_file, 'r0_to_dl1_vRTA')

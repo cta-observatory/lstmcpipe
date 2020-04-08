@@ -324,16 +324,19 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
         Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
         4 more keys (one by particle) with all the jobs associated with each particle.
 
-    ids_by_particle_ok : str  # TODO in V0.2 - Job management
-        a string (of chained jobids separated by ',' and without spaces between each element), to be passed to the
-        the next stage of the workflow (as a slurm dependency).
     debug_log : dict
             dictionary containing minimum information - jobids -  for log_reduced.txt
 
+    # ids_by_particle_ok : str  # TODO in V0.2 - Job management
+    #     a string (of chained jobids separated by ',' and without spaces between each element), to be passed to the
+    #     the next stage of the workflow (as a slurm dependency).
+
     """
     full_log = {'jobid_log': {}}
-    ids_by_particle_ok = []
+    # ids_by_particle_ok = []
     debug_log = {}
+
+    print("\n ==== START {} ==== \n".format('r0_to_dl1_workflow'))
 
     for particle in ALL_PARTICLES:
         log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
@@ -356,7 +359,9 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
 
         # how to launch the check of files and what to pass to merge (4 ids or ~300)
 
-    return full_log, ids_by_particle_ok, debug_log
+    print("\n ==== END {} ==== \n".format('r0_to_dl1_workflow'))
+
+    return full_log, debug_log  # ids_by_particle_ok
 
 
 if __name__ == '__main__':
@@ -409,9 +414,9 @@ if __name__ == '__main__':
     debug_file = './log_reduced.txt'
 
     if DO_r0_to_r1:  # TODO V0.2 Job management : _ jobids to check if they have finished without erros
-        log_batch_r0_dl1, _, debug = batch_r0_to_dl1(DL0_DATA_DIR,
-                                                     args.config_file,
-                                                     args.prod_id)
+        log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
+                                                  args.config_file,
+                                                  PROD_ID)
 
         # First time opening the log --> erase
         if os.path.exists(log_file):
