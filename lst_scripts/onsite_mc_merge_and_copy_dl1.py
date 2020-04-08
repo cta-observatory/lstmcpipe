@@ -28,7 +28,7 @@ parser.add_argument('input_dir', type=str,
                     )
 
 
-def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None):
+def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=True):
     """
     Merge and copy DL1 data after production.
 
@@ -43,15 +43,23 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
     ----------
     input_dir : str
         path to the DL1 files directory to merge, copy and move.  Compulsory argument.
+
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+
     particle2jobs_dict : dict
         Dictionary used to retrieve the r0 to dl1 jobids that were sent in the previous step of the r0-dl3 workflow.
         This script will NOT start until all the jobs sent before have finished.
         COMPULSORY argument when flag_full_workflow is set to True.
+
     particle : str
         Type of particle used to create the log and dictionary
         COMPULSORY argument when flag_full_workflow is set to True.
+
+    flag_merge : bool
+        Flag to indicate whether the `--smart` argument of the `lstchain_merge_hdf5_files.py` script must be set to
+        True (smart merge) or False (auto merge)
+        Default set to True.
 
 
     Returns
@@ -80,8 +88,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         log_merge = {particle: {'training': {}, 'testing': {}}}
 
         wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
-
-        print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
         return_jobids4train = []
         return_jobids_debug = []
@@ -141,7 +147,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
-            cmd += "--no-image True"
+            cmd += " --no-image True"
             os.system(cmd)
 
         # 4. move DL1 files in final place
@@ -188,11 +194,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-            # TODO mark for to date version of workflow-rta
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True --smart False"'.format(
+            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True --smart {}"'.format(
                 job_name[particle],
                 tdir,
-                output_filename
+                output_filename,
+                flag_merge  #
             )
 
             jobid_merge = os.popen(cmd).read().strip('\n')
@@ -255,7 +261,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print("\tLOGS will be moved to {}".format(logs_destination_dir))
 
-        # Little 'astuce' (it will not be clear in log). These keys are stored here for 2 purposes:
+        # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
         # 1 - In train_pipe recover final dl1 names and path.
         # 2 - In dl1_to_dl2 recover the jobids of the merged dl1 files; (all dl1 files MUST be merged and moved
         # to dl1_dir), so instead of storing the jobid that merges all the *particle*_dl1 (jobid_merge), it will
@@ -265,8 +271,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                                         wait_both_merges+' up to ' + jobid_move_log,
                                                                         running_DL1_dir,
                                                                         final_DL1_dir, 'False')
-
-        print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
         return_jobids4train = ','.join(return_jobids4train)
         return_jobids_debug = ','.join(return_jobids_debug)

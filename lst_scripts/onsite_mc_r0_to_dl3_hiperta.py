@@ -173,7 +173,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
         log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
                                                      flag_full_workflow=True,
                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
-                                                     particle=particle
+                                                     particle=particle,
+                                                     flag_merge=False
                                                      )
 
         log_merge_and_copy.update(log)

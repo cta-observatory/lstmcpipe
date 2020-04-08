@@ -143,7 +143,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     """
 
     log_dl1_to_dl2 = {}
-    jobid_4_dl2_to_dl3 = []
+    jobid_for_dl2_to_dl3 = []
     debug_log = {}
 
     for particle in ALL_PARTICLES:
@@ -158,12 +158,12 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                 )
 
         log_dl1_to_dl2.update(log)
-        jobid_4_dl2_to_dl3.append(jobid)
+        jobid_for_dl2_to_dl3.append(jobid)
 
         debug_log[jobid] = f'{particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} training ' \
                            f'jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
 
-    jobid_4_dl2_to_dl3 = ','.join(jobid_4_dl2_to_dl3)
+    jobid_4_dl2_to_dl3 = ','.join(jobid_for_dl2_to_dl3)
 
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
@@ -216,7 +216,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag_rta_or_lst='lst'):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -227,9 +227,14 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
     ----------
     running_analysis_dir : str
         Directory to dl1 files
+
     log_jobs_from_r0_to_dl1 : dict
         dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
         (onsite_mc_r0_to_dl1)
+
+    flag_rta_or_lst : bool
+        flag to indicate whether the workflow corresponds to the an lstchian or an HiPeRTA one.
+        Set the `--smart` argument of the `lstchain_merge_hdf5_files.py` (batched in this function).
 
     Returns
     -------
@@ -249,11 +254,21 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
     all_merge = []
     debug_log = {}
 
+    if flag_rta_or_lst == 'lst':
+        flag_merge = True
+    elif flag_rta_or_lst == 'rta':
+        flag_merge = False
+    else:
+        flag_merge = True
+
+    print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
+
     for particle in ALL_PARTICLES:
         log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
                                                      flag_full_workflow=True,
                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
-                                                     particle=particle
+                                                     particle=particle,
+                                                     flag_merge=flag_merge
                                                      )
 
         log_merge_and_copy.update(log)
@@ -263,10 +278,12 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1):
 
         debug_log[jobid] = f'{particle} merge_and_copy-jobs that will go to dl1_to_dl2. They depend on the following ' \
                            f'{log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
-        debug_log[jobid_debug] = f'All the {particle} jobs that have been launched in merge_and_copy_dl1.'
+        debug_log[jobid_debug] = f'Are all the {particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
     all_merge = ','.join(all_merge)
+
+    print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
     return log_merge_and_copy, jobid_4_train, all_merge, debug_log
 
