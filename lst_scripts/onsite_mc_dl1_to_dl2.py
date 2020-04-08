@@ -157,4 +157,6 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    main(args.input_dir, args.path_models, args.config_file)
+    main(args.input_dir,
+         args.path_models,
+         args.config_file)

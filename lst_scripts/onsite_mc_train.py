@@ -141,4 +141,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    main(args.gamma_dl1_train, args.proton_dl1_trainm, args.config_file, source_environment=source_env)
+    main(args.gamma_dl1_train,
+         args.proton_dl1_trainm,
+         args.config_file,
+         source_environment=source_env)
