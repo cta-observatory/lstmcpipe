@@ -120,7 +120,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)  #
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)  ##
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -178,7 +178,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
 
-            # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  #
+            # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
             base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'

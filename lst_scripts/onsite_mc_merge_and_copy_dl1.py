@@ -198,7 +198,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 job_name[particle],
                 tdir,
                 output_filename,
-                flag_merge  #
+                flag_merge  ##
             )
 
             jobid_merge = os.popen(cmd).read().strip('\n')

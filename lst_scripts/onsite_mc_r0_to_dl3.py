@@ -21,6 +21,7 @@ import lstchain
 import glob
 import pprint
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
+from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from onsite_mc_train import main as train_pipe
 from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
@@ -28,7 +29,11 @@ from data_management import *
 
 #######################################################################################################################
 #######################################################################################################################
+# choose between 'lst' for lstchain-like workflow OR 'rta' for HiPeRTA-like workflow
+WORKFLOW_KIND = 'lst'
+
 BASE_PATH = '/fefs/aswg/data/mc'
+# BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
 
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
@@ -110,7 +115,7 @@ def batch_dl2_to_dl3():
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
-                     dict_with_dl1_paths):
+                     dict_with_dl1_paths, particles_loop):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
@@ -118,18 +123,26 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     ----------
     dl1_directory : str
         Path to the dl1 directory
+
     path_to_models : str
         Path to the model directory - should be taken from train_pipe
+
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
+
     jobid_from_training : str
         string containing the jobid from the jobs batched in the train_pipe stage, to be passed to the
         dl1_to_dl2 function (as a slurm dependency)
+
     jobids_from_merge : str
         string containing the jobid from the jobs batched in the merge_and_copy_dl1 stage,
         to be passed to the dl1_to_dl2 function (as a slurm dependency)
+
     dict_with_dl1_paths : dict
         Indeed the log of the merge_and_copy stage, where the final names of the dl1 files were stored
+
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
     Returns
     -------
@@ -148,7 +161,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
     print("\n ==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
 
-    for particle in ALL_PARTICLES:
+    for particle in particles_loop:
         log, jobid = dl1_to_dl2(dl1_directory.format(particle),
                                 path_models=path_to_models,
                                 config_file=config_file,
@@ -182,8 +195,10 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     log_from_merge : dict
         dictionary containing the output name and abs path to the DL1 files, derived in merge_and_copy and saved
         through the log
+
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
+
     jobids_from_merge : str
         string containing the jobids (***ONLY from proton and gamma-diffuse***) from the jobs batched in the
          merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency)
@@ -192,11 +207,14 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     -------
     log_train : dict
         Dictionary containing the log of the batched train_pipe jobs
+
     jobid_4_dl1_to_dl2 : str
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
+
     debug_log : dict
         Debug purposes
+
     model_path :
         Path with the model's directory
 
@@ -224,7 +242,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag_rta_or_lst='lst'):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, flag_rta_or_lst='lst'):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -240,9 +258,12 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag
         dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
         (onsite_mc_r0_to_dl1)
 
-    flag_rta_or_lst : bool
+    flag_rta_or_lst : str
         flag to indicate whether the workflow corresponds to the an lstchian or an HiPeRTA one.
         Set the `--smart` argument of the `lstchain_merge_hdf5_files.py` (batched in this function).
+
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
     Returns
     -------
@@ -271,7 +292,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag
 
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
-    for particle in ALL_PARTICLES:
+    for particle in particles_loop:
         log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
                                                      flag_full_workflow=True,
                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
@@ -314,6 +335,8 @@ def check_job_output_logs(dict_particle_jobid):
             Debug purposes
 
     """
+    # TODO log_batch_r0_dl1 take place also in the job management
+
     # dictionary by particle with all the jobids corresponding to each particle
 
     jobid_dependecies = ','.join(map(str, dict_particle_jobid.keys()))
@@ -325,7 +348,59 @@ def check_job_output_logs(dict_particle_jobid):
     return ids_single_particle_ok
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id):
+def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id):
+    """
+    Function to batch the r0_to_dl1 jobs by particle type, using the HiPeRTA code. Files in input_dir MUST had been
+     previously converted to *.h5
+
+    It will also create, arrange and return a dictionary with all the log of this stage.
+
+    Parameters
+    ----------
+    input_dir : str
+        Path to the R1 (h5 !) files
+    conf_file : str
+        Path to a configuration file. If none is given, a standard configuration is applied
+    prod_id : str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+
+
+    Returns
+    -------
+    full_log : dict
+        Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
+        4 more keys (one by particle) with all the jobs associated with each particle.
+
+    debug_log : dict
+            dictionary containing minimum information - jobids -  for log_reduced.txt
+
+    """
+    full_log = {'jobid_log': {}}
+    debug_log = {}
+
+    print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
+
+    for particle in ALL_PARTICLES:
+        log, jobids_by_particle = r0_to_dl1_rta(input_dir.format(particle),
+                                                config_file=conf_file,
+                                                prod_id=prod_id,
+                                                flag_full_workflow=True
+                                                )
+
+        # Create jobid to full log information dictionary.
+        # And the inverse dictionary, particle to the list of all the jobids of that same particle
+        full_log['jobid_log'].update(log)
+        full_log[particle] = jobids_by_particle
+
+        for jid in jobids_by_particle:
+            debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+
+    print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
+
+    return full_log, debug_log
+
+
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop):
     """
     Function to batch the r0_to_dl1 jobs by particle type.
 
@@ -341,7 +416,8 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
         Path to a configuration file. If none is given, a standard configuration is applied
     prod_id : str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
     Returns
     -------
@@ -363,26 +439,24 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
 
     print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
 
-    for particle in ALL_PARTICLES:
+    for particle in particles_loop:
         log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
                                             config_file=conf_file,
                                             prod_id=prod_id,
                                             flag_full_workflow=True
                                             )
 
-        # Create jobid to full log information dictionary
-        # And the inverse dictionary, particle to the list of all the jobids of that same particle
+        # Create dictionary : jobid to full log information, and
+        #  the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
         full_log[particle] = jobids_by_particle
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1'
 
-        # TODO in V0.2 - Job management
+        # TODO in V0.2 - Job management : how to launch the check of files and what to pass to merge (4 ids or ~300)
         # jobid_summary = check_job_output_logs(full_log[particle])  # full_log is a dict of dicts
         # ids_by_particle_ok.append(jobid_summary)
-
-        # how to launch the check of files and what to pass to merge (4 ids or ~300)
 
     print("\n ==== END {} ==== \n".format('batch r0_to_dl1_workflow'))
 
@@ -411,8 +485,6 @@ if __name__ == '__main__':
     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
     suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
 
-    # Missing global variables, some dependent of args.
-
     PROD_ID = base_prod_id + suffix_id
     RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
     ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
@@ -424,37 +496,49 @@ if __name__ == '__main__':
     # #################################################
 
     print(f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
-          f'\t{DL0_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n\n'
+          f'\t{DL0_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n\n'
           f'The following directories and all the information within them will be either created or overwritten:\n'
           f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
-          f'\t{RUNNING_ANALYSIS_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
-          f'\t{DL1_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
-          f'\t{DL1_DATA_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}""")).replace("DL1", "DL2")}\n'
-          f'\t{ANALYSIS_LOG_DIR.format(str("""{""")+",".join(ALL_PARTICLES)+str("""}"""))}\n'
+          f'\t{RUNNING_ANALYSIS_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
+          f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
+          f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}""")).replace("DL1", "DL2")}\n'
+          f'\t{ANALYSIS_LOG_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
           )
 
     query_continue('Are you sure ?')
 
-    log_file = './log_FULL_onsite_mc_r0_to_dl3.txt'
-    debug_file = './log_reduced.txt'
+    log_file = './log_FULL_onsite_mc_r0_to_dl3_{}.txt'.format(suffix_id)
+    debug_file = './log_reduced_{}.txt'.format(suffix_id)
 
-    if DO_r0_to_r1:  # TODO V0.2 Job management : _ jobids to check if they have finished without erros
-        log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
-                                                  args.config_file,
-                                                  PROD_ID)
+    # First time opening the log, otherwise --> erase
+    if os.path.exists(log_file):
+        os.remove(log_file)
+    if os.path.exists(debug_file):
+        os.remove(debug_file)
 
-        # First time opening the log --> erase
-        if os.path.exists(log_file):
-            os.remove(log_file)
-        if os.path.exists(debug_file):
-            os.remove(debug_file)
+    if DO_r0_to_r1:
+        if WORKFLOW_KIND == 'lst':
+            log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
+                                                      args.config_file,
+                                                      PROD_ID,
+                                                      ALL_PARTICLES)
+        elif WORKFLOW_KIND == 'rta':
+            log_batch_r0_dl1, debug = batch_r0_to_dl1_rta(DL0_DATA_DIR,
+                                                          args.config_file,
+                                                          PROD_ID,
+                                                          ALL_PARTICLES)
+        else:
+            sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
+
         save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1')
         save_log_to_file(debug, debug_file, 'r0_to_dl1')
 
     if DO_merge_and_copy:
-        # TODO log_batch_r0_dl1 take place also in the job management
-        log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished,\
-         debug = batch_merge_and_copy_dl1(RUNNING_ANALYSIS_DIR, log_batch_r0_dl1)
+        log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug = batch_merge_and_copy_dl1(
+            RUNNING_ANALYSIS_DIR,
+            log_batch_r0_dl1,
+            ALL_PARTICLES,
+            flag_rta_or_lst=WORKFLOW_KIND)
 
         save_log_to_file(log_batch_merge_and_copy, log_file, 'merge_and_copy_dl1')
         save_log_to_file(debug, debug_file, 'merge_and_copy_dl1')
