@@ -146,6 +146,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     jobid_for_dl2_to_dl3 = []
     debug_log = {}
 
+    print("\n ==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
+
     for particle in ALL_PARTICLES:
         log, jobid = dl1_to_dl2(dl1_directory.format(particle),
                                 path_models=path_to_models,
@@ -164,6 +166,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                            f'jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_for_dl2_to_dl3)
+
+    print("\n ==== END {} ==== \n".format('batch dl1_to_dl2_workflow'))
 
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
@@ -199,6 +203,8 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
     """
     debug_log = {}
 
+    print("\n ==== START {} ==== \n".format('batch mc_train_workflow'))
+
     gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
     proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
 
@@ -212,6 +218,8 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge):
 
     debug_log[jobid_4_dl1_to_dl2] = f'The single jobid from train_pipe that depends of {jobids_from_merge} - merge' \
                                     f'_and_copy jobids'
+
+    print("\n ==== END {} ==== \n".format('batch mc_train_workflow'))
 
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
 
@@ -261,7 +269,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag
     else:
         flag_merge = True
 
-    print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
+    print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
     for particle in ALL_PARTICLES:
         log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
@@ -283,7 +291,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, flag
     jobid_4_train = ','.join(jobid_4_train)
     all_merge = ','.join(all_merge)
 
-    print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
+    print("\n ==== END {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
     return log_merge_and_copy, jobid_4_train, all_merge, debug_log
 
@@ -353,7 +361,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
     # ids_by_particle_ok = []
     debug_log = {}
 
-    print("\n ==== START {} ==== \n".format('r0_to_dl1_workflow'))
+    print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
 
     for particle in ALL_PARTICLES:
         log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
@@ -376,7 +384,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id):
 
         # how to launch the check of files and what to pass to merge (4 ids or ~300)
 
-    print("\n ==== END {} ==== \n".format('r0_to_dl1_workflow'))
+    print("\n ==== END {} ==== \n".format('batch r0_to_dl1_workflow'))
 
     return full_log, debug_log  # ids_by_particle_ok
 
