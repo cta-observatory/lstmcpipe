@@ -20,15 +20,15 @@ import sys
 import argparse
 import calendar
 import lstchain
-from data_management import (query_continue,
-                             batch_r0_to_dl1,
-                             batch_r0_to_dl1_rta,
-                             batch_merge_and_copy_dl1,
-                             batch_train_pipe,
-                             batch_dl1_to_dl2,
-                             save_log_to_file,
-                             create_dict_with_filenames
-                             )
+from data_management import query_continue
+from workflow_management import (batch_r0_to_dl1,
+                                 batch_r0_to_dl1_rta,
+                                 batch_merge_and_copy_dl1,
+                                 batch_train_pipe,
+                                 batch_dl1_to_dl2,
+                                 save_log_to_file,
+                                 create_dict_with_filenames
+                                 )
 
 #######################################################################################################################
 #######################################################################################################################
@@ -48,7 +48,7 @@ ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
-DO_r0_to_r1 = True
+DO_r0_to_dl1 = True
 DO_merge_and_copy = True
 DO_TRAIN_PIPE = True
 DO_dl1_to_dl2 = True
@@ -118,7 +118,9 @@ if __name__ == '__main__':
     if os.path.exists(debug_file):
         os.remove(debug_file)
 
-    if DO_r0_to_r1:
+    # R0/1 to DL1
+    if DO_r0_to_dl1:
+
         if WORKFLOW_KIND == 'lst':
             log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
                                                       args.config_file_lst,
@@ -135,6 +137,7 @@ if __name__ == '__main__':
         save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1')
         save_log_to_file(debug, debug_file, 'r0_to_dl1')
 
+    # Merge,copy and move DL1 files
     if DO_merge_and_copy:
         log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug = batch_merge_and_copy_dl1(
             RUNNING_ANALYSIS_DIR,
@@ -150,6 +153,7 @@ if __name__ == '__main__':
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
+    # Train pipe
     if DO_TRAIN_PIPE:
         log_batch_train_pipe, job_from_train_pipe, model_dir, debug = batch_train_pipe(log_batch_merge_and_copy,
                                                                                        args.config_file_lst,
@@ -164,6 +168,7 @@ if __name__ == '__main__':
         model_dir = os.path.join(BASE_PATH, 'models', OBS_DATE, POINTING, PROD_ID)
         log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
 
+    # DL1 to DL2 stage
     if DO_dl1_to_dl2:
         log_batch_dl1_to_dl2, jobs_4_dl2_to_dl3, debug = batch_dl1_to_dl2(DL1_DATA_DIR,
                                                                           model_dir,
