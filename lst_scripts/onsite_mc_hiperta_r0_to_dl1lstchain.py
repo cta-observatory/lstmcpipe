@@ -61,7 +61,27 @@ parser.add_argument('--keep_rta_file', '-k',
 
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, prod_id=None,
-         keep_rta_file=False, flag_full_workflow=False):
+         keep_rta_file=False, flag_full_workflow=False, lst_config=None):
+    """
+    same as for r0_to_dl1 lst-like but with the exceptions of rta
+
+    Parameters
+    ----------
+    input_dir
+    config_file
+    train_test_ratio
+    random_seed
+    n_files_per_dl1
+    prod_id
+    keep_rta_file
+    flag_full_workflow
+    lst_config: str
+        path used just to copy the config to `running analysis`
+
+    Returns
+    -------
+
+    """
 
     if not flag_full_workflow:
         # This formatting should be the same as in `onsite_mc_r0_to_dl3_hiperta.py`
@@ -229,6 +249,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     # copy config file into logs
     if config_file is not None:
         shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
+    if lst_config is not None:
+        shutil.copy(lst_config, os.path.join(RUNNING_DIR, os.path.basename(lst_config)))
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))

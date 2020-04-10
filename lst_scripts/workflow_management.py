@@ -98,7 +98,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
     conf_file_lst : str
-        Path to a lstchain configuration file so that it can be copied too to `/running_analysis/`
+        Path to a lstchain configuration. JUST to be copied at the same time as the rta_config to `/running_analysis/`.
 
     Returns
     -------
@@ -119,7 +119,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
         log, jobids_by_particle = r0_to_dl1_rta(input_dir.format(particle),
                                                 config_file=conf_file_rta,
                                                 prod_id=prod_id,
-                                                flag_full_workflow=True
+                                                flag_full_workflow=True,
+                                                lst_config=conf_file_lst
                                                 )
 
         # Create jobid to full log information dictionary.
@@ -129,12 +130,6 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
-
-        # In in the rta workflow, the lstchain_cofig is not copied to running_analysis.
-        # Not ideal that this is here, but to avoid large changes of code:
-        if conf_file_lst is not None:
-            run_dir = os.path.join(input_dir.format(particle).replace('R1', 'running_analysis'), prod_id)
-            shutil.copy(conf_file_lst, os.path.join(run_dir, os.path.basename(conf_file_lst)))
 
     print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
