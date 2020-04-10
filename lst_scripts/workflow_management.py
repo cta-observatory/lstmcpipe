@@ -5,6 +5,7 @@
 import os
 import glob
 import pprint
+import shutil
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -75,7 +76,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop):
     return full_log, debug_log  # ids_by_particle_ok
 
 
-def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id, particles_loop):
+def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_file_lst):
     """
     Function to batch the r0_to_dl1 jobs by particle type, using the HiPeRTA code. Files in input_dir MUST had been
      previously converted to *.h5
@@ -87,8 +88,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id, particles_loop):
     input_dir : str
         Path to the R1 (h5 !) files
 
-    conf_file : str
-        Path to a configuration file. If none is given, a standard configuration is applied
+    conf_file_rta : str
+        Path to a HiPeRTA configuration file. If none is given, a standard configuration is applied
 
     prod_id : str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
@@ -96,6 +97,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id, particles_loop):
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
+    conf_file_lst : str
+        Path to a lstchain configuration file so that it can be copied too to `/running_analysis/`
 
     Returns
     -------
@@ -114,7 +117,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id, particles_loop):
 
     for particle in particles_loop:
         log, jobids_by_particle = r0_to_dl1_rta(input_dir.format(particle),
-                                                config_file=conf_file,
+                                                config_file=conf_file_rta,
                                                 prod_id=prod_id,
                                                 flag_full_workflow=True
                                                 )
@@ -126,6 +129,12 @@ def batch_r0_to_dl1_rta(input_dir, conf_file, prod_id, particles_loop):
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+
+        # In in the rta workflow, the lstchain_cofig is not copied to running_analysis.
+        # Not ideal that this is here, but to avoid large changes of code:
+        if conf_file_lst is not None:
+            run_dir = os.path.join(input_dir.format(particle).replace('R1', 'running_analysis'), prod_id)
+            shutil.copy(conf_file_lst, os.path.join(run_dir, os.path.basename(conf_file_lst)))
 
     print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 

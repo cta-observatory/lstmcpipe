@@ -117,8 +117,8 @@ if __name__ == '__main__':
 
     query_continue('Are you sure ?')
 
-    log_file = './log_FULL_onsite_mc_r0_to_dl3_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
-    debug_file = './log_reduced_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
+    log_file = './log_FULL_onsite_mc_r0_to_dl3_v{}{}.txt'.format(WORKFLOW_KIND, suffix_id)
+    debug_file = './log_reduced_v{}{}.txt'.format(WORKFLOW_KIND, suffix_id)
 
     # First time opening the log, otherwise --> erase
     if os.path.exists(log_file):
@@ -138,7 +138,8 @@ if __name__ == '__main__':
             log_batch_r0_dl1, debug = batch_r0_to_dl1_rta(DL0_DATA_DIR,
                                                           args.config_file_rta,
                                                           PROD_ID,
-                                                          ALL_PARTICLES)
+                                                          ALL_PARTICLES,
+                                                          args.config_file_lst)
         else:
             sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
 

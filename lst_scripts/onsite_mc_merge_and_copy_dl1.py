@@ -156,8 +156,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         move_dir_content(running_DL1_dir, final_DL1_dir)
         print("\tDL1 files have been moved to {}".format(final_DL1_dir))
 
-        # copy lstchain config file there too
-        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
+        # copy lstchain config file there too. HiPeRTA configs are *.txt
+        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(('.json', '.txt'))]
         for file in config_files:
             shutil.copyfile(file, os.path.join(final_DL1_dir, os.path.basename(file)))
 
@@ -246,7 +246,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
-        # 5 --> move running_dir as logs
+        # 5 --> move running_dir to final analysis_logs
         jobid_move_log = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
                                                   jobid_copy_conf,
                                                   input_dir,
