@@ -127,9 +127,10 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
                            "Continue ?".format(len(tf), tf))
 
-    print("\tmerging starts")
-
     if not flag_full_workflow:
+
+        print("\tmerging starts")
+
         # 3. merge DL1 files
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
@@ -168,6 +169,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
     else:  # flag_full_workflow == True !
+
+        print("\n\tmerging starts - {}".format(particle))
 
         # 3. merge DL1 files
         wait_both_merges = []
