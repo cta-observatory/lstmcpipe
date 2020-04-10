@@ -70,7 +70,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
                         dest='config_file_rta',
-                        help='Path to a HiPeRTA-like configuration file.',
+                        help='Path to a HiPeRTA-like configuration file.'
+                             'Only to be declared if WORKFLOW_KIND = "rta". ',
                         default=None
                         )
 
@@ -84,7 +85,10 @@ if __name__ == '__main__':
     # Global variables
 
     today = calendar.datetime.date.today()
-    base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    if WORKFLOW_KIND == 'lst':
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    elif WORKFLOW_KIND == 'rta':
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
     suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
 
     PROD_ID = base_prod_id + suffix_id
@@ -108,6 +112,7 @@ if __name__ == '__main__':
           f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
           f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}""")).replace("DL1", "DL2")}\n'
           f'\t{ANALYSIS_LOG_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
+          f'\n\tPROD_ID to be used:{PROD_ID}\n'
           )
 
     query_continue('Are you sure ?')
