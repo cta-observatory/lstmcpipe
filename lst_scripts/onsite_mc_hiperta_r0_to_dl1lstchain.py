@@ -1,21 +1,20 @@
 #!/usr//bin/env python
-
-# T. Vuillaume,
-# Modifications by E. Garcia
-# Code to reduce R0 data to DL1 onsite (La Palma cluster)
+#
+# T. Vuillaime,
+# Code adapted by E. Garcia 03/20
+# Code to reduce R0 data to DL1 onsite (La Palma cluster) - HiPeRTA version
 #
 # usage:
 # python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
-#  [-nfdl1 n_files_per_dl1] [--prod_id prod_id]
+#  [-nfdl1 n_files_per_dl1] [--prod_id prod_id] [-k keep_rta_output_file]
 
 import random
 import argparse
 import calendar
-import lstchain
 from lstchain.io.data_management import *
 from data_management import check_and_make_dir_without_verification
 
-parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
+parser = argparse.ArgumentParser(description="MC R0 to DL1 - MC onsite conversion")
 
 parser.add_argument('input_dir', type=str,
                     help='path to the files directory to analyse',
@@ -41,8 +40,8 @@ parser.add_argument('--random_seed', '-seed', action='store', type=str,
 
 parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
                     dest='n_files_per_dl1',
-                    help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
-                         'based on the size of the DL0 files and the expected reduction factor of 5 '
+                    help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based '
+                         'on the size of the DL0 files and the expected reduction factor of 5 '
                          'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
                     default=0,
                     )
@@ -53,63 +52,42 @@ parser.add_argument('--prod_id', action='store', type=str,
                     default=None,
                     )
 
+parser.add_argument('--keep_rta_file', '-k',
+                    dest='keep_rta_file',
+                    type=lambda x: bool(strtobool(x)),
+                    help='Keep output of hiperta. Set by default to False',
+                    default=False
+                    )
 
-def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0,
-         prod_id=None, flag_full_workflow=False):
+
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, prod_id=None,
+         keep_rta_file=False, flag_full_workflow=False, lst_config=None):
     """
-    R0 to DL1 MC onsite conversion.
-
+    same as for r0_to_dl1 lst-like but with the exceptions of rta
 
     Parameters
     ----------
-    input_dir : str
-        path to the files directory to analyse
-    config_file :str
-        Path to a configuration file. If none is given, a standard configuration is applied
-    train_test_ratio :int
-        Ratio of training data. Default = 0.5
-    random_seed : int
-        Random seed for random processes. Default = 42
-    n_files_per_dl1 : int
-        Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
-        of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
-        number of files. Default = 0
-    prod_id :str
-        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    flag_full_workflow : bool
-        Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+    input_dir
+    config_file
+    train_test_ratio
+    random_seed
+    n_files_per_dl1
+    prod_id
+    keep_rta_file
+    flag_full_workflow
+    lst_config: str
+        path used just to copy the config to `running analysis`
 
     Returns
     -------
 
-    jobid2log : dict (if flag_full_workflow is True)
-
-        A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
-        only the each jobid that the scripts has batched.
-
-            dict[jobid] = information
-
-        The second layer contains, organized by jobid,
-             - the kind of particle that corresponded to the jobid
-             - the command that was run to batch the job into the server
-             - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
-                 when the job was send to the cluster
-
-             dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
-
-             ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
-
-    jobids_r0_dl1
-
-        A list of all the jobs sent by particle (including test and train set types).
-
     """
+
     if not flag_full_workflow:
+        # This formatting should be the same as in `onsite_mc_r0_to_dl3_hiperta.py`
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
-        # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
         today = calendar.datetime.date.today()
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
         suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
         PROD_ID = base_prod_id + suffix_id
     else:
@@ -118,7 +96,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
-    NFILES_PER_DL1 = n_files_per_dl1
+    NFILES_PER_DL1 = int(n_files_per_dl1)
 
     DESIRED_DL1_SIZE_MB = 1000
 
@@ -162,7 +140,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)  ##
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -179,10 +157,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         else:
             check_and_make_dir(directory)
 
-    # dumping the training and testing lists and spliting them in sublists for parallel jobs
+    # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
 
     jobid2log = {}
-    jobids_r0_dl1 = []
+    jobids_RTA_r0_dl1_reorganized = []
 
     for set_type in 'training', 'testing':
         if set_type == 'training':
@@ -209,7 +187,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                     out.write('\n')
         print('\t{} files generated for {} list'.format(number_of_sublists, set_type))
 
-        ### LSTCHAIN ###
+        ### HiPeRTA ###
         counter = 0
 
         for file in os.listdir(dir_lists):
@@ -219,31 +197,37 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
-            base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
+
+            # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
+            cc = ' -c {}'.format(config_file) if config_file is not None else ' '
+            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
+                       f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
-                cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+
+                cmd = f'sbatch -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 # print(cmd)
                 os.system(cmd)
 
             else:  # flag_full_workflow == True !
-                job_name = {'electron': 'r0dl1_e',
-                            'gamma': 'r0dl1_g',
-                            'gamma-diffuse': 'r0dl1_gd',
-                            'proton': 'r0dl1_p'
+                job_name = {'electron': 'e_RTA-r0dl1',
+                            'gamma': 'g_RTA-r0dl1',
+                            'gamma-diffuse': 'gd_RTA-r0dl1',
+                            'proton': 'p_RTA-r0dl1'
                             }
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]
 
                 cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
                                                                          jobe, jobo,
-                                                                         base_cmd, os.path.join(dir_lists, file))
+                                                                         base_cmd,
+                                                                         os.path.join(dir_lists, file))
 
                 jobid = os.popen(cmd).read().strip('\n')
-                jobids_r0_dl1.append(jobid)
+
+                jobids_RTA_r0_dl1_reorganized.append(jobid)
 
                 # Fill the dictionaries if IN workflow mode
                 jobid2log[jobid] = {}
@@ -265,6 +249,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     # copy config file into logs
     if config_file is not None:
         shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
+    if lst_config is not None:
+        shutil.copy(lst_config, os.path.join(RUNNING_DIR, os.path.basename(lst_config)))
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
@@ -272,7 +258,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     # create log dictionary and return it if IN workflow mode
     if flag_full_workflow:
-        return jobid2log, jobids_r0_dl1
+        return jobid2log, jobids_RTA_r0_dl1_reorganized
 
     else:
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
@@ -285,5 +271,6 @@ if __name__ == '__main__':
          args.train_test_ratio,
          args.random_seed,
          args.n_files_per_dl1,
-         args.prod_id
+         args.prod_id,
+         args.keep_rta_file
          )

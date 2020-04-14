@@ -28,7 +28,7 @@ parser.add_argument('input_dir', type=str,
                     )
 
 
-def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None):
+def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=True):
     """
     Merge and copy DL1 data after production.
 
@@ -43,15 +43,23 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
     ----------
     input_dir : str
         path to the DL1 files directory to merge, copy and move.  Compulsory argument.
+
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+
     particle2jobs_dict : dict
         Dictionary used to retrieve the r0 to dl1 jobids that were sent in the previous step of the r0-dl3 workflow.
         This script will NOT start until all the jobs sent before have finished.
         COMPULSORY argument when flag_full_workflow is set to True.
+
     particle : str
         Type of particle used to create the log and dictionary
         COMPULSORY argument when flag_full_workflow is set to True.
+
+    flag_merge : bool
+        Flag to indicate whether the `--smart` argument of the `lstchain_merge_hdf5_files.py` script must be set to
+        True (smart merge) or False (auto merge)
+        Default set to True.
 
 
     Returns
@@ -80,8 +88,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         log_merge = {particle: {'training': {}, 'testing': {}}}
 
         wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
-
-        print("\n ==== START {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
         return_jobids4train = []
         return_jobids_debug = []
@@ -121,9 +127,10 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
                            "Continue ?".format(len(tf), tf))
 
-    print("\tmerging starts")
-
     if not flag_full_workflow:
+
+        print("\tmerging starts")
+
         # 3. merge DL1 files
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
@@ -141,7 +148,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
-            cmd += "--no-image True"
+            cmd += " --no-image True"
             os.system(cmd)
 
         # 4. move DL1 files in final place
@@ -149,8 +156,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         move_dir_content(running_DL1_dir, final_DL1_dir)
         print("\tDL1 files have been moved to {}".format(final_DL1_dir))
 
-        # copy lstchain config file there too
-        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.json')]
+        # copy lstchain config file there too. HiPeRTA configs are *.txt
+        config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(('.json', '.txt'))]
         for file in config_files:
             shutil.copyfile(file, os.path.join(final_DL1_dir, os.path.basename(file)))
 
@@ -162,6 +169,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
 
     else:  # flag_full_workflow == True !
+
+        print("\n\tmerging starts - {}".format(particle))
 
         # 3. merge DL1 files
         wait_both_merges = []
@@ -187,8 +196,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             cmd = 'sbatch --parsable'
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True"'.format(job_name[particle],
-                                                                                                  tdir, output_filename)
+
+            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True --smart {}"'.format(
+                job_name[particle],
+                tdir,
+                output_filename,
+                flag_merge  ##
+            )
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
@@ -232,7 +246,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
-        # 5 --> move running_dir as logs
+        # 5 --> move running_dir to final analysis_logs
         jobid_move_log = os.popen(base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
                                                   jobid_copy_conf,
                                                   input_dir,
@@ -250,7 +264,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print("\tLOGS will be moved to {}".format(logs_destination_dir))
 
-        # Little 'astuce' (it will not be clear in log). These keys are stored here for 2 purposes:
+        # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
         # 1 - In train_pipe recover final dl1 names and path.
         # 2 - In dl1_to_dl2 recover the jobids of the merged dl1 files; (all dl1 files MUST be merged and moved
         # to dl1_dir), so instead of storing the jobid that merges all the *particle*_dl1 (jobid_merge), it will
@@ -260,8 +274,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                                                                         wait_both_merges+' up to ' + jobid_move_log,
                                                                         running_DL1_dir,
                                                                         final_DL1_dir, 'False')
-
-        print("\n ==== END {} ==== \n".format('merge_and_copy_dl1_workflow'))
 
         return_jobids4train = ','.join(return_jobids4train)
         return_jobids_debug = ','.join(return_jobids_debug)

@@ -1,6 +1,7 @@
-## library of functions used for LST analysis data management
+# library of functions used for LST analysis data management
 
-## Thomas Vuillaume, 12/09/2019
+# Thomas Vuillaume, 12/09/2019
+# Enrique Garcia 09/04/2020
 
 import sys
 import os

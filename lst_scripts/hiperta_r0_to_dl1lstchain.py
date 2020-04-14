@@ -39,8 +39,15 @@ parser.add_argument('--keep_file', '-k',
                     default=False
                     )
 
+parser.add_argument('--debug_mode', '-d',
+                    type=lambda x: bool(strtobool(x)),
+                    dest='debug_mode',
+                    help='Activate debug mode (add cleaned mask in the output hdf5). Set by default to False',
+                    default=False
+                    )
 
-def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_file=False):
+
+def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_file=False, debug_mode=False):
     """
     Run hiperta_r0_dl1 and reorganize_dl1_files.
 
@@ -56,6 +63,8 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     keep_file: bool
         Boolean flag to indicate if the output of the hiperta_r1_to_dl1 code should be kept or not. The
         dl1_reorganized_*.h5 will be always created.
+    debug_mode : bool
+        Activate debug mode in HiPeRTA (add cleaned mask in the output hdf5). Set by default to False
 
     Returns
     -------
@@ -67,6 +76,8 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     os.makedirs(outdir, exist_ok=True)
 
     cmd_hiperta = f'hiperta_r1_dl1 -i {infile} -c {config} -o {outdir}'
+    if debug_mode:  # in HiPeRTA
+        cmd_hiperta += ' -g'
     os.system(cmd_hiperta)
 
     # We know in advance the name of the output
@@ -87,4 +98,5 @@ if __name__ == '__main__':
          args.outdir,
          args.config,
          args.keep_file,
+         args.debug_mode
          )

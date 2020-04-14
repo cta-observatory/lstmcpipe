@@ -75,21 +75,24 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
     if flag_full_workflow:
         log_train = {}
-        print("\n ==== START {} ==== \n".format('mc_train_workflow'))
 
     else:
         print("\n ==== START {} ==== \n".format(sys.argv[0]))
 
-    dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
+    # dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
 
     # TODO develop and add check_prod_id function --> @Thomas
     # check_prod_id(dl1_gamma_dir, dl1_proton_dir)
 
-    models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
+    # check if it path follows the established paths (lstchain-like) or not (rta-like) ##
+    if dl1_proton_dir.find('/mc/DL1/') > 0:
+        models_dir = dl1_proton_dir.replace('/mc/DL1', '/models')
+    else:
+        models_dir = dl1_proton_dir.replace('/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
-    print(f"Models will be placed in {models_dir}")
+    print(f"\tModels will be placed in {models_dir}")
     if flag_full_workflow:
         check_and_make_dir_without_verification(models_dir)
     else:
@@ -132,8 +135,6 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     if not flag_full_workflow:
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
     else:
-        print("\n ==== END {} ==== \n".format('mc_train_workflow'))
-
         return log_train, jobid_train, models_dir
 
 
