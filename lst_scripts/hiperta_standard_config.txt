@@ -1,0 +1,18 @@
+{
+        integratedFraction = 0.1;      #   (NOT USED)
+        nbEventAveragePed = 0;         #   Piedestal glissant
+        limitPulseIntegration = 0.1;   #   10% of max, to compute integration window
+        noisyPixelCutHi = 0;           #   param for Hess comparison
+        noisyPixelCutLo = 0;           #      idem
+        thresholdBadAdc = 0;           #      idem
+        thresholdBadPed = 0;           #      idem
+        nbSingularValueKeep = 0;       #   (NOT USED)
+        hillasThresholdSignalTel = 30; # First cut, in ph electron
+        cleaningType = 1;              # 0 wavelet_cleaning; 1 tailcut_cleaning
+        waveletThreshold = 4;          # wavelet param
+        hillasThresholdCenter = 6;     # tailcut_cleaning param
+        hillasThresholdNeigbours = 3;  # tailcut_cleaning param
+        minNumberNeighboursPixels = 1; # tailcut_cleaning param
+        keepIsolatedPixels = 0;        # 0 No, 1 Yes
+        minSelescedPixel = 2;          #
+}

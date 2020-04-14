@@ -38,25 +38,33 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
     ----------
     input_dir : str
         path to the files directory to analyse
+
     path_models : str
         path to the trained models
+
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
+
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+
     particle : str
         Type of particle used to create the log and dictionary
             ! COMPULSORY argument when flag_full_workflow is set to True.
+
     wait_jobid_train_pipe : str
         a string with the batched jobid from the train stage to indicate the
         dependencies of the job to be batched
             ! COMPULSORY argument when flag_full_workflow is set to True.
+
     wait_jobids_merge : str
         string with merge_and_copy jobids
             ! COMPULSORY argument when flag_full_workflow is set to True.
+
     dictionary_with_dl1_paths : dict
         Dictionary with 'particles' as keys containing final outnames of dl1 files.
             ! COMPULSORY argument when flag_full_workflow is set to True.
+
     source_environment : str
         path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
         certain conda environment. By default : `conda activate cta`.
@@ -80,10 +88,9 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
     output_dir = input_dir.replace('DL1', 'DL2')
 
     if flag_full_workflow:
-        print("\n ==== START {} ==== \n".format('dl1_to_dl2_workflow'))
 
         check_and_make_dir_without_verification(output_dir)
-        print(f"Output dir: {output_dir}")
+        print(f"\tOutput dir {particle}: {output_dir}")
 
         log_dl1_to_dl2 = {particle: {}}
 
@@ -149,7 +156,6 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
     if not flag_full_workflow:
         print("\n ==== END {} ==== \n".format(sys.argv[0]))
     else:
-        print("\n ==== END {} ==== \n".format('dl1_to_dl2_workflow'))
         return_jobids = ','.join(return_jobids)
 
         return log_dl1_to_dl2, return_jobids

@@ -151,7 +151,7 @@ def modify_params_table(table, tel_id, focal=28):
     Parameters
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
-        position_iterator: [int] iterator to include in the modifications
+        tel_id: [int] telescope identifier, i.e., 1,2,3,4 for LSTs
         focal: [float] focal length in meters
 
     Returns
@@ -169,12 +169,10 @@ def modify_params_table(table, tel_id, focal=28):
     table['x'] *= focal
     table['y'] *= focal
 
-
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
     table.add_column(np.log10(table['intensity']), name='log_intensity')
     table.add_column(table['width'] / table['length'], name='wl')
-
 
 
 def stack_by_telid(dl1_pointer, focal=28):
@@ -186,6 +184,7 @@ def stack_by_telid(dl1_pointer, focal=28):
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
+        focal: [float] focal length in meters
 
     Returns
     -------
@@ -199,7 +198,6 @@ def stack_by_telid(dl1_pointer, focal=28):
     except:
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i+1 for i in range(len(tels_params))]
-
 
     for tab, tel_id in zip(tels_params, tel_ids):
         modify_params_table(tab, tel_id, focal=focal)
@@ -255,7 +253,8 @@ def reorganize_dl1(input_filename, output_filename):
     _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
         os.path.basename(input_filename))
 
-    ## ONLY FOR LST files !
+    # File has not been reorganized yet ! Thus, the path for optics is inside /instrument/subarray/telescope
+    # only valid for LSTs !
     focal = hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0]
     table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
