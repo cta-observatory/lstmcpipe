@@ -11,7 +11,7 @@ import ctaplot
 
 savedir = 'plots'
 os.makedirs(savedir, exist_ok=True)
-pp = PdfPages(f'compare_lstchain_hipecta_{date.today()}.pdf')
+pp = PdfPages(f'compare_lstchain_hipecta_dl2_{date.today()}.pdf')
 
 
 lstchain_d = {}
@@ -19,14 +19,35 @@ hipecta_d = {}
 lstchain_d['dir'] = '../20200229_v0.4.4/lstchain'
 hipecta_d['dir'] = '.'
 
+# La Palma
+lstchain_d['dir'] = '/fefs/aswg/data/mc/DL2/20190415/{particle}/south_pointing/20200316_v0.4.5__EG1/'
+# hipecta_d['dir'] = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL2/20190415/{particle}/south_pointing/20200407_vRTA_no_intercept/'
+hipecta_d['dir'] = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL2/20190415/gamma/south_pointing/20200411_vRTA_v0.4.5.post117+git62d122d_test_dl1_dl2/'
+
+
 particles = ['gamma', 'proton', 'electron']
 
+# La Palma
 for dic in [lstchain_d, hipecta_d]:
-    files = [os.path.join(dic['dir'], f) for f in os.listdir(dic['dir']) if f.endswith('.h5')]
-    for f in files:
-        for p in particles:
-            if p in f:
-                dic[p] = pd.read_hdf(f, key=dl2_params_lstcam_key)
+    for particle in particles:
+        particle_dir = dic['dir'].format(particle=particle)
+        filename = [os.path.join(particle_dir, f) for f in os.listdir(particle_dir) if 'testing' in f][0]
+        dic[particle] = pd.read_hdf(filename, key=dl2_params_lstcam_key)
+        
+        # some rescaling 
+        if dic is hipecta_d:
+            dic[particle]['reco_energy'] *= 1e3
+            dic[particle]['log_mc_energy'] += 3
+            dic[particle]['log_reco_energy'] += 3
+
+        
+# # laptop where all files are in the same dir
+# for dic in [lstchain_d, hipecta_d]:
+#     files = [os.path.join(dic['dir'], f) for f in os.listdir(dic['dir']) if f.endswith('.h5')]
+#     for f in files:
+#         for p in particles:
+#             if p in f:
+#                 dic[p] = pd.read_hdf(f, key=dl2_params_lstcam_key)
 
 
 # hipe_all = pd.concat([hipecta_d[p] for p in particles])
