@@ -9,9 +9,9 @@ from astropy.table import Table, join, hstack
 from datetime import date
 from matplotlib.backends.backend_pdf import PdfPages
 
-pp = PdfPages(f'compare_lstchain_hipecta_{date.today()}.pdf')
+pp = PdfPages(f'compare_lstchain_hipecta_dl1_{date.today()}.pdf')
 
-filename_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL1/20190415/gamma/south_pointing/20200402_vRTA_tailcuts_6_3/training/dl1_reorganized_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.h5'
+filename_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL1/20190415/gamma/south_pointing/20200407_vRTA_no_intercept/testing/dl1_reorganized_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.h5'
 
 filename_lstchain = '/fefs/aswg/data/mc/DL1/20190415/gamma/south_pointing/20200316_v0.4.5__EG1/testing/dl1_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.simtel.h5'
 
@@ -30,10 +30,10 @@ li = Table.read(filename_lstchain, path=dl1_images_lstcam_key)
 
 print(f"{len(lp)} events in lstchain file")
 
-ht = hstack([hp, hi])
-lt = join(lp, li)
+ht = join(hp, hi, keys=['event_id', 'tel_id'])
+lt = join(lp, li, keys=['event_id', 'tel_id'])
 
-mega_table = join(lt, ht, keys=['event_id', 'tel_id', 'obs_id'], uniq_col_name='{table_name}_{col_name}',
+mega_table = join(lt, ht, keys=['event_id', 'tel_id'], uniq_col_name='{table_name}_{col_name}',
                   table_names=['lstchain', 'hipecta']);
 
 print(f"{len(mega_table)} events in common")
