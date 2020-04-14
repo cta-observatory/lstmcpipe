@@ -10,7 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import date
 
 
-def plot_feature_importance(feature_keys, feature_importances, ax=None):
+def plot_feature_importance(feature_keys, feature_importances, ax=None, **kwargs):
     """
     Plot features importance after model training (typically from scikit-learn)
 
@@ -27,15 +27,16 @@ def plot_feature_importance(feature_keys, feature_importances, ax=None):
     ax = plt.gca() if ax is None else ax
 
     sort_mask = np.argsort(feature_importances)[::-1]
-    ax.bar(np.array(feature_keys)[sort_mask], np.array(feature_importances)[sort_mask])
+    ax.bar(np.array(feature_keys)[sort_mask], np.array(feature_importances)[sort_mask], **kwargs)
     for t in ax.get_xticklabels():
         t.set_rotation(45)
     ax.set_title("Feature importances")
 
     return ax
 
+    
 
-def plot_feat(model_dir, pp, title):
+def plot_feat(model_dir, axes=None, **kwargs):
     config_filename = \
     [os.path.join(model_dir, f) for f in os.listdir(model_dir) if f.endswith('.json') or f.endswith('.conf')][0]
     print(f"config file = {config_filename}")
@@ -53,37 +54,42 @@ def plot_feat(model_dir, pp, title):
 
     regression_features = config['regression_features']
     classification_features = config['classification_features']
+    
+    if axes is None:
+        fig, axes = plt.subplots(3, 1, figsize=(10, 30))
+    
+    plot_feature_importance(regression_features, reg_disp.feature_importances_, ax=axes[0], **kwargs)
+    axes[0].set_title('DISP reconstruction features importance')
+    
+    plot_feature_importance(regression_features, reg_energy.feature_importances_, ax=axes[1], **kwargs)
+    axes[1].set_title('ENERGY reconstructure features importance')
 
-    plt.figure(figsize=(15, 10))
-    plot_feature_importance(regression_features, reg_disp.feature_importances_, ax=None)
-    plt.title(f'{title} DISP reconstruction features importance')
-    plt.tight_layout()
-    pp.savefig()
-    plt.close()
-
-    plt.figure(figsize=(15, 10))
-    plot_feature_importance(regression_features, reg_energy.feature_importances_, ax=None)
-    plt.title(f'{title} ENERGY reconstructure features importance')
-    plt.tight_layout()
-    pp.savefig()
-    plt.close()
-
-    plt.figure(figsize=(15, 10))
-    plot_feature_importance(classification_features, classif.feature_importances_, ax=None)
-    plt.title(f'{title} gamma/hadron classification features importance')
-    plt.tight_layout()
-    pp.savefig()
-    plt.close()
+    plot_feature_importance(classification_features, classif.feature_importances_, ax=axes[2], **kwargs)
+    axes[2].set_title('gamma/hadron classification features importance')
+    
+    if 'label' in kwargs:
+        for ax in axes:
+            ax.legend(fontsize=15)
+    
+    return axes
 
 
-models_directory_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/models/20190415/south_pointing/20200402_vRTA_tailcuts_6_3/'
+models_directory_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/models/20190415/south_pointing/20200411_vRTA_v0.4.5.post117+git62d122d_test_dl1_dl2/'
 models_directory_lstchain = '/fefs/aswg/data/models/20190415/south_pointing/20200316_v0.4.5__EG1/'
+
+
 
 pp = PdfPages(f'compare_lstchain_hipecta_models_{date.today()}.pdf')
 
-for model_dir, title in zip([models_directory_hipecta, models_directory_lstchain],
-                            ['hipecta', 'lstchain']
-                            ):
-    plot_feat(model_dir, pp, title)
 
+axes = plot_feat(models_directory_hipecta, label='hipecta')
+axes = plot_feat(models_directory_lstchain,
+          axes=axes,
+          fill=False,
+          label='lstchain',
+          linewidth=4
+         )
+
+
+pp.savefig()
 pp.close()
