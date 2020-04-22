@@ -14,11 +14,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import date
 import astropy.units as u
 from astropy.coordinates import Angle
-import argparser
+import argparse
 
 
 def tailcuts_clean_teltype(image, camera_name='LSTCam', **kwargs):
-    
+
     return tailcuts_clean(geom, image, **kwargs)
 
 
@@ -158,7 +158,6 @@ if __name__ == '__main__':
                         help='path to the hiperta debug DL1 file',
                         default=dl1_hipecta_filename)
     
-    args = parser.parse_args(
+    args = parser.parse_args()
         
     main(args.dl1_hipecta_filename, args.dl1_lstchain_filename)
-        
