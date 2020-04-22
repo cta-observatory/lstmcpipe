@@ -1,11 +1,11 @@
 {
         integratedFraction = 0.1;      #   (NOT USED)
-        nbEventAveragePed = 0;         #   Piedestal glissant
+        nbEventAveragePed = 10000;     #   Piedestal glissant
         limitPulseIntegration = 0.1;   #   10% of max, to compute integration window
-        noisyPixelCutHi = 0;           #   param for Hess comparison
-        noisyPixelCutLo = 0;           #      idem
-        thresholdBadAdc = 0;           #      idem
-        thresholdBadPed = 0;           #      idem
+        noisyPixelCutHi = 4094;        #   param for Hess comparison
+        noisyPixelCutLo = 4094;        #
+        thresholdBadAdc = 4094;        #
+        thresholdBadPed = 100000;      #
         nbSingularValueKeep = 0;       #   (NOT USED)
         hillasThresholdSignalTel = 30; # First cut, in ph electron
         cleaningType = 1;              # 0 wavelet_cleaning; 1 tailcut_cleaning
