@@ -270,10 +270,18 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # to dl1_dir), so instead of storing the jobid that merges all the *particle*_dl1 (jobid_merge), it will
         # be store the jobid that move the dl1 final file to dl1_dir. Until this step is not finished, the workflow
         # cannot continue.
-        log_merge[particle][set_type][jobid_move_log] = base_cmd.format(job_name[particle]+'_mv_dl1',
-                                                                        wait_both_merges+' up to ' + jobid_move_log,
+        log_merge[particle][set_type][jobid_move_dl1] = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dl1',
+                                                                        wait_both_merges,
                                                                         running_DL1_dir,
                                                                         final_DL1_dir, 'False')
+        log_merge[particle][set_type][jobid_copy_conf] = base_cmd.format(job_name[particle].split('_')[0] + '_cp_conf',
+                                                                         jobid_move_dl1,
+                                                                         input_dir,
+                                                                         final_DL1_dir, 'True')
+        log_merge[particle][set_type][jobid_move_log] = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
+                                                                        jobid_copy_conf,
+                                                                        input_dir,
+                                                                        logs_destination_dir, 'False')
 
         return_jobids4train = ','.join(return_jobids4train)
         return_jobids_debug = ','.join(return_jobids_debug)
