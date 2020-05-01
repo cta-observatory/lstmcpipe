@@ -8,11 +8,16 @@
 # python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
 #  [-nfdl1 n_files_per_dl1] [--prod_id prod_id] [-k keep_rta_output_file]
 
+import os
+import shutil
 import random
 import argparse
 import calendar
-from lstchain.io.data_management import *
-from data_management import check_and_make_dir_without_verification
+from distutils.util import strtobool
+from data_management import (check_data_path,
+                             get_input_filelist,
+                             check_and_make_dir,
+                             check_and_make_dir_without_verification)
 
 parser = argparse.ArgumentParser(description="MC R0 to DL1 - MC onsite conversion")
 
@@ -85,7 +90,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     if not flag_full_workflow:
         # This formatting should be the same as in `onsite_mc_r0_to_dl3_hiperta.py`
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
         today = calendar.datetime.date.today()
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
         suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
@@ -245,7 +250,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         print("\n\t{} jobs submitted".format(counter))
 
     # copy this script itself into logs
-    shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
+    shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
     # copy config file into logs
     if config_file is not None:
         shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
@@ -261,7 +266,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         return jobid2log, jobids_RTA_r0_dl1_reorganized
 
     else:
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
 
 
 if __name__ == '__main__':
