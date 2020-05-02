@@ -5,7 +5,6 @@
 import os
 import glob
 import pprint
-import shutil
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -211,6 +210,10 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     if flag_rta_or_lst == 'lst':
         flag_merge = True
     elif flag_rta_or_lst == 'rta':
+        flag_merge = False
+    elif flag_rta_or_lst:
+        flag_merge = True
+    elif not flag_rta_or_lst:
         flag_merge = False
     else:
         flag_merge = True
