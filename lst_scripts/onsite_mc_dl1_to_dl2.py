@@ -4,10 +4,12 @@
 # Modifications by E. Garcia
 # DL1 to DL2 onsite (La Palma cluster)
 
-
+import os
+import shutil
 import argparse
-from lstchain.io.data_management import *
-from data_management import check_and_make_dir_without_verification
+from data_management import (check_and_make_dir,
+                             query_continue,
+                             check_and_make_dir_without_verification)
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 
@@ -116,7 +118,7 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
                     }
 
     else:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
 
         check_and_make_dir(output_dir)
         print(f"Output dir: {output_dir}")
@@ -140,21 +142,30 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
             os.system(cmd)
 
         else:  # flag_full_workflow == True !
-            # TODO missing too the job.e and job.o for this stage
             # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
+
+            jobe = os.path.join(output_dir, f"dl1_dl2_{particle}_job.e")
+            jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_job.o")
 
             batch_cmd = 'sbatch --parsable'
             if wait_jobs != '':
                 batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
-            batch_cmd += ' -J {} --wrap="{}"'.format(job_name[particle], cmd)
+            batch_cmd += ' -J {} -e {} -o {} --wrap="{}"'.format(job_name[particle],
+                                                                 jobe, jobo,
+                                                                 cmd)
 
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
             return_jobids.append(jobid_dl1_to_dl2)
 
+    # copy this script and config into working dir
+    shutil.copyfile(__file__, os.path.join(output_dir, os.path.basename(__file__)))
+    if config_file is not None:
+        shutil.copyfile(config_file, os.path.join(output_dir, os.path.basename(config_file)))
+
     if not flag_full_workflow:
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
     else:
         return_jobids = ','.join(return_jobids)
 

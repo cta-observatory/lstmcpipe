@@ -4,9 +4,11 @@
 # Modifications by E. Garcia
 # Code train models from DL1 files onsite (La Palma cluster)
 
+import os
+import shutil
 import argparse
-from lstchain.io.data_management import *
-from data_management import check_and_make_dir_without_verification
+from data_management import (check_and_make_dir,
+                             check_and_make_dir_without_verification)
 
 parser = argparse.ArgumentParser(description="Train models onsite")
 
@@ -77,7 +79,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         log_train = {}
 
     else:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
 
     # dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
@@ -126,14 +128,13 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         jobid_train = os.popen(cmd).read().strip('\n')
         log_train[jobid_train] = cmd
 
-    # copy this script itself into logs
-    shutil.copyfile(sys.argv[0], os.path.join(models_dir, os.path.basename(sys.argv[0])))
-    # copy config file into logs
+    # copy this script and config into working dir
+    shutil.copyfile(__file__, os.path.join(models_dir, os.path.basename(__file__)))
     if config_file is not None:
-        shutil.copy(config_file, os.path.join(models_dir, os.path.basename(config_file)))
+        shutil.copyfile(config_file, os.path.join(models_dir, os.path.basename(config_file)))
 
     if not flag_full_workflow:
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
     else:
         return log_train, jobid_train, models_dir
 

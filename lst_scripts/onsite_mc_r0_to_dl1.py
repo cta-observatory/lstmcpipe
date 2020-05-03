@@ -8,12 +8,16 @@
 # python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
 #  [-nfdl1 n_files_per_dl1] [--prod_id prod_id]
 
+import os
+import shutil
 import random
 import argparse
 import calendar
 import lstchain
-from lstchain.io.data_management import *
-from data_management import check_and_make_dir_without_verification
+from data_management import (check_data_path,
+                             get_input_filelist,
+                             check_and_make_dir,
+                             check_and_make_dir_without_verification)
 
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
@@ -106,7 +110,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     """
     if not flag_full_workflow:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
         # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
         today = calendar.datetime.date.today()
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -260,11 +264,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
         print("\n\t{} jobs submitted".format(counter))
 
-    # copy this script itself into logs
-    shutil.copyfile(sys.argv[0], os.path.join(RUNNING_DIR, os.path.basename(sys.argv[0])))
-    # copy config file into logs
+    # copy this script and config into working dir
+    shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
     if config_file is not None:
-        shutil.copy(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
+        shutil.copyfile(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
@@ -275,7 +278,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         return jobid2log, jobids_r0_dl1
 
     else:
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
 
 
 if __name__ == '__main__':
