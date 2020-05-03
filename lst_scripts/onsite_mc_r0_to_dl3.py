@@ -104,7 +104,8 @@ if __name__ == '__main__':
     # ########### Beginning of the workflow ###########
     # #################################################
 
-    print(f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
+    print(f'\n\n\t ************ - {WORKFLOW_KIND} - PIPELINE KIND \n\n ************ '
+          f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
           f'\t{DL0_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n\n'
           f'The following directories and all the information within them will be either created or overwritten:\n'
           f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
@@ -117,8 +118,8 @@ if __name__ == '__main__':
 
     query_continue('Are you sure ?')
 
-    log_file = './log_FULL_onsite_mc_r0_to_dl3_v{}{}.txt'.format(WORKFLOW_KIND, suffix_id)
-    debug_file = './log_reduced_v{}{}.txt'.format(WORKFLOW_KIND, suffix_id)
+    log_file = './log_FULL_onsite_mc_r0_to_dl3_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
+    debug_file = './log_reduced_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
 
     # First time opening the log, otherwise --> erase
     if os.path.exists(log_file):
@@ -175,7 +176,6 @@ if __name__ == '__main__':
     else:
         job_from_train_pipe = ''
         model_dir = os.path.join(BASE_PATH, 'models', OBS_DATE, POINTING, PROD_ID)
-        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
 
     # DL1 to DL2 stage
     if DO_dl1_to_dl2:

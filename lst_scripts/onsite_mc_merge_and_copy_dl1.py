@@ -11,9 +11,15 @@
 # 4. merge DL1 files
 # 5. move running_dir 
 
+import os
+import shutil
 import argparse
-from data_management import *
-# from lstchain.io import smart_merge_h5files
+from data_management import (check_job_logs,
+                             read_lines_file,
+                             check_files_in_dir_from_file,
+                             query_continue,
+                             check_and_make_dir,
+                             move_dir_content)
 
 parser = argparse.ArgumentParser(description="Merge and copy DL1 data after production. \n"
                                              " 1. check job_logs \n"
@@ -99,7 +105,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                     }
 
     else:
-        print("\n ==== START {} ==== \n".format(sys.argv[0]))
+        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
 
     JOB_LOGS = os.path.join(input_dir, 'job_logs')
     training_filelist = os.path.join(input_dir, 'training.list')
@@ -115,13 +121,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
     # 2. check that all files have been created in DL1 based on training and testing lists
     # just check number of files first:
-    if not len(os.listdir(DL1_training_dir)) == len(readlines(training_filelist)):
+    if not len(os.listdir(DL1_training_dir)) == len(read_lines_file(training_filelist)):
         tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
         if tf != [] and not flag_full_workflow:
             query_continue("{} files from the training list are not in the `DL1/training` directory:\n{} "
                            "Continue ?".format(len(tf), tf))
 
-    if not len(os.listdir(DL1_testing_dir)) == len(readlines(testing_filelist)):
+    if not len(os.listdir(DL1_testing_dir)) == len(read_lines_file(testing_filelist)):
         tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
         if tf != [] and not flag_full_workflow:
             query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
@@ -166,7 +172,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         move_dir_content(input_dir, logs_destination_dir)
         print("\tLOGS have been moved to {}".format(logs_destination_dir))
 
-        print("\n ==== END {} ==== \n".format(sys.argv[0]))
+        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
 
     else:  # flag_full_workflow == True !
 
