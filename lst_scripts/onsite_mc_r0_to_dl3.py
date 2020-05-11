@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # ########### Beginning of the workflow ###########
     # #################################################
 
-    print(f'\n\n\t ************ - {WORKFLOW_KIND} - PIPELINE KIND \n\n ************ '
+    print(f'\n\n\t ************ - {WORKFLOW_KIND} - PIPELINE KIND ************ \n\n'
           f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
           f'\t{DL0_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n\n'
           f'The following directories and all the information within them will be either created or overwritten:\n'
