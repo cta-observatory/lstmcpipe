@@ -223,7 +223,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
+            cc = ' -c {}'.format(config_file) if config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
 
             # recover or not the jobid depending of the workflow mode
