@@ -175,19 +175,22 @@ if __name__ == '__main__':
         save_log_to_file(debug, debug_file, 'train_pipe')
     else:
         job_from_train_pipe = ''
-        model_dir = os.path.join(BASE_PATH, 'models', OBS_DATE, POINTING, PROD_ID)
+        if BASE_PATH == '/fefs/aswg/data/mc':
+            model_dir = os.path.join('/fefs/aswg/data/', 'models', OBS_DATE, POINTING, PROD_ID)
+        else:
+            model_dir = os.path.join(BASE_PATH, 'models', OBS_DATE, POINTING, PROD_ID)
 
     # DL1 to DL2 stage
     if DO_dl1_to_dl2:
-        log_batch_dl1_to_dl2, jobs_4_dl2_to_dl3, debug = batch_dl1_to_dl2(DL1_DATA_DIR,
-                                                                          model_dir,
-                                                                          args.config_file_lst,
-                                                                          job_from_train_pipe,  # Single jobid frm train
-                                                                          jobs_all_dl1_finished,  # jobids from merge
-                                                                          log_batch_merge_and_copy,  # finale dl1 names
-                                                                          ALL_PARTICLES,
-                                                                          source_env=source_env
-                                                                          )
+        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug = batch_dl1_to_dl2(DL1_DATA_DIR,
+                                                                            model_dir,
+                                                                            args.config_file_lst,
+                                                                            job_from_train_pipe,  # Single jobid frm train
+                                                                            jobs_all_dl1_finished,  # jobids from merge
+                                                                            log_batch_merge_and_copy,  # final dl1 names
+                                                                            ALL_PARTICLES,
+                                                                            source_env=source_env
+                                                                            )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, 'dl1_to_dl2')
         save_log_to_file(debug, debug_file, 'dl1_to_dl2')
