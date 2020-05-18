@@ -20,7 +20,9 @@ import sys
 import argparse
 import calendar
 import lstchain
-from data_management import query_continue
+from data_management import (query_continue,
+                             manage_source_env_r0_dl1
+                             )
 from workflow_management import (batch_r0_to_dl1,
                                  batch_r0_to_dl1_rta,
                                  batch_merge_and_copy_dl1,
@@ -44,7 +46,7 @@ OBS_DATE = '20190415'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
-# source env onsite - can be changed for custom install
+# source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
@@ -82,6 +84,7 @@ if __name__ == '__main__':
                         )
     args = parser.parse_args()
 
+    ###################################################################################################################
     # Global variables
 
     today = calendar.datetime.date.today()
@@ -127,6 +130,10 @@ if __name__ == '__main__':
     if os.path.exists(debug_file):
         os.remove(debug_file)
 
+    # Check syntaxis source_env
+    if source_env.strip()[-1] != ';':
+        source_env = source_env + ';'
+
     # R0/1 to DL1
     if DO_r0_to_dl1:
 
@@ -134,7 +141,8 @@ if __name__ == '__main__':
             log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
                                                       args.config_file_lst,
                                                       PROD_ID,
-                                                      ALL_PARTICLES)
+                                                      ALL_PARTICLES,
+                                                      source_env=source_env)
         elif WORKFLOW_KIND == 'rta':
             log_batch_r0_dl1, debug = batch_r0_to_dl1_rta(DL0_DATA_DIR,
                                                           args.config_file_rta,
