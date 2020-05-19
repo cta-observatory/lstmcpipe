@@ -11,7 +11,7 @@
 #   - TODO onsite_mc_dl2_to_dl3
 #
 # usage:
-# > python onsite_mc_r0_to_dl3.py [-conf_lst LSTCHAIN_CONFIG_FILE] [-conf_rta RTA_CONFIG_FILE] [--prod_id PROD_ID]
+# > python onsite_mc_r0_to_dl3.py [-conf_lst LSTCHAIN_CONFIG_FILE] [-conf_rta RTA_CONFIG_FILE] [-pid PROD_ID]
 #
 #   The input_dir is set in the global variable `DL0_DATA_DIR`
 
@@ -20,9 +20,7 @@ import sys
 import argparse
 import calendar
 import lstchain
-from data_management import (query_continue,
-                             manage_source_env_r0_dl1
-                             )
+from data_management import query_continue
 from workflow_management import (batch_r0_to_dl1,
                                  batch_r0_to_dl1_rta,
                                  batch_merge_and_copy_dl1,
@@ -57,36 +55,36 @@ DO_dl1_to_dl2 = True
 # DO_dl2_to_dl3 = True
 
 #######################################################################################################################
+
+parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow")
+
+parser.add_argument('--config_file_lst', '-conf_lst', action='store', type=str,
+                    dest='config_file_lst',
+                    help='Path to a lstchain-like configuration file. '
+                         'RF classifier and regressor arguments must be declared here !',
+                    default=None
+                    )
+
+parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
+                    dest='config_file_rta',
+                    help='Path to a HiPeRTA-like configuration file.'
+                         'Only to be declared if WORKFLOW_KIND = "rta". ',
+                    default=None
+                    )
+
+parser.add_argument('--prod_id', '-pid', action='store', type=str,
+                    dest='prod_id',
+                    help="Production ID. If None, _v00 will be used, indicating an official base production",
+                    default=None,
+                    )
+args = parser.parse_args()
+
+#######################################################################################################################
 #######################################################################################################################
 
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow")
 
-    parser.add_argument('--config_file_lst', '-conf_lst', action='store', type=str,
-                        dest='config_file_lst',
-                        help='Path to a lstchain-like configuration file. '
-                             'RF classifier and regressor arguments must be declared here !',
-                        default=None
-                        )
-
-    parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
-                        dest='config_file_rta',
-                        help='Path to a HiPeRTA-like configuration file.'
-                             'Only to be declared if WORKFLOW_KIND = "rta". ',
-                        default=None
-                        )
-
-    parser.add_argument('--prod_id', action='store', type=str,
-                        dest='prod_id',
-                        help="Production ID. If None, _v00 will be used, indicating an official base production",
-                        default=None,
-                        )
-    args = parser.parse_args()
-
-    ###################################################################################################################
     # Global variables
-
     today = calendar.datetime.date.today()
     if WORKFLOW_KIND == 'lst':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -130,7 +128,7 @@ if __name__ == '__main__':
     if os.path.exists(debug_file):
         os.remove(debug_file)
 
-    # Check syntaxis source_env
+    # Check syntax source_env
     if source_env.strip()[-1] != ';':
         source_env = source_env + ';'
 
@@ -190,15 +188,16 @@ if __name__ == '__main__':
 
     # DL1 to DL2 stage
     if DO_dl1_to_dl2:
-        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug = batch_dl1_to_dl2(DL1_DATA_DIR,
-                                                                            model_dir,
-                                                                            args.config_file_lst,
-                                                                            job_from_train_pipe,  # Single jobid frm train
-                                                                            jobs_all_dl1_finished,  # jobids from merge
-                                                                            log_batch_merge_and_copy,  # final dl1 names
-                                                                            ALL_PARTICLES,
-                                                                            source_env=source_env
-                                                                            )
+        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug = batch_dl1_to_dl2(
+            DL1_DATA_DIR,
+            model_dir,
+            args.config_file_lst,
+            job_from_train_pipe,  # Single jobid from train
+            jobs_all_dl1_finished,  # jobids from merge
+            log_batch_merge_and_copy,  # final dl1 names
+            ALL_PARTICLES,
+            source_env=source_env
+        )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, 'dl1_to_dl2')
         save_log_to_file(debug, debug_file, 'dl1_to_dl2')
