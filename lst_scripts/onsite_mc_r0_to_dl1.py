@@ -123,7 +123,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
         PROD_ID = base_prod_id + suffix_id
 
-        manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
     else:
         # Full prod_id is passed as argument
         PROD_ID = prod_id
@@ -135,6 +134,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     DESIRED_DL1_SIZE_MB = 1000
 
     DL0_DATA_DIR = input_dir
+
+    manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
 
     ##############################################################################
 
