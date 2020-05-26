@@ -159,7 +159,8 @@ if __name__ == '__main__':
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
-            flag_rta_or_lst=WORKFLOW_KIND)
+            #smart_merge=WORKFLOW_KIND
+            smart_merge=False)
 
         save_log_to_file(log_batch_merge_and_copy, log_file, 'merge_and_copy_dl1')
         save_log_to_file(debug, debug_file, 'merge_and_copy_dl1')

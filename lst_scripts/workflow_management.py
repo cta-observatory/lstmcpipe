@@ -169,7 +169,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 #     return ids_single_particle_ok
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, flag_rta_or_lst='lst'):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -185,9 +185,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
         (onsite_mc_r0_to_dl1)
 
-    flag_rta_or_lst : str
-        flag to indicate whether the workflow corresponds to the an lstchian or an HiPeRTA one.
-        Set the `--smart` argument of the `lstchain_merge_hdf5_files.py` (batched in this function).
+    smart_merge : bool
+        flag to indicate whether the merge of the files should be done with `--smart True` or `--smart False`,
+        controlling the argument of the `lstchain_merge_hdf5_files.py` script (batched in this function).
 
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
@@ -210,16 +210,16 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     all_merge = []
     debug_log = {}
 
-    if flag_rta_or_lst == 'lst':
+    if smart_merge == 'lst':
         flag_merge = True
-    elif flag_rta_or_lst == 'rta':
+    elif smart_merge == 'rta':
         flag_merge = False
-    elif flag_rta_or_lst:
+    elif smart_merge:
         flag_merge = True
-    elif not flag_rta_or_lst:
+    elif not smart_merge:
         flag_merge = False
     else:
-        flag_merge = True
+        flag_merge = False
 
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 

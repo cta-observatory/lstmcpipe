@@ -34,7 +34,7 @@ parser.add_argument('input_dir', type=str,
                     )
 
 
-def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=True):
+def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False):
     """
     Merge and copy DL1 data after production.
 
