@@ -207,5 +207,44 @@ def move_dir_content(src, dest):
     os.rmdir(src)
 
 
+def manage_source_env_r0_dl1(source_and_env, file):
+    """
+    Manages the source environment for the r0_to_dl1 stage --> need to modify `core_list.sh` file.
+
+    Parameters
+    ----------
+    source_and_env: str
+        String in the form `source ###; conda activate $$$;` coming from onsite_mc_r0_to_dl3.
+    file: str
+        path to the `core_list.sh` file
+
+    Returns
+    -------
+    None. It overwrites the whole file ONLY if there is any changes.
+    """
+    source = source_and_env.strip(';').rsplit(';')[0].split()[-1]
+    environment = source_and_env.strip(';').rsplit(';')[1].split()[-1]
+
+    all_lines = []
+    with open(file, 'r+') as f:
+        for line in f.readlines():
+            if line.startswith('source'):
+                old_source = line.split()[-1]
+                new_source = line.replace(old_source, source)
+                all_lines.append(new_source)
+            elif line.startswith('conda'):
+                old_env = line.split()[-1]
+                new_env = line.replace(old_env, environment)
+                all_lines.append(new_env)
+            else:
+                all_lines.append(line)
+
+    # Overwrite the file ONLY if there is any change in the source path or environment
+    if (new_env != old_env) and (new_source != old_source):
+        with open(file, 'w+') as new_f:
+            new_f.writelines(all_lines)
+        os.chmod(file, 0o755)  # -rwxr-xr-x
+
+
 if __name__ == '__main__':
     pass

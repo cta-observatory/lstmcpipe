@@ -132,10 +132,10 @@ def main(input_dir, path_models=None, config_file=None, flag_full_workflow=False
         cmd = ''
         if source_environment is not None:
             cmd += source_environment
-        cmd += f'lstchain_mc_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}'
+        cmd += f'lstchain_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}'
 
         if config_file is not None:
-            cmd += f' -conf {config_file}'
+            cmd += f' -c {config_file}'
 
         if not flag_full_workflow:
             print(cmd)

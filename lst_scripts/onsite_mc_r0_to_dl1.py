@@ -17,7 +17,9 @@ import lstchain
 from data_management import (check_data_path,
                              get_input_filelist,
                              check_and_make_dir,
-                             check_and_make_dir_without_verification)
+                             check_and_make_dir_without_verification,
+                             manage_source_env_r0_dl1
+                             )
 
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
@@ -59,7 +61,7 @@ parser.add_argument('--prod_id', action='store', type=str,
 
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0,
-         prod_id=None, flag_full_workflow=False):
+         prod_id=None, flag_full_workflow=False, source_environment=None):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -82,6 +84,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+    source_environment : str
+        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs @ mc_r0_to_dl3 script)
+         to activate a certain conda environment. By default : `conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
 
     Returns
     -------
@@ -116,6 +122,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
         suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
         PROD_ID = base_prod_id + suffix_id
+
     else:
         # Full prod_id is passed as argument
         PROD_ID = prod_id
@@ -127,6 +134,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     DESIRED_DL1_SIZE_MB = 1000
 
     DL0_DATA_DIR = input_dir
+
+    manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
 
     ##############################################################################
 
@@ -223,7 +232,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             else:
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
-            cc = ' -conf {}'.format(config_file) if config_file is not None else ' '
+            cc = ' -c {}'.format(config_file) if config_file is not None else ' '
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
 
             # recover or not the jobid depending of the workflow mode

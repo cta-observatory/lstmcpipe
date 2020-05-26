@@ -12,7 +12,7 @@ from onsite_mc_train import main as train_pipe
 from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop):
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
     """
     Function to batch the r0_to_dl1 jobs by particle type.
 
@@ -30,6 +30,8 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop):
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
+    source_env : str
+        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
 
     Returns
     -------
@@ -55,7 +57,8 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop):
         log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
                                             config_file=conf_file,
                                             prod_id=prod_id,
-                                            flag_full_workflow=True
+                                            flag_full_workflow=True,
+                                            source_environment=source_env
                                             )
 
         # Create dictionary : jobid to full log information, and
@@ -135,38 +138,38 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     return full_log, debug_log
 
 
-def check_job_output_logs(dict_particle_jobid):
-    """
-    # TODO V0.2 - Job management
+# def check_job_output_logs(dict_particle_jobid):
+#     """
+#     # TODO V0.2 - Job management
+#
+#     Parameters
+#     ----------
+#     dict_particle_jobid : dict
+#         Dictionary coming from batch_r0_to_dl1 with all the information and log of that stage, from where the jobids
+#         will be retrieved to be checked.
+#
+#     Returns
+#     -------
+#     ids_single_particle_ok : str
+#         String containing the checked jobids to be passed to the next stage of the workflow (as a slurm dependency)
+#     debug_log : dict
+#             Debug purposes
+#
+#     """
+#     # TODO log_batch_r0_dl1 take place also in the job management
+#
+#     # dictionary by particle with all the jobids corresponding to each particle
+#
+#     jobid_dependecies = ','.join(map(str, dict_particle_jobid.keys()))
+#     cmd = f'sbatch --parsable ---dependency=afterok:{jobid_dependecies} --wrap="python  THE_CODE_TO_PARSE_OUTPUT.py"'
+#     # TODO V0.2 - Job management & THE_CODE_TO_PARSE_OUTPUT.py
+#
+#     ids_single_particle_ok = os.popen(cmd).read().split('\n')
+#
+#     return ids_single_particle_ok
 
-    Parameters
-    ----------
-    dict_particle_jobid : dict
-        Dictionary coming from batch_r0_to_dl1 with all the information and log of that stage, from where the jobids
-        will be retrieved to be checked.
 
-    Returns
-    -------
-    ids_single_particle_ok : str
-        String containing the checked jobids to be passed to the next stage of the workflow (as a slurm dependency)
-    debug_log : dict
-            Debug purposes
-
-    """
-    # TODO log_batch_r0_dl1 take place also in the job management
-
-    # dictionary by particle with all the jobids corresponding to each particle
-
-    jobid_dependecies = ','.join(map(str, dict_particle_jobid.keys()))
-    cmd = f'sbatch --parsable ---dependency=afterok:{jobid_dependecies} --wrap="python  THE_CODE_TO_PARSE_OUTPUT.py"'
-    # TODO V0.2 - Job management & THE_CODE_TO_PARSE_OUTPUT.py
-
-    ids_single_particle_ok = os.popen(cmd).read().split('\n')
-
-    return ids_single_particle_ok
-
-
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, flag_rta_or_lst='lst'):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -182,9 +185,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
         (onsite_mc_r0_to_dl1)
 
-    flag_rta_or_lst : str
-        flag to indicate whether the workflow corresponds to the an lstchian or an HiPeRTA one.
-        Set the `--smart` argument of the `lstchain_merge_hdf5_files.py` (batched in this function).
+    smart_merge : bool
+        flag to indicate whether the merge of the files should be done with `--smart True` or `--smart False`,
+        controlling the argument of the `lstchain_merge_hdf5_files.py` script (batched in this function).
 
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
@@ -207,16 +210,16 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     all_merge = []
     debug_log = {}
 
-    if flag_rta_or_lst == 'lst':
+    if smart_merge == 'lst':
         flag_merge = True
-    elif flag_rta_or_lst == 'rta':
+    elif smart_merge == 'rta':
         flag_merge = False
-    elif flag_rta_or_lst:
+    elif smart_merge:
         flag_merge = True
-    elif not flag_rta_or_lst:
+    elif not smart_merge:
         flag_merge = False
     else:
-        flag_merge = True
+        flag_merge = False
 
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 

@@ -162,8 +162,11 @@ def modify_params_table(table, tel_id, focal=28):
 
     table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name='tel_id')
 
-    # Rename `leakage_intensity2` --> `leakage`
-    table.rename_column('leakage_intensity2', 'leakage')
+    # Rename `leakage_intensity2` --> `leakage`  # lstchain v0.4.5
+    table.rename_column('leakage_intensity2', 'leakage2_intensity')
+    table.rename_column('leakage_intensity1', 'leakage1_intensity')
+    table.rename_column('leakage_pixel1', 'leakage1_pixel')
+    table.rename_column('leakage_pixel2', 'leakage2_pixel')
 
     # X and Y in meters
     table['x'] *= focal
