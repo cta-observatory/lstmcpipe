@@ -240,7 +240,7 @@ def manage_source_env_r0_dl1(source_and_env, file):
                 all_lines.append(line)
 
     # Overwrite the file ONLY if there is any change in the source path or environment
-    if (new_env != old_env) and (new_source != old_source):
+    if (new_env != old_env) or (new_source != old_source):
         with open(file, 'w+') as new_f:
             new_f.writelines(all_lines)
         os.chmod(file, 0o755)  # -rwxr-xr-x
