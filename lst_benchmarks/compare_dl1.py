@@ -9,11 +9,13 @@ from astropy.table import Table, join, hstack
 from datetime import date
 from matplotlib.backends.backend_pdf import PdfPages
 
-pp = PdfPages(f'compare_lstchain_hipecta_dl1_{date.today()}.pdf')
+pp = PdfPages(f'{date.today()}_dl1_compare_lstchain_hipecta.pdf')
 
-filename_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL1/20190415/gamma/south_pointing/20200407_vRTA_no_intercept/testing/dl1_reorganized_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.h5'
+# filename_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/run1/dl1_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.h5'
 
-filename_lstchain = '/fefs/aswg/data/mc/DL1/20190415/gamma/south_pointing/20200316_v0.4.5__EG1/testing/dl1_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.simtel.h5'
+filename_hipecta = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/DL1/20190415/gamma/south_pointing/20200506_vRTA_v0.4.5_tailcuts_6_3_no_intercept/testing/dl1_reorganized_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.h5'
+
+filename_lstchain = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/run1/lstchain/dl1_gamma_20deg_180deg_run1___cta-prod3-demo-2147m-LaPalma-baseline-mono_off0.4.simtel.h5'
 
 geom = CameraGeometry.from_name('LSTCam')
 geom2 = CameraGeometry.from_name('LSTCam-002')
@@ -38,9 +40,9 @@ mega_table = join(lt, ht, keys=['event_id', 'tel_id'], uniq_col_name='{table_nam
 
 print(f"{len(mega_table)} events in common")
 
-filter = mega_table['is_good_event'] == 1
-print(
-    f"Only {np.count_nonzero(filter)} common events well reconstructed by hipecta will be included in the following plots")
+filter = (mega_table['is_good_event'] == 1) & (mega_table['hipecta_n_islands'] == 1) # & (mega_table['lstchain_n_islands'] == 1) #
+
+print(f"Only {np.count_nonzero(filter)} common events well reconstructed by hipecta will be included in the following plots")
 
 selected_events = mega_table[filter]
 
