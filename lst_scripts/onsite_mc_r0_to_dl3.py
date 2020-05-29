@@ -35,10 +35,10 @@ from workflow_management import (batch_r0_to_dl1,
 # choose between :
 #  'lst' for lstchain-like workflow  OR
 #  'rta' for HiPeRTA-like workflow
-WORKFLOW_KIND = 'lst'
+WORKFLOW_KIND = 'rta'
 
-BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
+# BASE_PATH = '/fefs/aswg/data/mc'
+BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
 
 OBS_DATE = '20190415'
 POINTING = 'south_pointing'
@@ -48,8 +48,8 @@ ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
-DO_r0_to_dl1 = True
-DO_merge_and_copy = True
+DO_r0_to_dl1 = False
+DO_merge_and_copy = False
 DO_TRAIN_PIPE = True
 DO_dl1_to_dl2 = True
 # DO_dl2_to_dl3 = True
@@ -86,13 +86,17 @@ if __name__ == '__main__':
 
     # Global variables
     today = calendar.datetime.date.today()
-    if WORKFLOW_KIND == 'lst':
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    elif WORKFLOW_KIND == 'rta':
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
-    suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
+    # if WORKFLOW_KIND == 'lst':
+    #     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    # elif WORKFLOW_KIND == 'rta':
+    #     base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+    # suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
+    #
+    # PROD_ID = base_prod_id + suffix_id
 
-    PROD_ID = base_prod_id + suffix_id
+    PROD_ID = '20200529_vRTA_v0.5.1_recalculated'
+    suffix_id = 'train_&_dl1_to_dl2'
+
     RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
     ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
     if WORKFLOW_KIND == 'lst':
