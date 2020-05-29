@@ -167,6 +167,7 @@ def modify_params_table(table, tel_id, focal=28):
     table.rename_column('leakage_intensity1', 'leakage1_intensity')
     table.rename_column('leakage_pixel1', 'leakage1_pixel')
     table.rename_column('leakage_pixel2', 'leakage2_pixel')
+    table.rename_column('nb_selected_pixel', 'n_pixels')
 
     # X and Y in meters
     table['x'] *= focal
