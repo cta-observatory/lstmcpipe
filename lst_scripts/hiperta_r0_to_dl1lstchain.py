@@ -6,7 +6,6 @@
 import os
 import argparse
 from distutils.util import strtobool
-#from hipecta.programs.reorganize_dl1_files import reorganize_dl1
 from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
 
 
