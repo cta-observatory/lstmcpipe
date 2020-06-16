@@ -4,9 +4,8 @@ import os
 import tables
 import argparse
 import numpy as np
-from distutils.util import strtobool
 from astropy.table import Table
-from lst_scripts.hiperta_r0_to_dl1lstchain import main as reorganize_dl1_hiperta
+from lst_scripts.reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
 
 parser = argparse.ArgumentParser(description="Test the hipecta to lstchain dl1 file converted")
 
@@ -14,27 +13,14 @@ parser.add_argument('--infile', '-i',
                     type=str,
                     dest='infile',
                     help='Output of `hiperta_r1_dl1 file to test',
-                    default='/Users/garciaenrique/CTA/data/LST_mono/dl1_gamma_20190415_20_0_run100_Tel_1_1_Tel_1_0.h5'
+                    # default='/Users/garciaenrique/CTA/data/LST_mono/dl1_gamma_20190415_20_0_run100_Tel_1_1_Tel_1_0.h5'
                     )
 
 parser.add_argument('--outdir', '-o',
                     type=str,
                     dest='outdir',
                     help='Path where to store the dl1_reorganized_* file.',
-                    default='./'
-                    )
-
-parser.add_argument('--config', '-c',
-                    type=str,
-                    dest='config',
-                    help='Configuration file for hiperta_r1_dl1 script'
-                    )
-
-parser.add_argument('--debug_mode', '-d',
-                    type=lambda x: bool(strtobool(x)),
-                    dest='debug_mode',
-                    help='Activate debug mode (add cleaned mask in the output hdf5). Set by default to False',
-                    default=False
+                    # default='/Users/garciaenrique/CTA/data/LST_mono'
                     )
 
 args = parser.parse_args()
@@ -46,19 +32,15 @@ def test_reorganize_dl1hiperta_to_dl1lstchain():
     """
     # We know in advance the output names
     # gamma.h5 --> dl1_gamma.h5 (after hiperta_r1_dl1) --> dl1_reorganized_gamma.h5 (after reorganizer script).
-    print(args.infile)
-    #assert args.infile.find('dl1_') == 0
-    base_filename = args.infile[4:]
-    output_reorganized_filename = os.path.join(args.outdir, "dl1_reorganized_" + os.path.basename(base_filename))
-    if not os.path.isfile(output_reorganized_filename):
-        reorganize_dl1_hiperta(args.infile,
-                               output_reorganized_filename,
-                               config=args.config,
-                               keep_file=True,
-                               debug_mode=args.debug_mode)
+    assert os.path.basename(args.infile).find('dl1_') == 0
+    base_filename = os.path.basename(args.infile)[4:]
+    dl1_reorganized_filename = os.path.join(args.outdir, "dl1_reorganized_" + base_filename)
+    if not os.path.exists(dl1_reorganized_filename):
+        reorganize_dl1(args.infile,
+                       dl1_reorganized_filename)
 
     hf = tables.open_file(args.infile, mode='r')
-    hf_reorg = tables.open_file(output_reorganized_filename, mode='r')
+    hf_reorg = tables.open_file(dl1_reorganized_filename, mode='r')
 
     dl1 = hf.root.dl1
     dl1_reorg = hf_reorg.root.dl1
