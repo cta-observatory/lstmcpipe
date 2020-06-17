@@ -13,14 +13,14 @@ parser.add_argument('--infile', '-i',
                     type=str,
                     dest='infile',
                     help='Output of `hiperta_r1_dl1 file to test',
-                    # default='/Users/garciaenrique/CTA/data/LST_mono/dl1_gamma_20190415_20_0_run100_Tel_1_1_Tel_1_0.h5'
+                    # default='./dl1_gamma_20190415_20_0_run100_Tel_1_1_Tel_1_0.h5'
                     )
 
 parser.add_argument('--outdir', '-o',
                     type=str,
                     dest='outdir',
                     help='Path where to store the dl1_reorganized_* file.',
-                    # default='/Users/garciaenrique/CTA/data/LST_mono'
+                    # default='./'
                     )
 
 args = parser.parse_args()
@@ -70,5 +70,5 @@ def test_reorganize_dl1hiperta_to_dl1lstchain():
             reorganized_table[reorganized_table['tel_id'] == tel]['event_id'].all()
         # check the join of the `mc_events` tables
         for col in mc_events.itercols():
-            assert set(reorganized_table[reorganized_table['tel_id'] == tel][mc_events.colnames][col]).issubset(
-                mc_events[col])
+            assert set(reorganized_table[reorganized_table['tel_id'] == tel][mc_events.colnames][col.name]).issubset(
+                mc_events[col.name])
