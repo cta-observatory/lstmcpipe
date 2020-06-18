@@ -152,7 +152,7 @@ def modify_params_table(table, tel_id, focal=28):
     ----------
         table: [obj, astropy.table.table.Table] The table to be modified.
         tel_id: [int] telescope identifier, i.e., 1,2,3,4 for LSTs
-        focal: [float] focal length in meters
+        focal: [float] focal length in meters  # TODO: deprecated, done at hipecta/rta level
 
     Returns
     -------
@@ -170,8 +170,8 @@ def modify_params_table(table, tel_id, focal=28):
     table.rename_column('nb_selected_pixel', 'n_pixels')
 
     # X and Y in meters
-    table['x'] *= focal
-    table['y'] *= focal
+    # table['x'] *= focal
+    # table['y'] *= focal
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
@@ -188,7 +188,7 @@ def stack_by_telid(dl1_pointer, focal=28):
     Parameters
     ----------
         dl1_pointer: [obj, tables.group.Group] pointer of the input hdf5 file `hfile.root.dl1`
-        focal: [float] focal length in meters
+        focal: [float] focal length in meters  # TODO: deprecated, done at hipecta/rta level
 
     Returns
     -------

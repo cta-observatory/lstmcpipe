@@ -1,0 +1,7 @@
+# Packages/installer info
+*.egg
+*.eggs
+*.egg-info
+dist
+build
+.pytest_cache
