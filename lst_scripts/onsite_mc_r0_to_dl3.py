@@ -21,6 +21,7 @@ import argparse
 import calendar
 import lstchain
 from data_management import query_continue
+from distutils.util import strtobool
 from workflow_management import (batch_r0_to_dl1,
                                  batch_r0_to_dl1_rta,
                                  batch_merge_and_copy_dl1,
@@ -76,6 +77,16 @@ parser.add_argument('--prod_id', '-pid', action='store', type=str,
                     dest='prod_id',
                     help="Production ID. If None, _v00 will be used, indicating an official base production",
                     default=None,
+                    )
+
+# OPTIONAL / ADVANCED ARGUMENTS
+
+parser.add_argument('--no-image', action='store',
+                    type=lambda x: bool(strtobool(x)),
+                    dest='flag_no_image',
+                    help='--no-image argument for merging stage.'
+                         'True will merge dl1 files without image. False will do the oppossite',
+                    default=True
                     )
 args = parser.parse_args()
 
@@ -159,8 +170,10 @@ if __name__ == '__main__':
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
-            #smart_merge=WORKFLOW_KIND
-            smart_merge=False)
+            # smart_merge=WORKFLOW_KIND
+            smart_merge=False,
+            no_image_flag=args.flag_no_image
+        )
 
         save_log_to_file(log_batch_merge_and_copy, log_file, 'merge_and_copy_dl1')
         save_log_to_file(debug, debug_file, 'merge_and_copy_dl1')

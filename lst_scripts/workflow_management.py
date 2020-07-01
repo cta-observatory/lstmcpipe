@@ -169,7 +169,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 #     return ids_single_particle_ok
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False,
+                             no_image_flag=True):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -192,6 +193,10 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
+    no_image_flag : bool
+        flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
+        this function) should be either True or False. 
+
     Returns
     -------
     log_merge_and_copy : dict
@@ -211,15 +216,15 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     debug_log = {}
 
     if smart_merge == 'lst':
-        flag_merge = True
+        merge_flag = True
     elif smart_merge == 'rta':
-        flag_merge = False
+        merge_flag = False
     elif smart_merge:
-        flag_merge = True
+        merge_flag = True
     elif not smart_merge:
-        flag_merge = False
+        merge_flag = False
     else:
-        flag_merge = False
+        merge_flag = False
 
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
@@ -228,7 +233,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                                                      flag_full_workflow=True,
                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
                                                      particle=particle,
-                                                     flag_merge=flag_merge
+                                                     flag_merge=merge_flag,
+                                                     flag_no_image=no_image_flag
                                                      )
 
         log_merge_and_copy.update(log)
