@@ -195,7 +195,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
 
     no_image_flag : bool
         flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
-        this function) should be either True or False. 
+        this function) should be either True or False.
 
     Returns
     -------
@@ -453,3 +453,36 @@ def create_dict_with_filenames(dl1_directory, particles_loop):
             dl1_directory.format(particle), '*testing*.h5'))[0]
 
     return dl1_filename_directory
+
+
+def batch_check_prod(jobids_from_dl1_to_dl2, prod_id):
+    """
+    Check that the dl2, and therefore, the whole workflow has ended correctly.
+    It will JUST create an EMPTY file if the dl2 jobs finish without errors.
+    The file will take the form `check_MC_prodID_{prod_id}_OK.txt`
+
+    Parameters
+    ----------
+    jobids_from_dl1_to_dl2 : str
+        jobs from the dl1_to_dl2 stage
+
+    prod_id : str
+        MC Production ID.
+
+    Returns
+    -------
+    jobid : str
+        The jobid of the batched job to be stored in the `debug file`
+
+    """
+    cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt'
+    batch_cmd = 'sbatch --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
+        jobids_from_dl1_to_dl2,
+        'prod_check',
+        cmd_wrap
+    )
+
+    jobid = os.popen(batch_cmd).read().strip('\n')
+    print(f'\n\n\t\tSubmitted batch CHECK-job {jobid}')
+
+    return jobid

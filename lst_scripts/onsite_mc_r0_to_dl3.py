@@ -28,7 +28,8 @@ from workflow_management import (batch_r0_to_dl1,
                                  batch_train_pipe,
                                  batch_dl1_to_dl2,
                                  save_log_to_file,
-                                 create_dict_with_filenames
+                                 create_dict_with_filenames,
+                                 batch_check_prod
                                  )
 
 #######################################################################################################################
@@ -147,26 +148,26 @@ if __name__ == '__main__':
     if DO_r0_to_dl1:
 
         if WORKFLOW_KIND == 'lst':
-            log_batch_r0_dl1, debug = batch_r0_to_dl1(DL0_DATA_DIR,
-                                                      args.config_file_lst,
-                                                      PROD_ID,
-                                                      ALL_PARTICLES,
-                                                      source_env=source_env)
+            log_batch_r0_dl1, debug_r0dl1 = batch_r0_to_dl1(DL0_DATA_DIR,
+                                                            args.config_file_lst,
+                                                            PROD_ID,
+                                                            ALL_PARTICLES,
+                                                            source_env=source_env)
         elif WORKFLOW_KIND == 'rta':
-            log_batch_r0_dl1, debug = batch_r0_to_dl1_rta(DL0_DATA_DIR,
-                                                          args.config_file_rta,
-                                                          PROD_ID,
-                                                          ALL_PARTICLES,
-                                                          args.config_file_lst)
+            log_batch_r0_dl1, debug_r0dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
+                                                                args.config_file_rta,
+                                                                PROD_ID,
+                                                                ALL_PARTICLES,
+                                                                args.config_file_lst)
         else:
             sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
 
         save_log_to_file(log_batch_r0_dl1, log_file, 'r0_to_dl1')
-        save_log_to_file(debug, debug_file, 'r0_to_dl1')
+        save_log_to_file(debug_r0dl1, debug_file, 'r0_to_dl1')
 
     # Merge,copy and move DL1 files
     if DO_merge_and_copy:
-        log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug = batch_merge_and_copy_dl1(
+        log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug_merge = batch_merge_and_copy_dl1(
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
@@ -176,7 +177,7 @@ if __name__ == '__main__':
         )
 
         save_log_to_file(log_batch_merge_and_copy, log_file, 'merge_and_copy_dl1')
-        save_log_to_file(debug, debug_file, 'merge_and_copy_dl1')
+        save_log_to_file(debug_merge, debug_file, 'merge_and_copy_dl1')
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
         log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
@@ -185,14 +186,15 @@ if __name__ == '__main__':
 
     # Train pipe
     if DO_TRAIN_PIPE:
-        log_batch_train_pipe, job_from_train_pipe, model_dir, debug = batch_train_pipe(log_batch_merge_and_copy,
-                                                                                       args.config_file_lst,
-                                                                                       jobs_to_train,
-                                                                                       source_env=source_env
-                                                                                       )
+        log_batch_train_pipe, job_from_train_pipe, model_dir, debug_train = batch_train_pipe(
+            log_batch_merge_and_copy,
+            args.config_file_lst,
+            jobs_to_train,
+            source_env=source_env
+        )
 
         save_log_to_file(log_batch_train_pipe, log_file, 'train_pipe')
-        save_log_to_file(debug, debug_file, 'train_pipe')
+        save_log_to_file(debug_train, debug_file, 'train_pipe')
     else:
         job_from_train_pipe = ''
         if BASE_PATH == '/fefs/aswg/data/mc':
@@ -202,7 +204,7 @@ if __name__ == '__main__':
 
     # DL1 to DL2 stage
     if DO_dl1_to_dl2:
-        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug = batch_dl1_to_dl2(
+        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug_dl1dl2 = batch_dl1_to_dl2(
             DL1_DATA_DIR,
             model_dir,
             args.config_file_lst,
@@ -214,5 +216,11 @@ if __name__ == '__main__':
         )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, 'dl1_to_dl2')
-        save_log_to_file(debug, debug_file, 'dl1_to_dl2')
+        save_log_to_file(debug_dl1dl2, debug_file, 'dl1_to_dl2')
+    else:
+        jobs_for_dl2_to_dl3 = ''
 
+    # Check DL2 jobs and thus the full workflow has finished correctly
+    jobid_check = batch_check_prod(jobs_for_dl2_to_dl3, prod_id=PROD_ID)
+
+    save_log_to_file(jobid_check, debug_file, 'check_full_workflow')
