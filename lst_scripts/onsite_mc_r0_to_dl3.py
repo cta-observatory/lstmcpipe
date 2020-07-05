@@ -29,7 +29,7 @@ from workflow_management import (batch_r0_to_dl1,
                                  batch_dl1_to_dl2,
                                  save_log_to_file,
                                  create_dict_with_filenames,
-                                 batch_check_prod
+                                 batch_mc_production_check
                                  )
 
 #######################################################################################################################
@@ -221,6 +221,6 @@ if __name__ == '__main__':
         jobs_for_dl2_to_dl3 = ''
 
     # Check DL2 jobs and thus the full workflow has finished correctly
-    jobid_check = batch_check_prod(jobs_for_dl2_to_dl3, prod_id=PROD_ID)
+    jobid_check = batch_mc_production_check(jobs_for_dl2_to_dl3, prod_id=PROD_ID)
 
     save_log_to_file(jobid_check, debug_file, 'check_full_workflow')

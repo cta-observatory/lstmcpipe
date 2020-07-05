@@ -455,7 +455,7 @@ def create_dict_with_filenames(dl1_directory, particles_loop):
     return dl1_filename_directory
 
 
-def batch_check_prod(jobids_from_dl1_to_dl2, prod_id):
+def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
     """
     Check that the dl2, and therefore, the whole workflow has ended correctly.
     It will JUST create an EMPTY file if the dl2 jobs finish without errors.
