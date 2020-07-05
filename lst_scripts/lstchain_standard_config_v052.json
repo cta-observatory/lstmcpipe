@@ -101,7 +101,7 @@
   "image_extractor_config": {},
   "gain_selector": "ThresholdGainSelector",
   "gain_selector_config": {
-    "threshold":  3500
+    "threshold":  20
   },
   "apply_charge_correction": false,
   "charge_scale": [1.0,1.0],
