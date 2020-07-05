@@ -34,7 +34,8 @@ parser.add_argument('input_dir', type=str,
                     )
 
 
-def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False):
+def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
+         flag_no_image=True):
     """
     Merge and copy DL1 data after production.
 
@@ -64,7 +65,12 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
     flag_merge : bool
         Flag to indicate whether the `--smart` argument of the `lstchain_merge_hdf5_files.py` script must be set to
-        True (smart merge) or False (auto merge)
+        True (smart merge) or False (auto merge).
+        Default set to True.
+
+    flag_no_image : bool
+        Flaf to indicate whether the `--no-image` argument of the `lstchain_merge_hdf5_files.py` script must be set to
+        True (--no-image True) or False (--no-image False).
         Default set to True.
 
 
@@ -154,7 +160,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
             cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
-            cmd += " --no-image True"
+            cmd += f" --no-image {flag_no_image} --smart {flag_merge}"
             os.system(cmd)
 
         # 4. move DL1 files in final place
@@ -203,10 +209,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image True --smart {}"'.format(
+            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image {} --smart {}"'.format(
                 job_name[particle],
                 tdir,
                 output_filename,
+                flag_no_image,
                 flag_merge  ##
             )
 
