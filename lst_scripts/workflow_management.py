@@ -5,6 +5,7 @@
 import os
 import glob
 import pprint
+import yaml
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -64,7 +65,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
         # Create dictionary : jobid to full log information, and
         #  the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
-        full_log[particle] = jobids_by_particle
+        full_log[particle] = ','.join(jobids_by_particle)
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1'
@@ -128,7 +129,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
         # Create jobid to full log information dictionary.
         # And the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
-        full_log[particle] = jobids_by_particle
+        full_log[particle] = ','.join(jobids_by_particle)
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
@@ -395,9 +396,9 @@ def batch_dl2_to_dl3():
     pass
 
 
-def save_log_to_file(dictionary, output_file, workflow_step=None):
+def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
     """
-    Dumps a dictionary (log) to a file
+    Dumps a dictionary (log) either to a .txt file or to a .yml file
 
     Parameters
     ----------
@@ -405,8 +406,10 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
         The dictionary to be dumped to a file
     output_file : str
         Output file to store the log
+    log_format : str
+        The way the data will be dumped to the output file. Either using yaml or just writing a dictionary as plain text
     workflow_step : str
-        Step of the workflow, to be recorded in the dict
+        Step of the workflow, to be recorded in the log
 
     Returns
     -------
@@ -414,11 +417,19 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
     """
     if workflow_step is None:
         workflow_step = '--'
-    with open(output_file, 'a+') as fout:
-        fout.write('\n\n  *******************************************\n')
-        fout.write(f'   *** Log from the {workflow_step} stage \n')
-        fout.write('  *******************************************\n')
-        fout.write(pprint.pformat(dictionary))
+
+    if log_format == 'yml':
+        with open(output_file, 'a+') as fileout:
+            yaml.dump(' *******************************************', fileout)
+            yaml.dump(f' *** Log from the {workflow_step} stage ', fileout)
+            yaml.dump(' *******************************************', fileout)
+            yaml.dump(dictionary, fileout)
+    else:
+        with open(output_file, 'a+') as fout:
+            fout.write('\n\n  *******************************************\n')
+            fout.write(f'   *** Log from the {workflow_step} stage \n')
+            fout.write('  *******************************************\n')
+            fout.write(pprint.pformat(dictionary))
 
 
 def create_dict_with_filenames(dl1_directory, particles_loop):
@@ -471,10 +482,12 @@ def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
 
     Returns
     -------
-    jobid : str
-        The jobid of the batched job to be stored in the `debug file`
+    debug_log : dict
+        Dict with the jobid of the batched job to be stored in the `debug file`
 
     """
+    debug_log = {}
+
     cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt'
     batch_cmd = 'sbatch --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
         jobids_from_dl1_to_dl2,
@@ -485,4 +498,6 @@ def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
     jobid = os.popen(batch_cmd).read().strip('\n')
     print(f'\n\n\t\tSubmitted batch CHECK-job {jobid}')
 
-    return jobid
+    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
+
+    return debug_log
