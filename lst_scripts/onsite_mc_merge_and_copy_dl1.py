@@ -102,7 +102,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
     if flag_full_workflow:
         log_merge = {particle: {'training': {}, 'testing': {}}}
 
-        wait_r0_dl1_jobs = ','.join(particle2jobs_dict[particle])
+        wait_r0_dl1_jobs = particle2jobs_dict[particle]
 
         return_jobids4train = []
         return_jobids_debug = []

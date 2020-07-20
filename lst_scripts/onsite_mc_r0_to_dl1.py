@@ -267,11 +267,11 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobid2log[jobid]['sbatch_command'] = cmd
 
                 # print(f'\t\t{cmd}')
-                # print(f'\t\tSubmitted batch job {jobid}')
+                print(f'\t\tSubmitted batch job {jobid}')
 
             counter += 1
 
-        print("\n\t{} jobs submitted. From {} to {}".format(counter, jobids_r0_dl1[0], jobids_r0_dl1[-1]))
+        print("\n\t{} jobs submitted".format(counter))
 
     # copy this script and config into working dir
     shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
