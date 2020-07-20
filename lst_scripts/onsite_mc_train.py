@@ -103,9 +103,9 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     base_cmd = ''
     base_cmd += source_environment
     base_cmd += 'lstchain_mc_trainpipe --fg {} --fp {} -o {}'.format(os.path.abspath(gamma_dl1_train_file),
-                                                                   os.path.abspath(proton_dl1_train_file),
-                                                                   models_dir,
-                                                                   )
+                                                                     os.path.abspath(proton_dl1_train_file),
+                                                                     models_dir,
+                                                                     )
     if config_file is not None:
         base_cmd = base_cmd + ' -c {}'.format(config_file)
 

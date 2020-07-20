@@ -35,7 +35,7 @@ parser.add_argument('input_dir', type=str,
 
 
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
-         flag_no_image=True):
+         flag_no_image=True, prod_id=None):
     """
     Merge and copy DL1 data after production.
 
@@ -72,6 +72,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         Flaf to indicate whether the `--no-image` argument of the `lstchain_merge_hdf5_files.py` script must be set to
         True (--no-image True) or False (--no-image False).
         Default set to True.
+
+    prod_id : str
+        TBD
 
 
     Returns
@@ -225,7 +228,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             wait_both_merges.append(jobid_merge)
             return_jobids_debug.append(jobid_merge)
 
-        # This MUST be out of the set_type loop !
+        # Out of testing/training loop !
+
+        # Save MACHINE info of previous stage (jobs must be finished)
+        cmd_machine_log = f'sacct -j {wait_r0_dl1_jobs} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
+                          f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
+                          f'reqmem >> log_machine_R0_TO_DL1_{prod_id}.txt'
+        os.system(cmd_machine_log)
 
         # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge, the three steps:
         # 4 --> move DL1 files in final place
