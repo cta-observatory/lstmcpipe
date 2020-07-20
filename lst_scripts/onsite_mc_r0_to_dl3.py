@@ -177,7 +177,8 @@ if __name__ == '__main__':
             ALL_PARTICLES,
             # smart_merge=WORKFLOW_KIND
             smart_merge=False,
-            no_image_flag=args.flag_no_image
+            no_image_flag=args.flag_no_image,
+            prod_id=PROD_ID
         )
 
         save_log_to_file(log_batch_merge_and_copy, OLD_log_file, 'merge_and_copy_dl1')
@@ -221,7 +222,8 @@ if __name__ == '__main__':
             jobs_all_dl1_finished,  # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             ALL_PARTICLES,
-            source_env=source_env
+            source_env=source_env,
+            prod_id=PROD_ID
         )
 
         save_log_to_file(log_batch_dl1_to_dl2, OLD_log_file, 'dl1_to_dl2')

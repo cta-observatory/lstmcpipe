@@ -171,7 +171,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 
 
 def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False,
-                             no_image_flag=True):
+                             no_image_flag=True, prod_id=None):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -197,6 +197,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     no_image_flag : bool
         flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
         this function) should be either True or False.
+
+    prod_id : str
+        TBD
 
     Returns
     -------
@@ -230,21 +233,23 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
     for particle in particles_loop:
-        log, jobid, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
-                                                     flag_full_workflow=True,
-                                                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
-                                                     particle=particle,
-                                                     flag_merge=merge_flag,
-                                                     flag_no_image=no_image_flag
-                                                     )
+        log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
+                                                      flag_full_workflow=True,
+                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                                                      particle=particle,
+                                                      flag_merge=merge_flag,
+                                                      flag_no_image=no_image_flag,
+                                                      prod_id=prod_id
+                                                      )
 
         log_merge_and_copy.update(log)
-        all_merge.append(jobid)
+        all_merge.append(jobids)
         if particle == 'gamma-diffuse' or particle == 'proton':
-            jobid_4_train.append(jobid)
+            jobid_4_train.append(jobids)
 
-        debug_log[jobid] = f'{particle} merge_and_copy-jobs that will go to dl1_to_dl2. They depend on the following ' \
-                           f'{log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
+        debug_log[jobids] = f'{particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
+                            f' that will go to dl1_to_dl2. They depend on the following' \
+                            f' {log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
         debug_log[jobid_debug] = f'Are all the {particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
@@ -316,7 +321,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
-                     dict_with_dl1_paths, particles_loop, source_env):
+                     dict_with_dl1_paths, particles_loop, source_env, prod_id=None):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
@@ -348,6 +353,9 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     source_env : str
         source environment to select the desired conda environment to run train_pipe and dl1_to_dl2 stages
 
+    prod_id : str
+        TBD
+
     Returns
     -------
     log_batch_dl1_to_dl2 : dict
@@ -376,7 +384,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                 wait_jobid_train_pipe=jobid_from_training,
                                 wait_jobids_merge=jobids_from_merge,
                                 dictionary_with_dl1_paths=dict_with_dl1_paths,
-                                source_environment=source_env
+                                source_environment=source_env,
+                                prod_id=prod_id
                                 )
 
         log_dl1_to_dl2.update(log)
@@ -488,7 +497,10 @@ def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
     """
     debug_log = {}
 
-    cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt'
+    cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt; '
+    cmd_wrap += f'sacct -j {jobids_from_dl1_to_dl2} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
+                f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
+                f'reqmem >> log_machine_DL1_TO_DL2_{prod_id}.txt'
     batch_cmd = 'sbatch --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
         jobids_from_dl1_to_dl2,
         'prod_check',
