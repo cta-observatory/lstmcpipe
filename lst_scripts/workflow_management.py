@@ -43,14 +43,18 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
     debug_log : dict
             dictionary containing minimum information - jobids -  for log_reduced.txt
 
+    all_jobids_from_r0_dl1_stage : str
+        TBD
+
     # ids_by_particle_ok : str  # TODO in V0.2 - Job management
     #     a string (of chained jobids separated by ',' and without spaces between each element), to be passed to the
     #     the next stage of the workflow (as a slurm dependency).
 
     """
     full_log = {'jobid_log': {}}
-    # ids_by_particle_ok = []
     debug_log = {}
+    all_jobids_from_r0_dl1_stage = []
+    # ids_by_particle_ok = []
 
     print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
 
@@ -66,6 +70,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
         #  the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
         full_log[particle] = ','.join(jobids_by_particle)
+        all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1'
@@ -74,9 +79,11 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
         # jobid_summary = check_job_output_logs(full_log[particle])  # full_log is a dict of dicts
         # ids_by_particle_ok.append(jobid_summary)
 
+    all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
+
     print("\n ==== END {} ==== \n".format('batch r0_to_dl1_workflow'))
 
-    return full_log, debug_log  # ids_by_particle_ok
+    return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 
 
 def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_file_lst):
@@ -112,9 +119,12 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     debug_log : dict
             dictionary containing minimum information - jobids -  for log_reduced.txt
 
+    all_jobids_from_r0_dl1_stage : str
+        TBD
     """
     full_log = {'jobid_log': {}}
     debug_log = {}
+    all_jobids_from_r0_dl1_stage = []
 
     print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
@@ -130,13 +140,16 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
         # And the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
         full_log[particle] = ','.join(jobids_by_particle)
+        all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
 
         for jid in jobids_by_particle:
             debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
 
+    all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
+
     print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
-    return full_log, debug_log
+    return full_log, debug_log, all_jobids_from_r0_dl1_stage
 
 
 # def check_job_output_logs(dict_particle_jobid):
@@ -216,7 +229,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     """
     log_merge_and_copy = {}
     jobid_4_train = []
-    all_merge = []
+    all_jobs_from_merge_stage = []
     debug_log = {}
 
     if smart_merge == 'lst':
@@ -243,7 +256,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                                                       )
 
         log_merge_and_copy.update(log)
-        all_merge.append(jobids)
+        all_jobs_from_merge_stage.append(jobid_debug)
         if particle == 'gamma-diffuse' or particle == 'proton':
             jobid_4_train.append(jobids)
 
@@ -253,11 +266,11 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         debug_log[jobid_debug] = f'Are all the {particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
-    all_merge = ','.join(all_merge)
+    all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
 
     print("\n ==== END {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
-    return log_merge_and_copy, jobid_4_train, all_merge, debug_log
+    return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage, debug_log
 
 
 def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env):
@@ -475,10 +488,11 @@ def create_dict_with_filenames(dl1_directory, particles_loop):
     return dl1_filename_directory
 
 
-def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
+def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
+                              jobids_from_dl1_to_dl2, prod_id):
     """
-    Check that the dl2, and therefore, the whole workflow has ended correctly.
-    It will JUST create an EMPTY file if the dl2 jobs finish without errors.
+    Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
+    The machine information of each job will be dumped to the file.
     The file will take the form `check_MC_prodID_{prod_id}_OK.txt`
 
     Parameters
@@ -497,10 +511,13 @@ def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
     """
     debug_log = {}
 
+    all_pipeline_jobs = jobids_from_r0_to_dl1 + jobids_from_merge + jobids_from_train_pipe + jobids_from_dl1_to_dl2
+
+    # Save machine info into the check file
     cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt; '
-    cmd_wrap += f'sacct -j {jobids_from_dl1_to_dl2} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
+    cmd_wrap += f'sacct -j {all_pipeline_jobs} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
                 f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
-                f'reqmem >> log_machine_DL1_TO_DL2_{prod_id}.txt'
+                f'reqmem >> check_MC_prodID_{prod_id}_OK.txt'
     batch_cmd = 'sbatch --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
         jobids_from_dl1_to_dl2,
         'prod_check',
@@ -508,8 +525,13 @@ def batch_mc_production_check(jobids_from_dl1_to_dl2, prod_id):
     )
 
     jobid = os.popen(batch_cmd).read().strip('\n')
-    print(f'\n\n\t\tSubmitted batch CHECK-job {jobid}')
+    print(f'\n\n\tSubmitted batch CHECK-job {jobid}\n\n')
 
+    # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
+    debug_log['r0_dl1'] = jobids_from_r0_to_dl1
+    debug_log['merge'] = jobids_from_merge
+    debug_log['train_pipe'] = jobids_from_train_pipe
+    debug_log['dl1_dl2'] = jobids_from_dl1_to_dl2
 
     return debug_log
