@@ -119,18 +119,6 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
                     'proton': 'dl1-2_p'
                     }
 
-        # Save MACHINE info of MERGE_AND_COPY_DL1 stage (jobs must be finished)
-        cmd_machine_log = f'sacct -j {wait_jobids_merge} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
-                          f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
-                          f'reqmem >> log_machine_MERGE_AND_COPY_{prod_id}.txt'
-        os.system(cmd_machine_log)
-
-        # And of the TRAIN_PIPE stage
-        cmd_another_machine_log = f'sacct -j {wait_jobid_train_pipe} --format=jobid,jobname,nodelist,cputime,state,' \
-                                  f'exitcode,avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,' \
-                                  f'avecpufreq,reqmem >> log_machine_TRAIN_PIPE_{prod_id}.txt'
-        os.system(cmd_another_machine_log)
-
     else:
         print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
 

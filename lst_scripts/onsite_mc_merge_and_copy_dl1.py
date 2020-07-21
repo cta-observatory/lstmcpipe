@@ -230,12 +230,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         # Out of testing/training loop !
 
-        # Save MACHINE info of previous stage (jobs must be finished)
-        cmd_machine_log = f'sacct -j {wait_r0_dl1_jobs} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
-                          f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
-                          f'reqmem >> log_machine_R0_TO_DL1_{prod_id}.txt'
-        os.system(cmd_machine_log)
-
         # 4. & 5. in the case of the full workflow are done in a separate sbatch to wait merge, the three steps:
         # 4 --> move DL1 files in final place
         # copy lstchain config file in final_dir too

@@ -150,17 +150,17 @@ if __name__ == '__main__':
     if DO_r0_to_dl1:
 
         if WORKFLOW_KIND == 'lst':
-            log_batch_r0_dl1, debug_r0dl1 = batch_r0_to_dl1(DL0_DATA_DIR,
-                                                            args.config_file_lst,
-                                                            PROD_ID,
-                                                            ALL_PARTICLES,
-                                                            source_env=source_env)
+            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(DL0_DATA_DIR,
+                                                                             args.config_file_lst,
+                                                                             PROD_ID,
+                                                                             ALL_PARTICLES,
+                                                                             source_env=source_env)
         elif WORKFLOW_KIND == 'rta':
-            log_batch_r0_dl1, debug_r0dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
-                                                                args.config_file_rta,
-                                                                PROD_ID,
-                                                                ALL_PARTICLES,
-                                                                args.config_file_lst)
+            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
+                                                                                 args.config_file_rta,
+                                                                                 PROD_ID,
+                                                                                 ALL_PARTICLES,
+                                                                                 args.config_file_lst)
         else:
             sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
 
@@ -234,6 +234,10 @@ if __name__ == '__main__':
         jobs_for_dl2_to_dl3 = ''
 
     # Check DL2 jobs and thus the full workflow has finished correctly
-    jobid_check = batch_mc_production_check(jobs_for_dl2_to_dl3, prod_id=PROD_ID)
+    jobid_check = batch_mc_production_check(jobs_all_r0_dl1,
+                                            jobs_all_dl1_finished,
+                                            job_from_train_pipe,
+                                            jobs_for_dl2_to_dl3,
+                                            prod_id=PROD_ID)
 
-    save_log_to_file(jobid_check, debug_file, 'check_full_workflow')
+    save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
