@@ -35,7 +35,7 @@ parser.add_argument('input_dir', type=str,
 
 
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
-         flag_no_image=True, prod_id=None):
+         flag_no_image=True):
     """
     Merge and copy DL1 data after production.
 
@@ -72,10 +72,6 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         Flaf to indicate whether the `--no-image` argument of the `lstchain_merge_hdf5_files.py` script must be set to
         True (--no-image True) or False (--no-image False).
         Default set to True.
-
-    prod_id : str
-        TBD
-
 
     Returns
     -------

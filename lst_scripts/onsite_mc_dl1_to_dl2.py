@@ -31,7 +31,7 @@ parser.add_argument('--config_file', '-conf', action='store', type=str,
 
 
 def main(input_dir, path_models, config_file, flag_full_workflow=False, particle=None, wait_jobid_train_pipe=None,
-         wait_jobids_merge=None, dictionary_with_dl1_paths=None, source_environment=None, prod_id=None):
+         wait_jobids_merge=None, dictionary_with_dl1_paths=None, source_environment=None):
     """
     Convert onsite files from dl1 to dl2"
 
@@ -70,9 +70,6 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
         certain conda environment. By default : `conda activate cta`.
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
-
-    prod_id : str
-        TBD
 
     Returns
     -------

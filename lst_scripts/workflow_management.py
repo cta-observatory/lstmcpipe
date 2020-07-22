@@ -251,8 +251,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                                                       particle2jobs_dict=log_jobs_from_r0_to_dl1,
                                                       particle=particle,
                                                       flag_merge=merge_flag,
-                                                      flag_no_image=no_image_flag,
-                                                      prod_id=prod_id
+                                                      flag_no_image=no_image_flag
                                                       )
 
         log_merge_and_copy.update(log)
@@ -334,7 +333,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
-                     dict_with_dl1_paths, particles_loop, source_env, prod_id=None):
+                     dict_with_dl1_paths, particles_loop, source_env):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
@@ -366,9 +365,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     source_env : str
         source environment to select the desired conda environment to run train_pipe and dl1_to_dl2 stages
 
-    prod_id : str
-        TBD
-
     Returns
     -------
     log_batch_dl1_to_dl2 : dict
@@ -397,8 +393,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                 wait_jobid_train_pipe=jobid_from_training,
                                 wait_jobids_merge=jobids_from_merge,
                                 dictionary_with_dl1_paths=dict_with_dl1_paths,
-                                source_environment=source_env,
-                                prod_id=prod_id
+                                source_environment=source_env
                                 )
 
         log_dl1_to_dl2.update(log)
@@ -511,13 +506,14 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     """
     debug_log = {}
 
-    all_pipeline_jobs = jobids_from_r0_to_dl1 + jobids_from_merge + jobids_from_train_pipe + jobids_from_dl1_to_dl2
+    all_pipeline_jobs = jobids_from_r0_to_dl1 + ',' + jobids_from_merge + ',' + jobids_from_train_pipe + ',' + \
+                        jobids_from_dl1_to_dl2
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt; '
-    cmd_wrap += f'sacct -j {all_pipeline_jobs} --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
+    cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
                 f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
-                f'reqmem >> check_MC_prodID_{prod_id}_OK.txt'
+                f'reqmem -j {all_pipeline_jobs} >> check_MC_prodID_{prod_id}_OK.txt'
     batch_cmd = 'sbatch --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
         jobids_from_dl1_to_dl2,
         'prod_check',
@@ -528,7 +524,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     print(f'\n\n\tSubmitted batch CHECK-job {jobid}\n\n')
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
+    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.\n' + cmd_wrap
     debug_log['r0_dl1'] = jobids_from_r0_to_dl1
     debug_log['merge'] = jobids_from_merge
     debug_log['train_pipe'] = jobids_from_train_pipe
