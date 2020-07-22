@@ -111,7 +111,7 @@ if __name__ == '__main__':
         DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
     elif WORKFLOW_KIND == 'rta':
         DL0_DATA_DIR = os.path.join(BASE_PATH, 'R1', OBS_DATE, '{}', POINTING)  ##
-    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
+    DL1_DATA_DIR  = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
     # #################################################
     # ########### Beginning of the workflow ###########
@@ -126,13 +126,11 @@ if __name__ == '__main__':
           f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
           f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}""")).replace("DL1", "DL2")}\n'
           f'\t{ANALYSIS_LOG_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
-          f'\n\tPROD_ID to be used:{PROD_ID}\n'
+          f'\n\tPROD_ID to be used: {PROD_ID}\n'
           )
 
     query_continue('Are you sure ?')
 
-    OLD_log_file = './log_FULL_onsite_mc_r0_to_dl3_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
-    OLD_debug_file = './log_reduced_v{}_{}.txt'.format(WORKFLOW_KIND, suffix_id)
     log_file = f'./log_onsite_mc_r0_to_dl3_{PROD_ID}.yml'
     debug_file = f'./log_reduced_{PROD_ID}.yml'
 
@@ -164,10 +162,14 @@ if __name__ == '__main__':
         else:
             sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
 
-        save_log_to_file(log_batch_r0_dl1, OLD_log_file, 'r0_to_dl1')
-        save_log_to_file(debug_r0dl1, OLD_debug_file, 'r0_to_dl1')
         save_log_to_file(log_batch_r0_dl1, log_file, log_format='yml', workflow_step='r0_to_dl1')
         save_log_to_file(debug_r0dl1, debug_file, log_format='yml', workflow_step='r0_to_dl1')
+
+    else:
+        jobs_all_r0_dl1 = ''
+        log_batch_r0_dl1 = {}
+        for particle in ALL_PARTICLES:
+            log_batch_r0_dl1[particle] = ''
 
     # Merge,copy and move DL1 files
     if DO_merge_and_copy:
@@ -177,14 +179,12 @@ if __name__ == '__main__':
             ALL_PARTICLES,
             # smart_merge=WORKFLOW_KIND
             smart_merge=False,
-            no_image_flag=args.flag_no_image,
-            prod_id=PROD_ID
+            no_image_flag=args.flag_no_image
         )
 
-        save_log_to_file(log_batch_merge_and_copy, OLD_log_file, 'merge_and_copy_dl1')
-        save_log_to_file(debug_merge, OLD_debug_file, 'merge_and_copy_dl1')
         save_log_to_file(log_batch_merge_and_copy, log_file, log_format='yml', workflow_step='merge_and_copy_dl1')
         save_log_to_file(debug_merge, debug_file, log_format='yml', workflow_step='merge_and_copy_dl1')
+
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
         log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
@@ -200,8 +200,6 @@ if __name__ == '__main__':
             source_env=source_env
         )
 
-        save_log_to_file(log_batch_train_pipe, OLD_log_file, 'train_pipe')
-        save_log_to_file(debug_train, OLD_debug_file, 'train_pipe')
         save_log_to_file(log_batch_train_pipe, log_file, log_format='yml', workflow_step='train_pipe')
         save_log_to_file(debug_train, debug_file, log_format='yml', workflow_step='train_pipe')
 
@@ -218,18 +216,16 @@ if __name__ == '__main__':
             DL1_DATA_DIR,
             model_dir,
             args.config_file_lst,
-            job_from_train_pipe,  # Single jobid from train
-            jobs_all_dl1_finished,  # jobids from merge
+            job_from_train_pipe,       # Single jobid from train
+            jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             ALL_PARTICLES,
-            source_env=source_env,
-            prod_id=PROD_ID
+            source_env=source_env
         )
 
-        save_log_to_file(log_batch_dl1_to_dl2, OLD_log_file, 'dl1_to_dl2')
-        save_log_to_file(debug_dl1dl2, OLD_debug_file, 'dl1_to_dl2')
         save_log_to_file(log_batch_dl1_to_dl2, log_file, log_format='yml', workflow_step='dl1_to_dl2')
         save_log_to_file(debug_dl1dl2, debug_file, log_format='yml', workflow_step='dl1_to_dl2')
+
     else:
         jobs_for_dl2_to_dl3 = ''
 
