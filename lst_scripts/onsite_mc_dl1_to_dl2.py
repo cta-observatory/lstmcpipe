@@ -136,15 +136,22 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         if config_file is not None:
             cmd += f' -c {config_file}'
 
-        if not flag_full_workflow:
+        if not flag_full_workflow:  # Run interactively
             print(cmd)
             os.system(cmd)
 
         else:  # flag_full_workflow == True !
             # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"'
 
-            jobe = os.path.join(output_dir, f"dl1_dl2_{particle}_job.e")
-            jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_job.o")
+            if 'training' in file:
+                ftype = 'train'
+            elif 'testing' in file:
+                ftype = 'test'
+            else:
+                ftype = '-'
+
+            jobe = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.e")
+            jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.o")
 
             batch_cmd = 'sbatch --parsable'
             if wait_jobs != '':
