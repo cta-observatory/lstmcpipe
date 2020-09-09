@@ -233,11 +233,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
                 jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
+
             base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
-                cmd = 'sbatch -e {} -o {} {} {}'.format(jobe, jobo, base_cmd, os.path.join(dir_lists, file))
+                cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 # print(cmd)
                 os.system(cmd)
@@ -250,10 +251,13 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                             }
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]
+                if particle_type == 'proton':
+                    queue = 'long'
+                else:
+                    queue = 'short'
 
-                cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
-                                                                         jobe, jobo,
-                                                                         base_cmd, os.path.join(dir_lists, file))
+                cmd = f'sbatch --parsable -p {queue} -J {job_name[particle_type]} ' \
+                      f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 jobid = os.popen(cmd).read().strip('\n')
                 jobids_r0_dl1.append(jobid)

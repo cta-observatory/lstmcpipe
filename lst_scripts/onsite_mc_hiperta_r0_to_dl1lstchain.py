@@ -211,7 +211,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
 
-                cmd = f'sbatch -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
+                cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 # print(cmd)
                 os.system(cmd)
@@ -225,10 +225,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]
 
-                cmd = 'sbatch --parsable -J {} -e {} -o {} {} {}'.format(job_name[particle_type],
-                                                                         jobe, jobo,
-                                                                         base_cmd,
-                                                                         os.path.join(dir_lists, file))
+                cmd = f'sbatch --parsable -p short -J {job_name[particle_type]} ' \
+                      f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 jobid = os.popen(cmd).read().strip('\n')
 

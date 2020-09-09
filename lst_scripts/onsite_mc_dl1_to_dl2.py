@@ -153,7 +153,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
             jobe = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.e")
             jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.o")
 
-            batch_cmd = 'sbatch --parsable'
+            batch_cmd = 'sbatch --parsable -p short'
             if wait_jobs != '':
                 batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
             batch_cmd += ' -J {} -e {} -o {} --wrap="{}"'.format(job_name[particle],

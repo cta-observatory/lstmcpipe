@@ -113,14 +113,14 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     jobe = os.path.join(models_dir, "train_job.e")
 
     if not flag_full_workflow:
-        cmd = 'sbatch -e {} -o {} --wrap="{}" '.format(jobe, jobo, base_cmd)
+        cmd = 'sbatch -p long -e {} -o {} --wrap="{}" '.format(jobe, jobo, base_cmd)
 
         print(cmd)
         os.system(cmd)
 
     else:  # flag_full_workflow == True !
         # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-        cmd = 'sbatch --parsable'
+        cmd = 'sbatch --parsable -p long'
         if wait_ids_proton_and_gammas != '':
             cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
         cmd += ' -J {} -e {} -o {} --wrap="{}" '.format('train_pipe', jobe, jobo, base_cmd)
