@@ -7,16 +7,25 @@
 # $ python reorganize_dl1_file -i input.h5 [-o outname.h5]
 
 import os
-import argparse
+import copy
 import tables
-from lstchain.io.io import dl1_params_lstcam_key, dl1_images_lstcam_key, add_column_table
-from astropy.table import join, Table, vstack, Column
-import astropy.units as u
+import argparse
 import numpy as np
 import pandas as pd
-import copy
-from lstchain.reco import disp
-from lstchain.reco.utils import sky_to_camera
+import astropy.units as u
+from astropy.table import join, Table, vstack, Column
+
+# from lstchain.io.io import dl1_params_lstcam_key, dl1_images_lstcam_key, add_column_table
+# from lstchain.reco import disp
+# from lstchain.reco.utils import sky_to_camera
+
+# Make the hiperta side of lst_scripts independent of lstchian
+from data_management import (dl1_params_lstcam_key,
+                             dl1_images_lstcam_key,
+                             add_column_table,
+                             disp,
+                             sky_to_camera
+                             )
 
 parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                              "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
