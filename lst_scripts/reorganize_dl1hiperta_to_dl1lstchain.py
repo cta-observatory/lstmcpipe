@@ -22,12 +22,11 @@ from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 # from lstchain.reco import disp
 # from lstchain.reco.utils import sky_to_camera
 
-# Make the hiperta side of lst_scripts independent of lstchian so
+# Make the hiperta side of lst_scripts independent of lstchian. Thus the reorganizer contains all the functions
+#  from lstchain that needs to run
 
 dl1_params_lstcam_key = 'dl1/event/telescope/parameters/LST_LSTCam'
 dl1_images_lstcam_key = 'dl1/event/telescope/image/LST_LSTCam'
-
-
 # position of the LST1
 location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
 obstime = Time('2018-11-01T02:00')
