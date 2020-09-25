@@ -6,21 +6,7 @@
 import os
 import sys
 import shutil
-import tables
-import numpy as np
-import astropy.units as u
 from distutils.util import strtobool
-from astropy.time import Time
-from astropy.coordinates import SkyCoord, EarthLocation, AltAz
-from ctapipe.coordinates import CameraFrame
-
-dl1_params_lstcam_key = 'dl1/event/telescope/parameters/LST_LSTCam'
-dl1_images_lstcam_key = 'dl1/event/telescope/image/LST_LSTCam'
-
-# position of the LST1
-location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
-obstime = Time('2018-11-01T02:00')
-horizon_frame = AltAz(location=location, obstime=obstime)
 
 
 def query_yes_no(question, default="yes"):
@@ -258,121 +244,6 @@ def manage_source_env_r0_dl1(source_and_env, file):
         with open(file, 'w+') as new_f:
             new_f.writelines(all_lines)
         os.chmod(file, 0o755)  # -rwxr-xr-x
-
-
-def add_column_table(table, ColClass, col_label, values):
-    """
-    FUNCTION COPIED FROM lstchain.io.io to avoid hiperta depend on lstchain.
-
-    Add a column to an pytable Table
-
-    Parameters
-    ----------
-    table: `tables.table.Table`
-    ColClass: `tables.atom.MetaAtom`
-    col_label: str
-    values: list or `numpy.ndarray`
-
-    Returns
-    -------
-    `tables.table.Table`
-    """
-    # Step 1: Adjust table description
-    d = table.description._v_colobjects.copy()  # original description
-    d[col_label] = ColClass()  # add column
-
-    # Step 2: Create new temporary table:
-    newtable = tables.Table(table._v_file.root, '_temp_table', d, filters=table.filters)  # new table
-    table.attrs._f_copy(newtable)  # copy attributes
-    # Copy table rows, also add new column values:
-    for row, value in zip(table, values):
-        newtable.append([tuple(list(row[:]) + [value])])
-    newtable.flush()
-
-    # Step 3: Move temporary table to original location:
-    parent = table._v_parent  # original table location
-    name = table._v_name  # original table name
-    table.remove()  # remove original table
-    newtable.move(parent, name)  # move temporary table to original location
-
-    return newtable
-
-
-def disp(cog_x, cog_y, src_x, src_y):
-    """
-    FUNCTION COPIED FROM lstchain.reco.disp to avoid hiperta depend on lstchain.
-
-    Compute the disp parameters
-
-    Parameters
-    ----------
-    cog_x: `numpy.ndarray` or float
-    cog_y: `numpy.ndarray` or float
-    src_x: `numpy.ndarray` or float
-    src_y: `numpy.ndarray` or float
-
-    Returns
-    -------
-    (disp_dx, disp_dy, disp_norm, disp_angle, disp_sign):
-        disp_dx: 'astropy.units.m`
-        disp_dy: 'astropy.units.m`
-        disp_norm: 'astropy.units.m`
-        disp_angle: 'astropy.units.rad`
-        disp_sign: `numpy.ndarray`
-    """
-    disp_dx = src_x - cog_x
-    disp_dy = src_y - cog_y
-    disp_norm = np.sqrt(disp_dx**2 + disp_dy**2)
-    if hasattr(disp_dx, '__len__'):
-        disp_angle = np.arctan(disp_dy / disp_dx)
-        disp_angle[disp_dx == 0] = np.pi / 2. * np.sign(disp_dy[disp_dx == 0])
-    else:
-        if disp_dx == 0:
-            disp_angle = np.pi/2. * np.sign(disp_dy)
-        else:
-            disp_angle = np.arctan(disp_dy/disp_dx)
-
-    disp_sign = np.sign(disp_dx)
-
-    return disp_dx, disp_dy, disp_norm, disp_angle, disp_sign
-
-
-def clip_alt(alt):
-    """
-    FUNCTION COPIED FROM lstchain.reco.utils to avoid hiperta depend on lstchain.
-
-    Make sure altitude is not larger than 90 deg (it happens in some MC files for zenith=0),
-    to keep astropy happy
-    """
-    return np.clip(alt, -90.*u.deg, 90.*u.deg)
-
-
-def sky_to_camera(alt, az, focal, pointing_alt, pointing_az):
-    """
-    FUNCTION COPIED FROM lstchain.reco.utils to avoid hiperta depend on lstchain.
-
-    Coordinate transform from aky position (alt, az) (in angles) to camera coordinates (x, y) in distance
-    Parameters
-    ----------
-    alt: astropy Quantity
-    az: astropy Quantity
-    focal: astropy Quantity
-    pointing_alt: pointing altitude in angle unit
-    pointing_az: pointing altitude in angle unit
-
-    Returns
-    -------
-    camera frame: `astropy.coordinates.sky_coordinate.SkyCoord`
-    """
-    pointing_direction = SkyCoord(alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame)
-
-    camera_frame = CameraFrame(focal_length=focal, telescope_pointing=pointing_direction)
-
-    event_direction = SkyCoord(alt=clip_alt(alt), az=az, frame=horizon_frame)
-
-    camera_pos = event_direction.transform_to(camera_frame)
-
-    return camera_pos
 
 
 if __name__ == '__main__':

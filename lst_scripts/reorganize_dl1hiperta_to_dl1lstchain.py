@@ -14,18 +14,25 @@ import numpy as np
 import pandas as pd
 import astropy.units as u
 from astropy.table import join, Table, vstack, Column
+from ctapipe.coordinates import CameraFrame
+from astropy.time import Time
+from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 
 # from lstchain.io.io import dl1_params_lstcam_key, dl1_images_lstcam_key, add_column_table
 # from lstchain.reco import disp
 # from lstchain.reco.utils import sky_to_camera
 
-# Make the hiperta side of lst_scripts independent of lstchian
-from data_management import (dl1_params_lstcam_key,
-                             dl1_images_lstcam_key,
-                             add_column_table,
-                             disp,
-                             sky_to_camera
-                             )
+# Make the hiperta side of lst_scripts independent of lstchian so
+
+dl1_params_lstcam_key = 'dl1/event/telescope/parameters/LST_LSTCam'
+dl1_images_lstcam_key = 'dl1/event/telescope/image/LST_LSTCam'
+
+
+# position of the LST1
+location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
+obstime = Time('2018-11-01T02:00')
+horizon_frame = AltAz(location=location, obstime=obstime)
+
 
 parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                              "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
@@ -46,41 +53,119 @@ parser.add_argument('--outfile', '-o',
                     )
 
 
-def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
+def add_column_table(table, ColClass, col_label, values):
     """
-    Create the final output HDF5 file.
-    It copies /instruments and /simulations nodes from the output of hipecta_hdf5_r1_to_dl1.py,
-        - and /dl1/event from the created table.
-        - and includes the image and pulse_time within the correct path, i.e., /dl1/event/telescope/
+    FUNCTION COPIED FROM lstchain.io.io to avoid hiperta depend on lstchain.
 
-    TODO: Define somehow the paths globally so that it can be used .get_node()
+    Add a column to an pytable Table
 
     Parameters
     ----------
-        hfile: [obj, astropy.table.table.Table] output file
-        hfile_tmp: [obj, astropy.table.table.Table] hdf5 file with dl1 parameters. path:
-                    `dl1/event/telescope/parameters/LST_LSTCam`
-        hfile_tmp2: [obj, astropy.table.table.Table] hdf5 file with images and pulse_time. path:
-                    `dl1/event/telescope/image/LST_LSTCam`
-        output_filename: [str] name of output file
+    table: `tables.table.Table`
+    ColClass: `tables.atom.MetaAtom`
+    col_label: str
+    values: list or `numpy.ndarray`
 
     Returns
     -------
-        None
-
+    `tables.table.Table`
     """
-    # The complevel MUST be set to zero, otherwise this version of libhdf5 does NOT accept the copy_node()
-    filter = tables.Filters(complevel=0, complib='blosc:zstd', shuffle=False, bitshuffle=False, fletcher32=False)
+    # Step 1: Adjust table description
+    d = table.description._v_colobjects.copy()  # original description
+    d[col_label] = ColClass()  # add column
 
-    hfile_out = tables.open_file(output_filename, 'w')
-    hfile_out.copy_node(hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter)
-    hfile_out.copy_node(hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter)
-    hfile_out.copy_node(hfile_tmp.root.dl1, newparent=hfile_out.root, recursive=True)
-    hfile_out.copy_children(hfile_tmp2.root.dl1.event.telescope, hfile_out.root.dl1.event.telescope, recursive=True)
+    # Step 2: Create new temporary table:
+    newtable = tables.Table(table._v_file.root, '_temp_table', d, filters=table.filters)  # new table
+    table.attrs._f_copy(newtable)  # copy attributes
+    # Copy table rows, also add new column values:
+    for row, value in zip(table, values):
+        newtable.append([tuple(list(row[:]) + [value])])
+    newtable.flush()
 
-    # Move the telescope table from /instrument/subarray to /instrument (lstchain output file dl1 format)
-    hfile_out.move_node('/instrument/subarray/telescope', newparent='/instrument', createparents=True)
-    hfile_out.close()
+    # Step 3: Move temporary table to original location:
+    parent = table._v_parent  # original table location
+    name = table._v_name  # original table name
+    table.remove()  # remove original table
+    newtable.move(parent, name)  # move temporary table to original location
+
+    return newtable
+
+
+def disp(cog_x, cog_y, src_x, src_y):
+    """
+    FUNCTION COPIED FROM lstchain.reco.disp to avoid hiperta depend on lstchain.
+
+    Compute the disp parameters
+
+    Parameters
+    ----------
+    cog_x: `numpy.ndarray` or float
+    cog_y: `numpy.ndarray` or float
+    src_x: `numpy.ndarray` or float
+    src_y: `numpy.ndarray` or float
+
+    Returns
+    -------
+    (disp_dx, disp_dy, disp_norm, disp_angle, disp_sign):
+        disp_dx: 'astropy.units.m`
+        disp_dy: 'astropy.units.m`
+        disp_norm: 'astropy.units.m`
+        disp_angle: 'astropy.units.rad`
+        disp_sign: `numpy.ndarray`
+    """
+    disp_dx = src_x - cog_x
+    disp_dy = src_y - cog_y
+    disp_norm = np.sqrt(disp_dx**2 + disp_dy**2)
+    if hasattr(disp_dx, '__len__'):
+        disp_angle = np.arctan(disp_dy / disp_dx)
+        disp_angle[disp_dx == 0] = np.pi / 2. * np.sign(disp_dy[disp_dx == 0])
+    else:
+        if disp_dx == 0:
+            disp_angle = np.pi/2. * np.sign(disp_dy)
+        else:
+            disp_angle = np.arctan(disp_dy/disp_dx)
+
+    disp_sign = np.sign(disp_dx)
+
+    return disp_dx, disp_dy, disp_norm, disp_angle, disp_sign
+
+
+def clip_alt(alt):
+    """
+    FUNCTION COPIED FROM lstchain.reco.utils to avoid hiperta depend on lstchain.
+
+    Make sure altitude is not larger than 90 deg (it happens in some MC files for zenith=0),
+    to keep astropy happy
+    """
+    return np.clip(alt, -90.*u.deg, 90.*u.deg)
+
+
+def sky_to_camera(alt, az, focal, pointing_alt, pointing_az):
+    """
+    FUNCTION COPIED FROM lstchain.reco.utils to avoid hiperta depend on lstchain.
+
+    Coordinate transform from aky position (alt, az) (in angles) to camera coordinates (x, y) in distance
+    Parameters
+    ----------
+    alt: astropy Quantity
+    az: astropy Quantity
+    focal: astropy Quantity
+    pointing_alt: pointing altitude in angle unit
+    pointing_az: pointing altitude in angle unit
+
+    Returns
+    -------
+    camera frame: `astropy.coordinates.sky_coordinate.SkyCoord`
+    """
+    pointing_direction = SkyCoord(alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame)
+
+    camera_frame = CameraFrame(focal_length=focal, telescope_pointing=pointing_direction)
+
+    event_direction = SkyCoord(alt=clip_alt(alt), az=az, frame=horizon_frame)
+
+    camera_pos = event_direction.transform_to(camera_frame)
+
+    return camera_pos
 
 
 def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
@@ -151,6 +236,43 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         if 'proton' in dl1_file:
             tab = file.root[table_path]
             add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
+
+
+def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
+    """
+    Create the final output HDF5 file.
+    It copies /instruments and /simulations nodes from the output of hipecta_hdf5_r1_to_dl1.py,
+        - and /dl1/event from the created table.
+        - and includes the image and pulse_time within the correct path, i.e., /dl1/event/telescope/
+
+    TODO: Define somehow the paths globally so that it can be used .get_node()
+
+    Parameters
+    ----------
+        hfile: [obj, astropy.table.table.Table] output file
+        hfile_tmp: [obj, astropy.table.table.Table] hdf5 file with dl1 parameters. path:
+                    `dl1/event/telescope/parameters/LST_LSTCam`
+        hfile_tmp2: [obj, astropy.table.table.Table] hdf5 file with images and pulse_time. path:
+                    `dl1/event/telescope/image/LST_LSTCam`
+        output_filename: [str] name of output file
+
+    Returns
+    -------
+        None
+
+    """
+    # The complevel MUST be set to zero, otherwise this version of libhdf5 does NOT accept the copy_node()
+    filter = tables.Filters(complevel=0, complib='blosc:zstd', shuffle=False, bitshuffle=False, fletcher32=False)
+
+    hfile_out = tables.open_file(output_filename, 'w')
+    hfile_out.copy_node(hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter)
+    hfile_out.copy_node(hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter)
+    hfile_out.copy_node(hfile_tmp.root.dl1, newparent=hfile_out.root, recursive=True)
+    hfile_out.copy_children(hfile_tmp2.root.dl1.event.telescope, hfile_out.root.dl1.event.telescope, recursive=True)
+
+    # Move the telescope table from /instrument/subarray to /instrument (lstchain output file dl1 format)
+    hfile_out.move_node('/instrument/subarray/telescope', newparent='/instrument', createparents=True)
+    hfile_out.close()
 
 
 def modify_params_table(table, tel_id, focal=28):
