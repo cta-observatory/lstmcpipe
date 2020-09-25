@@ -118,10 +118,10 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
                                          run_array_dir[0] * u.rad,
                                          )
 
-    disp_parameters = disp.disp(df.x.values * u.m,
-                                df.y.values * u.m,
-                                source_pos_in_camera.x,
-                                source_pos_in_camera.y)
+    disp_parameters = disp(df.x.values * u.m,
+                           df.y.values * u.m,
+                           source_pos_in_camera.x,
+                           source_pos_in_camera.y)
 
     with tables.open_file(dl1_file, mode="a") as file:
         tab = file.root[table_path]
