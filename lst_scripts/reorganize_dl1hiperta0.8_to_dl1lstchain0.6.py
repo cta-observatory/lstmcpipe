@@ -1,9 +1,10 @@
 # !/usr/bin/env python3
 
+import os
 import tables
-from astropy.table import join, Table, vstack, Column
-import numpy as np
 import argparse
+from astropy.table import Table, vstack
+from astropy.io.misc.hdf5 import write_table_hdf5
 
 parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                              "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
@@ -23,60 +24,70 @@ parser.add_argument('--outfile', '-o',
                     )
 
 
-def stack_and_write_images_table(hfile_out, node_dl1, filter_pointer):
+def stack_and_write_images_table(hfile_out, node_dl1_event):
     """
 
     Parameters
     ----------
     hfile_out
-    node_dl1
+    node_dl1_event
     filter_pointer
 
     Returns
     -------
 
     """
-    telescope_node = node_dl1.event.telescope
+    telescope_node = node_dl1_event.telescope
 
-    imag_per_tels = [Table(telescope_node.images.table_img.read()) for table_img in telescope_node.images]
+    imag_per_tels = [Table(table_img.read()) for table_img in telescope_node.images]
     image_table = vstack(imag_per_tels)
 
     for tab in telescope_node.images:
         hfile_out.remove_node(tab)
-    hfile_out.copy_node(image_table, newparent=telescope_node.images, newname='LST_LSTCam',
-                        filters=filter_pointer)
+
+    tmp_imgs = './imgs_erase.h5'
+    write_table_hdf5(image_table, tmp_imgs, path='/root')
+    temp = tables.open_file(tmp_imgs, 'r')
+    hfile_out.copy_node(temp.root, newparent=hfile_out.root.dl1.event.telescope.image)
+    temp.close()
+    os.remove(tmp_imgs)
 
 
-def stack_and_write_parameters_table(hfile_out, node_dl1, filter_pointer):
+def stack_and_write_parameters_table(hfile_out, node_dl1_event):
     """
 
     Parameters
     hfile_out :
-    node_dl1 : Output (V0.6) dl1 node pointer
+    node_dl1_event : Output (V0.6) dl1 node pointer
     filter_pointer :
     """
-    telescope_node = node_dl1.event.telescope
+    telescope_node = node_dl1_event.telescope
 
-    param_per_tels = [Table(telescope_node.parameters.table_param.read()) for table_param in telescope_node.parameters]
+    param_per_tels = [Table(table_param.read()) for table_param in telescope_node.parameters]
     parameter_table = vstack(param_per_tels)
 
     for tab in telescope_node.parameters:
         hfile_out.remove_node(tab)
-    hfile_out.copy_node(parameter_table, newparent=telescope_node.parameters, newname='LST_LSTCam',  # In lstchain there will only be LST wiht LSTCam
-                        filters=filter_pointer)
+
+    tmp_params = './param_erase.h5'
+    write_table_hdf5(parameter_table, tmp_params, path='/root')
+    temp = tables.open_file(tmp_params, 'r')
+    hfile_out.copy_node(temp.root, newparent=hfile_out.root.dl1.event.telescope.parameters)
+    temp.close()
+    os.remove(tmp_params)
 
 
-def rename_mc_shower_colnames(dl1_node):
+def rename_mc_shower_colnames(event_node):
     """
     Rename column names of the `mc_shower` table (as in lstchian V0.6)
 
     Parameters
     dl1_node : Output (V0.6) dl1 node pointer
     """
-    mc_shower_table = Table(dl1_node.event.subarray.mc_shower.read())
+    mc_shower_table = Table(event_node.subarray.mc_shower.read())
     mc_shower_table.rename_column('true_energy', 'mc_energy')
     mc_shower_table.rename_column('true_alt', 'mc_alt')
-    mc_shower_table.rename_column('true_az', 'mc_alt')
+    mc_shower_table.rename_column('true_az', 'mc_az')
     mc_shower_table.rename_column('true_core_x', 'mc_core_x')
     mc_shower_table.rename_column('true_core_y', 'mc_core_y')
     mc_shower_table.rename_column('true_h_first_int', 'mc_h_first_int')
@@ -84,19 +95,19 @@ def rename_mc_shower_colnames(dl1_node):
     mc_shower_table.rename_column('true_shower_primary_id', 'mc_shower_primary_id')
 
 
-def create_hfile_out(outf_name, sim_pointer, config_pointer, dl1_pointer, filter_pointer):
+def create_hfile_out(outfile_name, sim_pointer, config_pointer, dl1_pointer, filter_pointer):
     """
 
     Parameters
     ----------
-    outf_name
+    outfile_name
     sim_pointer
     config_pointer
     dl1_pointer
     filter_pointer
     """
 
-    hfile_out = tables.open_file(outf_name, 'w')
+    hfile_out = tables.open_file(outfile_name, 'w')
     hfile_out.create_group('/', 'simulation')
     hfile_out.create_group('/', 'dl1')
 
@@ -133,17 +144,17 @@ def create_hfile_out(outf_name, sim_pointer, config_pointer, dl1_pointer, filter
     #          `--subarray (Group)
     #             +--mc_shower (Table)
     #             `--trigger (Table)
-    dl1_out_node = hfile_out.copy_node(dl1_pointer.event, newparent=hfile_out.root.dl1,
-                                       recursive=True, filters=filter_pointer)
-    hfile_out.remove_node(dl1_out_node.event.telescope.trigger)  # Table stored twice, remove to avoid problems.
+    dl1_event_out_node = hfile_out.copy_node(dl1_pointer.event, newparent=hfile_out.root.dl1,
+                                             recursive=True, filters=filter_pointer)
+    hfile_out.remove_node(dl1_event_out_node.telescope.trigger)  # Table stored twice, remove to avoid problems.
 
     hfile_out.copy_node(sim_pointer.event.subarray.shower, newparent=hfile_out.root.dl1.event.subarray,
                         newname="mc_shower", recursive=True, filters=filter_pointer)
 
-    rename_mc_shower_colnames(dl1_out_node)
-    stack_and_write_parameters_table(hfile_out, dl1_out_node, filter_pointer)
-    if 'images' in dl1_out_node.event.telescope:
-        stack_and_write_images_table(hfile_out, dl1_out_node, filter_pointer)
+    rename_mc_shower_colnames(dl1_event_out_node)
+    stack_and_write_parameters_table(hfile_out, dl1_event_out_node)
+    if 'image' in dl1_event_out_node.telescope:
+        stack_and_write_images_table(hfile_out, dl1_event_out_node)
 
     hfile_out.close()
 
