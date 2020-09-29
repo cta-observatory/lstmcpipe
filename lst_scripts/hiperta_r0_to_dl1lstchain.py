@@ -8,7 +8,7 @@ import argparse
 from distutils.util import strtobool
 # from hipecta.programs.reorganize_dl1_files import reorganize_dl1
 # from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
-from reorganize_dl1hiperta08_to_dl1lstchain06 import main as reorganize_dl1
+from lst_scripts.reorganize_dl1hiperta08_to_dl1lstchain06 import main as reorganize_dl1
 
 
 parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_to_dl1lstchain")
