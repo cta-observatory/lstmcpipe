@@ -7,7 +7,8 @@ import os
 import argparse
 from distutils.util import strtobool
 # from hipecta.programs.reorganize_dl1_files import reorganize_dl1
-from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
+# from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
+from reorganize_dl1hiperta08_to_dl1lstchain06 import main as reorganize_dl1
 
 
 parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_to_dl1lstchain")
@@ -82,7 +83,7 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(outdir, "dl1_" + os.path.basename(infile))
-    output_reorganized_filename = os.path.join(outdir, "dl1_reorganized_" + os.path.basename(infile))
+    output_reorganized_filename = os.path.join(outdir, "dl1v06å_reorganized_" + os.path.basename(infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
