@@ -76,14 +76,14 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     """
     os.makedirs(outdir, exist_ok=True)
 
-    cmd_hiperta = f'hiperta_r1_dl1 -i {infile} -c {config} -o {outdir}'
+    cmd_hiperta = f'hiperta_r0_dl1 -i {infile} -c {config} -o {outdir}'
     if debug_mode:  # in HiPeRTA
         cmd_hiperta += ' -g'
     os.system(cmd_hiperta)
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(outdir, "dl1_" + os.path.basename(infile))
-    output_reorganized_filename = os.path.join(outdir, "dl1v06å_reorganized_" + os.path.basename(infile))
+    output_reorganized_filename = os.path.join(outdir, "dl1v06_reorganized_" + os.path.basename(infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
