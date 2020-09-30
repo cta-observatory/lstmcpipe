@@ -28,7 +28,7 @@ install:
   # - conda activate
   # cython needed for building gammapy
   # - pip install travis-sphinx codecov pytest-cov Cython
-  - pip install .[all]
+  - pip install .
   - python --version
 
 script:
