@@ -184,7 +184,8 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
     #             `--trigger (Table)
     dl1_event_node06 = hfile_out.copy_node(dl1_pointer.event, newparent=hfile_out.root.dl1,
                                            recursive=True, filters=filter_pointer)
-    hfile_out.remove_node(dl1_event_node06.telescope.trigger)  # Table stored twice, remove to avoid problems.
+    # This will only happen on ctapipe, not RTA
+    # hfile_out.remove_node(dl1_event_node06.telescope.trigger)  # Table stored twice, remove to avoid problems.
 
     subarray_pointer = hfile_out.root.dl1.event.subarray
     hfile_out.copy_node(sim_pointer08.event.subarray.shower, newparent=subarray_pointer,
