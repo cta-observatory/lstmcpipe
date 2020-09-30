@@ -9,10 +9,10 @@ Thomas Vuillaume, thomas.vuillaume [at] lapp.in2p3.fr
 Install
 -------
 
-```
-git clone https://github.com/vuillaut/LST_scripts.git
-cd LST_scripts
-pip install .
+```    
+git clone https://github.com/vuillaut/LST_scripts.git    
+cd LST_scripts    
+pip install .    
 ```
 
 You can install this as an independant package. This will give you the possibility to run ``onsite_`` commands from
