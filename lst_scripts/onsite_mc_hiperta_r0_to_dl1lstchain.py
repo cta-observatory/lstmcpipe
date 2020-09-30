@@ -145,7 +145,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R1', 'running_analysis'), PROD_ID)  ##
+    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('R0', 'running_analysis'), PROD_ID)  ##
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
