@@ -1,5 +1,9 @@
 LST scripts
 ===========
+
+.. image:: https://travis-ci.com/vuillaut/LST_scripts.svg?branch=master
+    :target: https://travis-ci.com/vuillaut/LST_scripts
+
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
 Contact:
