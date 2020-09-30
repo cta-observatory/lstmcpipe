@@ -5,7 +5,7 @@ import os
 from setuptools import setup, find_packages
 import re
 
-with open("lst_scripts/version.py") as f:
+with open("lst_scripts/__init__.py") as f:
     __version__ = re.search('^__version__ = "(.*)"$', f.read()).group(1)
 
 def find_scripts(script_dir, prefix):
@@ -23,7 +23,7 @@ def readfile(filename):
 scripts_list = find_scripts('lst_scripts','onsite_')
 
 setup(name='lst_scripts',
-      # version=get_property('__version__', 'lst_scripts'),
+      version=get_property('__version__', 'lst_scripts'),
       description="MC production with lstchain on LST cluster (La Palma)",
       install_requires=[
           'lstchain',
