@@ -79,9 +79,7 @@ def stack_and_write_parameters_table(hfile_out, node_dl1_event, output_mc_table_
     parameter_table.rename_column('hillas_skewness', 'skewness')
     parameter_table.rename_column('hillas_kurtosis', 'kurtosis')
     parameter_table.rename_column('timing_slope', 'time_gradient')
-    parameter_table.rename_column('timing_slope_err', 'time_gradient_err')
     parameter_table.rename_column('timing_intercept', 'intercept')
-    parameter_table.rename_column('timing_intercept_err', 'intercept_err')
     parameter_table.rename_column('morphology_num_pixels', 'n_pixels')
     parameter_table.rename_column('morphology_num_islands', 'n_islands')
 
