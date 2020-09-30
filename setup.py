@@ -5,6 +5,9 @@ import os
 from setuptools import setup, find_packages
 import re
 
+with open("lst_scripts/version.py") as f:
+    __version__ = re.search('^__version__ = "(.*)"$', f.read()).group(1)
+
 def find_scripts(script_dir, prefix):
     script_list = [os.path.join(script_dir, f) for f in os.listdir(script_dir) if f.startswith(prefix)]
     return script_list
