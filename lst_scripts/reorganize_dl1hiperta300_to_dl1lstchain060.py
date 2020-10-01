@@ -131,7 +131,7 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
 
     telescope_path = 'dl1/event/telescope'
     param_table_path = os.path.join(telescope_path, 'parameters/LST_LSTCam')
-    imag_table_path = os.path.join(telescope_path, 'parameters/LST_LSTCam')
+    imag_table_path = os.path.join(telescope_path, 'images/LST_LSTCam')
 
     with tables.open_file(outfile_name, 'w') as hfile_out:
         hfile_out.create_group('/', 'simulation')
