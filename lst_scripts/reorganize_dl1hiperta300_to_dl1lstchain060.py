@@ -40,7 +40,7 @@ def stack_images_table(output_filename):
     image_table : single table with all the tel_00X image tables stacked
     """
 
-    with tables.open_file(output_filename, 'a') as hfile_out:
+    with tables.open_file(output_filename, 'r+') as hfile_out:
 
         image_node = hfile_out.root.dl1.event.telescope.images
         images_table = [Table(img_table.read()) for img_table in image_node]
@@ -67,7 +67,7 @@ def stack_and_modify_parameters_table(output_filename, mc_shower_table):
     Returns
     parameters_table : astropy table with all tel_00x parameters table stacked and renamed
     """
-    with tables.open_file(output_filename, 'a') as hfile_out:
+    with tables.open_file(output_filename, 'r+') as hfile_out:
 
         param_node = hfile_out.root.dl1.event.telescope.parameters
         parameters_table = [Table(param_table.read()) for param_table in param_node]
