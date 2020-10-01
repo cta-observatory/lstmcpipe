@@ -44,7 +44,7 @@ def stack_images_table(output_filename, imgs_tables_per_tel_path):
     image_table = vstack(imag_per_tels)
 
     with tables.open_file(output_filename, 'r') as hfile_out:
-        for tab in imgs_tables_per_tel_path:
+        for tab in hfile_out.root.dl1.event.telescope.images:
             hfile_out.remove_node(tab)
 
     # Todo ?? change names of column `image_mask` to `` ??
@@ -70,7 +70,7 @@ def stack_and_modify_parameters_table(output_filename, param_tables_per_tel_path
     parameters_table = vstack(param_per_tels)
 
     with tables.open_file(output_filename, 'w') as hfile_out:
-        for tab in param_tables_per_tel_path:
+        for tab in hfile_out.root.dl1.event.telescope.parameters:
             hfile_out.remove_node(tab)
 
     parameters_table.rename_column('hillas_intensity', 'intensity')
