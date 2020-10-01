@@ -189,6 +189,9 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
                             recursive=True,
                             filters=filter_pointer)
 
+        if 'images' in dl1_event_node06.telescope:
+            images_in_dl1 = True
+
     # Rename mc_shower table
     mc_shower_table = Table.read(outfile_name, path=mc_shower_table_path)
     mc_shower_table = rename_mc_shower_colnames(mc_shower_table)
@@ -199,7 +202,7 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
     write_table_hdf5(param_table, outfile_name, path=param_table_path, overwrite=True, append=True)
 
     # Stack and modify images table if exist
-    if 'images' in dl1_event_node06.telescope:
+    if images_in_dl1:
         imag_table = stack_images_table(outfile_name)
         write_table_hdf5(imag_table, outfile_name, path=imag_table_path, overwrite=True, append=True)
 
