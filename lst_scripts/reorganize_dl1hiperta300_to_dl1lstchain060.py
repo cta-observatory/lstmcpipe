@@ -6,7 +6,7 @@
 import os
 import tables
 import argparse
-from copy import copy
+from copy import deepcopy
 from astropy.table import Table, vstack, join
 from astropy.io.misc.hdf5 import write_table_hdf5
 from lst_scripts.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
@@ -196,7 +196,7 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
     # Rename mc_shower table
     mc_shower_table = Table.read(outfile_name, path=mc_shower_table_path)
     mc_shower_table = rename_mc_shower_colnames(mc_shower_table)
-    copy_mc_shower_table = copy(mc_shower_table)
+    copy_mc_shower_table = deepcopy(mc_shower_table)
     write_table_hdf5(mc_shower_table, outfile_name, path=mc_shower_table_path, overwrite=True, append=True)
 
     # Stack and modify parameter table
