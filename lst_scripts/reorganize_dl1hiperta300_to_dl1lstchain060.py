@@ -116,13 +116,13 @@ def dump_plus_copy_node_to_create_new_table(input_filename, hfile_out, astropy_t
                 are run in the same dir)
     overwrite : overwrite parameter of the copy_node method
     """
-    input_filename = os.path.basename(input_filename)
+    input_filename = input_filename.split('___')[0]
     if tmp_name == '':
         flag_name = 'UNKNOWN'
     else:
         flag_name = tmp_name
 
-    temp_table_name = f'./tmp_table_reoganizer_{flag_name}_{input_filename}.h5'
+    temp_table_name = f'{input_filename}_tmp_table_reoganizer_{flag_name}.h5'
     write_table_hdf5(astropy_table_to_copy, temp_table_name, path='/root')
     temp_table = tables.open_file(temp_table_name, 'r')
     hfile_out.copy_node(temp_table.root.root, newparent=newparent_pointer, newname=newname_pointer, overwrite=overwrite)
