@@ -28,31 +28,32 @@ parser.add_argument('--outfile', '-o',
                     )
 
 
-def stack_images_table(output_filename, imgs_tables_per_tel_path):
+def stack_images_table(output_filename):
     """
     Stack all the `tel_00X` image tables (in case they exit) and write in the v0.6 file
 
     Parameters
     output_filename : [str] output file name
-    imgs_tables_per_tel_path : [list] containing all the tel_00X in output.root.dl1.event.telescope.images
 
     Returns
     image_table : single table with all the tel_00X image tables stacked
     """
 
-    imag_per_tels = [Table.read(output_filename, path=table_img) for table_img in imgs_tables_per_tel_path]
-    image_table = vstack(imag_per_tels)
+    with tables.open_file(output_filename, 'a') as hfile_out:
 
-    with tables.open_file(output_filename, 'r') as hfile_out:
-        for tab in hfile_out.root.dl1.event.telescope.images:
+        image_node = hfile_out.root.dl1.event.telescope.images
+        images_table = [Table(img_table.read()) for img_table in image_node]
+        images_table = vstack(images_table)
+
+        for tab in image_node:
             hfile_out.remove_node(tab)
 
     # Todo ?? change names of column `image_mask` to `` ??
 
-    return image_table
+    return images_table
 
 
-def stack_and_modify_parameters_table(output_filename, param_tables_per_tel_path, mc_shower_table):
+def stack_and_modify_parameters_table(output_filename, mc_shower_table):
     """
     Stack all the `tel_00X` parameters tables (of v0.8), change names of the columns and write the table in the
     V0.6 (lstchain like) format
@@ -65,12 +66,13 @@ def stack_and_modify_parameters_table(output_filename, param_tables_per_tel_path
     Returns
     parameters_table : astropy table with all tel_00x parameters table stacked and renamed
     """
+    with tables.open_file(output_filename, 'a') as hfile_out:
 
-    param_per_tels = [Table.read(output_filename, path=table_param) for table_param in param_tables_per_tel_path]
-    parameters_table = vstack(param_per_tels)
+        param_node = hfile_out.root.dl1.event.telescope.parameters
+        parameters_table = [Table(param_table.read()) for param_table in param_node]
+        parameters_table = vstack(parameters_table)
 
-    with tables.open_file(output_filename, 'w') as hfile_out:
-        for tab in hfile_out.root.dl1.event.telescope.parameters:
+        for tab in param_node:
             hfile_out.remove_node(tab)
 
     parameters_table.rename_column('hillas_intensity', 'intensity')
@@ -128,8 +130,6 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
     mc_shower_table_path = os.path.join(subarray_path, 'mc_shower')
 
     telescope_path = 'dl1/event/telescope'
-    param_tables_per_tel_path = os.path.join(telescope_path, 'parameters')
-    imag_tables_per_tel_path = os.path.join(telescope_path, 'images')
     param_table_path = os.path.join(telescope_path, 'parameters/LST_LSTCam')
     imag_table_path = os.path.join(telescope_path, 'parameters/LST_LSTCam')
 
@@ -189,28 +189,18 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
                             recursive=True,
                             filters=filter_pointer)
 
-        # get the name of the tables by tel_00x
-        tables_in_parameters_node = [os.path.join(param_tables_per_tel_path, table.name) for table in
-                                     dl1_event_node06.telescope.parameters]
-        if 'images' in dl1_event_node06.telescope:
-            tables_in_images_node = [os.path.join(imag_tables_per_tel_path, table.name) for table in
-                                     dl1_event_node06.telescope.images]
-
     # Rename mc_shower table
     mc_shower_table = Table.read(outfile_name, path=mc_shower_table_path)
     mc_shower_table = rename_mc_shower_colnames(mc_shower_table)
     write_table_hdf5(mc_shower_table, outfile_name, path=mc_shower_table_path, overwrite=True, append=True)
 
     # Stack and modify parameter table
-    param_table = stack_and_modify_parameters_table(outfile_name,
-                                                    tables_in_parameters_node,
-                                                    mc_shower_table)
+    param_table = stack_and_modify_parameters_table(outfile_name, mc_shower_table)
     write_table_hdf5(param_table, outfile_name, path=param_table_path, overwrite=True, append=True)
 
     # Stack and modify images table if exist
     if 'images' in dl1_event_node06.telescope:
-        imag_table = stack_images_table(outfile_name,
-                                        tables_in_images_node)
+        imag_table = stack_images_table(outfile_name)
         write_table_hdf5(imag_table, outfile_name, path=imag_table_path, overwrite=True, append=True)
 
 
