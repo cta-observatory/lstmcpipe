@@ -6,6 +6,7 @@
 import os
 import tables
 import argparse
+from copy import copy
 from astropy.table import Table, vstack, join
 from astropy.io.misc.hdf5 import write_table_hdf5
 from lst_scripts.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
@@ -195,10 +196,11 @@ def create_hfile_out(outfile_name, sim_pointer08, config_pointer08, dl1_pointer,
     # Rename mc_shower table
     mc_shower_table = Table.read(outfile_name, path=mc_shower_table_path)
     mc_shower_table = rename_mc_shower_colnames(mc_shower_table)
+    copy_mc_shower_table = copy(mc_shower_table)
     write_table_hdf5(mc_shower_table, outfile_name, path=mc_shower_table_path, overwrite=True, append=True)
 
     # Stack and modify parameter table
-    param_table = stack_and_modify_parameters_table(outfile_name, mc_shower_table)
+    param_table = stack_and_modify_parameters_table(outfile_name, copy_mc_shower_table)
     write_table_hdf5(param_table, outfile_name, path=param_table_path, overwrite=True, append=True)
 
     # Stack and modify images table if exist
@@ -226,7 +228,7 @@ def main(input_filename, output_filename):
     create_hfile_out(output_filename, simulation_v08, configuration_v08, dl1_v08, filter_v08)
 
     # Add disp_* and mc_type to the parameters table.
-    add_disp_and_mc_type_to_parameters_table(output_filename, 'dl1/event/telescope/parameters/LST_LSTCam')
+    add_disp_and_mc_type_to_parameters_table(output_filename, '/dl1/event/telescope/parameters/LST_LSTCam')
 
     hfile.close()
 
