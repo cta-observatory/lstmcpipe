@@ -6,6 +6,7 @@
 import os
 import tables
 import argparse
+import numpy as np
 from astropy.table import Table, vstack, join
 from astropy.io.misc.hdf5 import write_table_hdf5
 from lst_scripts.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
@@ -87,6 +88,10 @@ def stack_and_write_parameters_table(input_filename, hfile_out, node_dl1_event, 
     parameter_table.rename_column('timing_intercept', 'intercept')
     parameter_table.rename_column('morphology_num_pixels', 'n_pixels')
     parameter_table.rename_column('morphology_num_islands', 'n_islands')
+    parameter_table.rename_column('leakage_intensity_1', 'leakage_intensity_width_1')
+    parameter_table.rename_column('leakage_intensity_2', 'leakage_intensity_width_2')
+    parameter_table.add_column(np.log10(parameter_table['intensity']), name='log_intensity')
+    parameter_table.add_column(parameter_table['width'] / parameter_table['length'], name='wl')
 
     # Param table is indeed huge - it contains all the mc_events parameters (from v0.6 !!) too
     mc_event_table = Table(output_mc_table_pointer.mc_shower.read())
