@@ -95,7 +95,9 @@ def stack_and_write_parameters_table(input_filename, hfile_out, node_dl1_event, 
 
     # Param table is indeed huge - it contains all the mc_events parameters (from v0.6 !!) too
     mc_event_table = Table(output_mc_table_pointer.mc_shower.read())
+    mc_event_table.remove_column('obs_id')
     parameter_table = join(parameter_table, mc_event_table, keys='event_id')
+    parameter_table.add_column(np.log10(parameter_table['mc_energy']), name='log_mc_energy')
 
     dump_plus_copy_node_to_create_new_table(input_filename,
                                             hfile_out,
