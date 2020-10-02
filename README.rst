@@ -1,5 +1,9 @@
 LST scripts
 ===========
+
+.. image:: https://travis-ci.com/vuillaut/LST_scripts.svg?branch=master
+    :target: https://travis-ci.com/vuillaut/LST_scripts
+
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
 Contact:
@@ -8,6 +12,13 @@ Thomas Vuillaume, thomas.vuillaume [at] lapp.in2p3.fr
 
 Install
 -------
+
+.. code-block::
+
+    git clone https://github.com/vuillaut/LST_scripts.git 
+    cd LST_scripts 
+    pip install .    
+
 
 You can install this as an independant package. This will give you the possibility to run ``onsite_`` commands from
 anywhere.
