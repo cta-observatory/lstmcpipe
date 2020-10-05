@@ -6,11 +6,11 @@
 import os
 import argparse
 from distutils.util import strtobool
-# from hipecta.programs.reorganize_dl1_files import reorganize_dl1
-from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
+# from reorganize_dl1hiperta_to_dl1lstchain import reorganize_dl1
+from lst_scripts.reorganize_dl1hiperta300_to_dl1lstchain060 import main as reorganize_dl1
 
 
-parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_to_dl1lstchain")
+parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_v300_to_dl1lstchain_v060")
 
 parser.add_argument('--infile', '-i',
                     type=str,
@@ -49,7 +49,7 @@ parser.add_argument('--debug_mode', '-d',
 
 def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_file=False, debug_mode=False):
     """
-    Run hiperta_r0_dl1 and reorganize_dl1_files.
+    Run hiperta_r0_dl1 and reorganize_dl1hipertaV300_to_dl1lstchain060
 
     Parameters
     ----------
@@ -75,14 +75,14 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     """
     os.makedirs(outdir, exist_ok=True)
 
-    cmd_hiperta = f'hiperta_r1_dl1 -i {infile} -c {config} -o {outdir}'
+    cmd_hiperta = f'hiperta_r0_dl1 -i {infile} -c {config} -o {outdir}'
     if debug_mode:  # in HiPeRTA
         cmd_hiperta += ' -g'
     os.system(cmd_hiperta)
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(outdir, "dl1_" + os.path.basename(infile))
-    output_reorganized_filename = os.path.join(outdir, "dl1_reorganized_" + os.path.basename(infile))
+    output_reorganized_filename = os.path.join(outdir, "dl1v06_reorganized_" + os.path.basename(infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
