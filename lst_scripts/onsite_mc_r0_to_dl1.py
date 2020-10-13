@@ -180,10 +180,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    # if particle == 'gamma_off0.0deg' or particle == 'gamma_off0.4deg':  # TODO HARDCODED !
     if 'off' in particle:
         # Prod_id temp flag added in batch_r0_to_dl1, as well as the gamma-offset, it should be
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
+        DL0_DATA_DIR.remove(offset)
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
     else:
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
