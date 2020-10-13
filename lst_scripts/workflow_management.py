@@ -73,6 +73,13 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                                                     offset=off
                                                     )
 
+                full_log['jobid_log'].update(log)
+                full_log[_particle] = ','.join(jobids_by_particle)
+                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+
+                for jid in jobids_by_particle:
+                    debug_log[jid] = f'{_particle} job from r0_to_dl1'
+
         else:
             _particle = particle
             log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),  # Particle needs to be gamma w/o off
@@ -83,14 +90,14 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                                                 source_environment=source_env
                                                 )
 
-        # Create dictionary : jobid to full log information, and
-        #  the inverse dictionary, particle to the list of all the jobids of that same particle
-        full_log['jobid_log'].update(log)
-        full_log[_particle] = ','.join(jobids_by_particle)
-        all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+            # Create dictionary : jobid to full log information, and
+            #  the inverse dictionary, particle to the list of all the jobids of that same particle
+            full_log['jobid_log'].update(log)
+            full_log[_particle] = ','.join(jobids_by_particle)
+            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
-        for jid in jobids_by_particle:
-            debug_log[jid] = f'{_particle} job from r0_to_dl1'
+            for jid in jobids_by_particle:
+                debug_log[jid] = f'{_particle} job from r0_to_dl1'
 
         # TODO in V0.2 - Job management : how to launch the check of files and what to pass to merge (4 ids or ~300)
         # jobid_summary = check_job_output_logs(full_log[particle])  # full_log is a dict of dicts
