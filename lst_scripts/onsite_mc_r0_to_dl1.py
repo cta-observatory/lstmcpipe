@@ -60,7 +60,7 @@ parser.add_argument('--prod_id', action='store', type=str,
                     )
 
 
-def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0,
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, particle=None,
          prod_id=None, flag_full_workflow=False, source_environment=None):
     """
     R0 to DL1 MC onsite conversion.
@@ -80,6 +80,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
         of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
         number of files. Default = 0
+
+    particle
+
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     flag_full_workflow : bool
@@ -252,7 +255,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                             'gamma_off0.4deg': 'g0.4_merge'
                             }
 
-                particle_type = DL0_DATA_DIR.split('/')[-2]
+                #particle_type = DL0_DATA_DIR.split('/')[-2]
+                particle_type = particle
                 if particle_type == 'proton':
                     queue = 'long'
                 else:
