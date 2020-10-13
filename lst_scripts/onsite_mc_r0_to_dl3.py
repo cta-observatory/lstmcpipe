@@ -39,12 +39,16 @@ from workflow_management import (batch_r0_to_dl1,
 #  'rta' for HiPeRTA-like workflow
 WORKFLOW_KIND = 'lst'
 
-BASE_PATH = '/fefs/aswg/data/mc'
+BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
+# BASE_PATH = '/fefs/aswg/data/mc'
 # BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
 
-OBS_DATE = '20190415'
+# OBS_DATE = '20190415'
+OBS_DATE = '20200629_prod5'
+ZENITH = 'zenith_20deg'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
+GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
 
 # source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
@@ -152,7 +156,9 @@ if __name__ == '__main__':
                                                                              args.config_file_lst,
                                                                              PROD_ID,
                                                                              ALL_PARTICLES,
-                                                                             source_env=source_env)
+                                                                             source_env=source_env,
+                                                                             gamma_offsets=GAMMA_OFFS
+                                                                             )
         elif WORKFLOW_KIND == 'rta':
             log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
                                                                                  args.config_file_rta,
@@ -177,8 +183,8 @@ if __name__ == '__main__':
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
-            # smart_merge=WORKFLOW_KIND
-            smart_merge=False,
+            gamma_offsets=GAMMA_OFFS,
+            smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=args.flag_no_image
         )
 
@@ -187,7 +193,7 @@ if __name__ == '__main__':
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
+        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES, GAMMA_OFFS)
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
@@ -220,7 +226,8 @@ if __name__ == '__main__':
             jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             ALL_PARTICLES,
-            source_env=source_env
+            source_env=source_env,
+            gamma_offsets=GAMMA_OFFS
         )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, log_format='yml', workflow_step='dl1_to_dl2')

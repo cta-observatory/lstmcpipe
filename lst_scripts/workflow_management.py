@@ -13,7 +13,7 @@ from onsite_mc_train import main as train_pipe
 from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
     """
     Function to batch the r0_to_dl1 jobs by particle type.
 
@@ -33,6 +33,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
     source_env : str
         source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+    gamma_offsets : list
 
     Returns
     -------
@@ -59,21 +60,35 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env):
     print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
 
     for particle in particles_loop:
-        log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),
-                                            config_file=conf_file,
-                                            prod_id=prod_id,
-                                            flag_full_workflow=True,
-                                            source_environment=source_env
-                                            )
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+                input_dir = os.path.join(input_dir, off)
+                log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),  # Particle needs to be gamma w/o off
+                                                    config_file=conf_file,
+                                                    prod_id=prod_id,
+                                                    flag_full_workflow=True,
+                                                    source_environment=source_env
+                                                    )
+                # Name for the loop
+                _particle = particle + '_' + off
+
+        else:
+            _particle = particle
+            log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),  # Particle needs to be gamma w/o off
+                                                config_file=conf_file,
+                                                prod_id=prod_id,
+                                                flag_full_workflow=True,
+                                                source_environment=source_env
+                                                )
 
         # Create dictionary : jobid to full log information, and
         #  the inverse dictionary, particle to the list of all the jobids of that same particle
         full_log['jobid_log'].update(log)
-        full_log[particle] = ','.join(jobids_by_particle)
-        all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
+        full_log[_particle] = ','.join(jobids_by_particle)
+        all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
         for jid in jobids_by_particle:
-            debug_log[jid] = f'{particle} job from r0_to_dl1'
+            debug_log[jid] = f'{_particle} job from r0_to_dl1'
 
         # TODO in V0.2 - Job management : how to launch the check of files and what to pass to merge (4 ids or ~300)
         # jobid_summary = check_job_output_logs(full_log[particle])  # full_log is a dict of dicts
@@ -183,7 +198,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 #     return ids_single_particle_ok
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False,
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, gamma_offsets=None,
+                             smart_merge=False,
                              no_image_flag=True, prod_id=None):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
@@ -213,6 +229,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
 
     prod_id : str
         TBD
+
+    gamma_offsets : list
+
 
     Returns
     -------
@@ -246,23 +265,36 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
 
     for particle in particles_loop:
-        log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
-                                                      flag_full_workflow=True,
-                                                      particle2jobs_dict=log_jobs_from_r0_to_dl1,
-                                                      particle=particle,
-                                                      flag_merge=merge_flag,
-                                                      flag_no_image=no_image_flag
-                                                      )
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+                running_analysis_dir = os.path.join(running_analysis_dir, off)
+                _particle = particle + '_' + off
+                log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
+                                                              flag_full_workflow=True,
+                                                              particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                                                              particle=_particle,
+                                                              flag_merge=merge_flag,
+                                                              flag_no_image=no_image_flag
+                                                              )
+        else:
+            _particle = particle
+            log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
+                                                          flag_full_workflow=True,
+                                                          particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                                                          particle=_particle,
+                                                          flag_merge=merge_flag,
+                                                          flag_no_image=no_image_flag
+                                                          )
 
         log_merge_and_copy.update(log)
         all_jobs_from_merge_stage.append(jobid_debug)
-        if particle == 'gamma-diffuse' or particle == 'proton':
+        if _particle == 'gamma-diffuse' or _particle == 'proton':
             jobid_4_train.append(jobids)
 
-        debug_log[jobids] = f'{particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
+        debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
                             f' that will go to dl1_to_dl2. They depend on the following' \
-                            f' {log_jobs_from_r0_to_dl1[particle]} r0_t0_dl1 jobs.'
-        debug_log[jobid_debug] = f'Are all the {particle} jobs that have been launched in merge_and_copy_dl1.'
+                            f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+        debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
     all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
@@ -333,7 +365,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
-                     dict_with_dl1_paths, particles_loop, source_env):
+                     dict_with_dl1_paths, particles_loop, source_env, gamma_offsets=None):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
@@ -365,6 +397,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     source_env : str
         source environment to select the desired conda environment to run train_pipe and dl1_to_dl2 stages
 
+    gamma_offsets : list
+
     Returns
     -------
     log_batch_dl1_to_dl2 : dict
@@ -385,21 +419,39 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     print("\n ==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
 
     for particle in particles_loop:
-        log, jobid = dl1_to_dl2(dl1_directory.format(particle),
-                                path_models=path_to_models,
-                                config_file=config_file,
-                                flag_full_workflow=True,
-                                particle=particle,
-                                wait_jobid_train_pipe=jobid_from_training,
-                                wait_jobids_merge=jobids_from_merge,
-                                dictionary_with_dl1_paths=dict_with_dl1_paths,
-                                source_environment=source_env
-                                )
+
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+                dl1_directory = os.path.join(dl1_directory, off)
+                _particle = particle + '_' + off
+                log, jobid = dl1_to_dl2(dl1_directory.format(particle),
+                                        path_models=path_to_models,
+                                        config_file=config_file,
+                                        flag_full_workflow=True,
+                                        particle=_particle,
+                                        wait_jobid_train_pipe=jobid_from_training,
+                                        wait_jobids_merge=jobids_from_merge,
+                                        dictionary_with_dl1_paths=dict_with_dl1_paths,
+                                        source_environment=source_env
+                                        )
+        else:
+            _particle = particle
+            log, jobid = dl1_to_dl2(dl1_directory.format(particle),
+                                    path_models=path_to_models,
+                                    config_file=config_file,
+                                    flag_full_workflow=True,
+                                    particle=_particle,
+                                    wait_jobid_train_pipe=jobid_from_training,
+                                    wait_jobids_merge=jobids_from_merge,
+                                    dictionary_with_dl1_paths=dict_with_dl1_paths,
+                                    source_environment=source_env
+                                    )
+            _particle = particle
 
         log_dl1_to_dl2.update(log)
         jobid_for_dl2_to_dl3.append(jobid)
 
-        debug_log[jobid] = f'{particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} training ' \
+        debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} training ' \
                            f'jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_for_dl2_to_dl3)
@@ -449,7 +501,7 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
             fout.write(pprint.pformat(dictionary))
 
 
-def create_dict_with_filenames(dl1_directory, particles_loop):
+def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None):
     """
     Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
     in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow
@@ -463,6 +515,8 @@ def create_dict_with_filenames(dl1_directory, particles_loop):
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
 
+    gamma_offsets : list
+
     Returns
     -------
     dl1_filename_directory : dict
@@ -472,6 +526,11 @@ def create_dict_with_filenames(dl1_directory, particles_loop):
              dl1_filename_directory[particle].keys() = ['train_path_and_outname_dl1', 'test_path_and_outname_dl1']
     """
     dl1_filename_directory = {}
+    if gamma_offsets is not None:
+        if 'gamma' in particles_loop:
+            particles_loop.remove('gamma')
+        for off in gamma_offsets:
+            particles_loop.append('gamma_' + off)
 
     for particle in particles_loop:
         dl1_filename_directory[particle] = {'training': {}, 'testing': {}}
