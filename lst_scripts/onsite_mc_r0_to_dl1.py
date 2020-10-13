@@ -183,7 +183,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     if 'off' in particle:
         # Prod_id temp flag added in batch_r0_to_dl1, as well as the gamma-offset, it should be
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
-        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]
+        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]  # add something to git
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
     else:
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
