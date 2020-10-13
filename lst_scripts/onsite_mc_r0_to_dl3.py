@@ -109,13 +109,13 @@ if __name__ == '__main__':
     suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
 
     PROD_ID = base_prod_id + suffix_id
-    RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
-    ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
+    RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+    ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
     if WORKFLOW_KIND == 'lst':
-        DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
+        DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', ZENITH, POINTING)
     elif WORKFLOW_KIND == 'rta':
         DL0_DATA_DIR = os.path.join(BASE_PATH, 'R0', OBS_DATE, '{}', POINTING)  ##
-    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
+    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
 
     # #################################################
     # ########### Beginning of the workflow ###########
