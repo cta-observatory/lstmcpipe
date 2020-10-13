@@ -61,7 +61,7 @@ parser.add_argument('--prod_id', action='store', type=str,
 
 
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, particle=None,
-         prod_id=None, flag_full_workflow=False, source_environment=None):
+         prod_id=None, flag_full_workflow=False, source_environment=None, offset=None):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -82,6 +82,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         number of files. Default = 0
 
     particle
+
+    offset
 
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
@@ -182,8 +184,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     if 'off' in particle:
         # Prod_id temp flag added in batch_r0_to_dl1, as well as the gamma-offset, it should be
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
-        RUNNING_DIR = DL0_DATA_DIR.replace('PLACE_4_PROD_ID', PROD_ID)
-        RUNNING_DIR = RUNNING_DIR.replace('DL0', 'running_analysis')
+        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
     else:
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
 

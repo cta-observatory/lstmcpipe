@@ -62,14 +62,15 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-                input_dir = os.path.join(input_dir, 'PLACE_4_PROD_ID', off)
+                # input_dir = os.path.join(input_dir, 'PLACE_4_PROD_ID', off)
                 _particle = particle + '_' + off
                 log, jobids_by_particle = r0_to_dl1(input_dir.format(particle),  # Particle needs to be gamma w/o off
                                                     config_file=conf_file,
                                                     particle=_particle,
                                                     prod_id=prod_id,
                                                     flag_full_workflow=True,
-                                                    source_environment=source_env
+                                                    source_environment=source_env,
+                                                    offset=off
                                                     )
                 # Name for the loop
 
