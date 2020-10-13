@@ -80,11 +80,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
         of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
         number of files. Default = 0
-
-    particle
-
-    offset
-
+    particle : str
+        particle type
+    offset : str
+        gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     flag_full_workflow : bool
@@ -181,16 +180,15 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write('\n')
 
     if 'off' in particle:
-        # Prod_id temp flag added in batch_r0_to_dl1, as well as the gamma-offset, it should be
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
-        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]  # add something to git
+        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Takes out /off0.Xdeg
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
     else:
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
-    # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
+    # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
     print("\tRUNNING_DIR: \t", RUNNING_DIR)
@@ -263,14 +261,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                             'gamma_off0.4deg': 'g0.4_merge'
                             }
 
-                #particle_type = DL0_DATA_DIR.split('/')[-2]
-                particle_type = particle
-                if particle_type == 'proton':
+                if particle == 'proton':
                     queue = 'long'
                 else:
                     queue = 'short'
 
-                cmd = f'sbatch --parsable -p {queue} -J {job_name[particle_type]} ' \
+                cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
                       f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 jobid = os.popen(cmd).read().strip('\n')
@@ -278,7 +274,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
                 # Fill the dictionaries if IN workflow mode
                 jobid2log[jobid] = {}
-                jobid2log[jobid]['particle'] = particle_type
+                jobid2log[jobid]['particle'] = particle
                 jobid2log[jobid]['set_type'] = set_type
                 jobid2log[jobid]['jobe_path'] = jobe
                 jobid2log[jobid]['jobo_path'] = jobo
