@@ -276,15 +276,26 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-                running_analysis_dir = os.path.join(running_analysis_dir, off)
+                gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
-                log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
+                log, jobids, jobid_debug = merge_and_copy_dl1(gamma_running_analysis_dir.format(particle),
                                                               flag_full_workflow=True,
                                                               particle2jobs_dict=log_jobs_from_r0_to_dl1,
                                                               particle=_particle,
                                                               flag_merge=merge_flag,
                                                               flag_no_image=no_image_flag
                                                               )
+
+                log_merge_and_copy.update(log)
+                all_jobs_from_merge_stage.append(jobid_debug)
+                if _particle == 'gamma-diffuse' or _particle == 'proton':
+                    jobid_4_train.append(jobids)
+
+                debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
+                                    f' that will go to dl1_to_dl2. They depend on the following' \
+                                    f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+                debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+
         else:
             _particle = particle
             log, jobids, jobid_debug = merge_and_copy_dl1(running_analysis_dir.format(particle),
@@ -295,15 +306,15 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                                                           flag_no_image=no_image_flag
                                                           )
 
-        log_merge_and_copy.update(log)
-        all_jobs_from_merge_stage.append(jobid_debug)
-        if _particle == 'gamma-diffuse' or _particle == 'proton':
-            jobid_4_train.append(jobids)
+            log_merge_and_copy.update(log)
+            all_jobs_from_merge_stage.append(jobid_debug)
+            if _particle == 'gamma-diffuse' or _particle == 'proton':
+                jobid_4_train.append(jobids)
 
-        debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
-                            f' that will go to dl1_to_dl2. They depend on the following' \
-                            f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
-        debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+            debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
+                                f' that will go to dl1_to_dl2. They depend on the following' \
+                                f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+            debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
     all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
@@ -431,9 +442,9 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-                dl1_directory = os.path.join(dl1_directory, off)
+                gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
-                log, jobid = dl1_to_dl2(dl1_directory.format(particle),
+                log, jobid = dl1_to_dl2(gamma_dl1_directory.format(particle),
                                         path_models=path_to_models,
                                         config_file=config_file,
                                         flag_full_workflow=True,
@@ -443,6 +454,13 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                         dictionary_with_dl1_paths=dict_with_dl1_paths,
                                         source_environment=source_env
                                         )
+
+                log_dl1_to_dl2.update(log)
+                jobid_for_dl2_to_dl3.append(jobid)
+
+                debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} ' \
+                                   f'training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
+
         else:
             _particle = particle
             log, jobid = dl1_to_dl2(dl1_directory.format(particle),
@@ -455,13 +473,13 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                                     dictionary_with_dl1_paths=dict_with_dl1_paths,
                                     source_environment=source_env
                                     )
-            _particle = particle
 
-        log_dl1_to_dl2.update(log)
-        jobid_for_dl2_to_dl3.append(jobid)
 
-        debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} training ' \
-                           f'jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
+            log_dl1_to_dl2.update(log)
+            jobid_for_dl2_to_dl3.append(jobid)
+
+            debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} ' \
+                               f'training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_for_dl2_to_dl3)
 
