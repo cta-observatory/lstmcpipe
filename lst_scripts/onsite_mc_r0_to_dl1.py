@@ -178,7 +178,14 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+    # if particle == 'gamma_off0.0deg' or particle == 'gamma_off0.4deg':  # TODO HARDCODED !
+    if 'off' in particle:
+        # Prod_id temp flag added in batch_r0_to_dl1, as well as the gamma-offset, it should be
+        # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
+        RUNNING_DIR = DL0_DATA_DIR.replace('PLACE_4_PROD_ID', PROD_ID)
+        RUNNING_DIR = RUNNING_DIR.replace('DL0', 'running_analysis')
+    else:
+        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
@@ -195,7 +202,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         else:
             check_and_make_dir(directory)
 
-    # dumping the training and testing lists and spliting them in sublists for parallel jobs
+    # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
 
     jobid2log = {}
     jobids_r0_dl1 = []
