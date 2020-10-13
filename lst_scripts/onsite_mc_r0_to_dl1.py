@@ -247,7 +247,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 job_name = {'electron': 'r0dl1_e',
                             'gamma': 'r0dl1_g',
                             'gamma-diffuse': 'r0dl1_gd',
-                            'proton': 'r0dl1_p'
+                            'proton': 'r0dl1_p',
+                            'gamma_off0.0deg': 'g0.0_merge',
+                            'gamma_off0.4deg': 'g0.4_merge'
                             }
 
                 particle_type = DL0_DATA_DIR.split('/')[-2]
