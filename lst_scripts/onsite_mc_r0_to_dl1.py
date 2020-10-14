@@ -264,7 +264,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 if particle == 'proton':
                     queue = 'long'
                 else:
-                    queue = 'short'
+                    queue = 'long'  # TODO change to short after prod5 check
 
                 cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
                       f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
