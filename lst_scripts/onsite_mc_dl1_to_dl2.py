@@ -113,7 +113,9 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         job_name = {'electron': 'dl1-2_e',
                     'gamma': 'dl1-2_g',
                     'gamma-diffuse': 'dl1-2_gd',
-                    'proton': 'dl1-2_p'
+                    'proton': 'dl1-2_p',
+                    'gamma_off0.0deg': 'g0.0_merge',
+                    'gamma_off0.4deg': 'g0.4_merge'
                     }
 
     else:

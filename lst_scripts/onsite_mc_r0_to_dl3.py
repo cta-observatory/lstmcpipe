@@ -39,14 +39,20 @@ from workflow_management import (batch_r0_to_dl1,
 #  'rta' for HiPeRTA-like workflow
 WORKFLOW_KIND = 'lst'
 
-BASE_PATH = '/fefs/aswg/data/mc'
+# BASE_PATH = '/fefs/aswg/data/mc'
 # BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
+BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
 
-OBS_DATE = '20190415'
+# OBS_DATE = '20190415'
+OBS_DATE = '20200629_prod5'
+
+ZENITH = 'zenith_20deg'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
+GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
 
 # source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
+# source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
 source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
@@ -105,13 +111,15 @@ if __name__ == '__main__':
     suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
 
     PROD_ID = base_prod_id + suffix_id
-    RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
-    ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
+
     if WORKFLOW_KIND == 'lst':
-        DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
+        DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', ZENITH, POINTING)
     elif WORKFLOW_KIND == 'rta':
         DL0_DATA_DIR = os.path.join(BASE_PATH, 'R0', OBS_DATE, '{}', POINTING)  ##
-    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
+
+    RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+    ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
 
     # #################################################
     # ########### Beginning of the workflow ###########
@@ -148,17 +156,26 @@ if __name__ == '__main__':
     if DO_r0_to_dl1:
 
         if WORKFLOW_KIND == 'lst':
-            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(DL0_DATA_DIR,
-                                                                             args.config_file_lst,
-                                                                             PROD_ID,
-                                                                             ALL_PARTICLES,
-                                                                             source_env=source_env)
+
+            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
+                DL0_DATA_DIR,
+                args.config_file_lst,
+                PROD_ID,
+                ALL_PARTICLES,
+                source_env=source_env,
+                gamma_offsets=GAMMA_OFFS
+            )
+
         elif WORKFLOW_KIND == 'rta':
-            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(DL0_DATA_DIR,
-                                                                                 args.config_file_rta,
-                                                                                 PROD_ID,
-                                                                                 ALL_PARTICLES,
-                                                                                 args.config_file_lst)
+
+            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(
+                DL0_DATA_DIR,
+                args.config_file_rta,
+                PROD_ID,
+                ALL_PARTICLES,
+                args.config_file_lst
+            )
+
         else:
             sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
 
@@ -177,8 +194,8 @@ if __name__ == '__main__':
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
-            # smart_merge=WORKFLOW_KIND
-            smart_merge=False,
+            gamma_offsets=GAMMA_OFFS,
+            smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=args.flag_no_image
         )
 
@@ -187,7 +204,7 @@ if __name__ == '__main__':
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES)
+        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES, GAMMA_OFFS)
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
@@ -220,7 +237,8 @@ if __name__ == '__main__':
             jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             ALL_PARTICLES,
-            source_env=source_env
+            source_env=source_env,
+            gamma_offsets=GAMMA_OFFS
         )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, log_format='yml', workflow_step='dl1_to_dl2')
@@ -230,10 +248,12 @@ if __name__ == '__main__':
         jobs_for_dl2_to_dl3 = ''
 
     # Check DL2 jobs and thus the full workflow has finished correctly
-    jobid_check = batch_mc_production_check(jobs_all_r0_dl1,
-                                            jobs_all_dl1_finished,
-                                            job_from_train_pipe,
-                                            jobs_for_dl2_to_dl3,
-                                            prod_id=PROD_ID)
+    jobid_check = batch_mc_production_check(
+        jobs_all_r0_dl1,
+        jobs_all_dl1_finished,
+        job_from_train_pipe,
+        jobs_for_dl2_to_dl3,
+        prod_id=PROD_ID
+    )
 
     save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')

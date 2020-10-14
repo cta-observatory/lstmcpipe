@@ -106,7 +106,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         job_name = {'electron': 'e_merge',
                     'gamma': 'g_merge',
                     'gamma-diffuse': 'gd_merge',
-                    'proton': 'p_merge'
+                    'proton': 'p_merge',
+                    'gamma_off0.0deg': 'g0.0_merge',
+                    'gamma_off0.4deg': 'g0.4_merge'
                     }
 
     else:
