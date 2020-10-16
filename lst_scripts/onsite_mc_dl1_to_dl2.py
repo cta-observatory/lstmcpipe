@@ -39,33 +39,25 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
     ----------
     input_dir : str
         path to the files directory to analyse
-
     path_models : str
         path to the trained models
-
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
-
     particle : str
         Type of particle used to create the log and dictionary
             ! COMPULSORY argument when flag_full_workflow is set to True.
-
     wait_jobid_train_pipe : str
         a string with the batched jobid from the train stage to indicate the
         dependencies of the job to be batched
             ! COMPULSORY argument when flag_full_workflow is set to True.
-
     wait_jobids_merge : str
         string with merge_and_copy jobids
             ! COMPULSORY argument when flag_full_workflow is set to True.
-
     dictionary_with_dl1_paths : dict
         Dictionary with 'particles' as keys containing final outnames of dl1 files.
             ! COMPULSORY argument when flag_full_workflow is set to True.
-
     source_environment : str
         path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
         certain conda environment. By default : `conda activate cta`.
@@ -114,12 +106,12 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
                     'gamma': 'dl1-2_g',
                     'gamma-diffuse': 'dl1-2_gd',
                     'proton': 'dl1-2_p',
-                    'gamma_off0.0deg': 'g0.0_merge',
-                    'gamma_off0.4deg': 'g0.4_merge'
+                    'gamma_off0.0deg': 'g.0_1-2dl',
+                    'gamma_off0.4deg': 'g.4_1-2dl'
                     }
 
     else:
-        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
 
         check_and_make_dir(output_dir)
         print(f"Output dir: {output_dir}")
@@ -158,9 +150,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
             batch_cmd = 'sbatch --parsable -p short --exclude=cp13'
             if wait_jobs != '':
                 batch_cmd += ' --dependency=afterok:' + wait_jobid_train_pipe
-            batch_cmd += ' -J {} -e {} -o {} --wrap="{}"'.format(job_name[particle],
-                                                                 jobe, jobo,
-                                                                 cmd)
+            batch_cmd += f' -J {job_name[particle]} -e {jobe} -o {jobo} --wrap="{cmd}"'
 
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
@@ -173,7 +163,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         shutil.copyfile(config_file, os.path.join(output_dir, os.path.basename(config_file)))
 
     if not flag_full_workflow:
-        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
     else:
         return_jobids = ','.join(return_jobids)
 

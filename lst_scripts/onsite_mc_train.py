@@ -79,13 +79,10 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         log_train = {}
 
     else:
-        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
 
     # dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
-
-    # TODO develop and add check_prod_id function --> @Thomas
-    # check_prod_id(dl1_gamma_dir, dl1_proton_dir)
 
     # check if it path follows the established paths (lstchain-like) or not (rta-like) ##
     if dl1_proton_dir.find('/mc/DL1/') > 0:
@@ -102,10 +99,9 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
     base_cmd = ''
     base_cmd += source_environment
-    base_cmd += 'lstchain_mc_trainpipe --fg {} --fp {} -o {}'.format(os.path.abspath(gamma_dl1_train_file),
-                                                                     os.path.abspath(proton_dl1_train_file),
-                                                                     models_dir,
-                                                                     )
+    base_cmd += f'lstchain_mc_trainpipe --fg {os.path.abspath(gamma_dl1_train_file)}' \
+                f' --fp {os.path.abspath(proton_dl1_train_file)} -o {models_dir}'
+
     if config_file is not None:
         base_cmd = base_cmd + ' -c {}'.format(config_file)
 
@@ -113,7 +109,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
     jobe = os.path.join(models_dir, "train_job.e")
 
     if not flag_full_workflow:
-        cmd = 'sbatch -p long -e {} -o {} --wrap="{}" '.format(jobe, jobo, base_cmd)
+        cmd = f'sbatch -p long -e {jobe} -o {jobo} --wrap="{base_cmd}" '
 
         print(cmd)
         os.system(cmd)
@@ -123,7 +119,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         cmd = 'sbatch --parsable -p long --exclude=cp13'
         if wait_ids_proton_and_gammas != '':
             cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
-        cmd += ' -J {} -e {} -o {} --wrap="{}" '.format('train_pipe', jobe, jobo, base_cmd)
+        cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{base_cmd}" '
 
         jobid_train = os.popen(cmd).read().strip('\n')
         log_train[jobid_train] = cmd
@@ -134,7 +130,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
         shutil.copyfile(config_file, os.path.join(models_dir, os.path.basename(config_file)))
 
     if not flag_full_workflow:
-        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
     else:
         return log_train, jobid_train, models_dir
 

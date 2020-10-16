@@ -120,7 +120,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     """
     if not flag_full_workflow:
-        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
+
+        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
         # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
         today = calendar.datetime.date.today()
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -305,7 +306,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         return jobid2log, jobids_r0_dl1
 
     else:
-        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
 
 if __name__ == '__main__':

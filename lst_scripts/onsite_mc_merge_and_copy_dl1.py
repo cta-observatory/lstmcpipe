@@ -112,7 +112,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                     }
 
     else:
-        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
 
     JOB_LOGS = os.path.join(input_dir, 'job_logs')
     training_filelist = os.path.join(input_dir, 'training.list')
@@ -205,13 +205,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             else:
                 log_merge[particle][set_type]['test_path_and_outname_dl1'] = os.path.join(final_DL1_dir, base_filename)
 
-            # TODO missing the job.o and job.e for the sbatch of the merge and copy
             cmd = 'sbatch --parsable -p short --exclude=cp13'
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-            cmd += f' -J {job_name[particle]} --wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename} ' \
-                   f'--no-image {flag_no_image} --smart {flag_merge}"'
+            cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
+                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="lstchain_merge_hdf5_files -d {tdir} ' \
+                   f'-o {output_filename} --no-image {flag_no_image} --smart {flag_merge}"'
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
