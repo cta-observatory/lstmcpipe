@@ -120,7 +120,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     """
     if not flag_full_workflow:
-        print("\n ==== START {} ==== \n".format(os.path.basename(__file__)))
+
+        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
         # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
         today = calendar.datetime.date.today()
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -139,11 +140,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     DL0_DATA_DIR = input_dir
 
-    manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
+    if source_environment is not None:
+        manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
 
     ##############################################################################
 
-    print("Working on DL0 files in {}".format(DL0_DATA_DIR))
+    print(f"Working on DL0 files in {DL0_DATA_DIR}")
 
     check_data_path(DL0_DATA_DIR)
 
@@ -179,7 +181,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             newfile.write(f)
             newfile.write('\n')
 
-    if 'off' in particle:
+    if flag_full_workflow and 'off' in particle:
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Takes out /off0.Xdeg
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
@@ -208,45 +210,48 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     for set_type in 'training', 'testing':
         if set_type == 'training':
-            list = training_list
+            list_type = training_list
         else:
-            list = testing_list
+            list_type = testing_list
         dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
         output_dir = os.path.join(RUNNING_DIR, 'DL1')
         output_dir = os.path.join(output_dir, set_type)
+
         if flag_full_workflow:
             check_and_make_dir_without_verification(dir_lists)
             check_and_make_dir_without_verification(output_dir)
         else:
             check_and_make_dir(dir_lists)
             check_and_make_dir(output_dir)
+
         print("\toutput dir: \t", output_dir)
 
-        number_of_sublists = len(list) // NFILES_PER_DL1 + int(len(list) % NFILES_PER_DL1 > 0)
+        number_of_sublists = len(list_type) // NFILES_PER_DL1 + int(len(list_type) % NFILES_PER_DL1 > 0)
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
             with open(output_file, 'w+') as out:
-                for line in list[i * NFILES_PER_DL1:NFILES_PER_DL1 * (i + 1)]:
+                for line in list_type[i * NFILES_PER_DL1:NFILES_PER_DL1 * (i + 1)]:
                     out.write(line)
                     out.write('\n')
-        print('\t{} files generated for {} list'.format(number_of_sublists, set_type))
+        print(f'\t{number_of_sublists} files generated for {set_type} list')
 
         ### LSTCHAIN ###
         counter = 0
 
         for file in os.listdir(dir_lists):
             if set_type == 'training':
-                jobo = os.path.join(JOB_LOGS, "job{}_train.o".format(counter))
-                jobe = os.path.join(JOB_LOGS, "job{}_train.e".format(counter))
+                jobo = os.path.join(JOB_LOGS, f"job{counter}_train.o")
+                jobe = os.path.join(JOB_LOGS, f"job{counter}_train.e")
             else:
-                jobo = os.path.join(JOB_LOGS, "job{}_test.o".format(counter))
-                jobe = os.path.join(JOB_LOGS, "job{}_test.e".format(counter))
+                jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
+                jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
             cc = ' -c {}'.format(config_file) if config_file is not None else ' '
 
-            base_cmd = 'core_list.sh "lstchain_mc_r0_to_dl1 -o {} {}"'.format(output_dir, cc)
+            base_cmd = f'core_list.sh "lstchain_mc_r0_to_dl1 -o {output_dir} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:
+
                 cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
 
                 # print(cmd)
@@ -257,8 +262,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                             'gamma': 'r0dl1_g',
                             'gamma-diffuse': 'r0dl1_gd',
                             'proton': 'r0dl1_p',
-                            'gamma_off0.0deg': 'g0.0_merge',
-                            'gamma_off0.4deg': 'g0.4_merge'
+                            'gamma_off0.0deg': 'g0.0_r0dl1',
+                            'gamma_off0.4deg': 'g0.4_r0dl1'
                             }
 
                 if particle == 'proton':
@@ -285,7 +290,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
             counter += 1
 
-        print("\n\t{} jobs submitted".format(counter))
+        print(f"\n\t{counter} jobs submitted")
 
     # copy this script and config into working dir
     shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
@@ -301,7 +306,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         return jobid2log, jobids_r0_dl1
 
     else:
-        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
 
 if __name__ == '__main__':
