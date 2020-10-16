@@ -167,7 +167,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # 4. move DL1 files in final place
         check_and_make_dir(final_DL1_dir)
         move_dir_content(running_DL1_dir, final_DL1_dir)
-        print("\tDL1 files have been moved to {}".format(final_DL1_dir))
+        print(f"\tDL1 files have been moved to {final_DL1_dir}")
 
         # copy lstchain config file there too. HiPeRTA configs are *.txt
         config_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(('.json', '.txt'))]
@@ -177,13 +177,13 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # 5. move running_dir as logs
         check_and_make_dir(logs_destination_dir)
         move_dir_content(input_dir, logs_destination_dir)
-        print("\tLOGS have been moved to {}".format(logs_destination_dir))
+        print(f"\tLOGS have been moved to {logs_destination_dir}")
 
-        print("\n ==== END {} ==== \n".format(os.path.basename(__file__)))
+        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
     else:  # flag_full_workflow == True !
 
-        print("\n\tmerging starts - {}".format(particle))
+        print(f"\n\tmerging starts - {particle}")
 
         # 3. merge DL1 files
         wait_both_merges = []
@@ -210,13 +210,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-            cmd += ' -J {} --wrap="lstchain_merge_hdf5_files -d {} -o {} --no-image {} --smart {}"'.format(
-                job_name[particle],
-                tdir,
-                output_filename,
-                flag_no_image,
-                flag_merge  ##
-            )
+            cmd += f' -J {job_name[particle]} --wrap="lstchain_merge_hdf5_files -d {tdir} -o {output_filename} ' \
+                   f'--no-image {flag_no_image} --smart {flag_merge}"'
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
@@ -233,7 +228,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # 5 --> copy lstchain config file in final_dir too
         # 6 --> move running_dir as logs
 
-        print("\tDL1 files will be moved to {}".format(final_DL1_dir))
+        print(f"\tDL1 files will be moved to {final_DL1_dir}")
 
         base_cmd = 'sbatch --parsable -p short -J {} --dependency=afterok:{} ' \
                    '--wrap="python batch_dl1_utils-merge_and_copy.py -s {} -d {} --copy_conf {}"'
@@ -285,7 +280,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         return_jobids_debug.append(jobid_move_log)
         return_jobids_debug.append(jobid_copy_conf)
 
-        print("\tLOGS will be moved to {}".format(logs_destination_dir))
+        print(f"\tLOGS will be moved to {logs_destination_dir}")
 
         # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
         # 1 - train_pipe recover final dl1 names and path.

@@ -39,12 +39,19 @@ from workflow_management import (batch_r0_to_dl1,
 #  'rta' for HiPeRTA-like workflow
 WORKFLOW_KIND = 'lst'
 
-# BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
-BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
+# And PROD type - Chooche between
+#  'prod5' or 'prod3b'
+PROD_TYPE = 'prod5'
 
-# OBS_DATE = '20190415'
-OBS_DATE = '20200629_prod5'
+
+BASE_PATH = '/fefs/aswg/data/mc'
+# BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
+# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
+
+if PROD_TYPE == 'prod5':
+    OBS_DATE = '20200629_prod5'
+else:
+    OBS_DATE = '20190415'
 
 ZENITH = 'zenith_20deg'
 POINTING = 'south_pointing'
@@ -113,13 +120,21 @@ if __name__ == '__main__':
     PROD_ID = base_prod_id + suffix_id
 
     if WORKFLOW_KIND == 'lst':
-        DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', ZENITH, POINTING)
+        if PROD_TYPE == 'prod5':
+            DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', ZENITH, POINTING)
+        else:
+            DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
     elif WORKFLOW_KIND == 'rta':
         DL0_DATA_DIR = os.path.join(BASE_PATH, 'R0', OBS_DATE, '{}', POINTING)  ##
 
-    RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
-    ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
-    DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+    if PROD_TYPE == 'prod5':
+        RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+        ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+        DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
+    else:
+        RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
+        ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
+        DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
 
     # #################################################
     # ########### Beginning of the workflow ###########
@@ -139,8 +154,8 @@ if __name__ == '__main__':
 
     query_continue('Are you sure ?')
 
-    log_file = f'./log_onsite_mc_r0_to_dl3_{PROD_ID}.yml'
-    debug_file = f'./log_reduced_{PROD_ID}.yml'
+    log_file = f'./log_onsite_mc_r0_to_dl3_{PROD_TYPE}_{PROD_ID}.yml'
+    debug_file = f'./log_reduced_{PROD_TYPE}_{PROD_ID}.yml'
 
     # First time opening the log, otherwise --> erase
     if os.path.exists(log_file):

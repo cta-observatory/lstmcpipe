@@ -1,11 +1,11 @@
-# library of functions used to the management of the MC workflow analysis at la Palma
+# library of functions used to the management of the MC workflow analysis at La Palma
 
 # Enrique Garcia Nov 2019
 
 import os
 import glob
-import pprint
 import yaml
+import pprint
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -226,7 +226,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
 
-                log, jobids, jobid_debug = merge_and_copy_dl1(
+                log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
                     gamma_running_analysis_dir.format(particle),
                     flag_full_workflow=True,
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
@@ -238,17 +238,18 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 log_merge_and_copy.update(log)
                 all_jobs_from_merge_stage.append(jobid_debug)
                 if _particle == 'gamma-diffuse' or _particle == 'proton':
-                    jobid_4_train.append(jobids)
+                    jobid_4_train.append(jobid_mv_all_dl1)
 
-                debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
-                                    f' that will go to dl1_to_dl2. They depend on the following' \
-                                    f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+                debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                              f'move_dl1 jobid - that will be send to the train pipe stage. They ' \
+                                              f'depend on the following {log_jobs_from_r0_to_dl1[_particle]} ' \
+                                              f'r0_t0_dl1 jobs.'
                 debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
 
         else:
             _particle = particle
 
-            log, jobids, jobid_debug = merge_and_copy_dl1(
+            log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
                 running_analysis_dir.format(particle),
                 flag_full_workflow=True,
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
@@ -260,11 +261,11 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
             log_merge_and_copy.update(log)
             all_jobs_from_merge_stage.append(jobid_debug)
             if _particle == 'gamma-diffuse' or _particle == 'proton':
-                jobid_4_train.append(jobids)
+                jobid_4_train.append(jobid_mv_all_dl1)
 
-            debug_log[jobids] = f'{_particle} merge_and_copy-jobs - INDEED IT IS JUST PASSED move_dl1 jobid -' \
-                                f' that will go to dl1_to_dl2. They depend on the following' \
-                                f' {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+            debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                          f'move_dl1 jobid - that will be send to the train pipe stage. They depend ' \
+                                          f'on the following {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
             debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
 
     jobid_4_train = ','.join(jobid_4_train)
@@ -491,18 +492,30 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
              dl1_filename_directory[particle].keys() = ['train_path_and_outname_dl1', 'test_path_and_outname_dl1']
     """
     dl1_filename_directory = {}
-    if gamma_offsets is not None:
-        if 'gamma' in particles_loop:
-            particles_loop.remove('gamma')
-        for off in gamma_offsets:
-            particles_loop.append('gamma_' + off)
 
     for particle in particles_loop:
-        dl1_filename_directory[particle] = {'training': {}, 'testing': {}}
-        dl1_filename_directory[particle]['training']['train_path_and_outname_dl1'] = glob.glob(os.path.join(
-            dl1_directory.format(particle), '*training*.h5'))[0]
-        dl1_filename_directory[particle]['testing']['test_path_and_outname_dl1'] = glob.glob(os.path.join(
-            dl1_directory.format(particle), '*testing*.h5'))[0]
+        if gamma_offsets is not None and particle == 'gamma':
+            for off in gamma_offsets:
+
+                _particle = particle + off
+                dl1_filename_directory[_particle] = {'training': {}, 'testing': {}}
+
+                dl1_filename_directory[_particle]['training']['train_path_and_outname_dl1'] = \
+                    glob.glob(os.path.join(
+                        os.path.join(off, dl1_directory.format(particle)),
+                        '*training*.h5'
+                    ))[0]
+                dl1_filename_directory[_particle]['testing']['test_path_and_outname_dl1'] = \
+                    glob.glob(os.path.join(
+                        os.path.join(off, dl1_directory.format(particle)),
+                        '*testing*.h5'
+                    ))[0]
+        else:
+            dl1_filename_directory[particle] = {'training': {}, 'testing': {}}
+            dl1_filename_directory[particle]['training']['train_path_and_outname_dl1'] = \
+                glob.glob(os.path.join(dl1_directory.format(particle), '*training*.h5'))[0]
+            dl1_filename_directory[particle]['testing']['test_path_and_outname_dl1'] = \
+                glob.glob(os.path.join(dl1_directory.format(particle), '*testing*.h5'))[0]
 
     return dl1_filename_directory
 
