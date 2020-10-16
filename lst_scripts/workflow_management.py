@@ -457,9 +457,7 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
 
     if log_format == 'yml':
         with open(output_file, 'a+') as fileout:
-            yaml.dump(' *******************************************', fileout)
-            yaml.dump(f' *** Log from the {workflow_step} stage ', fileout)
-            yaml.dump(' *******************************************', fileout)
+            yaml.dump(f'\n\n\n********** Log from the {workflow_step} stage \n\n\n', fileout)
             yaml.dump(dictionary, fileout)
     else:
         with open(output_file, 'a+') as fout:
