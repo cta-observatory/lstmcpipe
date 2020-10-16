@@ -550,11 +550,9 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
                 f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
                 f'reqmem -j {all_pipeline_jobs} >> check_MC_prodID_{prod_id}_OK.txt'
-    batch_cmd = 'sbatch -p short --parsable --dependency=afterok:{} -J {} --wrap="{}"'.format(
-        jobids_from_dl1_to_dl2,
-        'prod_check',
-        cmd_wrap
-    )
+
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
+                f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
     print(f'\n\n\tSubmitted batch CHECK-job {jobid}\n\n')
