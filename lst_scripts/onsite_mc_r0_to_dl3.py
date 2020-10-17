@@ -114,7 +114,7 @@ if __name__ == '__main__':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
     elif WORKFLOW_KIND == 'rta':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
-    suffix_id = '_v00' if args.prod_id is None else '_{}'.format(args.prod_id)
+    suffix_id = '{}_v00'.format(PROD_TYPE) if args.prod_id is None else '{}_{}'.format(PROD_TYPE, args.prod_id)
 
     PROD_ID = base_prod_id + suffix_id
 
