@@ -435,7 +435,7 @@ def batch_dl2_to_dl3():
 
 def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
     """
-    Dumps a dictionary (log) either to a .txt file or to a .yml file
+    Dumps a dictionary (log) into a dicts of dicts with keys each of the pipeline stages.
 
     Parameters
     ----------
@@ -453,18 +453,19 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
         None
     """
     if workflow_step is None:
-        workflow_step = '--'
+        workflow_step = 'NoKEY'
+
+    dict2log = {workflow_step: dictionary}
 
     if log_format == 'yml':
         with open(output_file, 'a+') as fileout:
-            yaml.dump(f'\n\n\n********** Log from the {workflow_step} stage \n\n\n', fileout)
-            yaml.dump(dictionary, fileout)
+            yaml.dump(dict2log, fileout)
     else:
         with open(output_file, 'a+') as fout:
             fout.write('\n\n  *******************************************\n')
             fout.write(f'   *** Log from the {workflow_step} stage \n')
             fout.write('  *******************************************\n')
-            fout.write(pprint.pformat(dictionary))
+            fout.write(pprint.pformat(dict2log))
 
 
 def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None):
@@ -519,7 +520,7 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, prod_id):
+                              jobids_from_dl1_to_dl2, prod_id, prod_type):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -531,6 +532,10 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
         jobs from the dl1_to_dl2 stage
     prod_id : str
         MC Production ID.
+    prod_type : str
+    jobids_from_merge :  str
+    jobids_from_train_pipe : str
+    jobids_from_dl1_to_dl2: str
 
     Returns
     -------
@@ -545,9 +550,10 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_prodID_{prod_id}_OK.txt; '
-    cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,' \
-                f'avediskread,maxdiskread,avediskwrite,maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,' \
-                f'reqmem -j {all_pipeline_jobs} >> check_MC_prodID_{prod_id}_OK.txt'
+    cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
+                f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
+                f'check_MC_{prod_type}_{prod_id}_OK.txt; mkdir -p logs_{prod_type}_{prod_id}; ' \
+                f'mv slurm-* logs_{prod_type}_{prod_id}'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
@@ -594,4 +600,3 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 #     ids_single_particle_ok = os.popen(cmd).read().split('\n')
 #
 #     return ids_single_particle_ok
-

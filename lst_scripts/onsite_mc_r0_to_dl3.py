@@ -40,12 +40,11 @@ from workflow_management import (batch_r0_to_dl1,
 WORKFLOW_KIND = 'lst'
 
 # And PROD type - Chooche between
-#  'prod5' or 'prod3b'
+#  'prod5' or 'prod3'
 PROD_TYPE = 'prod5'
 
 
 BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/thomas.vuillaume/mchdf5/' ##
 # BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
 
 if PROD_TYPE == 'prod5':
@@ -268,7 +267,8 @@ if __name__ == '__main__':
         jobs_all_dl1_finished,
         job_from_train_pipe,
         jobs_for_dl2_to_dl3,
-        prod_id=PROD_ID
+        prod_id=PROD_ID,
+        prod_type=PROD_TYPE
     )
 
     save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
