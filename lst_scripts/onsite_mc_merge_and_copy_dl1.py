@@ -160,8 +160,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # whole workflow
             # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
 
-            cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename}"
-            cmd += f" --no-image {flag_no_image} --smart {flag_merge}"
+            cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} " \
+                  f"--smart {flag_merge}"
             os.system(cmd)
 
         # 4. move DL1 files in final place
@@ -230,13 +230,15 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         print(f"\tDL1 files will be moved to {final_DL1_dir}")
 
-        base_cmd = 'sbatch --parsable -p short -J {} --dependency=afterok:{} ' \
+        base_cmd = 'sbatch --parsable -p short -J {} -e {} -o {} --dependency=afterok:{} ' \
                    '--wrap="python batch_dl1_utils-merge_and_copy.py -s {} -d {} --copy_conf {}"'
 
         wait_both_merges = ','.join(wait_both_merges)
 
         # 4 --> move DL1 files in final place
         batch_mv_dl1 = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dl1',
+                                       f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_files.e',
+                                       f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_files.o',
                                        wait_both_merges,
                                        running_DL1_dir,
                                        final_DL1_dir,
@@ -250,6 +252,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         # 5 --> copy lstchain config file in final_dir too
         batch_copy_conf = base_cmd.format(job_name[particle].split('_')[0] + '_cp_conf',
+                                          f'slurm-{job_name[particle].split("_")[0]}_cp_config.e',
+                                          f'slurm-{job_name[particle].split("_")[0]}_cp_config.o',
                                           jobid_move_dl1,
                                           input_dir,
                                           final_DL1_dir,
@@ -263,6 +267,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         # 6 --> move running_dir to final analysis_logs
         batch_mv_dir = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
+                                       f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_direct.e',
+                                       f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_direct.o',
                                        jobid_copy_conf,
                                        input_dir,
                                        logs_destination_dir,
