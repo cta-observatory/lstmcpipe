@@ -267,8 +267,7 @@ if __name__ == '__main__':
         jobs_all_dl1_finished,
         job_from_train_pipe,
         jobs_for_dl2_to_dl3,
-        prod_id=PROD_ID,
-        prod_type=PROD_TYPE
+        prod_id=PROD_ID
     )
 
     save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')

@@ -520,7 +520,7 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, prod_id, prod_type):
+                              jobids_from_dl1_to_dl2, prod_id):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -532,7 +532,6 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
         jobs from the dl1_to_dl2 stage
     prod_id : str
         MC Production ID.
-    prod_type : str
     jobids_from_merge :  str
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
@@ -549,11 +548,10 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                         jobids_from_dl1_to_dl2
 
     # Save machine info into the check file
-    cmd_wrap = f'touch check_MC_{prod_type}_{prod_id}.txt; '
+    cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
-                f'check_MC_{prod_type}_{prod_id}.txt; mkdir -p logs_{prod_type}_{prod_id}; ' \
-                f'mv slurm-* logs_{prod_type}_{prod_id}'
+                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; mv slurm-* logs_{prod_id}'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
