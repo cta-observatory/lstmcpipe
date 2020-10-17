@@ -49,13 +49,14 @@ BASE_PATH = '/fefs/aswg/data/mc'
 
 if PROD_TYPE == 'prod5':
     OBS_DATE = '20200629_prod5'
+    GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
 else:
     OBS_DATE = '20190415'
+    GAMMA_OFFS = None
 
 ZENITH = 'zenith_20deg'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
-GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
 
 # source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
 # source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
