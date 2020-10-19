@@ -148,7 +148,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
             output_filename = 'dl1_'
-            for i in [-4, -3, -2, -1]:
+            if '/zenith_' in running_DL1_dir:  # /20200629_prod5/{particle}/zenith_20deg/south_pointing/{prod_id}/DL1
+                list_find_better_way_to_do_this = [-5, -4, -3, -2, -1]
+            else:                              # /20190415/{particle}/south_pointing/{prod_id}/DL1
+                list_find_better_way_to_do_this = [-4, -3, -2, -1]
+            for i in list_find_better_way_to_do_this:
                 output_filename += running_DL1_dir.split('/')[i]
                 output_filename += '_'
             output_filename += set_type
