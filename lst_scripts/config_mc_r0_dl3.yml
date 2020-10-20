@@ -1,5 +1,7 @@
+prod_id:  # If none, '_v00' will be added
+
 global_paths:
-  workflow_kind:  lst
+  'workflow_kind':  lst
     # {lst, rta}
   prod_type:  prod5
     # {prod5, prod3}
@@ -10,9 +12,9 @@ global_paths:
   zenith: zenith_20deg  # Only when prod5 (and therefore 20200629_prod5)
   pointing: south_pointing
   particles:
-    - electron,
-    - gamma,
-    - gamma-diffuse,
+    - electron
+    - gamma
+    - gamma-diffuse
     - proton
   offset_gammas:  # Only when prod5 (and therefore 20200629_prod5)
     - off0.0deg
@@ -30,3 +32,12 @@ stages_to_be_run:
   - train_pipe
   - DL1_to_DL2
 #  - DL2_to_DL3
+
+
+# Please note the yml Syntax:
+# key: value --> will return {'key': 'value'}
+# key:
+#  - value   --> will return {'key': [value]}  ! A list !
+# key:
+#  - list1
+#  - list2   --> will return {'key': [list1, list2]}

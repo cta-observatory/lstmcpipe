@@ -3,9 +3,13 @@
 # Enrique Garcia Nov 2019
 
 import os
+import sys
 import glob
 import yaml
 import pprint
+import calendar
+import lstchain
+from data_management import query_continue
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -415,7 +419,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 source_environment=source_env
             )
 
-
             log_dl1_to_dl2.update(log)
             jobid_for_dl2_to_dl3.append(jobid)
 
@@ -431,6 +434,152 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
 def batch_dl2_to_dl3():
     pass
+
+
+def load_yml_config(yml_file):
+    """
+    Reads a yaml file and parses the global variables to run a MC production
+
+    Parameters
+    ----------
+    yml_file : str
+        path to the production configuration file; `config_mc_r0_dl3.yml` by default
+
+    Returns
+    -------
+    config : dict
+        dictionary containing the MC global variables and general config
+    """
+    with open(yml_file) as f:
+        try:
+            config = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            print(e)
+            exit()
+
+    return config
+
+
+def manage_global_vars(yml_file):
+    """
+    Manages global paths and variables, as well as all the exceptions, depending on kind of MC prod to be run
+
+    Parameters
+    ----------
+    yml_file : str
+        path to the MC prod YAML config file
+
+    Returns
+    -------
+    config : dict
+        Dictionary with all the variables needed along the r0_to_dl3 workflow
+
+    """
+    loaded_config = load_yml_config(yml_file)
+    config = {}
+
+    custom_prod_id = loaded_config['prod_id']
+    global_paths = loaded_config['global_paths']
+    source_environment = loaded_config['source_environment']
+    stages_to_be_run = loaded_config['stages_to_be_run']
+
+    # First check if used has read the instructions
+    allowed_workflows = ['rta', 'lst']
+    allowed_prods = ['prod3', 'prod5']
+
+    if not global_paths['workflow_kind'] in allowed_workflows or not global_paths['prod_type'] in allowed_prods:
+        print(f'Please select an \n\tallowed workflow kind: {allowed_workflows} or an \n\tallowed production type: '
+              f'{allowed_prods} in the config YAML file; {yml_file}.')
+        sys.exit()
+
+    # Compute the prod_id
+    today = calendar.datetime.date.today()
+    if global_paths['workflow_kind'] == 'lst':
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    else:  # RTA
+        # TODO parse version from hiPeRTA module
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+
+    suffix_id = '_{}_v00'.format(global_paths['prod_type']) if custom_prod_id is None else '_{}_{}'.format(
+        global_paths['prod_type'], custom_prod_id)
+
+    config['prod_id'] = base_prod_id + suffix_id
+
+    # Parse source environment correctly
+    config['source_environment'] = source_environment['source'] + '; ' + source_environment['env'] + '; '
+
+    # particles loop
+    config['all_particles'] = global_paths['particles']
+
+    # Stages to be run
+    config['stages_to_run'] = stages_to_be_run
+
+    # production workflow and type
+    config['workflow_kind'] = global_paths['workflow_kind']
+    config['prod_type'] = global_paths['prod_type']
+
+    # Global paths
+    if global_paths['workflow_kind'] == 'prod3':
+        if global_paths['prod_type'] == 'lst':
+            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'DL0', global_paths['obs_date'], '{}',
+                                                  global_paths['pointing'])
+        else:  # RTA
+            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'R0', global_paths['obs_date'], '{}',
+                                                  global_paths['pointing'])
+
+        config['running_analysis_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                                      global_paths['obs_date'], '{}', global_paths['pointing'],
+                                                      config['prod_id'])
+        config['analysis_log_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                                  global_paths['obs_date'], '{}', global_paths['pointing'],
+                                                  config['prod_id'])
+        config['DL1_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                              global_paths['obs_date'], '{}', global_paths['pointing'],
+                                              config['prod_id'])
+
+    else:  # Prod5
+
+        config['gammas_offsets'] = global_paths['offset_gammas']
+
+        if global_paths['prod_type'] == 'lst':
+            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'DL0', global_paths['obs_date'], '{}',
+                                                  global_paths['zenith'], global_paths['pointing'])
+        else:  # RTA
+            print('HiPeRTA and prod5 not implement yet.')
+            sys.exit()
+
+        config['running_analysis_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                                      global_paths['obs_date'], '{}', global_paths['zenith'],
+                                                      global_paths['pointing'], config['prod_id'])
+        config['analysis_log_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                                  global_paths['obs_date'], '{}', global_paths['zenith'],
+                                                  global_paths['pointing'], config['prod_id'])
+        config['DL1_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
+                                              global_paths['obs_date'], '{}', global_paths['zenith'],
+                                              global_paths['pointing'], config['prod_id'])
+
+    # print the confirmation of paths
+
+    print(f'\n\n\t ************ - {global_paths["workflow_kind"]} - PIPELINE KIND : {global_paths["prod_type"]} - ************ \n\n'
+          f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
+          f'\t{global_paths["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
+          f'The following directories and all the information within them will be either created or overwritten:\n'
+          f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
+          f'\t{config["running_analysis_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}""")).replace("DL1", "DL2")}\n'
+          f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\n\tPROD_ID to be used: {config["analysis_log_dir"]}\n'
+          )
+
+    print("Stages to be run:")
+    for stage in config['stages_to_run']:
+        print(f" - {stage}")
+    print("\n")
+
+    query_continue('Are you sure ?')
+
+    return config
 
 
 def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
