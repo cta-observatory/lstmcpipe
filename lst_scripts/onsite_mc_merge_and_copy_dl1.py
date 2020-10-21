@@ -153,8 +153,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
 
-            output_filename = os.listdir(tdir)[0]
-            output_filename = output_filename.split('_run')[0]
+            output_filename = os.listdir(training_filelist)[0]  # just need to take the base name of the file
+
+            output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
             if gamma_offset is not None:
                 output_filename += f'_{gamma_offset}'
             if prod_id is not None:
@@ -199,8 +200,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
 
-            output_filename = os.listdir(tdir)[0]
-            output_filename = output_filename.split('_run')[0]
+            output_filename = os.listdir(training_filelist)[0]  # just need to take the base name of the file
+
+            output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
             if '_off' in particle:
                 output_filename += f'_{gamma_offset}'
             output_filename += f'_{prod_id}_{set_type}'
