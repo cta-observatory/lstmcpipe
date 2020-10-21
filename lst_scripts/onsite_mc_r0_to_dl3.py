@@ -209,9 +209,10 @@ if __name__ == '__main__':
             RUNNING_ANALYSIS_DIR,
             log_batch_r0_dl1,
             ALL_PARTICLES,
-            gamma_offsets=GAMMA_OFFS,
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
-            no_image_flag=args.flag_no_image
+            no_image_flag=args.flag_no_image,
+            gamma_offsets=GAMMA_OFFS,
+            prod_id=PROD_ID
         )
 
         save_log_to_file(log_batch_merge_and_copy, log_file, log_format='yml', workflow_step='merge_and_copy_dl1')
