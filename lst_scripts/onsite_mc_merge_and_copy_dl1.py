@@ -200,9 +200,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
 
-            # just need to take the base name of the file, so read a single processed simtel file
-            output_filename = os.path.join(training_filelist, os.listdir(training_filelist)[0])
-            with open(output_filename, 'r') as f:
+            # just need to take the base name of the file, so we read a processed bunch and take first file
+            with open(training_filelist, 'r') as f:
                 output_filename = f.readline()
 
             output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
