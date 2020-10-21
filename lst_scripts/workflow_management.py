@@ -232,7 +232,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
                     flag_merge=merge_flag,
-                    flag_no_image=no_image_flag
+                    flag_no_image=no_image_flag,
+                    prod_id=prod_id,
+                    gamma_offset=off
                 )
 
                 log_merge_and_copy.update(log)
@@ -255,7 +257,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
                 flag_merge=merge_flag,
-                flag_no_image=no_image_flag
+                flag_no_image=no_image_flag,
+                prod_id=prod_id
             )
 
             log_merge_and_copy.update(log)
