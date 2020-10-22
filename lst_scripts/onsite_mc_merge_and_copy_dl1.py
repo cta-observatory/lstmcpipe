@@ -156,6 +156,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # dl1 files should (must otherwise you are not trying to merge) already been created
             output_filename = os.listdir(tdir)[0]
             output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
+
+            if particle == 'gamma-diffuse':
+                output_filename = output_filename.replace('gamma', 'gamma-diffuse')
             if gamma_offset is not None:
                 output_filename += f'_{gamma_offset}'
             if prod_id is not None:
