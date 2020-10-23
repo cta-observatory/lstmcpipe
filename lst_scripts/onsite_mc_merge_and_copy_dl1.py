@@ -208,6 +208,8 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 output_filename = f.readline()
 
             output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
+            if particle == 'gamma-diffuse':
+                output_filename = output_filename.replace('gamma', 'gamma-diffuse')
             if '_off' in particle:
                 output_filename += f'_{gamma_offset}'
             output_filename += f'_{prod_id}_{set_type}'
