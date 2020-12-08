@@ -44,8 +44,8 @@ WORKFLOW_KIND = 'lst'
 PROD_TYPE = 'prod5'
 
 
-BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
+BASE_PATH = '/fefs/aswg/data/mc'  # lstanalyzer user ONLY
+# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'  # any other user
 
 if PROD_TYPE == 'prod5':
     OBS_DATE = '20200629_prod5'
@@ -59,8 +59,8 @@ POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
 # source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default, can be used by anybody
 # source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
-source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
 # run and batch all the steps of the code (see above)
 DO_r0_to_dl1 = True
