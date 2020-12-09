@@ -54,7 +54,7 @@ point, and successively.
 ``onsite_mc_r0_to_dl3.py`` also passes all the needed information and arguments to the consecutive stages,
 thus **ALL** the configuration that the pipeline would need is passed;
 
-    - At the beginning of the same ``onsite_mc_r0_to_dl3.py`` script - lines ~35 to ~75 (MC production related configuration).
+    - At the beginning of the same ``onsite_mc_r0_to_dl3.py`` script - lines ~35 to ~80 (MC production related configuration).
     - Through the ``lstchain_*.json`` file (lstchain pipe related configuration).
 
 Changing the default arguments on each of the steps of the pipeline: **Use at your own risk.**
