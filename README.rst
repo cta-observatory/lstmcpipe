@@ -62,12 +62,14 @@ Changing the default arguments on each of the steps of the pipeline: **Use at yo
 **PLEASE NOTE** that the library is **extremely job heavy**. Think about other LP-IT cluster users.
 
 MC production logs
-******************
-1. All the ``r0_to_dl1`` stage job logs are stored ``/fefs/aswg/data/mc/running_analysis/.../job_logs`` and later
-moved to ``/fefs/aswg/data/mc/analysis_logs/.../``.
+------------------
 
-2. A single MC production is extremely job heavy, it schedules around ~1000 jobs (configurable so that this number can be
+1. All the ``r0_to_dl1`` stage job logs are stored ``/fefs/aswg/data/mc/running_analysis/.../job_logs`` and later
+moved to ``/fefs/aswg/data/mc/analysis_logs/.../``.  
+
+2. A single MC production is extremely job heavy, it schedules around 1000 jobs (configurable so that this number can be
 reduced), most of them at the ``r0_to_dl1`` stage.
+
 
 Every time a full MC production is launched, two files with logging information are created:
     - ``log_reduced_Prod{3,5}_{PROD_ID}.yml``
