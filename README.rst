@@ -63,7 +63,7 @@ Changing the default arguments on each of the steps of the pipeline: **Use at yo
 
 MC production logs
 ******************
-1. All the ```r0_to_dl1`` stage job logs are stored ``/fefs/aswg/data/mc/running_analysis/.../job_logs`` and later
+1. All the ``r0_to_dl1`` stage job logs are stored ``/fefs/aswg/data/mc/running_analysis/.../job_logs`` and later
 moved to ``/fefs/aswg/data/mc/analysis_logs/.../``.
 
 2. A single MC production is extremely job heavy, it schedules around ~1000 jobs (configurable so that this number can be
