@@ -1,4 +1,4 @@
-#!/usr//bin/env python
+#!/usr/bin/env python
 
 # E. Garcia, Jan '20
 #
@@ -11,7 +11,7 @@
 #   - TODO onsite_mc_dl2_to_dl3
 #
 # usage:
-# > python onsite_mc_r0_to_dl3.py [-conf_lst LSTCHAIN_CONFIG_FILE] [-conf_rta RTA_CONFIG_FILE] [-pid PROD_ID]
+# > python onsite_mc_r0_to_dl3.py -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE] [-pid PROD_ID]
 #
 #   The input_dir is set in the global variable `DL0_DATA_DIR`
 
@@ -34,35 +34,43 @@ from workflow_management import (batch_r0_to_dl1,
 
 #######################################################################################################################
 #######################################################################################################################
+#
+# *** USER CONFIGURATION ***
+#
+
 # choose between :
 #  'lst' for lstchain-like workflow  OR
 #  'rta' for HiPeRTA-like workflow
 WORKFLOW_KIND = 'lst'
+
 
 # And PROD type - Chooche between
 #  'prod5' or 'prod3'
 PROD_TYPE = 'prod5'
 
 
-BASE_PATH = '/fefs/aswg/data/mc'
-# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'
+BASE_PATH = '/fefs/aswg/data/mc'  # lstanalyzer user ONLY
+# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'  # any other user
+
 
 if PROD_TYPE == 'prod5':
-    OBS_DATE = '20200629_prod5'
+    OBS_DATE = '20200629_prod5'  # '20200629_prod5_trans_80'
     GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
 else:
     OBS_DATE = '20190415'
     GAMMA_OFFS = None
 
+
 ZENITH = 'zenith_20deg'
 POINTING = 'south_pointing'
 ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
 
-# source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
-# source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
-source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default
 
-# run and batch all the steps of the code (see above)
+# source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
+source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default, can be used by anybody
+# source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
+
+# run and batch the selected steps of the code
 DO_r0_to_dl1 = True
 DO_merge_and_copy = True
 DO_TRAIN_PIPE = True
@@ -77,7 +85,7 @@ parser.add_argument('--config_file_lst', '-conf_lst', action='store', type=str,
                     dest='config_file_lst',
                     help='Path to a lstchain-like configuration file. '
                          'RF classifier and regressor arguments must be declared here !',
-                    default=None
+                    default=None, required=True
                     )
 
 parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
@@ -90,7 +98,7 @@ parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
 parser.add_argument('--prod_id', '-pid', action='store', type=str,
                     dest='prod_id',
                     help="Production ID. If None, _v00 will be used, indicating an official base production",
-                    default=None,
+                    default=None
                     )
 
 # OPTIONAL / ADVANCED ARGUMENTS

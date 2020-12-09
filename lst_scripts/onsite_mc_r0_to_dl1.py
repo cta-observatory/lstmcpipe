@@ -1,4 +1,4 @@
-#!/usr//bin/env python
+#!/usr/bin/env python
 
 # T. Vuillaume,
 # Modifications by E. Garcia
@@ -9,6 +9,7 @@
 #  [-nfdl1 n_files_per_dl1] [--prod_id prod_id]
 
 import os
+import time
 import shutil
 import random
 import argparse
@@ -291,6 +292,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             counter += 1
 
         print(f"\n\t{counter} jobs submitted")
+        time.sleep(1)  # Avoid collapsing the cluster
 
     # copy this script and config into working dir
     shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
