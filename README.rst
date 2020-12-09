@@ -40,10 +40,10 @@ shows the all the information that you are passing to the pipeline.
 The ``onsite_mc_r0_to_dl3.py`` script is the orchestrator of the pipeline, it schedules the following stages (scripts)
 per particle;
 
-    1. ``onsite_mc_r0_to_dl1.py``
-    2. ``onsite_mc_merge_and_copy_dl1.py``
-    3. ``onsite_mc_train.py``
-    4. ``onsite_mc_dl1_to_dl2.py``
+1. ``onsite_mc_r0_to_dl1.py``
+2. ``onsite_mc_merge_and_copy_dl1.py``
+3. ``onsite_mc_train.py``
+4. ``onsite_mc_dl1_to_dl2.py``
 
 by using the slurm scheduling job manager system at LP cluster and the dependencies between each stage.
 
@@ -54,8 +54,8 @@ point, and successively.
 ``onsite_mc_r0_to_dl3.py`` also passes all the needed information and arguments to the consecutive stages,
 thus **ALL** the configuration that the pipeline would need is passed;
 
-    - At the beginning of the same ``onsite_mc_r0_to_dl3.py`` script - lines ~35 to ~80 (MC production related configuration).
-    - Through the ``lstchain_*.json`` file (lstchain pipe related configuration).
+- At the beginning of the same ``onsite_mc_r0_to_dl3.py`` script - lines ~35 to ~80 (MC production related configuration).
+- Through the ``lstchain_*.json`` file (lstchain pipe related configuration).
 
 Changing the default arguments on each of the steps of the pipeline: **Use at your own risk.**
 
