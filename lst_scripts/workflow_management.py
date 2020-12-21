@@ -462,9 +462,10 @@ def load_yml_config(yml_file):
     return config
 
 
-def manage_global_vars(yml_file):
+def parse_config_and_handle_global_vars(yml_file):
     """
-    Manages global paths and variables, as well as all the exceptions, depending on kind of MC prod to be run
+    Handles global paths and variables, as well as all the exceptions, depending on kind of MC prod to be run.
+    Composes the final path tree to be passed to each stage
 
     Parameters
     ----------
@@ -483,6 +484,7 @@ def manage_global_vars(yml_file):
     # Allowed options
     allowed_workflows = ['hiperta', 'lstchain']
     allowed_prods = ['prod3', 'prod5']
+    allowed_obs_date = ['20190415', '20200629_prod5', '20200629_prod5_trans_80']
 
     # Load configuration
     workflow_kind = loaded_config['workflow_kind']
@@ -491,18 +493,25 @@ def manage_global_vars(yml_file):
 
     base_path_dl0 = loaded_config['base_path_dl0']
     prod_type = loaded_config['prod_type']
-    obs_date = loaded_config['obs_date']
+    obs_date = str(loaded_config['obs_date'])
     pointing = loaded_config['pointing']
     zenith = loaded_config['zenith']
     particles = loaded_config['particles']
     offset_gammas = loaded_config['offset_gammas']
 
+    # Check allowed cases
     if workflow_kind not in allowed_workflows or prod_type not in allowed_prods:
-        print(f'Please select an \n\tallowed workflow kind: {allowed_workflows} or an \n\tallowed production type: '
-              f'{allowed_prods} in the config YAML file; {yml_file}.')
-        sys.exit()
+        print(f'\nPlease select an \n\t - allowed `workflow_kind`: {allowed_workflows} or an \n\t - allowed production '
+              f'type: {allowed_prods} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
 
-    # Compute the prod_id syntax
+    # and incompatible possibilities
+    if (prod_type == 'prod3' and obs_date != '20190415') or (prod_type == 'prod5' and obs_date == '20190415'):
+        print(f'\nThis prod_type and obs_date combination is not possible.\n'
+              f'Please change it in the config YAML file; {yml_file}.')
+        sys.exit(-1)
+
+    # Prod_id syntax
     today = calendar.datetime.date.today()
     if workflow_kind == 'lstchain':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
@@ -510,8 +519,8 @@ def manage_global_vars(yml_file):
         # TODO parse version from hiPeRTA module
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
     else:
-        print(f'\n\tPlease select an allowed workflow kind: {allowed_workflows} in the config YAML file; {yml_file}.')
-        sys.exit()
+        print(f'\n\tPlease select an allowed `workflow_kind`: {allowed_workflows} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
@@ -525,6 +534,15 @@ def manage_global_vars(yml_file):
 
     # 3 - particles loop
     config['all_particles'] = particles
+
+    # 3.1 - Gammas' offsets
+    if obs_date == '20200629_prod5' or obs_date == '20200629_prod5_trans_80':  # prod5 case
+        config['gamma_offs'] = loaded_config['offset_gammas']
+    elif obs_date == '20190415' or prod_type == 'prod3':
+        config['gamma_offs'] = None
+    else:
+        print(f'\n\tPlease select an \n\tallowed `obs_date`: {allowed_obs_date} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
 
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
@@ -553,6 +571,12 @@ def manage_global_vars(yml_file):
             base_path_dl0, 'DL2', obs_date, '{}', pointing, config['prod_id']
         )
 
+        if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
+            config['model_dir'] = os.path.join('/fefs/aswg/data/', 'models', obs_date, pointing, config['prod_id'])
+        else:
+            # user case, model dir in same dir as DL0, DL1, DL2, running...
+            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, pointing, config['prod_id'])
+
     else:  # Prod5
 
         config['gammas_offsets'] = offset_gammas
@@ -561,7 +585,7 @@ def manage_global_vars(yml_file):
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing, zenith)
         else:  # RTA
             print('HiPeRTA and prod5 not implement yet.')
-            sys.exit()
+            sys.exit(-1)
 
         config['running_analysis_dir'] = os.path.join(
             base_path_dl0, 'running_analysis', obs_date, '{}', pointing, zenith, config['prod_id']
@@ -576,17 +600,26 @@ def manage_global_vars(yml_file):
             base_path_dl0, 'DL2', obs_date, '{}', pointing, zenith, config['prod_id']
         )
 
+        if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
+            config['model_dir'] = os.path.join(
+                '/fefs/aswg/data/', 'models', obs_date, pointing, zenith, config['prod_id']
+            )
+        else:
+            # user case, model dir in same dir as DL0, DL1, DL2, running...
+            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, pointing, zenith, config['prod_id'])
+
     # print the PATH and prod_id confirmation
 
     print(f'\n\n\t ************ - {workflow_kind} {prod_type} - WORKFLOW KIND - ************ \n\n'
           f'\nSimtel DL0 files are going to be searched at  \n\n   '
           f'\t{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
           f'The following directories and all the information within them will be either created or overwritten:\n'
-          f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
+          f'[subdirectories with a same PROD_ID and analysed the same day]\n\n'
           f'\t{config["running_analysis_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["model_dir"]}\n'
           f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
           )
 

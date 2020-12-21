@@ -253,10 +253,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             base_cmd = f'core_list.sh "lstchain_mc_r0_to_dl1 -o {output_dir} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
-            if not flag_full_workflow:
+            if not flag_full_workflow:  # Run interactively
 
                 cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
-
                 # print(cmd)
                 os.system(cmd)
 
@@ -272,7 +271,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 if particle == 'proton':
                     queue = 'long'
                 else:
-                    queue = 'long'  # TODO change to short after prod5 check
+                    queue = 'short'  # TODO change to short after prod5 check
 
                 cmd = f'sbatch --parsable -p {queue} --exclude=cp13 -J {job_name[particle]} ' \
                       f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
