@@ -61,8 +61,8 @@ parser.add_argument('--prod_id', action='store', type=str,
                     )
 
 
-def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, particle=None,
-         prod_id=None, flag_full_workflow=False, source_environment=None, offset=None):
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, flag_full_workflow=False,
+         particle=None, prod_id=None, source_environment=None, offset=None):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -90,9 +90,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     source_environment : str
-        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs @ mc_r0_to_dl3 script)
-         to activate a certain conda environment. By default : `conda activate cta`.
-        ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
+        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script)
+         to activate a certain conda environment.
+         DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
 
     Returns
     -------
@@ -236,8 +237,9 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                     out.write('\n')
         print(f'\t{number_of_sublists} files generated for {set_type} list')
 
-        ### LSTCHAIN ###
+        # LSTCHAIN #
         counter = 0
+        save_job_ids = []
 
         for file in os.listdir(dir_lists):
             if set_type == 'training':
@@ -287,12 +289,14 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
                 jobid2log[jobid]['sbatch_command'] = cmd
 
                 # print(f'\t\t{cmd}')
-                print(f'\t\tSubmitted batch job {jobid}')
+                # print(f'\t\tSubmitted batch job {jobid}')
+                save_job_ids.append(jobid)
 
             counter += 1
 
-        print(f"\n\t{counter} jobs submitted")
-        time.sleep(1)  # Avoid collapsing the cluster
+        if flag_full_workflow:
+            print(f"\n\t{counter} jobs submitted. From jobid {jobid[0]} to {jobid[-1]}")
+            time.sleep(1)  # Avoid collapsing LP cluster
 
     # copy this script and config into working dir
     shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
@@ -318,5 +322,5 @@ if __name__ == '__main__':
          args.train_test_ratio,
          args.random_seed,
          args.n_files_per_dl1,
-         args.prod_id
+         args.flag_full_workflow
          )
