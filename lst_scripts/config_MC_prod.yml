@@ -1,0 +1,34 @@
+workflow_kind: lstchain
+prod_id:  # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+
+base_path_dl0: /fefs/aswg/data/mc
+  # user example : /fefs/aswg/workspace/enrique.garcia/MC_DL0_SYMLINK/
+  # lstanalyzer user : /fefs/aswg/data/mc
+prod_type: prod5  # {prod5, prod3}
+obs_date: 20200629_prod5
+  # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
+  # pro3 : `20190415`
+pointing: south_pointing
+zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [and therefore 20200629_prod5(_trans_80) ]
+particles:
+  - electron
+  - gamma
+  - gamma-diffuse
+  - proton
+offset_gammas:  # Taken into account only when `prod_type: prod5` [and therefore 20200629_prod5(_trans_80) ]
+  - off0.0deg
+  - off0.4deg
+
+source_environment:
+  source_file: /fefs/aswg/software/virtual_env/.bashrc
+  conda_env: cta
+  # user example:
+  #   source_file: /fefs/home/enrique.garcia/.bashrc
+  #   conda_env: lst-dev
+
+stages_to_be_run:
+  - r0_to_dl1
+  - merge_and_copy_dl1
+  - train_pipe
+  - dl1_to_dl2
+#  - dl2_to_irfs  # WIP

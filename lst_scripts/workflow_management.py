@@ -210,9 +210,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     all_jobs_from_merge_stage = []
     debug_log = {}
 
-    if smart_merge == 'lst':
+    if smart_merge == 'lst' or smart_merge == 'lstchain':
         merge_flag = True
-    elif smart_merge == 'rta':
+    elif smart_merge == 'rta' or smart_merge == 'hiperta':
         merge_flag = False
     elif smart_merge:
         merge_flag = True
@@ -386,7 +386,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
 
@@ -481,98 +480,114 @@ def manage_global_vars(yml_file):
     loaded_config = load_yml_config(yml_file)
     config = {}
 
-    custom_prod_id = loaded_config['prod_id']
-    global_paths = loaded_config['global_paths']
-    source_environment = loaded_config['source_environment']
-    stages_to_be_run = loaded_config['stages_to_be_run']
-
-    # First check if used has read the instructions
-    allowed_workflows = ['rta', 'lst']
+    # Allowed options
+    allowed_workflows = ['hiperta', 'lstchain']
     allowed_prods = ['prod3', 'prod5']
 
-    if not global_paths['workflow_kind'] in allowed_workflows or not global_paths['prod_type'] in allowed_prods:
+    # Load configuration
+    workflow_kind = loaded_config['workflow_kind']
+    custom_prod_id = loaded_config['prod_id']
+    stages_to_be_run = loaded_config['stages_to_be_run']
+
+    base_path_dl0 = loaded_config['base_path_dl0']
+    prod_type = loaded_config['prod_type']
+    obs_date = loaded_config['obs_date']
+    pointing = loaded_config['pointing']
+    zenith = loaded_config['zenith']
+    particles = loaded_config['particles']
+    offset_gammas = loaded_config['offset_gammas']
+
+    if workflow_kind not in allowed_workflows or prod_type not in allowed_prods:
         print(f'Please select an \n\tallowed workflow kind: {allowed_workflows} or an \n\tallowed production type: '
               f'{allowed_prods} in the config YAML file; {yml_file}.')
         sys.exit()
 
-    # Compute the prod_id
+    # Compute the prod_id syntax
     today = calendar.datetime.date.today()
-    if global_paths['workflow_kind'] == 'lst':
+    if workflow_kind == 'lstchain':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    else:  # RTA
+    elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+    else:
+        print(f'\n\tPlease select an allowed workflow kind: {allowed_workflows} in the config YAML file; {yml_file}.')
+        sys.exit()
 
-    suffix_id = '_{}_v00'.format(global_paths['prod_type']) if custom_prod_id is None else '_{}_{}'.format(
-        global_paths['prod_type'], custom_prod_id)
-
+    # Create the final config structure to be passed to the pipeline
+    # 1 - Prod_id
+    suffix_id = '_{}_v00'.format(prod_type) if custom_prod_id is None else '_{}_{}'.format(prod_type, custom_prod_id)
     config['prod_id'] = base_prod_id + suffix_id
 
-    # Parse source environment correctly
-    config['source_environment'] = source_environment['source'] + '; ' + source_environment['env'] + '; '
+    # 2 - Parse source environment correctly
+    config['source_environment'] = \
+        loaded_config['source_environment']['source_file'] + '; ' + \
+        loaded_config['source_environment']['conda_env'] + '; '
 
-    # particles loop
-    config['all_particles'] = global_paths['particles']
+    # 3 - particles loop
+    config['all_particles'] = particles
 
-    # Stages to be run
+    # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
 
-    # production workflow and type
-    config['workflow_kind'] = global_paths['workflow_kind']
-    config['prod_type'] = global_paths['prod_type']
+    # 5 - production workflow and type
+    config['workflow_kind'] = workflow_kind
+    config['prod_type'] = prod_type
 
-    # Global paths
-    if global_paths['workflow_kind'] == 'prod3':
-        if global_paths['prod_type'] == 'lst':
-            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'DL0', global_paths['obs_date'], '{}',
-                                                  global_paths['pointing'])
+    # 6 - Global paths
+    if prod_type == 'prod3':
+        if workflow_kind == 'lstchain':
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing)
         else:  # RTA
-            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'R0', global_paths['obs_date'], '{}',
-                                                  global_paths['pointing'])
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', pointing)
 
-        config['running_analysis_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                                      global_paths['obs_date'], '{}', global_paths['pointing'],
-                                                      config['prod_id'])
-        config['analysis_log_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                                  global_paths['obs_date'], '{}', global_paths['pointing'],
-                                                  config['prod_id'])
-        config['DL1_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                              global_paths['obs_date'], '{}', global_paths['pointing'],
-                                              config['prod_id'])
+        config['running_analysis_dir'] = os.path.join(
+            base_path_dl0, 'running_analysis', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['analysis_log_dir'] = os.path.join(
+            base_path_dl0, 'analysis_logs', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['DL1_data_dir'] = os.path.join(
+            base_path_dl0, 'DL1', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['DL2_data_dir'] = os.path.join(
+            base_path_dl0, 'DL2', obs_date, '{}', pointing, config['prod_id']
+        )
 
     else:  # Prod5
 
-        config['gammas_offsets'] = global_paths['offset_gammas']
+        config['gammas_offsets'] = offset_gammas
 
-        if global_paths['prod_type'] == 'lst':
-            config['DL0_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'DL0', global_paths['obs_date'], '{}',
-                                                  global_paths['zenith'], global_paths['pointing'])
+        if workflow_kind == 'lstchain':
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing, zenith)
         else:  # RTA
             print('HiPeRTA and prod5 not implement yet.')
             sys.exit()
 
-        config['running_analysis_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                                      global_paths['obs_date'], '{}', global_paths['zenith'],
-                                                      global_paths['pointing'], config['prod_id'])
-        config['analysis_log_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                                  global_paths['obs_date'], '{}', global_paths['zenith'],
-                                                  global_paths['pointing'], config['prod_id'])
-        config['DL1_data_dir'] = os.path.join(global_paths['base_path_dl0'], 'running_analysis',
-                                              global_paths['obs_date'], '{}', global_paths['zenith'],
-                                              global_paths['pointing'], config['prod_id'])
+        config['running_analysis_dir'] = os.path.join(
+            base_path_dl0, 'running_analysis', obs_date, '{}', pointing, zenith, config['prod_id']
+        )
+        config['analysis_log_dir'] = os.path.join(
+            base_path_dl0, 'analysis_logs', obs_date, '{}', pointing, zenith, config['prod_id']
+        )
+        config['DL1_data_dir'] = os.path.join(
+            base_path_dl0, 'DL1', obs_date, '{}', pointing, zenith, config['prod_id']
+        )
+        config['DL2_data_dir'] = os.path.join(
+            base_path_dl0, 'DL2', obs_date, '{}', pointing, zenith, config['prod_id']
+        )
 
-    # print the confirmation of paths
+    # print the PATH and prod_id confirmation
 
-    print(f'\n\n\t ************ - {global_paths["workflow_kind"]} - PIPELINE KIND : {global_paths["prod_type"]} - ************ \n\n'
-          f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
-          f'\t{global_paths["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
+    print(f'\n\n\t ************ - {workflow_kind} {prod_type} - WORKFLOW KIND - ************ \n\n'
+          f'\nSimtel DL0 files are going to be searched at  \n\n   '
+          f'\t{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
           f'The following directories and all the information within them will be either created or overwritten:\n'
           f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
           f'\t{config["running_analysis_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-          f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}""")).replace("DL1", "DL2")}\n'
+          f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-          f'\n\tPROD_ID to be used: {config["analysis_log_dir"]}\n'
+          f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
           )
 
     print("Stages to be run:")
@@ -647,7 +662,6 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
     for particle in particles_loop:
         if gamma_offsets is not None and particle == 'gamma':
             for off in gamma_offsets:
-
                 _particle = particle + off
                 dl1_filename_directory[_particle] = {'training': {}, 'testing': {}}
 
@@ -719,7 +733,6 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log['dl1_dl2'] = jobids_from_dl1_to_dl2
 
     return debug_log
-
 
 # def check_job_output_logs(dict_particle_jobid):
 #     """
