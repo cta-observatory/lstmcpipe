@@ -35,7 +35,7 @@ parser.add_argument('input_dir', type=str,
 
 
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
-         flag_no_image=True):
+         flag_no_image=True, prod_id=None, gamma_offset=None):
     """
     Merge and copy DL1 data after production.
 
@@ -72,6 +72,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         Flaf to indicate whether the `--no-image` argument of the `lstchain_merge_hdf5_files.py` script must be set to
         True (--no-image True) or False (--no-image False).
         Default set to True.
+
+    prod_id : str
+        prod_id for output filename.
+    gamma_offset : str
+        if gamma files have various off0.Xdeg observations, include the offset within the filename for completeness.
 
     Returns
     -------
@@ -147,12 +152,19 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         # 3. merge DL1 files
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
-            output_filename = 'dl1_'
-            for i in [-4, -3, -2, -1]:
-                output_filename += running_DL1_dir.split('/')[i]
-                output_filename += '_'
-            output_filename += set_type
-            output_filename += '.h5'
+
+            # dl1 files should (must otherwise you are not trying to merge) already been created
+            output_filename = os.listdir(tdir)[0]
+            output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
+
+            if particle == 'gamma-diffuse':
+                output_filename = output_filename.replace('gamma', 'gamma-diffuse')
+            if gamma_offset is not None:
+                output_filename += f'_{gamma_offset}'
+            if prod_id is not None:
+                output_filename += f'_{prod_id}'
+            output_filename += f'_{set_type}.h5'
+
             output_filename = os.path.join(running_DL1_dir, output_filename)
             print(f"\t\tmerge output: {output_filename}")
 
@@ -187,23 +199,32 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
 
         # 3. merge DL1 files
         wait_both_merges = []
+
         for set_type in ['testing', 'training']:
             tdir = os.path.join(running_DL1_dir, set_type)
-            output_filename = 'dl1_'
-            for i in [-4, -3, -2, -1]:
-                output_filename += running_DL1_dir.split('/')[i]
-                output_filename += '_'
-            output_filename += set_type
+
+            # just need to take the base name of the file, so we read a processed bunch and take first file
+            with open(training_filelist, 'r') as f:
+                output_filename = f.readline()
+
+            output_filename = 'dl1_' + os.path.basename(output_filename.split('_run')[0])
+            if particle == 'gamma-diffuse':
+                output_filename = output_filename.replace('gamma', 'gamma-diffuse')
+            if '_off' in particle:
+                output_filename += f'_{gamma_offset}'
+            output_filename += f'_{prod_id}_{set_type}'
             output_filename += '.h5'
-            base_filename = output_filename
+
             output_filename = os.path.join(running_DL1_dir, output_filename)
             print(f"\t\tmerge output: {output_filename}")
 
             # After the workflow the files will be moved, will not stay at output_filename
             if set_type == 'training':
-                log_merge[particle][set_type]['train_path_and_outname_dl1'] = os.path.join(final_DL1_dir, base_filename)
+                log_merge[particle][set_type]['train_path_and_outname_dl1'] = os.path.join(
+                    final_DL1_dir, os.path.basename(output_filename))
             else:
-                log_merge[particle][set_type]['test_path_and_outname_dl1'] = os.path.join(final_DL1_dir, base_filename)
+                log_merge[particle][set_type]['test_path_and_outname_dl1'] = os.path.join(
+                    final_DL1_dir, os.path.basename(output_filename))
 
             cmd = 'sbatch --parsable -p short --exclude=cp13'
             if wait_r0_dl1_jobs != '':

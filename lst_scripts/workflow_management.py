@@ -165,8 +165,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     return full_log, debug_log, all_jobids_from_r0_dl1_stage
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, gamma_offsets=None,
-                             smart_merge=False, no_image_flag=True, prod_id=None):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False,
+                             no_image_flag=True, prod_id=None, gamma_offsets=None):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -236,7 +236,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
                     flag_merge=merge_flag,
-                    flag_no_image=no_image_flag
+                    flag_no_image=no_image_flag,
+                    prod_id=prod_id,
+                    gamma_offset=off
                 )
 
                 log_merge_and_copy.update(log)
@@ -259,7 +261,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
                 flag_merge=merge_flag,
-                flag_no_image=no_image_flag
+                flag_no_image=no_image_flag,
+                prod_id=prod_id
             )
 
             log_merge_and_copy.update(log)
