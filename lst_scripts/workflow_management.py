@@ -45,7 +45,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {'jobid_log': {}}
+    full_log = {'log_all_job_ids': {}}
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
@@ -68,7 +68,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     offset=off
                 )
 
-                full_log['jobid_log'].update(log)
+                full_log['log_all_job_ids'].update(log)
                 full_log[_particle] = ','.join(jobids_by_particle)
                 all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
@@ -88,7 +88,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
 
             # Create dictionary : jobid to full log information, and
             #  the inverse dictionary, particle to the list of all the jobids of that same particle
-            full_log['jobid_log'].update(log)
+            full_log['log_all_job_ids'].update(log)
             full_log[_particle] = ','.join(jobids_by_particle)
             all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
@@ -134,7 +134,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {'jobid_log': {}}
+    full_log = {'log_all_job_ids': {}}
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
@@ -151,7 +151,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 
         # Create jobid to full log information dictionary.
         # And the inverse dictionary, particle to the list of all the jobids of that same particle
-        full_log['jobid_log'].update(log)
+        full_log['log_all_job_ids'].update(log)
         full_log[particle] = ','.join(jobids_by_particle)
         all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
 
@@ -528,9 +528,8 @@ def parse_config_and_handle_global_vars(yml_file):
     config['prod_id'] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly
-    config['source_environment'] = \
-        loaded_config['source_environment']['source_file'] + '; ' + \
-        loaded_config['source_environment']['conda_env'] + '; '
+    config['source_environment'] = f"source {loaded_config['source_environment']['source_file']}; " \
+                                   f"conda activate {loaded_config['source_environment']['conda_env']}; "
 
     # 3 - particles loop
     config['all_particles'] = particles
@@ -750,20 +749,21 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
-                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; mv slurm-* logs_{prod_id}'
+                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; mv slurm-* check_MC_{prod_id}.txt logs_{prod_id} '
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
-    print(f'\n\n\tSubmitted batch CHECK-job {jobid}\n\n')
+    print(f'\n\tSubmitted batch CHECK-job {jobid}\n')
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.\n' + cmd_wrap
-    debug_log['r0_dl1'] = jobids_from_r0_to_dl1
-    debug_log['merge'] = jobids_from_merge
-    debug_log['train_pipe'] = jobids_from_train_pipe
-    debug_log['dl1_dl2'] = jobids_from_dl1_to_dl2
+    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
+    debug_log['sbatch_cmd'] = cmd_wrap
+    debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
+    debug_log['SUMMARY_merge'] = jobids_from_merge
+    debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
+    debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
 
     return debug_log
 

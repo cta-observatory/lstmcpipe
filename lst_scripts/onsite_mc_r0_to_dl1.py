@@ -294,7 +294,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
             counter += 1
 
         if flag_full_workflow:
-            print(f"\n\t{counter} jobs submitted - {particle} {list_type}. "
+            print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
                   f"From jobid {save_job_ids[0]} to {save_job_ids[-1]}\n")
             time.sleep(1)  # Avoid collapsing LP cluster
 
