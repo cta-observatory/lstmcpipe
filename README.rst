@@ -21,9 +21,9 @@ Install
     pip install .    
 
 
-You can install this as an independent package (although it will uses various ``lstchain_`` scripts). This will give you the possibility to run ``onsite_`` commands from
+You can install this as an independent package (although it will uses various ``lstchain_*`` scripts). This will give you the possibility to run ``onsite_`` commands from
 anywhere.
-This is not mandatory though and you can simply run the scripts as ``python onsite_.py``
+This is not mandatory though and you can simply run the scripts as ``python onsite_*.py``
 
 Quickstart
 ----------
@@ -50,6 +50,9 @@ by using the slurm scheduling job manager system at LP cluster and the dependenc
 
 Each 'onsite' stage calls a lstchain script; i.e., ``onsite_mc_r0_to_dl1.py`` will call the ``lstchain_mc_r0_to_dl1``
 script, and successively.
+
+Configuration of the pipeline
+*****************************
 
 ``onsite_mc_r0_to_dl3.py`` passes the configuration and all the needed arguments to the consecutive stages. The
 pipeline uses two configuration files;
