@@ -14,9 +14,7 @@
 # > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
 #       [-pid PROD_ID]
 #
-#   The input_dir is set in the global variable `DL0_DATA_DIR`
 
-import os
 import sys
 import argparse
 from distutils.util import strtobool
@@ -28,7 +26,8 @@ from workflow_management import (batch_r0_to_dl1,
                                  save_log_to_file,
                                  create_dict_with_filenames,
                                  batch_mc_production_check,
-                                 parse_config_and_handle_global_vars
+                                 parse_config_and_handle_global_vars,
+                                 create_log_files
                                  )
 
 
@@ -76,13 +75,13 @@ parser.add_argument('--no-image',
                     action='store',
                     type=lambda x: bool(strtobool(x)),
                     dest='flag_no_image',
-                    help='--no-image argument for merging stage.'
+                    help='--no-image argument for the merging stage.'
                          'True will merge dl1 files without image. False will do the opposite',
                     default=True
                     )
+
 args = parser.parse_args()
 
-#######################################################################################################################
 #######################################################################################################################
 
 if __name__ == '__main__':
@@ -102,13 +101,8 @@ if __name__ == '__main__':
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
 
-    # First time creating the log; OK, otherwise --> erase
-    log_file = f'./log_onsite_mc_r0_to_dl3_{prod_type}_{prod_id}.yml'
-    debug_file = f'./log_reduced_{prod_type}_{prod_id}.yml'
-    if os.path.exists(log_file):
-        os.remove(log_file)
-    if os.path.exists(debug_file):
-        os.remove(debug_file)
+    # Create log files
+    log_file, debug_file = create_log_files(prod_type, prod_id)
 
     # 1 STAGE --> R0/1 to DL1
     if 'r0_to_dl1' in stages_to_run:
@@ -135,7 +129,7 @@ if __name__ == '__main__':
             )
 
         else:
-            sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
+            sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' in the config_MC_prod.yml file ")
 
         save_log_to_file(log_batch_r0_dl1, log_file, log_format='yml', workflow_step='r0_to_dl1')
         save_log_to_file(debug_r0dl1, debug_file, log_format='yml', workflow_step='r0_to_dl1')

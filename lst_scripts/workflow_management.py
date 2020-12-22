@@ -1,4 +1,4 @@
-# library of functions used to the management of the MC workflow analysis at La Palma
+# Functions used to manage the MC workflow analysis at La Palma
 
 # Enrique Garcia Nov 2019
 
@@ -766,6 +766,38 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log['dl1_dl2'] = jobids_from_dl1_to_dl2
 
     return debug_log
+
+
+def create_log_files(production_type, production_id):
+    """
+    Manages filenames (and overwrites if needed) log files.
+
+    Parameters
+    ----------
+    production_type : str
+        prod3 or prod5 MC production
+    production_id : str
+        production identifier of the MC production to be launched
+
+    Returns
+    -------
+    log_file: str
+         path and filename of full log file
+    debug_file: str
+        path and filename of reduced (debug) log file
+
+    """
+    log_file = f'./log_onsite_mc_r0_to_dl3_{production_type}_{production_id}.yml'
+    debug_file = f'./log_reduced_{production_type}_{production_id}.yml'
+
+    # If the file exists, i,e., the pipeline has been relaunched, erase it
+    if os.path.exists(log_file):
+        os.remove(log_file)
+    if os.path.exists(debug_file):
+        os.remove(debug_file)
+
+    return log_file, debug_file
+
 
 # def check_job_output_logs(dict_particle_jobid):
 #     """

@@ -1,10 +1,24 @@
+## MC PRODUCTION FULL PIPELINE CONFIGURATION ##
+#
+# The entries are needed to correctly select the MC production type
+#  and to create the common path tree;
+#
+#
+#   $BASE_PATH_DL0/$STAGE/$OBS_DATE/$PARTICLE/$POINTING/$ZENITH/$PROD_ID
+#
+#
+#  This way every MC production will follow the same path logic;
+#    ex;  $BASE_PATH_DL0/{DL0, DL1, DL2, running_analysis}/20200629_prod5/{electron, gamma, gamma-diffuse, proton}/
+#          /south_pointing/zenith_20deg/$PROD_ID
+
+
 workflow_kind: lstchain
 prod_id:  # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path_dl0: /fefs/aswg/data/mc
   # user example : /fefs/aswg/workspace/enrique.garcia/MC_DL0_SYMLINK/
   # lstanalyzer user : /fefs/aswg/data/mc
-prod_type: prod5  # {prod5, prod3}
+prod_type: prod5  # Choose between {prod5, prod3}
 obs_date: 20200629_prod5
   # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
   # pro3 : `20190415`
