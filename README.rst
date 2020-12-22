@@ -32,7 +32,7 @@ The MC full pipeline (r0 to dl2) is launched by running the ``onsite_mc_r0_to_dl
 
 .. code-block::
 
-    python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst lstchain_*.json --prod_id [e.g:] local_tail_8_4
+    python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst lstchain_*.json
 
 Note: You can launch this command without fearing; there is an intermediate step that verifies and
 shows the all the information that you are passing to the pipeline.

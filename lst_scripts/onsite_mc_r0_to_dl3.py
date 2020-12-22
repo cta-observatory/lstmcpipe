@@ -61,14 +61,6 @@ parser.add_argument('--config_file_rta', '-conf_rta',
                     default=None
                     )
 
-parser.add_argument('--prod_id', '-pid',
-                    action='store',
-                    type=str,
-                    dest='prod_id',
-                    help="Production ID. If None, _v00 will be used, indicating an official base production",
-                    default=None
-                    )
-
 # OPTIONAL / ADVANCED ARGUMENTS
 
 parser.add_argument('--no-image',
