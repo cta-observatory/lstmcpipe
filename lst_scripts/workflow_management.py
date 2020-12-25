@@ -797,7 +797,8 @@ def create_log_files(production_id):
     debug_file = f'./log_reduced_{production_id}.yml'
     scancel_file = f'./scancel_{production_id}.sh'
 
-    os.system(f"touch {scancel_file}; chmod +x {scancel_file}")
+    os.system(f"touch {scancel_file}")
+    os.chmod(scancel_file, 0o755)  # -rwxr-xr-x
 
     # If the file exists, i,e., the pipeline has been relaunched, erase it
     if os.path.exists(log_file):
