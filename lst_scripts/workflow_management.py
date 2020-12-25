@@ -718,11 +718,12 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, prod_id):
+                              jobids_from_dl1_to_dl2, prod_id, log_file, log_debug_file, scancel_file):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
     The file will take the form `check_MC_prodID_{prod_id}_OK.txt`
+    # TODO remove logs ? move the logs to the same logs_*_dir ?
 
     Parameters
     ----------
@@ -733,6 +734,9 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_merge :  str
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
+    #log_file: str
+    #log_debug_file: str
+    scancel_file: str
 
     Returns
     -------
@@ -749,7 +753,10 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
-                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; mv slurm-* check_MC_{prod_id}.txt logs_{prod_id} '
+                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
+                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id};' \
+                f'rm {scancel_file} ' \
+                #f'; mv {log_file} {log_debug_file} logs_{prod_id};'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
@@ -768,14 +775,12 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     return debug_log
 
 
-def create_log_files(production_type, production_id):
+def create_log_files(production_id):
     """
     Manages filenames (and overwrites if needed) log files.
 
     Parameters
     ----------
-    production_type : str
-        prod3 or prod5 MC production
     production_id : str
         production identifier of the MC production to be launched
 
@@ -785,18 +790,46 @@ def create_log_files(production_type, production_id):
          path and filename of full log file
     debug_file: str
         path and filename of reduced (debug) log file
-
+    scancel_file: str
+        path and filename of bash file to cancel all the schedulled jobs
     """
-    log_file = f'./log_onsite_mc_r0_to_dl3_{production_type}_{production_id}.yml'
-    debug_file = f'./log_reduced_{production_type}_{production_id}.yml'
+    log_file = f'./log_onsite_mc_r0_to_dl3_{production_id}.yml'
+    debug_file = f'./log_reduced_{production_id}.yml'
+    scancel_file = f'./scancel_{production_id}.sh'
+
+    os.system(f"touch {scancel_file}; chmod +x {scancel_file}")
 
     # If the file exists, i,e., the pipeline has been relaunched, erase it
     if os.path.exists(log_file):
         os.remove(log_file)
     if os.path.exists(debug_file):
         os.remove(debug_file)
+    if os.path.exists(scancel_file):
+        os.remove(scancel_file)
 
-    return log_file, debug_file
+    return log_file, debug_file, scancel_file
+
+
+def update_scancel_file(scancel_filename, jobids_to_update):
+    """
+    Bash file containing the slurm command to cancel multiple jobs.
+    The file will be updated after every batched stage and will be erased in case the whole MC prod succeed without
+    errors.
+
+    Parameters
+    ----------
+    scancel_filename: str
+        filename that cancels the whole MC production
+    jobids_to_update: str
+        job_ids to be included into the the file
+    """
+    if os.stat(scancel_filename).st_size == 0:
+        with open(scancel_filename, 'r+') as f:
+            f.write(f'scancel -n {jobids_to_update}')
+
+    else:
+        with open(scancel_filename, 'a') as f:
+            f.write(f',{jobids_to_update}')
 
 
 # def check_job_output_logs(dict_particle_jobid):
