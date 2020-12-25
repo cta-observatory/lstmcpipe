@@ -791,13 +791,14 @@ def create_log_files(production_id):
     debug_file: str
         path and filename of reduced (debug) log file
     scancel_file: str
-        path and filename of bash file to cancel all the schedulled jobs
+        path and filename of bash file to cancel all the scheduled jobs
     """
     log_file = f'./log_onsite_mc_r0_to_dl3_{production_id}.yml'
     debug_file = f'./log_reduced_{production_id}.yml'
     scancel_file = f'./scancel_{production_id}.sh'
 
-    os.system(f"touch {scancel_file}")
+    # scancel prod file needs chmod +x rights !
+    open(scancel_file, 'w').close()
     os.chmod(scancel_file, 0o755)  # -rwxr-xr-x
 
     # If the file exists, i,e., the pipeline has been relaunched, erase it
@@ -805,8 +806,6 @@ def create_log_files(production_id):
         os.remove(log_file)
     if os.path.exists(debug_file):
         os.remove(debug_file)
-    if os.path.exists(scancel_file):
-        os.remove(scancel_file)
 
     return log_file, debug_file, scancel_file
 
