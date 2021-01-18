@@ -577,35 +577,37 @@ def parse_config_and_handle_global_vars(yml_file):
             config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, pointing, config['prod_id'])
 
     else:  # Prod5
+        # TODO correct the path for all the prod5_* at the LP_cluster
+        #  as they were run as $ZENITH/$POINTING instead of $POINTING/$ZENITH/
 
         config['gammas_offsets'] = offset_gammas
 
         if workflow_kind == 'lstchain':
-            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing, zenith)
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', zenith, pointing)
         else:  # RTA
             print('HiPeRTA and prod5 not implement yet.')
             sys.exit(-1)
 
         config['running_analysis_dir'] = os.path.join(
-            base_path_dl0, 'running_analysis', obs_date, '{}', pointing, zenith, config['prod_id']
+            base_path_dl0, 'running_analysis', obs_date, '{}', zenith, pointing, config['prod_id']
         )
         config['analysis_log_dir'] = os.path.join(
-            base_path_dl0, 'analysis_logs', obs_date, '{}', pointing, zenith, config['prod_id']
+            base_path_dl0, 'analysis_logs', obs_date, '{}', zenith, pointing, config['prod_id']
         )
         config['DL1_data_dir'] = os.path.join(
-            base_path_dl0, 'DL1', obs_date, '{}', pointing, zenith, config['prod_id']
+            base_path_dl0, 'DL1', obs_date, '{}', zenith, pointing, config['prod_id']
         )
         config['DL2_data_dir'] = os.path.join(
-            base_path_dl0, 'DL2', obs_date, '{}', pointing, zenith, config['prod_id']
+            base_path_dl0, 'DL2', obs_date, '{}', zenith, pointing, config['prod_id']
         )
 
         if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
             config['model_dir'] = os.path.join(
-                '/fefs/aswg/data/', 'models', obs_date, pointing, zenith, config['prod_id']
+                '/fefs/aswg/data/', 'models', obs_date, zenith, pointing, config['prod_id']
             )
         else:
             # user case, model dir in same dir as DL0, DL1, DL2, running...
-            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, pointing, zenith, config['prod_id'])
+            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, zenith, pointing, config['prod_id'])
 
     # print the PATH and prod_id confirmation
 
