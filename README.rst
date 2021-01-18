@@ -21,9 +21,9 @@ Install
     pip install .    
 
 
-You can install this as an independent package (although it will uses various ``lstchain_`` scripts). This will give you the possibility to run ``onsite_`` commands from
+You can install this as an independent package (although it will uses various ``lstchain_*`` scripts). This will give you the possibility to run ``onsite_`` commands from
 anywhere.
-This is not mandatory though and you can simply run the scripts as ``python onsite_.py``
+This is not mandatory though and you can simply run the scripts as ``python onsite_*.py``
 
 Quickstart
 ----------
@@ -32,13 +32,13 @@ The MC full pipeline (r0 to dl2) is launched by running the ``onsite_mc_r0_to_dl
 
 .. code-block::
 
-    python onsite_mc_r0_to_dl3.py -conf_lst lstchain_*.json --prod_id (e.g:) local_tail_8_4
+    python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst lstchain_*.json
 
 Note: You can launch this command without fearing; there is an intermediate step that verifies and
 shows the all the information that you are passing to the pipeline.
 
-The ``onsite_mc_r0_to_dl3.py`` script is the orchestrator of the pipeline, it schedules the following stages (scripts)
-per particle;
+The ``onsite_mc_r0_to_dl3.py`` script is the **orchestrator** of the pipeline, it schedules the following stages
+(scripts) per particle;
 
 1. ``onsite_mc_r0_to_dl1.py``
 2. ``onsite_mc_merge_and_copy_dl1.py``
@@ -48,14 +48,17 @@ per particle;
 by using the slurm scheduling job manager system at LP cluster and the dependencies between each stage.
 
 
-Each stage calls a certain lstchain script; i.e., ``onsite_mc_r0_to_dl1.py`` will call ``lstchain_mc_r0_to_dl1`` entry
-point, and successively.
+Each 'onsite' stage calls a lstchain script; i.e., ``onsite_mc_r0_to_dl1.py`` will call the ``lstchain_mc_r0_to_dl1``
+script, and successively.
 
-``onsite_mc_r0_to_dl3.py`` also passes all the needed information and arguments to the consecutive stages,
-thus **ALL** the configuration that the pipeline would need is passed;
+Configuration of the pipeline
+*****************************
 
-- At the beginning of the same ``onsite_mc_r0_to_dl3.py`` script - lines ~35 to ~80 (MC production related configuration).
-- Through the ``lstchain_*.json`` file (lstchain pipe related configuration).
+``onsite_mc_r0_to_dl3.py`` passes the configuration and all the needed arguments to the consecutive stages. The
+pipeline uses two configuration files;
+
+- The ``config_MC_prod.yml`` file (details all the MC production related arguments; paths, ``prod3`` or ``prod5`` ...),
+- The ``lstchain_*.json`` configuration file (lstchain related configuration; tailcuts, integrator, RF arguments ...).
 
 Changing the default arguments on each of the steps of the pipeline: **Use at your own risk.**
 

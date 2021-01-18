@@ -222,6 +222,9 @@ def manage_source_env_r0_dl1(source_and_env, file):
     -------
     None. It overwrites the whole file ONLY if there is any changes.
     """
+    if source_and_env is None:
+        source_and_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'
+
     source = source_and_env.strip(';').rsplit(';')[0].split()[-1]
     environment = source_and_env.strip(';').rsplit(';')[1].split()[-1]
 

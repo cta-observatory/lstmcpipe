@@ -1,11 +1,15 @@
-# library of functions used to the management of the MC workflow analysis at La Palma
+# Functions used to manage the MC workflow analysis at La Palma
 
 # Enrique Garcia Nov 2019
 
 import os
+import sys
 import glob
 import yaml
 import pprint
+import calendar
+import lstchain
+from data_management import query_continue
 from onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -41,7 +45,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {'jobid_log': {}}
+    full_log = {'log_all_job_ids': {}}
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
@@ -64,7 +68,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     offset=off
                 )
 
-                full_log['jobid_log'].update(log)
+                full_log['log_all_job_ids'].update(log)
                 full_log[_particle] = ','.join(jobids_by_particle)
                 all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
@@ -84,7 +88,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
 
             # Create dictionary : jobid to full log information, and
             #  the inverse dictionary, particle to the list of all the jobids of that same particle
-            full_log['jobid_log'].update(log)
+            full_log['log_all_job_ids'].update(log)
             full_log[_particle] = ','.join(jobids_by_particle)
             all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
@@ -130,7 +134,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {'jobid_log': {}}
+    full_log = {'log_all_job_ids': {}}
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
@@ -147,7 +151,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
 
         # Create jobid to full log information dictionary.
         # And the inverse dictionary, particle to the list of all the jobids of that same particle
-        full_log['jobid_log'].update(log)
+        full_log['log_all_job_ids'].update(log)
         full_log[particle] = ','.join(jobids_by_particle)
         all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
 
@@ -206,9 +210,9 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     all_jobs_from_merge_stage = []
     debug_log = {}
 
-    if smart_merge == 'lst':
+    if smart_merge == 'lst' or smart_merge == 'lstchain':
         merge_flag = True
-    elif smart_merge == 'rta':
+    elif smart_merge == 'rta' or smart_merge == 'hiperta':
         merge_flag = False
     elif smart_merge:
         merge_flag = True
@@ -382,7 +386,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
 
@@ -418,7 +421,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 source_environment=source_env
             )
 
-
             log_dl1_to_dl2.update(log)
             jobid_for_dl2_to_dl3.append(jobid)
 
@@ -434,6 +436,202 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
 def batch_dl2_to_dl3():
     pass
+
+
+def load_yml_config(yml_file):
+    """
+    Reads a yaml file and parses the global variables to run a MC production
+
+    Parameters
+    ----------
+    yml_file : str
+        path to the production configuration file; `config_mc_r0_dl3.yml` by default
+
+    Returns
+    -------
+    config : dict
+        dictionary containing the MC global variables and general config
+    """
+    with open(yml_file) as f:
+        try:
+            config = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            print(e)
+            exit()
+
+    return config
+
+
+def parse_config_and_handle_global_vars(yml_file):
+    """
+    Handles global paths and variables, as well as all the exceptions, depending on kind of MC prod to be run.
+    Composes the final path tree to be passed to each stage
+
+    Parameters
+    ----------
+    yml_file : str
+        path to the MC prod YAML config file
+
+    Returns
+    -------
+    config : dict
+        Dictionary with all the variables needed along the r0_to_dl3 workflow
+
+    """
+    loaded_config = load_yml_config(yml_file)
+    config = {}
+
+    # Allowed options
+    allowed_workflows = ['hiperta', 'lstchain']
+    allowed_prods = ['prod3', 'prod5']
+    allowed_obs_date = ['20190415', '20200629_prod5', '20200629_prod5_trans_80']
+
+    # Load configuration
+    workflow_kind = loaded_config['workflow_kind']
+    custom_prod_id = loaded_config['prod_id']
+    stages_to_be_run = loaded_config['stages_to_be_run']
+
+    base_path_dl0 = loaded_config['base_path_dl0']
+    prod_type = loaded_config['prod_type']
+    obs_date = str(loaded_config['obs_date'])
+    pointing = loaded_config['pointing']
+    zenith = loaded_config['zenith']
+    particles = loaded_config['particles']
+    offset_gammas = loaded_config['offset_gammas']
+
+    # Check allowed cases
+    if workflow_kind not in allowed_workflows or prod_type not in allowed_prods:
+        print(f'\nPlease select an \n\t - allowed `workflow_kind`: {allowed_workflows} or an \n\t - allowed production '
+              f'type: {allowed_prods} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
+
+    # and incompatible possibilities
+    if (prod_type == 'prod3' and obs_date != '20190415') or (prod_type == 'prod5' and obs_date == '20190415'):
+        print(f'\nThis prod_type and obs_date combination is not possible.\n'
+              f'Please change it in the config YAML file; {yml_file}.')
+        sys.exit(-1)
+
+    # Prod_id syntax
+    today = calendar.datetime.date.today()
+    if workflow_kind == 'lstchain':
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    elif workflow_kind == 'hiperta':  # RTA
+        # TODO parse version from hiPeRTA module
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+    else:
+        print(f'\n\tPlease select an allowed `workflow_kind`: {allowed_workflows} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
+
+    # Create the final config structure to be passed to the pipeline
+    # 1 - Prod_id
+    suffix_id = '_{}_v00'.format(prod_type) if custom_prod_id is None else '_{}_{}'.format(prod_type, custom_prod_id)
+    config['prod_id'] = base_prod_id + suffix_id
+
+    # 2 - Parse source environment correctly
+    config['source_environment'] = f"source {loaded_config['source_environment']['source_file']}; " \
+                                   f"conda activate {loaded_config['source_environment']['conda_env']}; "
+
+    # 3 - particles loop
+    config['all_particles'] = particles
+
+    # 3.1 - Gammas' offsets
+    if obs_date == '20200629_prod5' or obs_date == '20200629_prod5_trans_80':  # prod5 case
+        config['gamma_offs'] = loaded_config['offset_gammas']
+    elif obs_date == '20190415' or prod_type == 'prod3':
+        config['gamma_offs'] = None
+    else:
+        print(f'\n\tPlease select an \n\tallowed `obs_date`: {allowed_obs_date} in the config YAML file; {yml_file}.')
+        sys.exit(-1)
+
+    # 4 - Stages to be run
+    config['stages_to_run'] = stages_to_be_run
+
+    # 5 - production workflow and type
+    config['workflow_kind'] = workflow_kind
+    config['prod_type'] = prod_type
+
+    # 6 - Global paths
+    if prod_type == 'prod3':
+        if workflow_kind == 'lstchain':
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing)
+        else:  # RTA
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', pointing)
+
+        config['running_analysis_dir'] = os.path.join(
+            base_path_dl0, 'running_analysis', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['analysis_log_dir'] = os.path.join(
+            base_path_dl0, 'analysis_logs', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['DL1_data_dir'] = os.path.join(
+            base_path_dl0, 'DL1', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['DL2_data_dir'] = os.path.join(
+            base_path_dl0, 'DL2', obs_date, '{}', pointing, config['prod_id']
+        )
+
+        if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
+            config['model_dir'] = os.path.join('/fefs/aswg/data/', 'models', obs_date, pointing, config['prod_id'])
+        else:
+            # user case, model dir in same dir as DL0, DL1, DL2, running...
+            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, pointing, config['prod_id'])
+
+    else:  # Prod5
+        # TODO correct the path for all the prod5_* at the LP_cluster
+        #  as they were run as $ZENITH/$POINTING instead of $POINTING/$ZENITH/
+
+        config['gammas_offsets'] = offset_gammas
+
+        if workflow_kind == 'lstchain':
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', zenith, pointing)
+        else:  # RTA
+            print('HiPeRTA and prod5 not implement yet.')
+            sys.exit(-1)
+
+        config['running_analysis_dir'] = os.path.join(
+            base_path_dl0, 'running_analysis', obs_date, '{}', zenith, pointing, config['prod_id']
+        )
+        config['analysis_log_dir'] = os.path.join(
+            base_path_dl0, 'analysis_logs', obs_date, '{}', zenith, pointing, config['prod_id']
+        )
+        config['DL1_data_dir'] = os.path.join(
+            base_path_dl0, 'DL1', obs_date, '{}', zenith, pointing, config['prod_id']
+        )
+        config['DL2_data_dir'] = os.path.join(
+            base_path_dl0, 'DL2', obs_date, '{}', zenith, pointing, config['prod_id']
+        )
+
+        if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
+            config['model_dir'] = os.path.join(
+                '/fefs/aswg/data/', 'models', obs_date, zenith, pointing, config['prod_id']
+            )
+        else:
+            # user case, model dir in same dir as DL0, DL1, DL2, running...
+            config['model_dir'] = os.path.join(base_path_dl0, 'models', obs_date, zenith, pointing, config['prod_id'])
+
+    # print the PATH and prod_id confirmation
+
+    print(f'\n\n\t ************ - {workflow_kind} {prod_type} - WORKFLOW KIND - ************ \n\n'
+          f'\nSimtel DL0 files are going to be searched at  \n\n   '
+          f'\t{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
+          f'The following directories and all the information within them will be either created or overwritten:\n'
+          f'[subdirectories with a same PROD_ID and analysed the same day]\n\n'
+          f'\t{config["running_analysis_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["model_dir"]}\n'
+          f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
+          )
+
+    print("Stages to be run:")
+    for stage in config['stages_to_run']:
+        print(f" - {stage}")
+    print("\n")
+
+    query_continue('Are you sure ?')
+
+    return config
 
 
 def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
@@ -498,7 +696,6 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
     for particle in particles_loop:
         if gamma_offsets is not None and particle == 'gamma':
             for off in gamma_offsets:
-
                 _particle = particle + off
                 dl1_filename_directory[_particle] = {'training': {}, 'testing': {}}
 
@@ -523,11 +720,12 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, prod_id):
+                              jobids_from_dl1_to_dl2, prod_id, log_file, log_debug_file, scancel_file):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
     The file will take the form `check_MC_prodID_{prod_id}_OK.txt`
+    # TODO remove logs ? move the logs to the same logs_*_dir ?
 
     Parameters
     ----------
@@ -538,6 +736,9 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_merge :  str
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
+    #log_file: str
+    #log_debug_file: str
+    scancel_file: str
 
     Returns
     -------
@@ -554,22 +755,83 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
-                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; mv slurm-* logs_{prod_id}'
+                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
+                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id};' \
+                f'rm {scancel_file} '
+                #f'; mv {log_file} {log_debug_file} logs_{prod_id};'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
-    print(f'\n\n\tSubmitted batch CHECK-job {jobid}\n\n')
+    print(f'\n\tSubmitted batch CHECK-job {jobid}\n')
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.\n' + cmd_wrap
-    debug_log['r0_dl1'] = jobids_from_r0_to_dl1
-    debug_log['merge'] = jobids_from_merge
-    debug_log['train_pipe'] = jobids_from_train_pipe
-    debug_log['dl1_dl2'] = jobids_from_dl1_to_dl2
+    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
+    debug_log['sbatch_cmd'] = cmd_wrap
+    debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
+    debug_log['SUMMARY_merge'] = jobids_from_merge
+    debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
+    debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
 
     return debug_log
+
+
+def create_log_files(production_id):
+    """
+    Manages filenames (and overwrites if needed) log files.
+
+    Parameters
+    ----------
+    production_id : str
+        production identifier of the MC production to be launched
+
+    Returns
+    -------
+    log_file: str
+         path and filename of full log file
+    debug_file: str
+        path and filename of reduced (debug) log file
+    scancel_file: str
+        path and filename of bash file to cancel all the scheduled jobs
+    """
+    log_file = f'./log_onsite_mc_r0_to_dl3_{production_id}.yml'
+    debug_file = f'./log_reduced_{production_id}.yml'
+    scancel_file = f'./scancel_{production_id}.sh'
+
+    # scancel prod file needs chmod +x rights !
+    open(scancel_file, 'w').close()
+    os.chmod(scancel_file, 0o755)  # -rwxr-xr-x
+
+    # If the file exists, i,e., the pipeline has been relaunched, erase it
+    if os.path.exists(log_file):
+        os.remove(log_file)
+    if os.path.exists(debug_file):
+        os.remove(debug_file)
+
+    return log_file, debug_file, scancel_file
+
+
+def update_scancel_file(scancel_filename, jobids_to_update):
+    """
+    Bash file containing the slurm command to cancel multiple jobs.
+    The file will be updated after every batched stage and will be erased in case the whole MC prod succeed without
+    errors.
+
+    Parameters
+    ----------
+    scancel_filename: str
+        filename that cancels the whole MC production
+    jobids_to_update: str
+        job_ids to be included into the the file
+    """
+    if os.stat(scancel_filename).st_size == 0:
+        with open(scancel_filename, 'r+') as f:
+            f.write(f'scancel {jobids_to_update}')
+
+    else:
+        with open(scancel_filename, 'a') as f:
+            f.write(f',{jobids_to_update}')
 
 
 # def check_job_output_logs(dict_particle_jobid):

@@ -43,6 +43,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         path to the trained models
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
+
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     particle : str
@@ -59,8 +60,9 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         Dictionary with 'particles' as keys containing final outnames of dl1 files.
             ! COMPULSORY argument when flag_full_workflow is set to True.
     source_environment : str
-        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
-        certain conda environment. By default : `conda activate cta`.
+        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script) to activate
+        a certain conda environment.
+         DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
 
     Returns
@@ -131,7 +133,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
             cmd += f' -c {config_file}'
 
         if not flag_full_workflow:  # Run interactively
-            print(cmd)
+            # print(cmd)
             os.system(cmd)
 
         else:  # flag_full_workflow == True !

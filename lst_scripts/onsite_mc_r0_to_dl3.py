@@ -8,19 +8,15 @@
 #   - onsite_mc_merge_and_copy_dl1
 #   - onsite_mc_train
 #   - onsite_mc_dl1_to_dl2
-#   - TODO onsite_mc_dl2_to_dl3
+#   - TODO onsite_mc_dl2_to_irfs # WIP
 #
 # usage:
-# > python onsite_mc_r0_to_dl3.py -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE] [-pid PROD_ID]
+# > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
+#       [-pid PROD_ID]
 #
-#   The input_dir is set in the global variable `DL0_DATA_DIR`
 
-import os
 import sys
 import argparse
-import calendar
-import lstchain
-from data_management import query_continue
 from distutils.util import strtobool
 from workflow_management import (batch_r0_to_dl1,
                                  batch_r0_to_dl1_rta,
@@ -29,211 +25,141 @@ from workflow_management import (batch_r0_to_dl1,
                                  batch_dl1_to_dl2,
                                  save_log_to_file,
                                  create_dict_with_filenames,
-                                 batch_mc_production_check
+                                 batch_mc_production_check,
+                                 parse_config_and_handle_global_vars,
+                                 create_log_files,
+                                 update_scancel_file
                                  )
 
-#######################################################################################################################
-#######################################################################################################################
-#
-# *** USER CONFIGURATION ***
-#
 
-# choose between :
-#  'lst' for lstchain-like workflow  OR
-#  'rta' for HiPeRTA-like workflow
-WORKFLOW_KIND = 'lst'
+parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
 
+parser.add_argument('--config_mc_prod', '-c',
+                    action='store',
+                    type=str,
+                    dest='config_mc_prod',
+                    help='Path to the MC_production configuration file. ',
+                    default='./config_MC_prod.yml',
+                    required=True
+                    )
 
-# And PROD type - Chooche between
-#  'prod5' or 'prod3'
-PROD_TYPE = 'prod5'
-
-
-BASE_PATH = '/fefs/aswg/data/mc'  # lstanalyzer user ONLY
-# BASE_PATH = '/fefs/aswg/workspace/enrique.garcia/workflow_r0_dl2_lst/'  # any other user
-
-
-if PROD_TYPE == 'prod5':
-    OBS_DATE = '20200629_prod5'  # '20200629_prod5_trans_80'
-    GAMMA_OFFS = ['off0.0deg', 'off0.4deg']
-else:
-    OBS_DATE = '20190415'
-    GAMMA_OFFS = None
-
-
-ZENITH = 'zenith_20deg'
-POINTING = 'south_pointing'
-ALL_PARTICLES = ['electron', 'gamma', 'gamma-diffuse', 'proton']
-
-
-# source env onsite - can be changed for custom install - ** !! ADD A `;` at the end of the `source_env` string !! **
-source_env = 'source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta;'  # By default, can be used by anybody
-# source_env = 'source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev;'
-
-# run and batch the selected steps of the code
-DO_r0_to_dl1 = True
-DO_merge_and_copy = True
-DO_TRAIN_PIPE = True
-DO_dl1_to_dl2 = True
-# DO_dl2_to_dl3 = True
-
-#######################################################################################################################
-
-parser = argparse.ArgumentParser(description="MC R0 to DL3 full workflow")
-
-parser.add_argument('--config_file_lst', '-conf_lst', action='store', type=str,
+parser.add_argument('--config_file_lst', '-conf_lst',
+                    action='store',
+                    type=str,
                     dest='config_file_lst',
                     help='Path to a lstchain-like configuration file. '
                          'RF classifier and regressor arguments must be declared here !',
-                    default=None, required=True
+                    default=None,
+                    required=True
                     )
 
-parser.add_argument('--config_file_rta', '-conf_rta', action='store', type=str,
+parser.add_argument('--config_file_rta', '-conf_rta',
+                    action='store',
+                    type=str,
                     dest='config_file_rta',
                     help='Path to a HiPeRTA-like configuration file.'
-                         'Only to be declared if WORKFLOW_KIND = "rta". ',
-                    default=None
-                    )
-
-parser.add_argument('--prod_id', '-pid', action='store', type=str,
-                    dest='prod_id',
-                    help="Production ID. If None, _v00 will be used, indicating an official base production",
+                         'Only to be declared if WORKFLOW_KIND = "hiperta". ',
                     default=None
                     )
 
 # OPTIONAL / ADVANCED ARGUMENTS
 
-parser.add_argument('--no-image', action='store',
+parser.add_argument('--no-image',
+                    action='store',
                     type=lambda x: bool(strtobool(x)),
                     dest='flag_no_image',
-                    help='--no-image argument for merging stage.'
-                         'True will merge dl1 files without image. False will do the oppossite',
+                    help='--no-image argument for the merging stage.'
+                         'True will merge dl1 files without image. False will do the opposite',
                     default=True
                     )
+
 args = parser.parse_args()
 
-#######################################################################################################################
 #######################################################################################################################
 
 if __name__ == '__main__':
 
-    # Global variables
-    today = calendar.datetime.date.today()
-    if WORKFLOW_KIND == 'lst':
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-    elif WORKFLOW_KIND == 'rta':
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
-    suffix_id = '_{}_v00'.format(PROD_TYPE) if args.prod_id is None else '_{}_{}'.format(PROD_TYPE, args.prod_id)
+    # Read MC production configuration file
+    config = parse_config_and_handle_global_vars(args.config_mc_prod)
 
-    PROD_ID = base_prod_id + suffix_id
+    # Load variables
+    prod_id = config['prod_id']
+    prod_type = config['prod_type']
+    workflow_kind = config['workflow_kind']
+    source_env = config['source_environment']
+    stages_to_run = config['stages_to_run']
+    all_particles = config['all_particles']
+    dl0_data_dir = config['DL0_data_dir']
+    dl1_data_dir = config['DL1_data_dir']
+    running_analysis_dir = config['running_analysis_dir']
+    gamma_offs = config['gamma_offs']
 
-    if WORKFLOW_KIND == 'lst':
-        if PROD_TYPE == 'prod5':
-            DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', ZENITH, POINTING)
-        else:
-            DL0_DATA_DIR = os.path.join(BASE_PATH, 'DL0', OBS_DATE, '{}', POINTING)
-    elif WORKFLOW_KIND == 'rta':
-        DL0_DATA_DIR = os.path.join(BASE_PATH, 'R0', OBS_DATE, '{}', POINTING)  ##
+    # Create log files
+    log_file, debug_file, scancel_file = create_log_files(prod_id)
 
-    if PROD_TYPE == 'prod5':
-        RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
-        ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
-        DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', ZENITH, POINTING, PROD_ID)
-    else:
-        RUNNING_ANALYSIS_DIR = os.path.join(BASE_PATH, 'running_analysis', OBS_DATE, '{}', POINTING, PROD_ID)
-        ANALYSIS_LOG_DIR = os.path.join(BASE_PATH, 'analysis_logs', OBS_DATE, '{}', POINTING, PROD_ID)
-        DL1_DATA_DIR = os.path.join(BASE_PATH, 'DL1', OBS_DATE, '{}', POINTING, PROD_ID)
+    # 1 STAGE --> R0/1 to DL1
+    if 'r0_to_dl1' in stages_to_run:
 
-    # #################################################
-    # ########### Beginning of the workflow ###########
-    # #################################################
-
-    print(f'\n\n\t ************ - {WORKFLOW_KIND} - PIPELINE KIND : {PROD_TYPE} - ************ \n\n'
-          f'\nThe full r0 to dl3 workflow is going to be run at \n\n   '
-          f'\t{DL0_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n\n'
-          f'The following directories and all the information within them will be either created or overwritten:\n'
-          f'(subdirectories with a same PROD_ID and analysed the same day)\n\n'
-          f'\t{RUNNING_ANALYSIS_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
-          f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
-          f'\t{DL1_DATA_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}""")).replace("DL1", "DL2")}\n'
-          f'\t{ANALYSIS_LOG_DIR.format(str("""{""") + ",".join(ALL_PARTICLES) + str("""}"""))}\n'
-          f'\n\tPROD_ID to be used: {PROD_ID}\n'
-          )
-
-    query_continue('Are you sure ?')
-
-    log_file = f'./log_onsite_mc_r0_to_dl3_{PROD_TYPE}_{PROD_ID}.yml'
-    debug_file = f'./log_reduced_{PROD_TYPE}_{PROD_ID}.yml'
-
-    # First time opening the log, otherwise --> erase
-    if os.path.exists(log_file):
-        os.remove(log_file)
-    if os.path.exists(debug_file):
-        os.remove(debug_file)
-
-    # Check syntax source_env
-    if source_env.strip()[-1] != ';':
-        source_env = source_env + ';'
-
-    # R0/1 to DL1
-    if DO_r0_to_dl1:
-
-        if WORKFLOW_KIND == 'lst':
+        if workflow_kind == 'lstchain':
 
             log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
-                DL0_DATA_DIR,
+                dl0_data_dir,
                 args.config_file_lst,
-                PROD_ID,
-                ALL_PARTICLES,
+                prod_id,
+                all_particles,
                 source_env=source_env,
-                gamma_offsets=GAMMA_OFFS
+                gamma_offsets=gamma_offs
             )
 
-        elif WORKFLOW_KIND == 'rta':
+        elif workflow_kind == 'hiperta':
 
             log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(
-                DL0_DATA_DIR,
+                dl0_data_dir,
                 args.config_file_rta,
-                PROD_ID,
-                ALL_PARTICLES,
+                prod_id,
+                all_particles,
                 args.config_file_lst
             )
 
         else:
-            sys.exit("Choose a valid WORKFLOW_KIND : 'lst' OR 'rta' ")
+            sys.exit("Choose a valid `workflow_kind` : 'lst' OR 'rta' in the config_MC_prod.yml file ")
 
         save_log_to_file(log_batch_r0_dl1, log_file, log_format='yml', workflow_step='r0_to_dl1')
         save_log_to_file(debug_r0dl1, debug_file, log_format='yml', workflow_step='r0_to_dl1')
+        update_scancel_file(scancel_file, jobs_all_r0_dl1)
 
     else:
         jobs_all_r0_dl1 = ''
         log_batch_r0_dl1 = {}
-        for particle in ALL_PARTICLES:
+        for particle in all_particles:
             log_batch_r0_dl1[particle] = ''
 
-    # Merge,copy and move DL1 files
-    if DO_merge_and_copy:
+    # 2 STAGE --> Merge,copy and move DL1 files
+    if 'merge_and_copy_dl1' in stages_to_run:
+
         log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug_merge = batch_merge_and_copy_dl1(
-            RUNNING_ANALYSIS_DIR,
+            running_analysis_dir,
             log_batch_r0_dl1,
-            ALL_PARTICLES,
+            all_particles,
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=args.flag_no_image,
-            gamma_offsets=GAMMA_OFFS,
-            prod_id=PROD_ID
+            gamma_offsets=gamma_offs,
+            prod_id=prod_id
         )
 
         save_log_to_file(log_batch_merge_and_copy, log_file, log_format='yml', workflow_step='merge_and_copy_dl1')
         save_log_to_file(debug_merge, debug_file, log_format='yml', workflow_step='merge_and_copy_dl1')
+        update_scancel_file(scancel_file, jobs_all_dl1_finished)
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_filenames(DL1_DATA_DIR, ALL_PARTICLES, GAMMA_OFFS)
+        log_batch_merge_and_copy = create_dict_with_filenames(dl1_data_dir, all_particles, gamma_offs)
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
-    # Train pipe
-    if DO_TRAIN_PIPE:
+    # 3 STAGE --> Train pipe
+    if 'train_pipe' in stages_to_run:
+
         log_batch_train_pipe, job_from_train_pipe, model_dir, debug_train = batch_train_pipe(
             log_batch_merge_and_copy,
             args.config_file_lst,
@@ -243,41 +169,44 @@ if __name__ == '__main__':
 
         save_log_to_file(log_batch_train_pipe, log_file, log_format='yml', workflow_step='train_pipe')
         save_log_to_file(debug_train, debug_file, log_format='yml', workflow_step='train_pipe')
+        update_scancel_file(scancel_file, job_from_train_pipe)
 
     else:
         job_from_train_pipe = ''
-        if BASE_PATH == '/fefs/aswg/data/mc':
-            model_dir = os.path.join('/fefs/aswg/data/', 'models', OBS_DATE, POINTING, PROD_ID)
-        else:
-            model_dir = os.path.join(BASE_PATH, 'models', OBS_DATE, POINTING, PROD_ID)
+        model_dir = config['model_dir']
 
-    # DL1 to DL2 stage
-    if DO_dl1_to_dl2:
+    # 4 STAGE --> DL1 to DL2 stage
+    if 'dl1_to_dl2' in stages_to_run:
+
         log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug_dl1dl2 = batch_dl1_to_dl2(
-            DL1_DATA_DIR,
+            dl1_data_dir,
             model_dir,
             args.config_file_lst,
             job_from_train_pipe,       # Single jobid from train
             jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
-            ALL_PARTICLES,
+            all_particles,
             source_env=source_env,
-            gamma_offsets=GAMMA_OFFS
+            gamma_offsets=gamma_offs
         )
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, log_format='yml', workflow_step='dl1_to_dl2')
         save_log_to_file(debug_dl1dl2, debug_file, log_format='yml', workflow_step='dl1_to_dl2')
+        update_scancel_file(scancel_file, jobs_for_dl2_to_dl3)
 
     else:
         jobs_for_dl2_to_dl3 = ''
 
-    # Check DL2 jobs and thus the full workflow has finished correctly
+    # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check = batch_mc_production_check(
         jobs_all_r0_dl1,
         jobs_all_dl1_finished,
         job_from_train_pipe,
         jobs_for_dl2_to_dl3,
-        prod_id=PROD_ID
+        prod_id,
+        log_file,
+        debug_file,
+        scancel_file
     )
 
     save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
