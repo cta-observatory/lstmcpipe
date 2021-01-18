@@ -827,7 +827,7 @@ def update_scancel_file(scancel_filename, jobids_to_update):
     """
     if os.stat(scancel_filename).st_size == 0:
         with open(scancel_filename, 'r+') as f:
-            f.write(f'scancel -n {jobids_to_update}')
+            f.write(f'scancel {jobids_to_update}')
 
     else:
         with open(scancel_filename, 'a') as f:
