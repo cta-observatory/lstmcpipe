@@ -61,8 +61,8 @@ parser.add_argument('--prod_id', action='store', type=str,
                     )
 
 
-def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_files_per_dl1=0, flag_full_workflow=False,
-         particle=None, prod_id=None, source_environment=None, offset=None):
+def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
+         flag_full_workflow=False, particle=None, prod_id=None, source_environment=None, offset=None):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -77,12 +77,22 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
         Ratio of training data. Default = 0.5
     random_seed : int
         Random seed for random processes. Default = 42
-    n_files_per_dl1 : int
-        Number of input files merged in one DL1. If 0, the number of files per DL1 is computed based on the size
-        of the DL0 files and the expected reduction factor of 5 to obtain DL1 files of ~100 MB. Else, use fixed
-        number of files. Default = 0
+    n_r0_files_per_dl1_job : int
+        Number of r0 files processed by r0_to_dl1 batched stage. If set to 0 (Default), see below the `usual
+        production` case.
+
+        If the number of r0 files found in `input_dir` is less than 100, it is consider to be a test on a small
+        production. Therefore, the number of r0 files treated per batched stage will be set to 10.
+
+        Usual productions have =>1000 r0 files, in this case, the number of batched jobs will be fixed to 50 (in case
+        of gamma and electrons), 80 for (gamma-diffuse) and 125 to protons. This means that there will be batched a
+        total of 50+50+80+125 = 305 jobs only for the r0_to_dl1 stage. (there are 1k r0 files for gammas (although 2
+        offsets, thus 2k files), 2k r0 files for gd and e- and 5k for protons).
+
+        Default = 0
+
     particle : str
-        particle type
+        particle type for `flag_full_workflow` = True
     offset : str
         gamma offset
     prod_id :str
@@ -136,9 +146,10 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
-    NFILES_PER_DL1 = n_files_per_dl1
+    #NFILES_PER_DL1 = n_files_per_dl1
+    #DESIRED_DL1_SIZE_MB = 1000
 
-    DESIRED_DL1_SIZE_MB = 1000
+    N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
 
     DL0_DATA_DIR = input_dir
 
@@ -153,11 +164,25 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     raw_files_list = get_input_filelist(DL0_DATA_DIR)
 
-    if NFILES_PER_DL1 == 0:
-        size_dl0 = os.stat(raw_files_list[0]).st_size / 1e6
-        reduction_dl0_dl1 = 5
-        size_dl1 = size_dl0 / reduction_dl0_dl1
-        NFILES_PER_DL1 = max(1, int(DESIRED_DL1_SIZE_MB / size_dl1))
+    if len(raw_files_list) < 100:
+        N_R0_PER_DL1_JOB = 10
+    elif n_r0_files_per_dl1_job == 0:
+        if 'gamma' in input_dir:
+            N_R0_PER_DL1_JOB = 25
+        elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
+            N_R0_PER_DL1_JOB = 50
+        elif 'proton' in input_dir:
+            N_R0_PER_DL1_JOB = 125
+        else:
+            N_R0_PER_DL1_JOB = 50
+    else:
+        N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
+
+    # if NFILES_PER_DL1 == 0:
+    #     size_dl0 = os.stat(raw_files_list[0]).st_size / 1e6
+    #     reduction_dl0_dl1 = 5
+    #     size_dl1 = size_dl0 / reduction_dl0_dl1
+    #     NFILES_PER_DL1 = max(1, int(DESIRED_DL1_SIZE_MB / size_dl1))
 
     random.seed(RANDOM_SEED)
     random.shuffle(raw_files_list)
@@ -185,7 +210,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
     if flag_full_workflow and 'off' in particle:
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
-        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Takes out /off0.Xdeg
+        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
     else:
         RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
@@ -228,11 +253,11 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_fi
 
         print("\toutput dir: \t", output_dir)
 
-        number_of_sublists = len(list_type) // NFILES_PER_DL1 + int(len(list_type) % NFILES_PER_DL1 > 0)
+        number_of_sublists = len(list_type) // N_R0_PER_DL1_JOB + int(len(list_type) % N_R0_PER_DL1_JOB > 0)
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
             with open(output_file, 'w+') as out:
-                for line in list_type[i * NFILES_PER_DL1:NFILES_PER_DL1 * (i + 1)]:
+                for line in list_type[i * N_R0_PER_DL1_JOB:N_R0_PER_DL1_JOB * (i + 1)]:
                     out.write(line)
                     out.write('\n')
         print(f'\t{number_of_sublists} files generated for {set_type} list')
