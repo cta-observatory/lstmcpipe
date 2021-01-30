@@ -160,9 +160,18 @@ def check_job_logs(job_logs_dir):
     for log_filename in job_logs:
         with open(log_filename) as log_file:
             for line in log_file.readlines():
-                if 'Error' in line:
+
+                if 'Remote data cache could not be accessed due to FileNotFoundError' in line or \
+                        "URLError(" in line or \
+                        "<urlopen error Unable to open any source!" in line or \
+                        "ftp error: timeout(" in line:
+
+                    continue  # Known astropy errors, they do not break the workflow
+
+                elif line.startswith('Error') or line.startswith('ERROR') or 'ERROR' in line or 'Error' in line:
                     logs_with_error.append(os.path.basename(log_filename))
                     break
+
     if not logs_with_error == []:
         answer = query_continue("There are errors in the following log files:\n {}\n "
                                 "Are you sure you want to continue?".format(logs_with_error), default="no")
