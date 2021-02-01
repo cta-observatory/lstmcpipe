@@ -116,7 +116,7 @@ def main(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_e
 
     else:  # flag_full_workflow == True !
         # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-        cmd = 'sbatch --parsable -p long --exclude=cp13'
+        cmd = 'sbatch --parsable -p long'
         if wait_ids_proton_and_gammas != '':
             cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
         cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{base_cmd}" '

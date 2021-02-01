@@ -226,7 +226,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 log_merge[particle][set_type]['test_path_and_outname_dl1'] = os.path.join(
                     final_DL1_dir, os.path.basename(output_filename))
 
-            cmd = 'sbatch --parsable -p short --exclude=cp13'
+            cmd = 'sbatch --parsable -p short'
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 

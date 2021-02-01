@@ -524,7 +524,12 @@ def parse_config_and_handle_global_vars(yml_file):
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
-    suffix_id = '_{}_v00'.format(prod_type) if custom_prod_id is None else '_{}_{}'.format(prod_type, custom_prod_id)
+    if 'trans_80' in obs_date:
+        suffix_id = '_{}_trans_80_v00'.format(prod_type) if custom_prod_id is None else '_{}_trans_80_{}'.format(
+            prod_type, custom_prod_id)
+    else:
+        suffix_id = '_{}_v00'.format(prod_type) if custom_prod_id is None else '_{}_{}'.format(prod_type,
+                                                                                               custom_prod_id)
     config['prod_id'] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly
