@@ -132,7 +132,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
 
     if len(raw_files_list) < 100:
         N_R0_PER_DL1_JOB = 10
-    elif args.n_r0_files_per_dl1_job == 0:
+    elif n_r0_files_per_dl1_job == 0:
         if 'gamma' in input_dir:
             N_R0_PER_DL1_JOB = 25
         elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
@@ -142,7 +142,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
         else:
             N_R0_PER_DL1_JOB = 50
     else:
-        N_R0_PER_DL1_JOB = args.n_r0_files_per_dl1_job
+        N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
 
     # if NFILES_PER_DL1 == 0:
     #     size_dl0 = os.stat(raw_files_list[0]).st_size / 1e6
