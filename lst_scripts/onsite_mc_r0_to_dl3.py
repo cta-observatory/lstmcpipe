@@ -118,7 +118,8 @@ if __name__ == '__main__':
                 args.config_file_rta,
                 prod_id,
                 all_particles,
-                args.config_file_lst
+                args.config_file_lst,
+                gamma_offsets=gamma_offs
             )
 
         else:

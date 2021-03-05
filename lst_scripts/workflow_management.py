@@ -78,9 +78,9 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
         else:
             _particle = particle
             log, jobids_by_particle = r0_to_dl1(
-                input_dir.format(particle),  # Particle needs to be gamma w/o off
+                input_dir.format(particle),  # Input dir needs particle gamma w/o off
                 config_file=conf_file,
-                particle=_particle,
+                particle=_particle,          # However _particle will contain the gamma_off
                 prod_id=prod_id,
                 flag_full_workflow=True,
                 source_environment=source_env
@@ -102,7 +102,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 
 
-def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_file_lst):
+def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_file_lst, gamma_offsets=None):
     """
     Function to batch the r0_to_dl1 jobs by particle type, using the HiPeRTA code. Files in input_dir MUST had been
      previously converted to *.h5
@@ -121,6 +121,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
     conf_file_lst : str
         Path to a lstchain configuration. JUST to be copied at the same time as the rta_config to `/running_analysis/`.
+    gamma_offsets : list
 
     Returns
     -------
@@ -141,22 +142,48 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
 
     for particle in particles_loop:
-        log, jobids_by_particle = r0_to_dl1_rta(
-            input_dir.format(particle),
-            config_file=conf_file_rta,
-            prod_id=prod_id,
-            flag_full_workflow=True,
-            lst_config=conf_file_lst
-        )
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
 
-        # Create jobid to full log information dictionary.
-        # And the inverse dictionary, particle to the list of all the jobids of that same particle
-        full_log['log_all_job_ids'].update(log)
-        full_log[particle] = ','.join(jobids_by_particle)
-        all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
+                gamma_input_dir = os.path.join(input_dir, off)
+                _particle = particle + '_' + off
 
-        for jid in jobids_by_particle:
-            debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+                log, jobids_by_particle = r0_to_dl1_rta(
+                    gamma_input_dir.format(particle),  # Input dir needs particle gamma w/o off
+                    particle=_particle,  # However _particle will contain the gamma_off
+                    config_rta_file=conf_file_rta,
+                    prod_id=prod_id,
+                    flag_full_workflow=True,
+                    lst_config=conf_file_lst,
+                    offset=off
+                )
+
+                full_log['log_all_job_ids'].update(log)
+                full_log[_particle] = ','.join(jobids_by_particle)
+                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+
+                for jid in jobids_by_particle:
+                    debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
+
+        else:
+            _particle = particle
+            log, jobids_by_particle = r0_to_dl1_rta(
+                input_dir.format(particle),  # Input dir needs particle gamma w/o off
+                particle=_particle,          # However _particle will contain the gamma_off
+                config_rta_file=conf_file_rta,
+                prod_id=prod_id,
+                flag_full_workflow=True,
+                lst_config=conf_file_lst
+            )
+
+            # Create jobid to full log information dictionary.
+            # And the inverse dictionary, particle to the list of all the jobids of that same particle
+            full_log['log_all_job_ids'].update(log)
+            full_log[_particle] = ','.join(jobids_by_particle)
+            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+
+            for jid in jobids_by_particle:
+                debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
 
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
@@ -517,7 +544,7 @@ def parse_config_and_handle_global_vars(yml_file):
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
     elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA300_v{lstchain.__version__}'
     else:
         print(f'\n\tPlease select an allowed `workflow_kind`: {allowed_workflows} in the config YAML file; {yml_file}.')
         sys.exit(-1)
@@ -590,8 +617,7 @@ def parse_config_and_handle_global_vars(yml_file):
         if workflow_kind == 'lstchain':
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', zenith, pointing)
         else:  # RTA
-            print('HiPeRTA and prod5 not implement yet.')
-            sys.exit(-1)
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', zenith, pointing)
 
         config['running_analysis_dir'] = os.path.join(
             base_path_dl0, 'running_analysis', obs_date, '{}', zenith, pointing, config['prod_id']

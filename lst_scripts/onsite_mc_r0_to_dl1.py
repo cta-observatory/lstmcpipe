@@ -46,11 +46,10 @@ parser.add_argument('--random_seed', '-seed', action='store', type=str,
                     default=42,
                     )
 
-parser.add_argument('--n_files_per_dl1', '-nfdl1', action='store', type=str,
-                    dest='n_files_per_dl1',
-                    help='Number of input files merged in one DL1. If 0, the number of files per DL1 is computed '
-                         'based on the size of the DL0 files and the expected reduction factor of 5 '
-                         'to obtain DL1 files of ~100 MB. Else, use fixed number of files',
+parser.add_argument('--n_r0_files_per_dl1_job', '-nfdl1', action='store', type=str,
+                    dest='n_r0_files_per_dl1_job',
+                    help='Number of r0 files processed by each r0_to_dl1 batched stage. '
+                         'Default values are defined in the script.',
                     default=0,
                     )
 
@@ -78,8 +77,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     random_seed : int
         Random seed for random processes. Default = 42
     n_r0_files_per_dl1_job : int
-        Number of r0 files processed by r0_to_dl1 batched stage. If set to 0 (Default), see below the `usual
-        production` case.
+        Number of r0 files processed by each r0_to_dl1 batched stage. If set to 0 (Default), see below the `usual
+        production` case.n_r0_files_per_dl1_job
 
         If the number of r0 files found in `input_dir` is less than 100, it is consider to be a test on a small
         production. Therefore, the number of r0 files treated per batched stage will be set to 10.
@@ -149,7 +148,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     #NFILES_PER_DL1 = n_files_per_dl1
     #DESIRED_DL1_SIZE_MB = 1000
 
-    N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
+    #N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
 
     DL0_DATA_DIR = input_dir
 
@@ -166,7 +165,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
 
     if len(raw_files_list) < 100:
         N_R0_PER_DL1_JOB = 10
-    elif n_r0_files_per_dl1_job == 0:
+    elif args.n_r0_files_per_dl1_job == 0:
         if 'gamma' in input_dir:
             N_R0_PER_DL1_JOB = 25
         elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
@@ -176,7 +175,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
         else:
             N_R0_PER_DL1_JOB = 50
     else:
-        N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
+        N_R0_PER_DL1_JOB = args.n_r0_files_per_dl1_job
 
     # if NFILES_PER_DL1 == 0:
     #     size_dl0 = os.stat(raw_files_list[0]).st_size / 1e6
