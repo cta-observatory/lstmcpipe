@@ -257,7 +257,9 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
                 job_name = {'electron': 'e_RTA-r0dl1',
                             'gamma': 'g_RTA-r0dl1',
                             'gamma-diffuse': 'gd_RTA-r0dl1',
-                            'proton': 'p_RTA-r0dl1'
+                            'proton': 'p_RTA-r0dl1',
+                            'gamma_off0.0deg': 'g0.0_RTA-r0dl1',
+                            'gamma_off0.4deg': 'g0.4_RTA-r0dl1'
                             }
 
                 if particle == 'proton':

@@ -231,7 +231,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
             cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
-                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="lstchain_merge_hdf5_files -d {tdir} ' \
+                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="x -d {tdir} ' \
                    f'-o {output_filename} --no-image {flag_no_image} --smart {flag_merge}"'
 
             jobid_merge = os.popen(cmd).read().strip('\n')

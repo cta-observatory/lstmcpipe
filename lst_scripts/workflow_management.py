@@ -159,11 +159,11 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
                 )
 
                 full_log['log_all_job_ids'].update(log)
-                full_log[particle] = ','.join(jobids_by_particle)
-                all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
+                full_log[_particle] = ','.join(jobids_by_particle)
+                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
-                    debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+                    debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
 
         else:
             _particle = particle
@@ -179,11 +179,11 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
             # Create jobid to full log information dictionary.
             # And the inverse dictionary, particle to the list of all the jobids of that same particle
             full_log['log_all_job_ids'].update(log)
-            full_log[particle] = ','.join(jobids_by_particle)
-            all_jobids_from_r0_dl1_stage.append(full_log[particle])  # Create a list with particles elements
+            full_log[_particle] = ','.join(jobids_by_particle)
+            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
             for jid in jobids_by_particle:
-                debug_log[jid] = f'{particle} job from r0_to_dl1_RTA'
+                debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
 
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
@@ -544,7 +544,7 @@ def parse_config_and_handle_global_vars(yml_file):
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
     elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA_v{lstchain.__version__}'
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA300_v{lstchain.__version__}'
     else:
         print(f'\n\tPlease select an allowed `workflow_kind`: {allowed_workflows} in the config YAML file; {yml_file}.')
         sys.exit(-1)
