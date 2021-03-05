@@ -617,8 +617,7 @@ def parse_config_and_handle_global_vars(yml_file):
         if workflow_kind == 'lstchain':
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', zenith, pointing)
         else:  # RTA
-            print('HiPeRTA and prod5 not implement yet.')
-            sys.exit(-1)
+            config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', zenith, pointing)
 
         config['running_analysis_dir'] = os.path.join(
             base_path_dl0, 'running_analysis', obs_date, '{}', zenith, pointing, config['prod_id']
