@@ -145,7 +145,8 @@ if __name__ == '__main__':
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=args.flag_no_image,
             gamma_offsets=gamma_offs,
-            prod_id=prod_id
+            prod_id=prod_id,
+            source_env=source_env
         )
 
         save_log_to_file(log_batch_merge_and_copy, log_file, log_format='yml', workflow_step='merge_and_copy_dl1')

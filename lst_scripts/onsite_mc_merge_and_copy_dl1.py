@@ -35,7 +35,7 @@ parser.add_argument('input_dir', type=str,
 
 
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
-         flag_no_image=True, prod_id=None, gamma_offset=None):
+         flag_no_image=True, prod_id=None, gamma_offset=None, source_environment=None):
     """
     Merge and copy DL1 data after production.
 
@@ -77,6 +77,11 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         prod_id for output filename.
     gamma_offset : str
         if gamma files have various off0.Xdeg observations, include the offset within the filename for completeness.
+    source_environment : str
+        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script)
+         to activate a certain conda environment.
+         DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
+        ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
 
     Returns
     -------
@@ -231,8 +236,9 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
             cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
-                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="lstchain_merge_hdf5_files -d {tdir} ' \
-                   f'-o {output_filename} --no-image {flag_no_image} --smart {flag_merge}"'
+                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} ' \
+                   f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
+                   f'--smart {flag_merge}"'
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd

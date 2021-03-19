@@ -192,8 +192,8 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
     return full_log, debug_log, all_jobids_from_r0_dl1_stage
 
 
-def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, smart_merge=False,
-                             no_image_flag=True, prod_id=None, gamma_offsets=None):
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
+                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -219,6 +219,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         list containig the offset of the gammas
     prod_id : str
         TBD
+    source_env : str
+        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
 
     Returns
     -------
@@ -265,7 +267,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     flag_merge=merge_flag,
                     flag_no_image=no_image_flag,
                     prod_id=prod_id,
-                    gamma_offset=off
+                    gamma_offset=off,
+                    source_environment=source_env
                 )
 
                 log_merge_and_copy.update(log)
@@ -289,7 +292,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 particle=_particle,
                 flag_merge=merge_flag,
                 flag_no_image=no_image_flag,
-                prod_id=prod_id
+                prod_id=prod_id,
+                source_environment=source_env
             )
 
             log_merge_and_copy.update(log)
