@@ -5,3 +5,7 @@
 dist
 build
 .pytest_cache
+.DS_Store
+.idea
+__pycache__/
+lst_scripts/__pycache__/
