@@ -791,9 +791,10 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
                 f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
-                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id};' \
-                f'rm {scancel_file} '
-                #f'; mv {log_file} {log_debug_file} logs_{prod_id};'
+                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id}; ' \
+                f'rm {scancel_file}; ' \
+                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; '\
+                f'mv {log_file} {log_debug_file} logs_{prod_id};'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
