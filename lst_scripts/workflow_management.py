@@ -80,7 +80,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
             log, jobids_by_particle = r0_to_dl1(
                 input_dir.format(particle),  # Input dir needs particle gamma w/o off
                 config_file=conf_file,
-                particle=_particle,          # However _particle will contain the gamma_off
+                particle=_particle,  # However _particle will contain the gamma_off
                 prod_id=prod_id,
                 flag_full_workflow=True,
                 source_environment=source_env
@@ -169,7 +169,7 @@ def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_
             _particle = particle
             log, jobids_by_particle = r0_to_dl1_rta(
                 input_dir.format(particle),  # Input dir needs particle gamma w/o off
-                particle=_particle,          # However _particle will contain the gamma_off
+                particle=_particle,  # However _particle will contain the gamma_off
                 config_rta_file=conf_file_rta,
                 prod_id=prod_id,
                 flag_full_workflow=True,
@@ -465,10 +465,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_dl3():
-    pass
-
-
 def load_yml_config(yml_file):
     """
     Reads a yaml file and parses the global variables to run a MC production
@@ -754,13 +750,54 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
     return dl1_filename_directory
 
 
+def batch_dl2_to_irfs(dl2_directory, gamma_offsets, config_file, job_ids_from_dl1_dl2, source_env):
+    """
+    Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+    gamma_offsets: list
+    config_file: str
+    job_ids_from_dl1_dl2: str
+    source_env: str
+
+    Returns
+    -------
+    log_batch_dl2_to_irfs: dict
+    jobs_from_dl2_irf: str
+    debug_dl2_to_irfs: dict
+    """
+    debug_log = {}
+
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    # TODO check tat DL2 files are correctly created ?
+    # How to pass point like and gamma offsets ?
+
+    log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
+        dl2_directory,
+        config_file=config_file,
+        source_environment=source_env,
+        flag_full_workflow=True,
+        wait_ids_dl1_dl2=job_ids_from_dl1_dl2
+    )
+
+    debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                                 f'job_ids; {job_ids_from_dl1_dl2}'
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    return log_dl2_to_irfs, jobid_for_check, debug_log
+
+
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, prod_id, log_file, log_debug_file, scancel_file):
+                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, prod_id, log_file, log_debug_file,
+                              scancel_file):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
     The file will take the form `check_MC_prodID_{prod_id}_OK.txt`
-    # TODO remove logs ? move the logs to the same logs_*_dir ?
 
     Parameters
     ----------
@@ -771,8 +808,9 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_merge :  str
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
-    #log_file: str
-    #log_debug_file: str
+    jobids_from_dl2_to_irf: str
+    log_file: str
+    log_debug_file: str
     scancel_file: str
 
     Returns
@@ -784,7 +822,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log = {}
 
     all_pipeline_jobs = jobids_from_r0_to_dl1 + ',' + jobids_from_merge + ',' + jobids_from_train_pipe + ',' + \
-                        jobids_from_dl1_to_dl2
+                        jobids_from_dl1_to_dl2 + ',' + jobids_from_dl2_to_irf
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
@@ -793,7 +831,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                 f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
                 f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id}; ' \
                 f'rm {scancel_file}; ' \
-                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; '\
+                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
                 f'mv {log_file} {log_debug_file} logs_{prod_id};'
 
     batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
@@ -809,8 +847,9 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log['SUMMARY_merge'] = jobids_from_merge
     debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
     debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
+    debug_log['SUMMARY_dl2_irfs'] = jobids_from_dl2_to_irf
 
-    return debug_log
+    return jobid, debug_log
 
 
 def create_log_files(production_id):
@@ -869,33 +908,3 @@ def update_scancel_file(scancel_filename, jobids_to_update):
         with open(scancel_filename, 'a') as f:
             f.write(f',{jobids_to_update}')
 
-
-# def check_job_output_logs(dict_particle_jobid):
-#     """
-#     # TODO V0.2 - Job management
-#
-#     Parameters
-#     ----------
-#     dict_particle_jobid : dict
-#         Dictionary coming from batch_r0_to_dl1 with all the information and log of that stage, from where the jobids
-#         will be retrieved to be checked.
-#
-#     Returns
-#     -------
-#     ids_single_particle_ok : str
-#         String containing the checked jobids to be passed to the next stage of the workflow (as a slurm dependency)
-#     debug_log : dict
-#             Debug purposes
-#
-#     """
-#     # TODO log_batch_r0_dl1 take place also in the job management
-#
-#     # dictionary by particle with all the jobids corresponding to each particle
-#
-#     jobid_dependecies = ','.join(map(str, dict_particle_jobid.keys()))
-#     cmd = f'sbatch --parsable ---dependency=afterok:{jobid_dependecies} --wrap="python  THE_CODE_TO_PARSE_OUTPUT.py"'
-#     # TODO V0.2 - Job management & THE_CODE_TO_PARSE_OUTPUT.py
-#
-#     ids_single_particle_ok = os.popen(cmd).read().split('\n')
-#
-#     return ids_single_particle_ok
