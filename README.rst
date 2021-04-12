@@ -44,12 +44,14 @@ The ``onsite_mc_r0_to_dl3.py`` script is the **orchestrator** of the pipeline, i
 2. ``onsite_mc_merge_and_copy_dl1.py``
 3. ``onsite_mc_train.py``
 4. ``onsite_mc_dl1_to_dl2.py``
+5. ``onsite_mc_dl2_to_irfs.py``
 
 by using the slurm scheduling job manager system at LP cluster and the dependencies between each stage.
 
 
 Each 'onsite' stage calls a lstchain script; i.e., ``onsite_mc_r0_to_dl1.py`` will call the ``lstchain_mc_r0_to_dl1``
-script, and successively.
+script, and successively. In the ``onsite_mc_dl2_to_irfs`` stage, the ``lstchain_create_irf_file`` lstchain tool is
+invoked.
 
 Configuration of the pipeline
 *****************************
@@ -107,8 +109,9 @@ Steps explanation
     - merge the DL1 files for training and testing
     - clean and move the `running_analysis` into `DL1` and `analysis_logs`
 - `onsite_mc_train.py`
-- `onsite_mc_dl1_to_dl2`
-- `onsite_mc_dl2_to_dl3.py` (TBD)
+- `onsite_mc_dl1_to_dl2.py`
+- `onsite_mc_dl2_to_irfs.py`
+    - runs the lstchain ``lstchain_create_irf_file.py`` tool.
         
 
 Note: by default, some (job heavy) scripts only print the commands instead of executing them for double check.
