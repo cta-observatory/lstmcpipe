@@ -14,6 +14,7 @@ from data_management import (check_and_make_dir,
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 
 parser.add_argument('input_dir', type=str,
+                    dest='input_dir',
                     help='path to the files directory to analyse',
                     )
 
@@ -43,7 +44,6 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
         path to the trained models
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-
     flag_full_workflow : bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     particle : str

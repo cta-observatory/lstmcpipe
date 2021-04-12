@@ -15,6 +15,7 @@ from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from onsite_mc_train import main as train_pipe
 from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
+from onsite_mc_dl2_to_irfs import main as dl2_to_irfs
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
@@ -465,6 +466,46 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
+def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, source_env):
+    """
+    Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+    config_file: str
+    irfs_config: dict
+    job_ids_from_dl1_dl2: str
+    source_env: str
+
+    Returns
+    -------
+    log_batch_dl2_to_irfs: dict
+    jobs_from_dl2_irf: str
+    debug_dl2_to_irfs: dict
+    """
+    debug_log = {}
+
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
+        dl2_directory,
+        config_file=config_file,
+        irf_point_like=irfs_config['point_like'],
+        irf_gamma_offset=irfs_config['gamma_offset'],
+        source_env=source_env,
+        flag_full_workflow=True,
+        wait_jobs_dl1dl2=job_ids_from_dl1_dl2
+    )
+
+    debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                                 f'job_ids; {job_ids_from_dl1_dl2}'
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    return log_dl2_to_irfs, jobid_for_check, debug_log
+
+
 def load_yml_config(yml_file):
     """
     Reads a yaml file and parses the global variables to run a MC production
@@ -577,6 +618,9 @@ def parse_config_and_handle_global_vars(yml_file):
 
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
+
+    # 4.1 - Load IRFs configuration (point-like and gamma-offset)
+    config['irfs_config'] = loaded_config['irf_config']
 
     # 5 - production workflow and type
     config['workflow_kind'] = workflow_kind
@@ -748,47 +792,6 @@ def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None
                 glob.glob(os.path.join(dl1_directory.format(particle), '*testing*.h5'))[0]
 
     return dl1_filename_directory
-
-
-def batch_dl2_to_irfs(dl2_directory, gamma_offsets, config_file, job_ids_from_dl1_dl2, source_env):
-    """
-    Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
-
-    Parameters
-    ----------
-    dl2_directory: str
-    gamma_offsets: list
-    config_file: str
-    job_ids_from_dl1_dl2: str
-    source_env: str
-
-    Returns
-    -------
-    log_batch_dl2_to_irfs: dict
-    jobs_from_dl2_irf: str
-    debug_dl2_to_irfs: dict
-    """
-    debug_log = {}
-
-    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
-
-    # TODO check tat DL2 files are correctly created ?
-    # How to pass point like and gamma offsets ?
-
-    log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
-        dl2_directory,
-        config_file=config_file,
-        source_environment=source_env,
-        flag_full_workflow=True,
-        wait_ids_dl1_dl2=job_ids_from_dl1_dl2
-    )
-
-    debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-                                 f'job_ids; {job_ids_from_dl1_dl2}'
-
-    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
-
-    return log_dl2_to_irfs, jobid_for_check, debug_log
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,

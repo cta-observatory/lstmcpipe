@@ -12,7 +12,6 @@
 #
 # usage:
 # > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
-#       [-pid PROD_ID]
 #
 
 import sys
@@ -92,8 +91,10 @@ if __name__ == '__main__':
     all_particles = config['all_particles']
     dl0_data_dir = config['DL0_data_dir']
     dl1_data_dir = config['DL1_data_dir']
+    dl2_data_dir = config['DL2_data_dir']
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
+    irfs_config = config['irfs_config']
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
@@ -199,17 +200,14 @@ if __name__ == '__main__':
 
     else:
         jobs_from_dl1_dl2 = ''
-        log_batch_dl1_to_dl2 = pass  # TODO create dict with dl2 paths ?
 
     # 5 STAGE --> DL2 to IRFs stage
     if 'dl2_to_irfs' in stages_to_run:
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
             dl2_data_dir,
-            gamma_offs,
+            irfs_config,
             args.config_file_lst,
             jobs_from_dl1_dl2,
-            #log_batch_dl1_to_dl2,       #  really needed ? How do we pass names
-            config['irfs_gamma_point_like'], # Todo how to pass this
             source_env=source_env,
         )
 
@@ -218,7 +216,7 @@ if __name__ == '__main__':
         update_scancel_file(scancel_file, jobs_from_dl2_irf)
 
     else:
-        pass
+        jobs_from_dl2_irf = ''
 
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check, debug_mc_check = batch_mc_production_check(
