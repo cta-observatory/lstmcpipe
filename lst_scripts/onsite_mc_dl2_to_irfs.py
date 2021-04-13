@@ -160,7 +160,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         electron_file = dl2_particle_paths['electron']
 
     else:
-        proton_file = log_from_dl1_dl2['proton']['dl2_test_pathf']
+        proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
         electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
 
         if irf_point_like and irf_gamma_offset == '0.0deg':
