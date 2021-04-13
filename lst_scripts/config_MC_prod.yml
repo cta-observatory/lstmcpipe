@@ -13,12 +13,13 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-prod_id:  # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id:                 # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path_dl0: /fefs/aswg/workspace/MC_data_simlink  # Default user path
   # lstanalyzer user : /fefs/aswg/data/mc
-prod_type: prod5  # Choose between {prod5, prod3}
-obs_date: 20200629_prod5
+prod_type: prod5
+  # Choose between {prod5, prod3}
+obs_date: 20200629_prod5_trans_80
   # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
   # pro3 : `20190415`
 zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
@@ -41,7 +42,7 @@ source_environment:
 
 irf_config:
   point_like: true      # If false, no `--point-like` argument will be passed to `lstchain_create_irf_files`
-  gamma_offset: 0.0deg  # Please select between {0.0deg, 0.4deg}
+  gamma_offset: 0.0deg  # Select between 0.0deg (ON/OFF obs) and 0.4deg (wobble obs).
 
 stages_to_be_run:
   - r0_to_dl1

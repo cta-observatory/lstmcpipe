@@ -24,8 +24,7 @@ from data_management import (check_and_make_dir,
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 
-parser.add_argument('dl2_dir', type=str,
-                    dest='input_dir',
+parser.add_argument('input_dir', type=str,
                     help='path to the DL2 directory to analyse',
                     )
 

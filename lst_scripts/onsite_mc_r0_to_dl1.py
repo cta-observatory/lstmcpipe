@@ -25,7 +25,6 @@ from data_management import (check_data_path,
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
 parser.add_argument('input_dir', type=str,
-                    dest='input_dir',
                     help='path to the files directory to analyse',
                     )
 
