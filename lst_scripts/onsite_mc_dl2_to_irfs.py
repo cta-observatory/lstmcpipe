@@ -190,7 +190,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
     else:  # flag_full_workflow == True !
-        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
+        print(f'\t\tOutput dir IRFs: {output_irfs_dir}')
 
         check_and_make_dir_without_verification(output_irfs_dir)
 

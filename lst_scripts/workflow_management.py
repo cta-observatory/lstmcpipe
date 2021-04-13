@@ -840,7 +840,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                 f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
                 f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl1_to_dl2} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl2_to_irf} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
