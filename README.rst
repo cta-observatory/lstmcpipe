@@ -133,7 +133,8 @@ Steps explanation
     - mandatory arguments: same as tool script mentioned above (gamma, proton and electron DL2)
 
 
- Job dependency between stages is done automatically. Also, the directory structure is created by every stage.
+
+Job dependency between stages is done automatically. Also, the directory structure is created by every stage.
     - If the full workflow is launched, directories will not be verified as containing data. Overwriting will only happen when a MC prods sharing the same ``prod_id`` and analysed the same day is run
     - If each step is launched independently (advanced users), no overwriting directory will take place prior confirmation from the user
 
