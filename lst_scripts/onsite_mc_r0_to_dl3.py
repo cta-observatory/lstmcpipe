@@ -8,11 +8,10 @@
 #   - onsite_mc_merge_and_copy_dl1
 #   - onsite_mc_train
 #   - onsite_mc_dl1_to_dl2
-#   - TODO onsite_mc_dl2_to_irfs # WIP
+#   - onsite_mc_dl2_to_irfs 
 #
 # usage:
 # > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
-#       [-pid PROD_ID]
 #
 
 import sys
@@ -23,8 +22,9 @@ from workflow_management import (batch_r0_to_dl1,
                                  batch_merge_and_copy_dl1,
                                  batch_train_pipe,
                                  batch_dl1_to_dl2,
+                                 batch_dl2_to_irfs,
                                  save_log_to_file,
-                                 create_dict_with_filenames,
+                                 create_dict_with_dl1_filenames,
                                  batch_mc_production_check,
                                  parse_config_and_handle_global_vars,
                                  create_log_files,
@@ -91,8 +91,10 @@ if __name__ == '__main__':
     all_particles = config['all_particles']
     dl0_data_dir = config['DL0_data_dir']
     dl1_data_dir = config['DL1_data_dir']
+    dl2_data_dir = config['DL2_data_dir']
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
+    irfs_config = config['irfs_config']
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
@@ -155,7 +157,7 @@ if __name__ == '__main__':
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_filenames(dl1_data_dir, all_particles, gamma_offs)
+        log_batch_merge_and_copy = create_dict_with_dl1_filenames(dl1_data_dir, all_particles, gamma_offs)
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
@@ -180,7 +182,7 @@ if __name__ == '__main__':
     # 4 STAGE --> DL1 to DL2 stage
     if 'dl1_to_dl2' in stages_to_run:
 
-        log_batch_dl1_to_dl2, jobs_for_dl2_to_dl3, debug_dl1dl2 = batch_dl1_to_dl2(
+        log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
             dl1_data_dir,
             model_dir,
             args.config_file_lst,
@@ -194,21 +196,43 @@ if __name__ == '__main__':
 
         save_log_to_file(log_batch_dl1_to_dl2, log_file, log_format='yml', workflow_step='dl1_to_dl2')
         save_log_to_file(debug_dl1dl2, debug_file, log_format='yml', workflow_step='dl1_to_dl2')
-        update_scancel_file(scancel_file, jobs_for_dl2_to_dl3)
+        update_scancel_file(scancel_file, jobs_from_dl1_dl2)
 
     else:
-        jobs_for_dl2_to_dl3 = ''
+        jobs_from_dl1_dl2 = ''
+        log_batch_dl1_to_dl2 = {}  # Empty log will be manage inside onsite_dl2_irfs
+
+    # 5 STAGE --> DL2 to IRFs stage
+    if 'dl2_to_irfs' in stages_to_run:
+        log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
+            dl2_data_dir,
+            irfs_config,
+            args.config_file_lst,
+            jobs_from_dl1_dl2,
+            log_from_dl1_dl2=log_batch_dl1_to_dl2,
+            source_env=source_env,
+            prod_id=prod_id
+        )
+
+        save_log_to_file(log_batch_dl2_to_irfs, log_file, log_format='yml', workflow_step='dl2_to_irfs')
+        save_log_to_file(debug_dl2_to_irfs, debug_file, log_format='yml', workflow_step='dl2_to_irfs')
+        update_scancel_file(scancel_file, jobs_from_dl2_irf)
+
+    else:
+        jobs_from_dl2_irf = ''
 
     # Check DL2 jobs and the full workflow if it has finished correctly
-    jobid_check = batch_mc_production_check(
+    jobid_check, debug_mc_check = batch_mc_production_check(
         jobs_all_r0_dl1,
         jobs_all_dl1_finished,
         job_from_train_pipe,
-        jobs_for_dl2_to_dl3,
+        jobs_from_dl1_dl2,
+        jobs_from_dl2_irf,
         prod_id,
         log_file,
         debug_file,
         scancel_file
     )
 
-    save_log_to_file(jobid_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
+    save_log_to_file(debug_mc_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
+    update_scancel_file(scancel_file, jobid_check)
