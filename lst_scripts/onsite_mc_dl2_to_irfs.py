@@ -178,9 +178,9 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_irfs_dir}'
     if config_file is not None:
-        cmd += f' -c {config_file}'
+        cmd += f' ---config= {config_file}'
 
-    if flag_full_workflow:
+    if not flag_full_workflow:
         print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
 
         check_and_make_dir(output_irfs_dir)
