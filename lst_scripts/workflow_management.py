@@ -506,6 +506,10 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
         wait_jobs_dl1dl2=job_ids_from_dl1_dl2
     )
 
+    print(f'DEBUG jobid_for_check: {jobid_for_check}')
+    jobid_for_check = ','.join(jobid_for_check)
+    print(f'DEBUG jobid_for_check: {jobid_for_check}')
+
     debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
                                  f'job_ids; {job_ids_from_dl1_dl2}'
 
