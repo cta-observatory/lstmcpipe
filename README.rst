@@ -106,25 +106,25 @@ Steps explanation
 
 - `onsite_mc_r0_to_dl1.py`
     - makes the training / testing separation (set to 0.5 0.5 by default).
-    - performs the `r0_to_dl1` stage for each particle
+    - performs the ``r0_to_dl1`` stage for each particle
     - the number of jobs per particle can be configured
     - mandatory input: directory containing DL0 data that you want to analyse. e.g; ``/fefs/aswg/data/mc/DL0/20190909/proton/North_pointing``
-    - results can be found in `running_analysis`
+    - results can be found in ``running_analysis``
 
 - `onsite_mc_merge_and_copy_dl1.py`
-    - to be run once all jobs from `onsite_mc_dl0_to_dl1.py` are finished
+    - to be run once all jobs from ``onsite_mc_dl0_to_dl1.py`` are finished
     - check that all jobs finished without error from the logs
     - merge the DL1 files for training and testing. Mandatory input: directory containing all the DL1 files to be merged
-    - clean and move the `running_analysis` directory into `DL1` and `analysis_logs`
+    - clean and move the ``running_analysis`` directory into ``DL1`` and ``analysis_logs``
 
 - `onsite_mc_train.py`
     - train three random forest using the merged DL1 merged files. Two RF regressors for Energy and disp_norm reconstruction and a RF gamma/hadron classifier.
-    - models will be stored in the `models` directory
+    - models will be stored in the ``models`` directory
     - mandatory arguments: same as ``lstchain_mc_trainpipe.py`` script (gamma-diffuse and proton DL1 files)
 
 - `onsite_mc_dl1_to_dl2.py`
-    - perform the `dl1_to_dl2` using the trained models and the DL1 data created in previous stages
-    - DL2 data can be found in `DL2` directory
+    - perform the ``dl1_to_dl2`` using the trained models and the DL1 data created in previous stages
+    - DL2 data can be found in ``DL2`` directory
     - mandatory arguments: same as ``lstchain_dl1_to_dl2.py`` script (models and DL1 files)
 
 - `onsite_mc_dl2_to_irfs.py`
@@ -133,7 +133,7 @@ Steps explanation
     - mandatory arguments: same as tool script mentioned above (gamma, proton and electron DL2)
 
 
-Job dependency between stages is done automatically. Also, the directory structure is created by every stage.
+ Job dependency between stages is done automatically. Also, the directory structure is created by every stage.
     - If the full workflow is launched, directories will not be verified as containing data. Overwriting will only happen when a MC prods sharing the same ``prod_id`` and analysed the same day is run
     - If each step is launched independently (advanced users), no overwriting directory will take place prior confirmation from the user
 
