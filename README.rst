@@ -174,7 +174,7 @@ Example of default directory structure for a prod5 MC prod:
 
 
 **Note:** by default, some (job heavy) scripts only print the commands instead of executing them for double check.
-Edit them and uncomment `os.system(cmd)` to execute all.
+Edit them and uncomment ``os.system(cmd)`` to execute all.
 
 
 Real Data analysis
