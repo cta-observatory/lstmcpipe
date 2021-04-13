@@ -219,7 +219,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     gamma_offsets : list
         list containig the offset of the gammas
     prod_id : str
-        TBD
+        prod_id defined in config_MC_prod.yml
     source_env : str
         source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
 
@@ -466,7 +466,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env):
+def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env,
+                      prod_id):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -478,6 +479,7 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     job_ids_from_dl1_dl2: str
     source_env: str
     log_from_dl1_dl2: dict
+    prod_id: str
 
     Returns
     -------
@@ -497,7 +499,8 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
         source_env=source_env,
         flag_full_workflow=True,
         log_from_dl1_dl2=log_from_dl1_dl2,
-        wait_jobs_dl1dl2=job_ids_from_dl1_dl2
+        wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+        prod_id=prod_id
     )
 
     jobid_for_check = ','.join(jobid_for_check)

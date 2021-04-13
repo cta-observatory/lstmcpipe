@@ -103,7 +103,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
 
 
 def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0deg', source_env=None,
-         flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None):
+         flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None, prod_id=''):
     """
     Batches/runs interactively the lstchain `lstchain_create_irf_files` entry point.
     Last stage of the MC prod workflow.
@@ -128,6 +128,8 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
     wait_jobs_dl1dl2: str
         Comma separated string with the job ids of previous stages (dl1_to_dl2 stage) to be passed as dependencies to
         the create_irfs_files job to be batched.
+    prod_id: str
+        prod_id defined within config_MC_prod.yml file
 
     Returns
     -------
@@ -142,6 +144,10 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         exit(-1)
 
     output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
+    if prod_id == '':
+        output_name_irfs = os.path.join(output_irfs_dir, 'irf.fits.gz')
+    else:
+        output_name_irfs = os.path.join(output_irfs_dir, prod_id.replace('.', ''))
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
@@ -176,7 +182,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         point_like = ''
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
-          f' -o {output_irfs_dir}'
+          f' -o {output_name_irfs}'
     if config_file is not None:
         cmd += f' --config={config_file}'
 

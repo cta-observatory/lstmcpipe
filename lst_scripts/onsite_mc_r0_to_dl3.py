@@ -211,6 +211,7 @@ if __name__ == '__main__':
             jobs_from_dl1_dl2,
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
+            prod_id=prod_id
         )
 
         save_log_to_file(log_batch_dl2_to_irfs, log_file, log_format='yml', workflow_step='dl2_to_irfs')
