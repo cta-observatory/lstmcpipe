@@ -70,14 +70,10 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
 
     Returns
     -------
-    irfs_dir: str
-        Path with final IRFs directory
     dl2_particle_paths: dict
         Dictionary containing the path to the DL2 testing files depending on the desired IRF configuration
 
     """
-    irfs_dir = dl2_dir.replace('/DL2/', '/IRF/').replace('/{}/', '/')
-
     # Make particle loop depending on gamma point like
     particles_irfs = ['electron', 'proton']
     if pointlike:
@@ -103,11 +99,11 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
             print(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
             exit(-1)
 
-    return irfs_dir, dl2_particle_paths
+    return dl2_particle_paths
 
 
 def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0deg', source_env=None,
-         flag_full_workflow=False, wait_jobs_dl1dl2=None):
+         flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None):
     """
     Batches/runs interactively the lstchain `lstchain_create_irf_files` entry point.
     Last stage of the MC prod workflow.
@@ -127,6 +123,8 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         a certain conda environment.
     flag_full_workflow: bool
         Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
+    log_from_dl1_dl2: dict
+        Dictionary with dl2 output path. Files are not yet here, but path and full name are needed to batch the job.
     wait_jobs_dl1dl2: str
         Comma separated string with the job ids of previous stages (dl1_to_dl2 stage) to be passed as dependencies to
         the create_irfs_files job to be batched.
@@ -143,25 +141,39 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
+    output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
+
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
 
-    output_irfs_dir, dl2_particle_paths = check_dl2_files(
-        dl2_directory,
-        irf_point_like,
-        irf_gamma_offset)
+    if not flag_full_workflow or log_from_dl1_dl2 == {}:
+        dl2_particle_paths = check_dl2_files(
+            dl2_directory,
+            irf_point_like,
+            irf_gamma_offset)
+
+        # Comprehension list to find gamma or gamma-diffuse
+        gamma_kind = [g for g in dl2_particle_paths.keys() if g.startswith('gamma')][0]
+
+        gamma_file = dl2_particle_paths[gamma_kind]
+        proton_file = dl2_particle_paths['proton']
+        electron_file = dl2_particle_paths['electron']
+
+    else:
+        proton_file = log_from_dl1_dl2['proton']['dl2_dir_and_filename']
+        electron_file = log_from_dl1_dl2['electron']['dl2_dir_and_filename']
+
+        if irf_point_like and irf_gamma_offset == '0.0deg':
+            gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_dir_and_filename']
+        elif irf_point_like and irf_gamma_offset == '0.4deg':
+            gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_dir_and_filename']
+        else:
+            gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_dir_and_filename']
 
     if irf_point_like:
         point_like = '--point-like'
     else:
         point_like = ''
-
-    # Comprehension list to find gamma or gamma-diffuse
-    gamma_kind = [g for g in dl2_particle_paths.keys() if g.startswith('gamma')][0]
-
-    gamma_file = dl2_particle_paths[gamma_kind]
-    proton_file = dl2_particle_paths['proton']
-    electron_file = dl2_particle_paths['electron']
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_irfs_dir}'

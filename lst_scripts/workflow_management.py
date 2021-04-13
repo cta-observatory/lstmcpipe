@@ -466,7 +466,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, source_env):
+def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env ):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -477,6 +477,7 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     irfs_config: dict
     job_ids_from_dl1_dl2: str
     source_env: str
+    log_from_dl1_dl2: dict
 
     Returns
     -------
@@ -488,6 +489,12 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
 
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
 
+    import pprint
+    print(f"DEBUG. irfs_config dict: ")
+    pprint.pprint(irfs_config)
+    print(f"DEBUG. log_from_dl1_dl2 dict:")
+    pprint.pprint(log_from_dl1_dl2)
+
     log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
         dl2_directory,
         config_file=config_file,
@@ -495,6 +502,7 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
         irf_gamma_offset=irfs_config['gamma_offset'],
         source_env=source_env,
         flag_full_workflow=True,
+        log_from_dl1_dl2=log_from_dl1_dl2,
         wait_jobs_dl1dl2=job_ids_from_dl1_dl2
     )
 
@@ -744,7 +752,7 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
             fout.write(pprint.pformat(dict2log))
 
 
-def create_dict_with_filenames(dl1_directory, particles_loop, gamma_offsets=None):
+def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=None):
     """
     Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
     in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow

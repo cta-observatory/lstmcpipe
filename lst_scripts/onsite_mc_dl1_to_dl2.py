@@ -75,7 +75,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
 
     jobid_dl1_to_dl2 : str
         jobid of the batched job to be send (for dependencies purposes) to the next stage of the
-        workflow (#TODO dl2_to_dl3 )
+        workflow (dl2_to_irfs)
 
     """
 
@@ -154,6 +154,7 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
+            log_dl1_to_dl2[particle]['dl2_dir_and_filename'] = os.path.join(output_dir, file.replace('dl1_', 'dl2_'))
             return_jobids.append(jobid_dl1_to_dl2)
 
     # copy this script and config into working dir

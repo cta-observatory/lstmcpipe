@@ -24,7 +24,7 @@ from workflow_management import (batch_r0_to_dl1,
                                  batch_dl1_to_dl2,
                                  batch_dl2_to_irfs,
                                  save_log_to_file,
-                                 create_dict_with_filenames,
+                                 create_dict_with_dl1_filenames,
                                  batch_mc_production_check,
                                  parse_config_and_handle_global_vars,
                                  create_log_files,
@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_filenames(dl1_data_dir, all_particles, gamma_offs)
+        log_batch_merge_and_copy = create_dict_with_dl1_filenames(dl1_data_dir, all_particles, gamma_offs)
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
@@ -200,6 +200,7 @@ if __name__ == '__main__':
 
     else:
         jobs_from_dl1_dl2 = ''
+        log_batch_dl1_to_dl2 = {}  # Empty log will be manage inside onsite_dl2_irfs
 
     # 5 STAGE --> DL2 to IRFs stage
     if 'dl2_to_irfs' in stages_to_run:
@@ -208,6 +209,7 @@ if __name__ == '__main__':
             irfs_config,
             args.config_file_lst,
             jobs_from_dl1_dl2,
+            log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
         )
 
