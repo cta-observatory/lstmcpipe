@@ -103,7 +103,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
 
 
 def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0deg', source_env=None,
-         flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None, prod_id=''):
+         flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None, prod_id=None):
     """
     Batches/runs interactively the lstchain `lstchain_create_irf_files` entry point.
     Last stage of the MC prod workflow.
@@ -144,10 +144,10 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         exit(-1)
 
     output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
-    if prod_id == '':
-        output_name_irfs = os.path.join(output_irfs_dir, 'irf.fits.gz')
+    if prod_id is None:
+        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
     else:
-        output_name_irfs = os.path.join(output_irfs_dir, prod_id.replace('.', ''))
+        output_filename_irf = os.path.join(output_irfs_dir, prod_id.replace('.', '') + '.fits.gz')
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
@@ -182,7 +182,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         point_like = ''
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
-          f' -o {output_name_irfs}'
+          f' -o {output_filename_irf}'
     if config_file is not None:
         cmd += f' --config={config_file}'
 
@@ -196,7 +196,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
     else:  # flag_full_workflow == True !
-        print(f'\t\tOutput dir IRFs: {output_irfs_dir}')
+        print(f'\tOutput dir IRFs: {output_irfs_dir}')
 
         check_and_make_dir_without_verification(output_irfs_dir)
 
