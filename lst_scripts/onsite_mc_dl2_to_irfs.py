@@ -160,15 +160,15 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         electron_file = dl2_particle_paths['electron']
 
     else:
-        proton_file = log_from_dl1_dl2['proton']['dl2_dir_and_filename']
-        electron_file = log_from_dl1_dl2['electron']['dl2_dir_and_filename']
+        proton_file = log_from_dl1_dl2['proton']['dl2_test_pathf']
+        electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
 
         if irf_point_like and irf_gamma_offset == '0.0deg':
-            gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_dir_and_filename']
+            gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
         elif irf_point_like and irf_gamma_offset == '0.4deg':
-            gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_dir_and_filename']
+            gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
         else:
-            gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_dir_and_filename']
+            gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
 
     if irf_point_like:
         point_like = '--point-like'
@@ -178,7 +178,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_irfs_dir}'
     if config_file is not None:
-        cmd += f' ---config= {config_file}'
+        cmd += f' --config={config_file}'
 
     if not flag_full_workflow:
         print(f"\n ==== START {os.path.basename(__file__)} ==== \n")

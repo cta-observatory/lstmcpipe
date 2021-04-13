@@ -154,7 +154,8 @@ def main(input_dir, path_models, config_file, flag_full_workflow=False, particle
             jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip('\n')
 
             log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
-            log_dl1_to_dl2[particle]['dl2_dir_and_filename'] = os.path.join(output_dir, file.replace('dl1_', 'dl2_'))
+            if 'testing' in file:
+                log_dl1_to_dl2[particle]['dl2_test_path'] = file.replace('/DL1/', '/DL2/').replace('dl1_', 'dl2_')
             return_jobids.append(jobid_dl1_to_dl2)
 
     # copy this script and config into working dir

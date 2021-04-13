@@ -466,7 +466,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env ):
+def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -489,12 +489,6 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
 
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
 
-    import pprint
-    print(f"DEBUG. irfs_config dict: ")
-    pprint.pprint(irfs_config)
-    print(f"DEBUG. log_from_dl1_dl2 dict:")
-    pprint.pprint(log_from_dl1_dl2)
-
     log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
         dl2_directory,
         config_file=config_file,
@@ -506,10 +500,7 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
         wait_jobs_dl1dl2=job_ids_from_dl1_dl2
     )
 
-    print(f'DEBUG jobid_for_check: {jobid_for_check}')
     jobid_for_check = ','.join(jobid_for_check)
-    print(f'DEBUG jobid_for_check: {jobid_for_check}')
-
     debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
                                  f'job_ids; {job_ids_from_dl1_dl2}'
 
