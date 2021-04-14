@@ -1,5 +1,5 @@
-LST scripts
-===========
+LST-I-RF
+========
 
 .. image:: https://travis-ci.com/cta-observatory/lst-i-rf.svg?branch=master
     :target: https://travis-ci.com/github/cta-observatory/lst-i-rf

@@ -14,12 +14,12 @@
 import os
 import shutil
 import argparse
-from data_management import (check_job_logs,
-                             read_lines_file,
-                             check_files_in_dir_from_file,
-                             query_continue,
-                             check_and_make_dir,
-                             move_dir_content)
+from .data_management import (check_job_logs,
+                              read_lines_file,
+                              check_files_in_dir_from_file,
+                              query_continue,
+                              check_and_make_dir,
+                              move_dir_content)
 
 parser = argparse.ArgumentParser(description="Merge and copy DL1 data after production. \n"
                                              " 1. check job_logs \n"

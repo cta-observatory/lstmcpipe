@@ -9,7 +9,7 @@ import argparse
 import numpy as np
 from astropy.table import Table, vstack, join
 from astropy.io.misc.hdf5 import write_table_hdf5
-from lst_scripts.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
+from .reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
 
 parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                              "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")

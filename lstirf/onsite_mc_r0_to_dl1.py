@@ -15,12 +15,12 @@ import random
 import argparse
 import calendar
 import lstchain
-from data_management import (check_data_path,
-                             get_input_filelist,
-                             check_and_make_dir,
-                             check_and_make_dir_without_verification,
-                             manage_source_env_r0_dl1
-                             )
+from .data_management import (check_data_path,
+                              get_input_filelist,
+                              check_and_make_dir,
+                              check_and_make_dir_without_verification,
+                              manage_source_env_r0_dl1
+                              )
 
 parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
