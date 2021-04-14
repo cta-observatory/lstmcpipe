@@ -1,7 +1,7 @@
 LST scripts
 ===========
 
-.. image:: https://travis-ci.com/github/cta-observatory/lst-i-rf.svg?branch=master
+.. image:: https://travis-ci.com/cta-observatory/lst-i-rf.svg?branch=master
     :target: https://travis-ci.com/github/cta-observatory/lst-i-rf
 
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
