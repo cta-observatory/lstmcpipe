@@ -3,7 +3,7 @@
 # E. Garcia, 12/02/2020
 
 import argparse
-from lst_scripts.data_management import move_dir_content, check_and_make_dir_without_verification
+from .data_management import move_dir_content, check_and_make_dir_without_verification
 import os
 import shutil
 from distutils.util import strtobool

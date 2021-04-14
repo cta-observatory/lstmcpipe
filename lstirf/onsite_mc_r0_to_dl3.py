@@ -17,19 +17,19 @@
 import sys
 import argparse
 from distutils.util import strtobool
-from workflow_management import (batch_r0_to_dl1,
-                                 batch_r0_to_dl1_rta,
-                                 batch_merge_and_copy_dl1,
-                                 batch_train_pipe,
-                                 batch_dl1_to_dl2,
-                                 batch_dl2_to_irfs,
-                                 save_log_to_file,
-                                 create_dict_with_dl1_filenames,
-                                 batch_mc_production_check,
-                                 parse_config_and_handle_global_vars,
-                                 create_log_files,
-                                 update_scancel_file
-                                 )
+from .workflow_management import (batch_r0_to_dl1,
+                                  batch_r0_to_dl1_rta,
+                                  batch_merge_and_copy_dl1,
+                                  batch_train_pipe,
+                                  batch_dl1_to_dl2,
+                                  batch_dl2_to_irfs,
+                                  save_log_to_file,
+                                  create_dict_with_dl1_filenames,
+                                  batch_mc_production_check,
+                                  parse_config_and_handle_global_vars,
+                                  create_log_files,
+                                  update_scancel_file
+                                  )
 
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")

@@ -9,13 +9,13 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from data_management import query_continue
-from onsite_mc_r0_to_dl1 import main as r0_to_dl1
-from onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
-from onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
-from onsite_mc_train import main as train_pipe
-from onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
-from onsite_mc_dl2_to_irfs import main as dl2_to_irfs
+from .data_management import query_continue
+from .onsite_mc_r0_to_dl1 import main as r0_to_dl1
+from .onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
+from .onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
+from .onsite_mc_train import main as train_pipe
+from .onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
+from .onsite_mc_dl2_to_irfs import main as dl2_to_irfs
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
