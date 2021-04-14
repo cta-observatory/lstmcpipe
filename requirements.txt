@@ -1,1 +1,1 @@
-cython
+ - git+https://github.com/cta-observatory/cta-lstchain.git@v0.7.2

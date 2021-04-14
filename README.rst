@@ -1,8 +1,8 @@
 LST scripts
 ===========
 
-.. image:: https://travis-ci.com/vuillaut/LST_scripts.svg?branch=master
-    :target: https://travis-ci.com/vuillaut/LST_scripts
+.. image:: https://travis-ci.com/github/cta-observatory/lst-i-rf.svg?branch=master
+    :target: https://travis-ci.com/github/cta-observatory/lst-i-rf
 
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
@@ -16,9 +16,9 @@ Install
 
 .. code-block::
 
-    git clone https://github.com/vuillaut/LST_scripts.git 
-    cd LST_scripts 
-    pip install .    
+    git clone https://github.com/cta-observatory/lst-i-rf.git
+    cd lst-i-rf
+    pip install .
 
 
 You can install this library as an independent package (Note that it uses various ``lstchain_*`` scripts).
