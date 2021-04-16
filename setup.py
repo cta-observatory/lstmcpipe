@@ -5,7 +5,7 @@ import os
 import re
 from setuptools import setup, find_packages
 
-with open("lstirf/__init__.py") as f:
+with open("lstmcpipe/__init__.py") as f:
     __version__ = re.search('^__version__ = "(.*)"$', f.read()).group(1)
 
 
@@ -24,10 +24,10 @@ def readfile(filename):
         return f.read()
 
 
-scripts_list = find_scripts('lstirf', 'onsite_')
+scripts_list = find_scripts('lstmcpipe', 'onsite_')
 
-setup(name='lst_scripts',
-      version=get_property('__version__', 'lstirf'),
+setup(name='lstmcpipe',
+      version=get_property('__version__', 'lstmcpipe'),
       description="MC production with lstchain on LST cluster (La Palma)",
       install_requires=[
           'lstchain',
@@ -36,7 +36,7 @@ setup(name='lst_scripts',
       # tests_require=['pytest'],
       author='Thomas Vuillaume',
       author_email='thomas.vuillaume@lapp.in2p3.fr',
-      url='https://github.com/cta-observatory/lst-i-rf',
+      url='https://github.com/cta-observatory/lstmcpipe',
       long_description=readfile('README.rst'),
       license='MIT',
       classifiers=[
