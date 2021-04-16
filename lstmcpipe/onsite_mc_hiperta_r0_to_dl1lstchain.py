@@ -15,11 +15,12 @@ import random
 import argparse
 import calendar
 from distutils.util import strtobool
-from .data_management import (check_data_path,
-                              get_input_filelist,
-                              check_and_make_dir,
-                              check_and_make_dir_without_verification
-                              )
+from lstmcpipe.data_management import (
+    check_data_path,
+    get_input_filelist,
+    check_and_make_dir,
+    check_and_make_dir_without_verification
+)
 
 parser = argparse.ArgumentParser(description="MC R0 to DL1 - MC onsite conversion")
 

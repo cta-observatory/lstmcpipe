@@ -8,4 +8,4 @@ build
 .DS_Store
 .idea
 __pycache__/
-lst_scripts/__pycache__/
+lstmcpipe/__pycache__/
