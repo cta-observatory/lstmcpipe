@@ -7,10 +7,11 @@
 import os
 import shutil
 import argparse
-from .data_management import (check_and_make_dir,
-                              query_continue,
-                              check_and_make_dir_without_verification
-                              )
+from lstmcpipe.data_management import (
+    check_and_make_dir,
+    query_continue,
+    check_and_make_dir_without_verification
+)
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 

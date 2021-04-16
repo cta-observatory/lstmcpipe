@@ -18,9 +18,10 @@ import glob
 import shutil
 import argparse
 from distutils.util import strtobool
-from .data_management import (check_and_make_dir,
-                              check_and_make_dir_without_verification
-                              )
+from lstmcpipe.data_management import (
+    check_and_make_dir,
+    check_and_make_dir_without_verification
+)
 
 parser = argparse.ArgumentParser(description="Convert onsite files from dl1 to dl2")
 
