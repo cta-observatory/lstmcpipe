@@ -1,8 +1,8 @@
-LST-I-RF
-========
+lstMCpipe
+=========
 
-.. image:: https://travis-ci.com/cta-observatory/lst-i-rf.svg?branch=master
-    :target: https://travis-ci.com/github/cta-observatory/lst-i-rf
+.. image:: https://travis-ci.com/cta-observatory/lstmcpipe.svg?branch=master
+    :target: https://travis-ci.com/github/cta-observatory/lstmcpipe
 
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 
@@ -16,7 +16,7 @@ Install
 
 .. code-block::
 
-    git clone https://github.com/cta-observatory/lst-i-rf.git
+    git clone https://github.com/cta-observatory/lstmcpipe.git
     cd lst-i-rf
     pip install .
 
