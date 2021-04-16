@@ -17,7 +17,7 @@ Install
 .. code-block::
 
     git clone https://github.com/cta-observatory/lstmcpipe.git
-    cd lst-i-rf
+    cd lstmcpipe
     pip install .
 
 
