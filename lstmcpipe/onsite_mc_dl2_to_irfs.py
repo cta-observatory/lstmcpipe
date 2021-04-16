@@ -145,10 +145,6 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         exit(-1)
 
     output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
-    if prod_id is None:
-        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
-    else:
-        output_filename_irf = os.path.join(output_irfs_dir, prod_id.replace('.', '') + '.fits.gz')
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
@@ -181,6 +177,21 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         point_like = '--point-like'
     else:
         point_like = ''
+
+    # Final outfile name with IRF kind
+    if prod_id is None:
+        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
+    else:
+        if irf_point_like:
+            output_filename_irf = os.path.join(
+                output_irfs_dir,
+                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset}.fits.gz'
+            )
+        else:
+            output_filename_irf = os.path.join(
+                output_irfs_dir,
+                'irf_' + prod_id.replace('.', '') + f'gamma_diffuse.fits.gz'
+            )
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_filename_irf}'
