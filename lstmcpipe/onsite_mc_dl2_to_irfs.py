@@ -185,7 +185,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         if irf_point_like:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset}.fits.gz'
+                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset.replace(".", "")}.fits.gz'
             )
         else:
             output_filename_irf = os.path.join(
