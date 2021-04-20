@@ -144,7 +144,12 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
         print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
-    output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
+    if irf_point_like:
+        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
+                                       irf_gamma_offset)
+    else:
+        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
+                                       'diffuse')
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
