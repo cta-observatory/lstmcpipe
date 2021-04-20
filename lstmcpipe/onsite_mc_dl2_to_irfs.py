@@ -49,7 +49,7 @@ parser.add_argument('--gamma_offset', '-offset', action='store', type=str,
                     dest='gamma_offset',
                     help='If point-like IRF argument selected, gamma offset can be configure:\n'
                          ' - "off0.0deg" for ON/OFF observation, \n'
-                         ' - "iff0.4deg" for wobble observations. \n'
+                         ' - "off0.4deg" for wobble observations. \n'
                          'Default="0.0deg"',
                     default='0.0deg',
                     )
