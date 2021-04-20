@@ -95,7 +95,6 @@ if __name__ == '__main__':
     dl2_data_dir = config['DL2_data_dir']
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
-    irfs_config = config['irfs_config']
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
@@ -207,7 +206,8 @@ if __name__ == '__main__':
     if 'dl2_to_irfs' in stages_to_run:
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
             dl2_data_dir,
-            irfs_config,
+            all_particles,
+            gamma_offs,
             args.config_file_lst,
             jobs_from_dl1_dl2,
             log_from_dl1_dl2=log_batch_dl1_to_dl2,

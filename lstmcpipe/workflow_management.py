@@ -466,8 +466,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env,
-                      prod_id):
+def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
+                      log_from_dl1_dl2, source_env, prod_id):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -475,7 +475,8 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     ----------
     dl2_directory: str
     config_file: str
-    irfs_config: dict
+    loop_particles: list
+    offset_gammas: list
     job_ids_from_dl1_dl2: str
     source_env: str
     log_from_dl1_dl2: dict
@@ -487,25 +488,50 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     jobs_from_dl2_irf: str
     debug_dl2_to_irfs: dict
     """
-    debug_log = {}
-
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
 
-    log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
-        dl2_directory,
-        config_file=config_file,
-        irf_point_like=irfs_config['point_like'],
-        irf_gamma_offset=irfs_config['gamma_offset'],
-        source_env=source_env,
-        flag_full_workflow=True,
-        log_from_dl1_dl2=log_from_dl1_dl2,
-        wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-        prod_id=prod_id
-    )
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_irfs = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=True,
+            irf_gamma_offset=off,
+            config_file=config_file,
+            source_env=source_env,
+            flag_full_workflow=True,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    if 'gamma-diffuse' in loop_particles:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=False,
+            config_file=config_file,
+            source_env=source_env,
+            flag_full_workflow=True,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma-diffuse'] = log
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
 
     jobid_for_check = ','.join(jobid_for_check)
-    debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-                                 f'job_ids; {job_ids_from_dl1_dl2}'
 
     print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
 
@@ -625,9 +651,6 @@ def parse_config_and_handle_global_vars(yml_file):
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
 
-    # 4.1 - Load IRFs configuration (point-like and gamma-offset)
-    config['irfs_config'] = loaded_config['irf_config']
-
     # 5 - production workflow and type
     config['workflow_kind'] = workflow_kind
     config['prod_type'] = prod_type
@@ -650,6 +673,9 @@ def parse_config_and_handle_global_vars(yml_file):
         )
         config['DL2_data_dir'] = os.path.join(
             base_path_dl0, 'DL2', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['IRFs_dir'] = os.path.join(
+            base_path_dl0, 'IRF', obs_date, pointing, config['prod_id']
         )
 
         if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
@@ -681,6 +707,9 @@ def parse_config_and_handle_global_vars(yml_file):
         config['DL2_data_dir'] = os.path.join(
             base_path_dl0, 'DL2', obs_date, '{}', zenith, pointing, config['prod_id']
         )
+        config['IRFs_dir'] = os.path.join(
+            base_path_dl0, 'IRF', obs_date, zenith, pointing, config['prod_id']
+        )
 
         if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
             config['model_dir'] = os.path.join(
@@ -701,6 +730,7 @@ def parse_config_and_handle_global_vars(yml_file):
           f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["IRFs_dir"]}\n'
           f'\t{config["model_dir"]}\n'
           f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
           )

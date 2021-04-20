@@ -40,10 +40,6 @@ source_environment:
   #   source_file: /fefs/home/enrique.garcia/.bashrc
   #   conda_env: lst-dev
 
-irf_config:
-  point_like: true      # If false, no `--point-like` argument will be passed to `lstchain_create_irf_files`
-  gamma_offset: 0.0deg  # Select between 0.0deg (ON/OFF obs) and 0.4deg (wobble obs).
-
 stages_to_be_run:
   - r0_to_dl1
   - merge_and_copy_dl1
