@@ -167,7 +167,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
         proton_file = dl2_particle_paths['proton']
         electron_file = dl2_particle_paths['electron']
 
-        name_tag_slurm = gamma_kind
+        irf_kind = gamma_kind
 
     else:
         proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
@@ -175,13 +175,13 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
 
         if irf_point_like and irf_gamma_offset == 'off0.0deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
-            name_tag_slurm = irf_gamma_offset
+            irf_kind = irf_gamma_offset
         elif irf_point_like and irf_gamma_offset == 'off0.4deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
-            name_tag_slurm = irf_gamma_offset
+            irf_kind = irf_gamma_offset
         else:
             gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
-            name_tag_slurm = 'diffuse'
+            irf_kind = 'diffuse'
 
     if irf_point_like:
         point_like = '--point-like'
@@ -218,14 +218,14 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
         print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
     else:  # flag_full_workflow == True !
-        print(f'\tOutput dir IRFs: {output_irfs_dir}')
+        print(f'\tOutput dir IRF {irf_kind}: {output_irfs_dir}')
 
         check_and_make_dir_without_verification(output_irfs_dir)
 
         jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.e")
         jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.o")
 
-        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{name_tag_slurm}' \
+        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{irf_kind}' \
                     f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
 
         job_id_dl2_irfs = os.popen(batch_cmd).read().strip('\n')
