@@ -145,10 +145,6 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         exit(-1)
 
     output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
-    if prod_id is None:
-        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
-    else:
-        output_filename_irf = os.path.join(output_irfs_dir, prod_id.replace('.', '') + '.fits.gz')
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
@@ -166,21 +162,41 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         proton_file = dl2_particle_paths['proton']
         electron_file = dl2_particle_paths['electron']
 
+        name_tag_slurm = gamma_kind
+
     else:
         proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
         electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
 
         if irf_point_like and irf_gamma_offset == '0.0deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
+            name_tag_slurm = irf_gamma_offset
         elif irf_point_like and irf_gamma_offset == '0.4deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
+            name_tag_slurm = irf_gamma_offset
         else:
             gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
+            name_tag_slurm = 'diffuse'
 
     if irf_point_like:
         point_like = '--point-like'
     else:
         point_like = ''
+
+    # Final outfile name with IRF kind
+    if prod_id is None:
+        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
+    else:
+        if irf_point_like:
+            output_filename_irf = os.path.join(
+                output_irfs_dir,
+                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset.replace(".", "")}.fits.gz'
+            )
+        else:
+            output_filename_irf = os.path.join(
+                output_irfs_dir,
+                'irf_' + prod_id.replace('.', '') + f'gamma_diffuse.fits.gz'
+            )
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_filename_irf}'
@@ -204,7 +220,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.e")
         jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.o")
 
-        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRFs' \
+        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{name_tag_slurm}' \
                     f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
 
         job_id_dl2_irfs = os.popen(batch_cmd).read().strip('\n')
