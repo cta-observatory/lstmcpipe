@@ -243,7 +243,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
 
             # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
             cc = ' -c {}'.format(config_rta_file) if config_rta_file is not None else ' '
-            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/LST_scripts/lst_scripts/' \
+            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/lstmcpipe/lstmcpipe/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
