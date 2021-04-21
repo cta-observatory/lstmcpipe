@@ -426,11 +426,12 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
 
 
 
-def main(filename):
+def main(filename, outfile):
     
     axes = plot_summary_from_file(filename)
     
-    plt.savefig('irfs.png')
+    os.makedirs(os.path.dirname(outfile), exist_ok=True)
+    plt.savefig(outfile)
     
     
 if __name__ == '__main__':
@@ -442,8 +443,9 @@ if __name__ == '__main__':
 
     # Required arguments
     parser.add_argument('filename')
+    parser.add_argument('outfile')
 
     args = parser.parse_args()
     
-    main(args.filename)
+    main(args.filename, args.outfile)
     
