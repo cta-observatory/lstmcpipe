@@ -39,7 +39,8 @@ if __name__ == '__main__':
 
     else:  # Re use the same script to copy the config file to the final_dir
 
-        # HiPeRTA config is *.txt
-        config_files = [os.path.join(args.source, f) for f in os.listdir(args.source) if f.endswith(('.json', '.txt'))]
+        # HiPeRTA config is *.txt (<v4.0.0), otherwise is *.yml
+        config_files = [os.path.join(args.source, f) for f in os.listdir(args.source)
+                        if f.endswith(('.json', '.txt')) or f.startswith('hiperta_conf*.yml')]
         for file in config_files:
             shutil.copyfile(file, os.path.join(args.dest, os.path.basename(file)))
