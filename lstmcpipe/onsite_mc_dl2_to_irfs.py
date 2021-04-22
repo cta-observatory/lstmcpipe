@@ -48,8 +48,8 @@ parser.add_argument('--point_like', '-p', action='store',
 parser.add_argument('--gamma_offset', '-offset', action='store', type=str,
                     dest='gamma_offset',
                     help='If point-like IRF argument selected, gamma offset can be configure:\n'
-                         ' - "0.0deg" for ON/OFF observation, \n'
-                         ' - "0.4deg" for wobble observations. \n'
+                         ' - "off0.0deg" for ON/OFF observation, \n'
+                         ' - "off0.4deg" for wobble observations. \n'
                          'Default="0.0deg"',
                     default='0.0deg',
                     )
@@ -87,7 +87,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
         dl2_particle_paths[particle] = {}
 
         if particle == 'gamma':
-            particle_dir_dl2 = os.path.join(dl2_dir.format(particle), f'off{gamma_off}')
+            particle_dir_dl2 = os.path.join(dl2_dir.format(particle), f'{gamma_off}')
         else:
             particle_dir_dl2 = dl2_dir.format(particle)
 
@@ -103,7 +103,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
     return dl2_particle_paths
 
 
-def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0deg', source_env=None,
+def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0.0deg', source_env=None,
          flag_full_workflow=False, log_from_dl1_dl2={}, wait_jobs_dl1dl2=None, prod_id=None):
     """
     Batches/runs interactively the lstchain `lstchain_create_irf_files` entry point.
@@ -118,7 +118,7 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
     irf_point_like: bool
         MC prod configuration argument to create IRFs: {True: gamma, False: gamma-diffuse}.
     irf_gamma_offset: str
-        MC prod configuration argument to create IRFs: 0.0deg (for ON/OFF obs) or 0.4deg (for wobble obs).
+        MC prod configuration argument to create IRFs: off0.0deg (for ON/OFF obs) or off0.4deg (for wobble obs).
     source_env: str
         path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script) to activate
         a certain conda environment.
@@ -136,15 +136,20 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
     -------
     log_dl2_to_irfs: dict
         Dictionary-wise log containing {'job_id': 'batched_cmd'}
-    list_job_id_dl2_irfs: list
+    list_job_id_dl2_irfs: str
         Job-ids of the batched job to be passed to the last (MC prod check) stage of the workflow.
     """
-    allowed_gamma_off = ['0.0deg', '0.4deg']
+    allowed_gamma_off = ['off0.0deg', 'off0.4deg']
     if irf_gamma_offset not in allowed_gamma_off:
         print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
-    output_irfs_dir = dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/')
+    if irf_point_like:
+        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
+                                       irf_gamma_offset)
+    else:
+        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
+                                       'diffuse')
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
@@ -162,21 +167,21 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         proton_file = dl2_particle_paths['proton']
         electron_file = dl2_particle_paths['electron']
 
-        name_tag_slurm = gamma_kind
+        irf_kind = gamma_kind
 
     else:
         proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
         electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
 
-        if irf_point_like and irf_gamma_offset == '0.0deg':
+        if irf_point_like and irf_gamma_offset == 'off0.0deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
-            name_tag_slurm = irf_gamma_offset
-        elif irf_point_like and irf_gamma_offset == '0.4deg':
+            irf_kind = irf_gamma_offset
+        elif irf_point_like and irf_gamma_offset == 'off0.4deg':
             gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
-            name_tag_slurm = irf_gamma_offset
+            irf_kind = irf_gamma_offset
         else:
             gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
-            name_tag_slurm = 'diffuse'
+            irf_kind = 'diffuse'
 
     if irf_point_like:
         point_like = '--point-like'
@@ -190,12 +195,12 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         if irf_point_like:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset.replace(".", "")}.fits.gz'
+                'irf_' + prod_id.replace('.', '') + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz'
             )
         else:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'gamma_diffuse.fits.gz'
+                'irf_' + prod_id.replace('.', '') + f'_gamma_diffuse.fits.gz'
             )
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
@@ -213,14 +218,14 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
 
     else:  # flag_full_workflow == True !
-        print(f'\tOutput dir IRFs: {output_irfs_dir}')
+        print(f'\tOutput dir IRF {irf_kind}: {output_irfs_dir}')
 
         check_and_make_dir_without_verification(output_irfs_dir)
 
         jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.e")
         jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.o")
 
-        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{name_tag_slurm}' \
+        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{irf_kind}' \
                     f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
 
         job_id_dl2_irfs = os.popen(batch_cmd).read().strip('\n')
@@ -234,6 +239,8 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='0.0d
         shutil.copyfile(config_file, os.path.join(output_irfs_dir, os.path.basename(config_file)))
 
     if flag_full_workflow:
+
+        list_job_id_dl2_irfs = ','.join(list_job_id_dl2_irfs)
         return log_dl2_to_irfs, list_job_id_dl2_irfs
 
 
