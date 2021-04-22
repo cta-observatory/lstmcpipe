@@ -18,7 +18,7 @@ import glob
 import shutil
 import argparse
 from distutils.util import strtobool
-from .io.data_management import (
+from lstmcpipe.io.data_management import (
     check_and_make_dir,
     check_and_make_dir_without_verification
 )

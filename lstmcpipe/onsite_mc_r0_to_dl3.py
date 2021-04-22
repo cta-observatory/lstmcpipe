@@ -17,7 +17,7 @@
 import sys
 import argparse
 from distutils.util import strtobool
-from .workflow_management import (
+from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
     batch_r0_to_dl1_rta,
     batch_merge_and_copy_dl1,
