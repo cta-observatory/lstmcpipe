@@ -15,7 +15,7 @@ import random
 import argparse
 import calendar
 from distutils.util import strtobool
-from lstmcpipe.data_management import (
+from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
     check_and_make_dir,
@@ -243,7 +243,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
 
             # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
             cc = ' -c {}'.format(config_rta_file) if config_rta_file is not None else ' '
-            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/lstmcpipe/lstmcpipe/' \
+            base_cmd = f'core_list_hiperta.sh "/home/enrique.garcia/software/lstmcpipe/lstmcpipe/hiperta/' \
                        f'hiperta_r0_to_dl1lstchain.py -o {output_dir} -k {keep_rta_file} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
@@ -266,7 +266,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
                 if particle == 'proton':
                     queue = 'long'
                 else:
-                    queue = 'long'  # TODO change to short after prod5 check
+                    queue = 'short'
 
                 cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
                       f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'

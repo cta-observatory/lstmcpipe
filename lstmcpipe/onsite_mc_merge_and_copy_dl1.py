@@ -14,7 +14,7 @@
 import os
 import shutil
 import argparse
-from lstmcpipe.data_management import (
+from lstmcpipe.io.data_management import (
     check_job_logs,
     read_lines_file,
     check_files_in_dir_from_file,
