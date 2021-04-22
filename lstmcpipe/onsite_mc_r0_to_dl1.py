@@ -15,7 +15,7 @@ import random
 import argparse
 import calendar
 import lstchain
-from lstmcpipe.io.data_management import (
+from .io.data_management import (
     check_data_path,
     get_input_filelist,
     check_and_make_dir,
