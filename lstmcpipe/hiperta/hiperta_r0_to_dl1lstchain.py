@@ -6,7 +6,7 @@
 import os
 import argparse
 from distutils.util import strtobool
-from .reorganize_dl1hiperta300_to_dl1lstchain060 import main as reorganize_dl1
+from lstmcpipe.hiperta.reorganize_dl1hiperta300_to_dl1lstchain060 import main as reorganize_dl1
 
 
 parser = argparse.ArgumentParser(description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_v300_to_dl1lstchain_v060")
