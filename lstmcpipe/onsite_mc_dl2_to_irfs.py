@@ -195,12 +195,12 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
         if irf_point_like:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'gamma_point-like_off{irf_gamma_offset.replace(".", "")}.fits.gz'
+                'irf_' + prod_id.replace('.', '') + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz'
             )
         else:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'gamma_diffuse.fits.gz'
+                'irf_' + prod_id.replace('.', '') + f'_gamma_diffuse.fits.gz'
             )
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
