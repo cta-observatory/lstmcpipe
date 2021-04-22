@@ -9,7 +9,7 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.data_management import query_continue
+from .io.data_management import query_continue
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
