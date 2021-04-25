@@ -869,8 +869,12 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
         all_pipeline_jobs.append(jobids_from_train_pipe)
     if jobids_from_dl1_to_dl2 != '':
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
+
     if jobids_from_dl2_to_irf != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
+        last_stage = jobids_from_dl2_to_irf
+    else:  # RTA case. Although this should be improved
+        last_stage = jobids_from_dl1_to_dl2
 
     all_pipeline_jobs = ','.join(all_pipeline_jobs)
 
@@ -884,7 +888,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                 f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
                 f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl2_to_irf} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{last_stage} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
