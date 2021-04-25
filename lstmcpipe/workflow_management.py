@@ -859,20 +859,20 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     """
     debug_log = {}
+    all_pipeline_jobs = []
 
     if jobids_from_r0_to_dl1 != '':
-        all_pipeline_jobs = jobids_from_r0_to_dl1 + ','
-    else:
-        all_pipeline_jobs = ''  # Start of all jobs
-
+        all_pipeline_jobs.append(jobids_from_r0_to_dl1)
     if jobids_from_merge != '':
-        all_pipeline_jobs += jobids_from_merge + ','
+        all_pipeline_jobs.append(jobids_from_merge)
     if jobids_from_train_pipe != '':
-        all_pipeline_jobs += jobids_from_train_pipe + ','
+        all_pipeline_jobs.append(jobids_from_train_pipe)
     if jobids_from_dl1_to_dl2 != '':
-        all_pipeline_jobs += jobids_from_dl1_to_dl2 + ','
+        all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
     if jobids_from_dl2_to_irf != '':
-        all_pipeline_jobs += jobids_from_dl2_to_irf + ','
+        all_pipeline_jobs.append(jobids_from_dl2_to_irf)
+
+    all_pipeline_jobs = ','.join(all_pipeline_jobs)
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
