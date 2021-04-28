@@ -263,7 +263,7 @@ def main(input_dir, config_rta_file=None, train_test_ratio=0.5, random_seed=42, 
                             'gamma_off0.4deg': 'g0.4_RTA-r0dl1'
                             }
 
-                if particle == 'proton':
+                if particle == 'gamma-diffuse':
                     queue = 'long'
                 else:
                     queue = 'short'
