@@ -46,7 +46,7 @@ parser.add_argument('--debug_mode', '-d',
                     )
 
 
-def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_file=False, debug_mode=False):
+def main(infile, outdir='./dl1_data/', config='./hiperta_configuration.yml', keep_file=False, debug_mode=False):
     """
     Run hiperta_r0_dl1 and reorganize_dl1hipertaV300_to_dl1lstchain060
 
@@ -57,7 +57,7 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     outdir: str
         Path to the OUTPUT DIRECTORY to store the outfile. Default = './dl1_data/'
     config: str
-        path to a configuration file. If none, the default './default_PConfigCut.txt' config is applied.
+        path to a configuration file. If none, the default './hiperta_configuration.yml' config is applied.
         # TODO : set a way of creating the small config file that it is needed
     keep_file: bool
         Boolean flag to indicate if the output of the hiperta_r1_to_dl1 code should be kept or not. The
@@ -74,7 +74,7 @@ def main(infile, outdir='./dl1_data/', config='./default_PConfigCut.txt', keep_f
     """
     os.makedirs(outdir, exist_ok=True)
 
-    cmd_hiperta = f'hiperta_r0_dl1 -i {infile} -c {config} -o {outdir}'
+    cmd_hiperta = f'hiperta_r0_dl1 -i {infile} -c {config} -o {outdir} --selectedtel 1'  # TODO. Harcoded. Change when various tels available
     if debug_mode:  # in HiPeRTA
         cmd_hiperta += ' -g'
     os.system(cmd_hiperta)
