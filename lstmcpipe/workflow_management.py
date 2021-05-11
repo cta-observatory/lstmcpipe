@@ -617,7 +617,7 @@ def parse_config_and_handle_global_vars(yml_file):
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
     elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA300_v{lstchain.__version__}'
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA400-dev_v{lstchain.__version__}'
     else:
         print(f'\n\tPlease select an allowed `workflow_kind`: {allowed_workflows} in the config YAML file; {yml_file}.')
         sys.exit(-1)
