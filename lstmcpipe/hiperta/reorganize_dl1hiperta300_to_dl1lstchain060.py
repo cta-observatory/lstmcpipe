@@ -51,7 +51,7 @@ def stack_and_write_images_table(input_filename, hfile_out, node_dl1_event):
     dump_plus_copy_node_to_create_new_table(input_filename,
                                             hfile_out,
                                             image_table,
-                                            hfile_out.root.dl1.event.telescope.images,
+                                            hfile_out.root.dl1.event.telescope.image,
                                             newname_pointer='LST_LSTCam',
                                             tmp_name='imgsTable')
 
