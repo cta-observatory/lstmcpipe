@@ -5,10 +5,11 @@ source /fefs/aswg/software/virtual_env/.bashrc
 conda activate cta
 
 CMD=$1
-filelist=$2
+output_dir=$2
+filelist=$3
 
 for file in `cat $filelist`;
 do
     echo "processing $file";
-    $CMD -f $file
+    $CMD -f $file -o $output_dir
 done

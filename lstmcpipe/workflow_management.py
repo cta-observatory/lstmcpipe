@@ -11,8 +11,6 @@ import calendar
 import lstchain
 from .io.data_management import query_continue
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
-from lstmcpipe.onsite_mc_r0_to_dl1_ctapipe import main as r0_to_dl1_ctapipe
-from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from lstmcpipe.onsite_mc_train import main as train_pipe
 from lstmcpipe.onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
@@ -54,36 +52,16 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
     
     def start_r0():
-        if workflow_kind == 'lstchain':
-            log, jobids_by_particle = r0_to_dl1(
-                particle_input_dir,  # Particle needs to be gamma w/o the off
-                config_file=conf_file,
-                particle=_particle,
-                prod_id=prod_id,
-                flag_full_workflow=True,
-                source_environment=source_env,
-                offset=off
-            )
-        elif workflow_kind == 'ctapipe':
-            log, jobids_by_particle = r0_to_dl1_ctapipe(
-                particle_input_dir,  # Particle needs to be gamma w/o the off
-                config_file=conf_file,
-                particle=_particle,
-                prod_id=prod_id,
-                flag_full_workflow=True,
-                source_environment=source_env,
-                offset=off
-            )
-        elif workflow_kind == 'hiperta':
-            log, jobids_by_particle = r0_to_dl1_rta(
-                gamma_input_dir.format(particle),  # Input dir needs particle gamma w/o off
-                particle=_particle,  # However _particle will contain the gamma_off
-                config_rta_file=conf_file_rta,
-                prod_id=prod_id,
-                flag_full_workflow=True,
-                lst_config=conf_file_lst,
-                offset=off
-            )
+        log, jobids_by_particle = r0_to_dl1(
+            particle_input_dir,  # Particle needs to be gamma w/o the off
+            config_file=conf_file,
+            particle=_particle,
+            prod_id=prod_id,
+            flag_full_workflow=True,
+            source_environment=source_env,
+            offset=off,
+            workflow_kind=workflow_kind,
+        )
         full_log['log_all_job_ids'].update(log)
         full_log[_particle] = ','.join(jobids_by_particle)
         all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements

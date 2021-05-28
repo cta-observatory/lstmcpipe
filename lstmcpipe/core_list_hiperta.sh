@@ -9,10 +9,11 @@ source /home/enrique.garcia/.bashrc
 conda activate hipe-prod
 
 CMD=$1
-filelist=$2
+output_dir=$2
+filelist=$3
 
 for file in `cat $filelist`;
 do
     echo "processing $file";
-    $CMD -i $file
+    $CMD -i $file -o $output_dir
 done
