@@ -20,7 +20,6 @@ from os.path import abspath
 from distutils.util import strtobool
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
-    batch_r0_to_dl1_rta,
     batch_merge_and_copy_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
@@ -102,31 +101,15 @@ if __name__ == '__main__':
 
     # 1 STAGE --> R0/1 to DL1
     if 'r0_to_dl1' in stages_to_run:
-
-        if workflow_kind == 'lstchain':
-
-            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
-                dl0_data_dir,
-                abspath(args.config_file_lst),
-                prod_id,
-                all_particles,
-                source_env=source_env,
-                gamma_offsets=gamma_offs
-            )
-
-        elif workflow_kind == 'hiperta':
-
-            log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(
-                dl0_data_dir,
-                abspath(args.config_file_rta),
-                prod_id,
-                all_particles,
-                abspath(args.config_file_lst),
-                gamma_offsets=gamma_offs
-            )
-
-        else:
-            sys.exit("Choose a valid `workflow_kind` : 'lst' OR 'rta' in the config_MC_prod.yml file ")
+        log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
+            dl0_data_dir,
+            abspath(args.config_file_lst),
+            prod_id,
+            all_particles,
+            source_env=source_env,
+            gamma_offsets=gamma_offs,
+            workflow_kind=workflow_kind
+        )
 
         save_log_to_file(log_batch_r0_dl1, log_file, log_format='yml', workflow_step='r0_to_dl1')
         save_log_to_file(debug_r0dl1, debug_file, log_format='yml', workflow_step='r0_to_dl1')
