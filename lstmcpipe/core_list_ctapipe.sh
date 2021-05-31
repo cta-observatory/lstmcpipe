@@ -1,5 +1,6 @@
 #!/bin/sh
-# slurm core job - send a job with the command passed as arg1 on every line in the file passed as arg2
+# slurm core job - send a job with the command passed as arg1, the output folder on arg2 on every line in the file passed as arg3
+# output files are constructed by replacing "simtel.{compression}" with "dl1.h5" on the filename
 
 source /fefs/aswg/software/virtual_env/.bashrc
 conda activate cta
