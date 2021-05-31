@@ -34,6 +34,8 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     source_env : str
         source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
     gamma_offsets : list
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
 
     Returns
     -------

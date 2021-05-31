@@ -109,6 +109,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
          to activate a certain conda environment.
          DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
     keep_rta_file : bool
         Argument to be passed to the hiperta_r0_to_dl1lstchain script, which runs the hiperta_r0_dl1 and
         re-organiser stage
