@@ -1,7 +1,5 @@
 """
-Example for using pyirf to calculate IRFS and sensitivity from EventDisplay DL2 fits
-files produced from the root output by this script:
-https://github.com/Eventdisplay/Converters/blob/master/DL2/generate_DL2_file.py
+Procedure adapted from pyirf v0.4 example one (used with eventdisplay)
 """
 import logging
 import operator
