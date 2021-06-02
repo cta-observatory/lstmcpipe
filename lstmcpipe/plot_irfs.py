@@ -356,49 +356,6 @@ def plot_magic_bkg_rate(ax=None, **kwargs):
 
 
 
-def plot_hess_angular_resolution(ax=None, **kwargs):
-    
-    ax = plt.gca() if ax is None else ax
-    
-    for key in ['Loose', 'Safe', 'Std']:
-        E, R = np.loadtxt(ctaplot.io.dataset.get(f'HESS_Impact_Angular_Resolution_{key}_Mono.txt'), unpack=True)
-        kwargs['label'] = f'HESS mono ImPACT {key}'
-        ax.plot(E, R, **kwargs)
-        
-    ax.set_xscale('log')
-    ax.legend()
-    return ax
-
-
-def plot_hess_effective_area(ax=None, **kwargs):
-    
-    ax = plt.gca() if ax is None else ax
-    
-    for key in ['Loose', 'Safe', 'Std']:
-        E, S = np.loadtxt(ctaplot.io.dataset.get(f'HESS_Impact_Effective_Area_{key}_Mono.txt'), unpack=True)
-        ax.plot(E, S, label=f'HESS mono ImPACT {key}', **kwargs)
-
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-    ax.legend() 
-    
-    return ax
-
-
-def plot_hess_energy_resolution(ax=None, **kwargs):
-    
-    ax = plt.gca() if ax is None else ax
-    
-    for key in ['Loose', 'Safe', 'Std']:
-        E, R = np.loadtxt(ctaplot.io.dataset.get(f'HESS_Impact_Energy_Resolution_{key}_Mono.txt'), unpack=True)
-        kwargs['label'] = f'HESS mono ImPACT {key}'
-        ax.plot(E, R, **kwargs)
-        
-    ax.set_xscale('log')
-    ax.legend()
-    return ax
-
-
 def plot_energy_bias_from_file(filename, ax=None, **kwargs):
 
     ax = plt.gca() if ax is None else ax
