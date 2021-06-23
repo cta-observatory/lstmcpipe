@@ -400,6 +400,7 @@ def batch_plot_rf_features(dir_models, config_file, source_env):
 
     log[jobid] = 'Single job_id to plot RF feature s importance'
 
+    print("")
     print("\n ==== END {} ==== \n".format('batch plot RF features importance'))
 
     return log
