@@ -178,7 +178,7 @@ if __name__ == '__main__':
         update_scancel_file(scancel_file, job_from_train_pipe)
 
         # Plot the RF feature's importance
-        log_plot_rf_features = batch_plot_rf_features(model_dir, args.config_file_lst, source_env)
+        log_plot_rf_features = batch_plot_rf_features(model_dir, args.config_file_lst, source_env, job_from_train_pipe)
         save_log_to_file(log_plot_rf_features, debug_file, log_format='yml',
                          workflow_step='plot_RF_features_importance')
 

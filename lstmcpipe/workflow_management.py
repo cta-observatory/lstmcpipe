@@ -369,7 +369,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
 
 
-def batch_plot_rf_features(dir_models, config_file, source_env):
+def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
     """
     Batches the plot_model_importance.py script that creates a .png with the RF feature's importance models
     after the RF are trained.
@@ -383,6 +383,8 @@ def batch_plot_rf_features(dir_models, config_file, source_env):
         Path to lstchain config file
     source_env: str
         String containing the .bashrc file to source and the conda env to call
+    train_jobid: str
+        Single jobid from training stage.
 
     Returns
     -------
@@ -395,12 +397,13 @@ def batch_plot_rf_features(dir_models, config_file, source_env):
     jobo = os.path.join(dir_models, 'job_plot_rf_feat_importance.o')
 
     base_cmd = f'lstmcpipe_plot_models_importance {dir_models} -cf {config_file}'
-    cmd = f'sbatch --parsable -e {jobe} -o {jobo} --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
+    cmd = f'sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance' \
+          f'--wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
     jobid = os.popen(cmd).read().strip('\n')
 
     log[jobid] = 'Single job_id to plot RF feature s importance'
 
-    print("")
+    print(f" Random Forest importance's plot will be saved at:\n   {dir_models}")
     print("\n ==== END {} ==== \n".format('batch plot RF features importance'))
 
     return log
