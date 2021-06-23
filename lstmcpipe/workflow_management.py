@@ -340,10 +340,10 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     jobid_4_dl1_to_dl2 : str
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
+    model_path : str
+        Path with the model's directory
     debug_log : dict
         Debug and summary purposes
-    model_path :
-        Path with the model's directory
     """
     debug_log = {}
 
