@@ -397,8 +397,8 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
     jobo = os.path.join(dir_models, 'job_plot_rf_feat_importance.o')
 
     base_cmd = f'lstmcpipe_plot_models_importance {dir_models} -cf {config_file}'
-    cmd = f'sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance' \
-          f'--wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
+    cmd = f'sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance ' \
+          f' --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
     jobid = os.popen(cmd).read().strip('\n')
 
     log[jobid] = 'Single job_id to plot RF feature s importance'
