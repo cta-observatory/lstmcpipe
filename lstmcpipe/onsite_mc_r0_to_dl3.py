@@ -16,6 +16,7 @@
 
 import sys
 import argparse
+from os.path import abspath
 from distutils.util import strtobool
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
@@ -96,7 +97,6 @@ if __name__ == '__main__':
     dl2_data_dir = config['DL2_data_dir']
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
-    irfs_config = config['irfs_config']
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
             log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
                 dl0_data_dir,
-                args.config_file_lst,
+                abspath(args.config_file_lst),
                 prod_id,
                 all_particles,
                 source_env=source_env,
@@ -119,10 +119,10 @@ if __name__ == '__main__':
 
             log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1_rta(
                 dl0_data_dir,
-                args.config_file_rta,
+                abspath(args.config_file_rta),
                 prod_id,
                 all_particles,
-                args.config_file_lst,
+                abspath(args.config_file_lst),
                 gamma_offsets=gamma_offs
             )
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
 
         log_batch_train_pipe, job_from_train_pipe, model_dir, debug_train = batch_train_pipe(
             log_batch_merge_and_copy,
-            args.config_file_lst,
+            abspath(args.config_file_lst),
             jobs_to_train,
             source_env=source_env
         )
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
             dl1_data_dir,
             model_dir,
-            args.config_file_lst,
+            abspath(args.config_file_lst),
             job_from_train_pipe,       # Single jobid from train
             jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
@@ -213,8 +213,9 @@ if __name__ == '__main__':
     if 'dl2_to_irfs' in stages_to_run:
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
             dl2_data_dir,
-            irfs_config,
-            args.config_file_lst,
+            all_particles,
+            gamma_offs,
+            abspath(args.config_file_lst),
             jobs_from_dl1_dl2,
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,

@@ -14,7 +14,7 @@
 import os
 import shutil
 import argparse
-from lstmcpipe.data_management import (
+from lstmcpipe.io.data_management import (
     check_job_logs,
     read_lines_file,
     check_files_in_dir_from_file,
@@ -277,7 +277,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         jobid_move_dl1 = os.popen(batch_mv_dl1).read().strip('\n')
         log_merge[particle][set_type][jobid_move_dl1] = batch_mv_dl1
 
-        print(f'\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+        print(f'\n\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
 
         # 5 --> copy lstchain config file in final_dir too
         batch_copy_conf = base_cmd.format(job_name[particle].split('_')[0] + '_cp_conf',
