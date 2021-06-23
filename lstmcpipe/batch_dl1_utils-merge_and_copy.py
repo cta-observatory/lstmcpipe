@@ -3,7 +3,7 @@
 # E. Garcia, 12/02/2020
 
 import argparse
-from lstmcpipe.data_management import move_dir_content, check_and_make_dir_without_verification
+from lstmcpipe.io.data_management import move_dir_content, check_and_make_dir_without_verification
 import os
 import shutil
 from distutils.util import strtobool
@@ -41,5 +41,6 @@ if __name__ == '__main__':
 
         # HiPeRTA config is *.txt
         config_files = [os.path.join(args.source, f) for f in os.listdir(args.source) if f.endswith(('.json', '.txt'))]
+
         for file in config_files:
             shutil.copyfile(file, os.path.join(args.dest, os.path.basename(file)))

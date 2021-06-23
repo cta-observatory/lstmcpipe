@@ -9,7 +9,7 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.data_management import query_continue
+from .io.data_management import query_continue
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -466,8 +466,8 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
 
-def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env,
-                      prod_id):
+def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
+                      log_from_dl1_dl2, source_env, prod_id):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -475,7 +475,8 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     ----------
     dl2_directory: str
     config_file: str
-    irfs_config: dict
+    loop_particles: list
+    offset_gammas: list
     job_ids_from_dl1_dl2: str
     source_env: str
     log_from_dl1_dl2: dict
@@ -487,25 +488,50 @@ def batch_dl2_to_irfs(dl2_directory, irfs_config, config_file, job_ids_from_dl1_
     jobs_from_dl2_irf: str
     debug_dl2_to_irfs: dict
     """
-    debug_log = {}
-
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
 
-    log_dl2_to_irfs, jobid_for_check = dl2_to_irfs(
-        dl2_directory,
-        config_file=config_file,
-        irf_point_like=irfs_config['point_like'],
-        irf_gamma_offset=irfs_config['gamma_offset'],
-        source_env=source_env,
-        flag_full_workflow=True,
-        log_from_dl1_dl2=log_from_dl1_dl2,
-        wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-        prod_id=prod_id
-    )
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_irfs = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=True,
+            irf_gamma_offset=off,
+            config_file=config_file,
+            source_env=source_env,
+            flag_full_workflow=True,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    if 'gamma-diffuse' in loop_particles:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=False,
+            config_file=config_file,
+            source_env=source_env,
+            flag_full_workflow=True,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma-diffuse'] = log
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
 
     jobid_for_check = ','.join(jobid_for_check)
-    debug_log[jobid_for_check] = f'Single job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-                                 f'job_ids; {job_ids_from_dl1_dl2}'
 
     print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
 
@@ -625,9 +651,6 @@ def parse_config_and_handle_global_vars(yml_file):
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
 
-    # 4.1 - Load IRFs configuration (point-like and gamma-offset)
-    config['irfs_config'] = loaded_config['irf_config']
-
     # 5 - production workflow and type
     config['workflow_kind'] = workflow_kind
     config['prod_type'] = prod_type
@@ -650,6 +673,9 @@ def parse_config_and_handle_global_vars(yml_file):
         )
         config['DL2_data_dir'] = os.path.join(
             base_path_dl0, 'DL2', obs_date, '{}', pointing, config['prod_id']
+        )
+        config['IRFs_dir'] = os.path.join(
+            base_path_dl0, 'IRF', obs_date, pointing, config['prod_id']
         )
 
         if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
@@ -681,6 +707,9 @@ def parse_config_and_handle_global_vars(yml_file):
         config['DL2_data_dir'] = os.path.join(
             base_path_dl0, 'DL2', obs_date, '{}', zenith, pointing, config['prod_id']
         )
+        config['IRFs_dir'] = os.path.join(
+            base_path_dl0, 'IRF', obs_date, zenith, pointing, config['prod_id']
+        )
 
         if base_path_dl0 == '/fefs/aswg/data/mc':  # lstanalyzer user
             config['model_dir'] = os.path.join(
@@ -701,6 +730,7 @@ def parse_config_and_handle_global_vars(yml_file):
           f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
           f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
+          f'\t{config["IRFs_dir"]}\n'
           f'\t{config["model_dir"]}\n'
           f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
           )
@@ -810,7 +840,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     Parameters
     ----------
-    jobids_from_dl1_to_dl2 : str
+    jobids_from_r0_to_dl1 : str
         jobs from the dl1_to_dl2 stage
     prod_id : str
         MC Production ID.
@@ -829,9 +859,24 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     """
     debug_log = {}
+    all_pipeline_jobs = []
 
-    all_pipeline_jobs = jobids_from_r0_to_dl1 + ',' + jobids_from_merge + ',' + jobids_from_train_pipe + ',' + \
-                        jobids_from_dl1_to_dl2 + ',' + jobids_from_dl2_to_irf
+    if jobids_from_r0_to_dl1 != '':
+        all_pipeline_jobs.append(jobids_from_r0_to_dl1)
+    if jobids_from_merge != '':
+        all_pipeline_jobs.append(jobids_from_merge)
+    if jobids_from_train_pipe != '':
+        all_pipeline_jobs.append(jobids_from_train_pipe)
+    if jobids_from_dl1_to_dl2 != '':
+        all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
+
+    if jobids_from_dl2_to_irf != '':
+        all_pipeline_jobs.append(jobids_from_dl2_to_irf)
+        last_stage = jobids_from_dl2_to_irf
+    else:  # RTA case. Although this should be improved
+        last_stage = jobids_from_dl1_to_dl2
+
+    all_pipeline_jobs = ','.join(all_pipeline_jobs)
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
@@ -843,7 +888,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                 f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
                 f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{jobids_from_dl2_to_irf} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{last_stage} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')

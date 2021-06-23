@@ -9,7 +9,7 @@ import argparse
 import numpy as np
 from astropy.table import Table, vstack, join
 from astropy.io.misc.hdf5 import write_table_hdf5
-from lstmcpipe.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
+from lstmcpipe.hiperta.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
 
 parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
                                              "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
@@ -51,7 +51,7 @@ def stack_and_write_images_table(input_filename, hfile_out, node_dl1_event):
     dump_plus_copy_node_to_create_new_table(input_filename,
                                             hfile_out,
                                             image_table,
-                                            hfile_out.root.dl1.event.telescope.images,
+                                            hfile_out.root.dl1.event.telescope.image,
                                             newname_pointer='LST_LSTCam',
                                             tmp_name='imgsTable')
 
