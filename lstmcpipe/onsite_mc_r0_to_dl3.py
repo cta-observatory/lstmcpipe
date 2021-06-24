@@ -30,7 +30,8 @@ from lstmcpipe.workflow_management import (
     batch_mc_production_check,
     parse_config_and_handle_global_vars,
     create_log_files,
-    update_scancel_file
+    update_scancel_file,
+    batch_plot_rf_features
 )
 
 
@@ -175,6 +176,11 @@ if __name__ == '__main__':
         save_log_to_file(log_batch_train_pipe, log_file, log_format='yml', workflow_step='train_pipe')
         save_log_to_file(debug_train, debug_file, log_format='yml', workflow_step='train_pipe')
         update_scancel_file(scancel_file, job_from_train_pipe)
+
+        # Plot the RF feature's importance
+        log_plot_rf_features = batch_plot_rf_features(model_dir, args.config_file_lst, source_env, job_from_train_pipe)
+        save_log_to_file(log_plot_rf_features, debug_file, log_format='yml',
+                         workflow_step='plot_RF_features_importance')
 
     else:
         job_from_train_pipe = ''
