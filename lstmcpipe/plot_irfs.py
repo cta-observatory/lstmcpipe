@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+# T. Vuillaume & E. Garcia - 2021
+
+import os
+import argparse
 from astropy.table import QTable
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,7 +36,6 @@ def read_sensitivity_table(irf_file):
     """
     sensitivity = QTable.read(irf_file, hdu='SENSITIVITY')[1:-1]
     return sensitivity
-
 
 
 def plot_gh_cut_per_energy(filename, ax=None, **kwargs):
@@ -106,7 +111,6 @@ def plot_magic_2014(ax=None, **kwargs):
     return ax
 
 
-
 def plot_effective_area_from_file(file, all_cuts=False, ax=None, **kwargs):
     """
     """
@@ -149,15 +153,12 @@ def plot_effective_area_from_file(file, all_cuts=False, ax=None, **kwargs):
 
 def plot_psf_from_file(filename):
 
-
     psf_table = QTable.read(filename, hdu='PSF')[0]
     # select the only fov offset bin
     psf = psf_table['RPSF'].T[:, 0, :].to_value(1 / u.sr)
 
     offset_bins = np.append(psf_table['RAD_LO'], psf_table['RAD_HI'][-1])
     phi_bins = np.linspace(0, 2 * np.pi, 100)
-
-
 
     # Let's make a nice 2d representation of the radially symmetric PSF
     r, phi = np.meshgrid(offset_bins.to_value(u.deg), phi_bins)
@@ -166,10 +167,8 @@ def plot_psf_from_file(filename):
     # repeat values for each phi bin
     center = 0.5 * (psf_table['ENERG_LO'] + psf_table['ENERG_HI'])
 
-
     fig = plt.figure(figsize=(15, 5))
     axs = [fig.add_subplot(1, 3, i, projection='polar') for i in range(1, 4)]
-
 
     for bin_id, ax in zip([10, 20, 30], axs):
         image = np.tile(psf[bin_id], (len(phi_bins) - 1, 1))
@@ -211,7 +210,6 @@ def plot_angular_resolution_from_file(filename, ax=None, **kwargs):
     ax = plt.gca() if ax is None else ax
 
     ang_res = QTable.read(filename, hdu='ANGULAR_RESOLUTION')[1:-1]
-
 
     kwargs.setdefault('ls', '')
     ax.errorbar(
@@ -286,13 +284,11 @@ def plot_background_rate_from_file(filename, ax=None, **kwargs):
     rad_max = QTable.read(filename, hdu='RAD_MAX')[0]
     bg_rate = QTable.read(filename, hdu='BACKGROUND')[0]
 
-
     reco_bins = np.append(bg_rate['ENERG_LO'], bg_rate['ENERG_HI'][-1])
 
     # first fov bin, [0, 1] deg
     fov_bin = 0
     rate_bin = bg_rate['BKG'].T[:, fov_bin]
-
 
     # interpolate theta cut for given e reco bin
     e_center_bg = 0.5 * (bg_rate['ENERG_LO'] + bg_rate['ENERG_HI'])
@@ -302,7 +298,6 @@ def plot_background_rate_from_file(filename, ax=None, **kwargs):
     # undo normalization
     rate_bin *= cone_solid_angle(theta_cut)
     rate_bin *= np.diff(reco_bins)
-
 
     if 'ls' not in kwargs and 'linestyle' not in kwargs:
         kwargs['ls'] = ''
@@ -355,7 +350,6 @@ def plot_magic_bkg_rate(ax=None, **kwargs):
     return ax
 
 
-
 def plot_energy_bias_from_file(filename, ax=None, **kwargs):
 
     ax = plt.gca() if ax is None else ax
@@ -382,27 +376,27 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
     return ax
 
 
+def main():
 
-def main(filename, outfile):
+    parser = argparse.ArgumentParser(description="Produce lstMCpipe IRFs plot from a sensitivity.fits.gz file")
+
+    # Required arguments
+    parser.add_argument('--filename', '-f', type=str,
+                        dest='filename',
+                        help='Input filename'
+                        )
+    parser.add_argument('--outfile', '-o', type=str,
+                        dest='outfile',
+                        help='O utput filename'
+                        )
+
+    args = parser.parse_args()
+
+    plot_summary_from_file(args.filename)
     
-    axes = plot_summary_from_file(filename)
-    
-    os.makedirs(os.path.dirname(outfile), exist_ok=True)
-    plt.savefig(outfile)
+    os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
+    plt.savefig(args.outfile)
     
     
 if __name__ == '__main__':
-    
-    import argparse
-
-
-    parser = argparse.ArgumentParser(description="MC DL2 to IRF")
-
-    # Required arguments
-    parser.add_argument('filename')
-    parser.add_argument('outfile')
-
-    args = parser.parse_args()
-    
-    main(args.filename, args.outfile)
-    
+    main()
