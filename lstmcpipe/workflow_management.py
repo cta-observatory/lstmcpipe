@@ -340,10 +340,10 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     jobid_4_dl1_to_dl2 : str
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
+    model_path : str
+        Path with the model's directory
     debug_log : dict
         Debug and summary purposes
-    model_path :
-        Path with the model's directory
     """
     debug_log = {}
 
@@ -367,6 +367,46 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     print("\n ==== END {} ==== \n".format('batch mc_train_workflow'))
 
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
+
+
+def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
+    """
+    Batches the plot_model_importance.py script that creates a .png with the RF feature's importance models
+    after the RF are trained.
+    The plot is saved in the same dir in where the modes are stored.
+
+    Parameters
+    ----------
+    dir_models: str
+        Path to model's directory
+    config_file: str
+        Path to lstchain config file
+    source_env: str
+        String containing the .bashrc file to source and the conda env to call
+    train_jobid: str
+        Single jobid from training stage.
+
+    Returns
+    -------
+    log: dict
+        Dictionary with lstmcpipe_plot_models_importance single job id to be passed to debug log.
+    """
+    log = {}
+    print("\n ==== START {} ==== \n".format('batch plot RF features importance'))
+    jobe = os.path.join(dir_models, 'job_plot_rf_feat_importance.e')
+    jobo = os.path.join(dir_models, 'job_plot_rf_feat_importance.o')
+
+    base_cmd = f'lstmcpipe_plot_models_importance {dir_models} -cf {config_file}'
+    cmd = f'sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance ' \
+          f' --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
+    jobid = os.popen(cmd).read().strip('\n')
+
+    log[jobid] = 'Single job_id to plot RF feature s importance'
+
+    print(f" Random Forest importance's plot will be saved at:\n   {dir_models}")
+    print("\n ==== END {} ==== \n".format('batch plot RF features importance'))
+
+    return log
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
