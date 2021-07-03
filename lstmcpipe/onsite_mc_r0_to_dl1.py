@@ -321,7 +321,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
                             'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
                             'proton': f'p_{jobtype_id}_r0dl1',
                             'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
-                            'gamma_off0.4deg': f'g0.4e_{jobtype_id}_r0dl1'
+                            'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
                             }
 
                 if particle == 'proton':
