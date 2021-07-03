@@ -168,7 +168,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     elif workflow_kind == 'ctapipe':
         core_file = 'core_list_ctapipe.sh'
         cc = ' --config {}'.format(config_file) if config_file is not None else ' '
-        base_cmd = f'{core_file} "ctapipe-stage1 --write-images --write-parameters {cc}"'
+        base_cmd = f'{core_file} "ctapipe-stage1 {cc}"'
         jobtype_id = 'CTA'
     elif workflow_kind == 'hiperta':
         # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
