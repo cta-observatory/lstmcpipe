@@ -17,6 +17,7 @@
 import sys
 import argparse
 from os.path import abspath
+from .io.data_management import query_continue
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
     batch_r0_to_dl1_rta,
@@ -73,6 +74,7 @@ if __name__ == '__main__':
 
     # Read MC production configuration file
     config = parse_config_and_handle_global_vars(args.config_mc_prod)
+    query_continue('Are you sure ?')
 
     # Load variables
     prod_id = config['prod_id']

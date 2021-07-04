@@ -9,7 +9,6 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from .io.data_management import query_continue
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -783,8 +782,6 @@ def parse_config_and_handle_global_vars(yml_file):
     print("\n")
     print(f"   - Merging options. No-image argument: {config['merging_no_image']}")
     print("\n")
-
-    query_continue('Are you sure ?')
 
     return config
 
