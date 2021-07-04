@@ -779,7 +779,6 @@ def parse_config_and_handle_global_vars(yml_file):
     print("Stages to be run:")
     for stage in config['stages_to_run']:
         print(f" - {stage}")
-    print("\n")
     print(f"   - Merging options. No-image argument: {config['merging_no_image']}")
     print("\n")
 
