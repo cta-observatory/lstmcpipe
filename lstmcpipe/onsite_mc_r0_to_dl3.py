@@ -17,7 +17,6 @@
 import sys
 import argparse
 from os.path import abspath
-from distutils.util import strtobool
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
     batch_r0_to_dl1_rta,
@@ -65,16 +64,6 @@ parser.add_argument('--config_file_rta', '-conf_rta',
                     default=None
                     )
 
-# OPTIONAL / ADVANCED ARGUMENTS
-
-parser.add_argument('--no-image',
-                    action='store',
-                    type=lambda x: bool(strtobool(x)),
-                    dest='flag_no_image',
-                    help='--no-image argument for the merging stage.'
-                         'True will merge dl1 files without image. False will do the opposite',
-                    default=True
-                    )
 
 args = parser.parse_args()
 
@@ -97,6 +86,7 @@ if __name__ == '__main__':
     dl2_data_dir = config['DL2_data_dir']
     running_analysis_dir = config['running_analysis_dir']
     gamma_offs = config['gamma_offs']
+    no_image_merging = config['merging_no_image']
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
@@ -147,7 +137,7 @@ if __name__ == '__main__':
             log_batch_r0_dl1,
             all_particles,
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
-            no_image_flag=args.flag_no_image,
+            no_image_flag=no_image_merging,
             gamma_offsets=gamma_offs,
             prod_id=prod_id,
             source_env=source_env
