@@ -387,7 +387,7 @@ def main():
                         )
     parser.add_argument('--outfile', '-o', type=str,
                         dest='outfile',
-                        help='O utput filename'
+                        help='Output filename'
                         )
 
     args = parser.parse_args()
