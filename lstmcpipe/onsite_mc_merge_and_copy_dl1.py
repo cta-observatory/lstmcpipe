@@ -260,7 +260,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
         print(f"\tDL1 files will be moved to {final_DL1_dir}")
 
         base_cmd = 'sbatch --parsable -p short -J {} -e {} -o {} --dependency=afterok:{} ' \
-                   '--wrap="python batch_dl1_utils-merge_and_copy.py -s {} -d {} --copy_conf {}"'
+                   '--wrap="onsite_utils_merge_and_copy_dl1.py -s {} -d {} --copy_conf {}"'
 
         wait_both_merges = ','.join(wait_both_merges)
 
