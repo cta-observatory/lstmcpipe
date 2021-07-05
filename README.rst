@@ -24,31 +24,33 @@ Install
 You can install this library as an independent package (Note that it uses various ``lstchain_*`` scripts).
 This will give you the possibility to run ``onsite_`` commands from anywhere.
 
-If you decide not to install the package, you can simply run the scripts interactively as
-
-.. code-block:: python
-
-    python onsite_*.py [ARGS]
-
 
 Quickstart
 ----------
 
-The MC full pipeline (r0 to IRFs) is launched by running the ``onsite_mc_r0_to_dl3.py`` script.
+The way to launch either the full pipeline (r0 to IRFs) or a workflow with less stages (r0 to merging, for example) is
+the same; you should run the same command/launch the same script in any case;
 
 .. code-block:: python
 
     python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst lstchain_*.json
 
-Note: You can launch this command without fear; there is an intermediate step that verifies and
-shows the all the information that you are passing to the pipeline.
+The ``onsite_mc_r0_to_dl3.py`` script is the **orchestrator** of the pipeline, it schedules the stages specified in the
+`onsite_MC_prod.yml` file. All the configuration related with the MC pipe must be declared in this file (stages,
+particles to be analysed, zenith, pointing, type of MC production...).
 
-The ``onsite_mc_r0_to_dl3.py`` script is the **orchestrator** of the pipeline, it schedules the following stages
-(scripts) per particle;
+Note: You can always launch this command without fear; there is an intermediate step that verifies and
+shows the configuration that you are passing to the pipeline.
+
+
+----------
+
+The full workflow schedules the following stages (scripts) per particle;
 
 1. ``onsite_mc_r0_to_dl1.py``
 2. ``onsite_mc_merge_and_copy_dl1.py``
 3. ``onsite_mc_train.py``
+    3.1. ``plots/plot_models_importances.py``
 4. ``onsite_mc_dl1_to_dl2.py``
 5. ``onsite_mc_dl2_to_irfs.py``
 
@@ -142,35 +144,44 @@ Example of default directory structure for a prod5 MC prod:
 
 .. code-block::
 
-    /fefs/aswg/data/mc
-    ├── DL0/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-    |   └── ...
-    ├── running_analysis/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-    |   └── YYYYMMDD_v{lstchain}_{prod_id}
-    |       └── temporary dir for r0_to_dl1 + merging stages
-    ├── DL1/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-    |   └── YYYYMMDD_v{lstchain}_{prod_id}
-    |       ├── dl1 files
-    |       ├── training/
-    |       └── testing/
-    ├── DL2/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-    |   └── YYYYMMDD_v{lstchain}_{prod_id}
-    |       └── dl2 files
-    ├── IRF/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-    |   └── YYYYMMDD_v{lstchain}_{prod_id}
-    |       └── irf.fits.gz
-    └── analysis_logs/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing
-        └── YYYYMMDD_v{lstchain}_{prod_id}
-            ├── file_lists_training/
-            ├── file_lists_testing/
-            └── job_logs/
 
-    /fefs/aswg/data/models
-    └── 20200629_prod5_trans_80/zenith_20deg/south_pointing
-        └── YYYYMMDD_v{lstchain}_{prod_id}
-            ├── reg_energy.sav
-            ├── reg_disp_vector.sav
-            └── cls_gh.sav
+   /fefs/aswg/data/
+    ├── mc/
+    |   ├── DL0/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
+    |   |   └── simtel files
+    |   |
+    |   ├── running_analysis/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
+    |   |   └── YYYYMMDD_v{lstchain}_{prod_id}/
+    |   |       └── temporary dir for r0_to_dl1 + merging stages
+    |   |
+    |   ├── analysis_logs/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
+    |   |   └── YYYYMMDD_v{lstchain}_{prod_id}/
+    |   |       ├── file_lists_training/
+    |   |       ├── file_lists_testing/
+    |   |       └── job_logs/
+    |   |
+    |   ├── DL1/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
+    |   |   └── YYYYMMDD_v{lstchain}_{prod_id}/
+    |   |       ├── dl1 files
+    |   |       ├── training/
+    |   |       └── testing/
+    |   |
+    |   ├── DL2/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
+    |   |   └── YYYYMMDD_v{lstchain}_{prod_id}/
+    |   |       └── dl2 files
+    |   |
+    |   └── IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/
+    |       └── YYYYMMDD_v{lstchain}_{prod_id}/
+    |           ├── off0.0deg/
+    |           ├── off0.4deg/
+    |           └── diffuse/
+    |
+    └── models/
+        └── 20200629_prod5_trans_80/zenith_20deg/south_pointing/
+            └── YYYYMMDD_v{lstchain}_{prod_id}/
+                ├── reg_energy.sav
+                ├── reg_disp_vector.sav
+                └── cls_gh.sav
 
 
 
