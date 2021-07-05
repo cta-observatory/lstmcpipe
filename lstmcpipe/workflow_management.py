@@ -9,7 +9,6 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from .io.data_management import query_continue
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
@@ -630,6 +629,7 @@ def parse_config_and_handle_global_vars(yml_file):
     workflow_kind = loaded_config['workflow_kind']
     custom_prod_id = loaded_config['prod_id']
     stages_to_be_run = loaded_config['stages_to_be_run']
+    merging_options = loaded_config['merging_options']['no_image']
 
     base_path_dl0 = loaded_config['base_path_dl0']
     prod_type = loaded_config['prod_type']
@@ -690,6 +690,7 @@ def parse_config_and_handle_global_vars(yml_file):
 
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
+    config['merging_no_image'] = merging_options
 
     # 5 - production workflow and type
     config['workflow_kind'] = workflow_kind
@@ -778,9 +779,8 @@ def parse_config_and_handle_global_vars(yml_file):
     print("Stages to be run:")
     for stage in config['stages_to_run']:
         print(f" - {stage}")
+    print(f"   - Merging options. No-image argument: {config['merging_no_image']}")
     print("\n")
-
-    query_continue('Are you sure ?')
 
     return config
 
