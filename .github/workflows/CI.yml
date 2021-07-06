@@ -39,7 +39,6 @@ jobs:
           echo "Installing additional pip packages"
           pip install \
             pytest-cov
-#            "git+https://github.com/cta-observatory/ctapipe@$CTAPIPE_VERSION"
 
           echo "pip install ."
           pip install .
