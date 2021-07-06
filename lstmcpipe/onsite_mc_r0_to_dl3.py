@@ -51,7 +51,15 @@ parser.add_argument('--config_file_lst', '-conf_lst',
                     help='Path to a lstchain-like configuration file. '
                          'RF classifier and regressor arguments must be declared here !',
                     default=None,
-                    required=True
+                    )
+
+parser.add_argument('--config_file_ctapipe', '-conf_cta',
+                    action='store',
+                    type=str,
+                    dest='config_file_ctapipe',
+                    help='Path to a ctapipe-like configuration file.'
+                         'Only to be declared if WORKFLOW_KIND = "ctapipe" and only used up to dl1.',
+                    default=None,
                     )
 
 parser.add_argument('--config_file_rta', '-conf_rta',
@@ -59,7 +67,7 @@ parser.add_argument('--config_file_rta', '-conf_rta',
                     type=str,
                     dest='config_file_rta',
                     help='Path to a HiPeRTA-like configuration file.'
-                         'Only to be declared if WORKFLOW_KIND = "hiperta". ',
+                         'Only to be declared if WORKFLOW_KIND = "hiperta" and only used up to dl1.',
                     default=None
                     )
 
@@ -99,16 +107,29 @@ if __name__ == '__main__':
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
 
+    # Make sure the lstchain config is defined if needed
+    # It is not exactly required if you process only up to dl1
+    if any([step not in ('r0_to_dl1', 'merge_and_copy_dl1') for step in stages_to_run]):
+        assert abspath(args.config_file_lst), 'The lstchain config needs to be defined for all steps following dl1 processing'
+
+
     # 1 STAGE --> R0/1 to DL1
     if 'r0_to_dl1' in stages_to_run:
+        if workflow_kind == 'lstchain':
+            r0_to_dl1_config = abspath(args.config_file_lst)
+        elif workflow_kind == 'hiperta':
+            r0_to_dl1_config = abspath(args.config_file_rta)
+        else:  # if this wasnt ctapipe, the config parsing would have failed
+            r0_to_dl1_config = abspath(args.config_file_ctapipe)
+
         log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
-            dl0_data_dir,
-            abspath(args.config_file_lst),
-            prod_id,
-            all_particles,
+            input_dir=dl0_data_dir,
+            conf_file=r0_to_dl1_config,
+            prod_id=prod_id,
+            particles_loop=all_particles,
             source_env=source_env,
             gamma_offsets=gamma_offs,
-            workflow_kind=workflow_kind
+            workflow_kind=workflow_kind,
         )
 
         save_log_to_file(log_batch_r0_dl1, log_file, log_format='yml', workflow_step='r0_to_dl1')
@@ -147,10 +168,10 @@ if __name__ == '__main__':
 
     # 3 STAGE --> Train pipe
     if 'train_pipe' in stages_to_run:
-
+        train_config = abspath(args.config_file_lst)
         log_batch_train_pipe, job_from_train_pipe, model_dir, debug_train = batch_train_pipe(
             log_batch_merge_and_copy,
-            abspath(args.config_file_lst),
+            train_config,
             jobs_to_train,
             source_env=source_env
         )
@@ -165,11 +186,11 @@ if __name__ == '__main__':
 
     # 4 STAGE --> DL1 to DL2 stage
     if 'dl1_to_dl2' in stages_to_run:
-
+        dl1_to_dl2_config = abspath(args.config_file_lst)
         log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
             dl1_data_dir,
             model_dir,
-            abspath(args.config_file_lst),
+            dl1_to_dl2_config,
             job_from_train_pipe,       # Single jobid from train
             jobs_all_dl1_finished,     # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
@@ -188,11 +209,12 @@ if __name__ == '__main__':
 
     # 5 STAGE --> DL2 to IRFs stage
     if 'dl2_to_irfs' in stages_to_run:
+        dl2_to_irfs_config = abspath(args.config_file_lst)
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
             dl2_data_dir,
             all_particles,
             gamma_offs,
-            abspath(args.config_file_lst),
+            dl2_to_irfs_config,
             jobs_from_dl1_dl2,
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
