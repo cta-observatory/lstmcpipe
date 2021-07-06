@@ -91,7 +91,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
 
 
 def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
-                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None):
+                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None, workflow_kind='lstchain'):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -166,7 +166,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     flag_no_image=no_image_flag,
                     prod_id=prod_id,
                     gamma_offset=off,
-                    source_environment=source_env
+                    source_environment=source_env,
+                    workflow_kind=workflow_kind,
                 )
 
                 log_merge_and_copy.update(log)
@@ -191,7 +192,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 flag_merge=merge_flag,
                 flag_no_image=no_image_flag,
                 prod_id=prod_id,
-                source_environment=source_env
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
             )
 
             log_merge_and_copy.update(log)

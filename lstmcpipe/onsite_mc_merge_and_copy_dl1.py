@@ -37,7 +37,7 @@ parser.add_argument('input_dir', type=str,
 
 
 def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=None, flag_merge=False,
-         flag_no_image=True, prod_id=None, gamma_offset=None, source_environment=None):
+         flag_no_image=True, prod_id=None, gamma_offset=None, source_environment=None, workflow_kind='lstchain'):
     """
     Merge and copy DL1 data after production.
 
@@ -178,9 +178,14 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             # 3.1 sbatch the jobs (or send them interactively depending) if the script is(not) run as part of the
             # whole workflow
             # filelist = [os.path.join(tdir, f) for f in os.listdir(tdir)]
-
-            cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} " \
-                  f"--smart {flag_merge}"
+            if workflow_kind == 'lstchain' or workflow_kind == 'hiperta':
+                cmd = f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} " \
+                f"--smart {flag_merge}"
+            else:
+                if flag_no_image:
+                    cmd = f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images {flag_no_image} --skip-simu-images {flag_no_image}'
+                else:
+                    cmd = f'ctapipe-merge --input-dir {tdir} --output {output_filename}'
             os.system(cmd)
 
         # 4. move DL1 files in final place
@@ -237,10 +242,18 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
             if wait_r0_dl1_jobs != '':
                 cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-            cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
-                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} ' \
-                   f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
-                   f'--smart {flag_merge}"'
+            if workflow_kind == 'lstchain' or workflow_kind == 'hiperta':
+                cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
+                    f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} ' \
+                    f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
+                    f'--smart {flag_merge}"'
+            else:
+                cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
+                    f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
+                if flag_no_image:
+                    cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images {flag_no_image} --skip-simu-images {flag_no_image}"'
+                else:
+                    cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename}"'
 
             jobid_merge = os.popen(cmd).read().strip('\n')
             log_merge[particle][set_type][jobid_merge] = cmd
