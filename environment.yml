@@ -8,10 +8,10 @@ dependencies:
   - astropy~=4.2
   - pip
   - ctapipe~=0.10.5
-  - lstchain=0.7.3
   - pip:
 #      - pytest_runner
 #      - pytest-ordering
-      - ctapipe_io_lst~=0.9.2
 #      - ctaplot
+      - ctapipe_io_lst~=0.9.2
+      - lstchain=0.7.3
       - pyirf~=0.4.0
