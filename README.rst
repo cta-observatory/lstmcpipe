@@ -1,8 +1,8 @@
-lstMCpipe
-=========
+lstMCpipe |CI|
+=========================
 
-.. image:: https://travis-ci.com/cta-observatory/lstmcpipe.svg?branch=master
-    :target: https://travis-ci.com/github/cta-observatory/lstmcpipe
+.. |CI| image:: https://github.com/cta-observatory/lstmcpipe/workflows/CI/badge.svg?branch=master
+  :target: https://github.com/cta-observatory/lstmcpipe/actions?query=workflow%3ACI
 
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 

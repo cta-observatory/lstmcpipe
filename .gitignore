@@ -9,3 +9,4 @@ build
 .idea
 __pycache__/
 lstmcpipe/__pycache__/
+.coverage
