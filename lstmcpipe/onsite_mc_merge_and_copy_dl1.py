@@ -183,7 +183,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 f"--smart {flag_merge}"
             else:
                 if flag_no_image:
-                    cmd = f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images {flag_no_image} --skip-simu-images {flag_no_image}'
+                    cmd = f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images'
                 else:
                     cmd = f'ctapipe-merge --input-dir {tdir} --output {output_filename}'
             os.system(cmd)
@@ -251,7 +251,7 @@ def main(input_dir, flag_full_workflow=False, particle2jobs_dict={}, particle=No
                 cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
                     f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
                 if flag_no_image:
-                    cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images {flag_no_image} --skip-simu-images {flag_no_image}"'
+                    cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images"'
                 else:
                     cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename}"'
 
