@@ -103,7 +103,8 @@ if __name__ == '__main__':
     # Make sure the lstchain config is defined if needed
     # It is not exactly required if you process only up to dl1
     if any([step not in ('r0_to_dl1', 'merge_and_copy_dl1') for step in stages_to_run]):
-        assert abspath(args.config_file_lst), 'The lstchain config needs to be defined for all steps following dl1 processing'
+        if args.config_file_lst is None:
+            raise Exception('The lstchain config needs to be defined for all steps following dl1 processing')
 
 
     # 1 STAGE --> R0/1 to DL1
