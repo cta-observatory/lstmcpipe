@@ -17,7 +17,7 @@
 import sys
 import argparse
 from os.path import abspath
-from .io.data_management import query_continue
+from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
     batch_merge_and_copy_dl1,
