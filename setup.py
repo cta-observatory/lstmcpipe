@@ -26,11 +26,18 @@ def readfile(filename):
 
 scripts_list = find_scripts('lstmcpipe', 'onsite_')
 
+entry_points = {
+    'console_scripts': [
+        'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main'
+    ]
+}
+
 setup(name='lstmcpipe',
       version=get_property('__version__', 'lstmcpipe'),
       description="MC production with lstchain on LST cluster (La Palma)",
       install_requires=[
           'lstchain',
+          'matplotlib'
       ],
       packages=find_packages(),
       # tests_require=['pytest'],
@@ -45,4 +52,5 @@ setup(name='lstmcpipe',
           'Topic :: Scientific/Engineering :: Astronomy',
       ],
       scripts=scripts_list,
+      entry_points=entry_points
       )
