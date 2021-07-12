@@ -48,30 +48,30 @@ from pyirf.io import (
 
 from lstchain.io.io import read_mc_dl2_to_QTable
 from lstchain.reco.utils import filter_events
-
-log = logging.getLogger("lstchain MC DL2 to IRF")
-
 import argparse
 from pathlib import Path
+
+
+log = logging.getLogger("lstchain MC DL2 to IRF")
 
 
 parser = argparse.ArgumentParser(description="MC DL2 to IRF")
 
 # Required arguments
 parser.add_argument('--gamma-dl2', '-g',
-                    type=Path,
+                    type=str,
                     dest='gamma_file',
                     help='Path to the dl2 gamma file',
                     )
 
 parser.add_argument('--proton-dl2', '-p',
-                    type=Path,
+                    type=str,
                     dest='proton_file',
                     help='Path to the dl2 proton file',
                     )
 
 parser.add_argument('--electron-dl2', '-e',
-                    type=Path,
+                    type=str,
                     dest='electron_file',
                     help='Path to the dl2 electron file',
                     )
@@ -140,7 +140,6 @@ particles = {
 #     'intensity': [50, np.inf],
 #     'leakage_intensity_width_2': [0, 0.2],
 # }
-
 
 
 def main():
@@ -362,7 +361,6 @@ def main():
     log.info('Writing output file')
     os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
     fits.HDUList(hdus).writeto(args.outfile, overwrite=True)
-
 
 
 if __name__ == "__main__":
