@@ -38,7 +38,7 @@ setup(name='lstmcpipe',
       description="MC production with lstchain on LST cluster (La Palma)",
       install_requires=[
           'lstchain',
-          'yaml',
+          'pyyaml',
           'numpy',
           'astropy',
           'ctaplot',
