@@ -73,13 +73,13 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-
                 particle_input_dir = os.path.join(input_dir, off).format(particle)
                 _particle = particle + '_' + off
                 start_r0()
         else:
             particle_input_dir = input_dir.format(particle)
             _particle = particle
+            off = None
             start_r0()
 
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
