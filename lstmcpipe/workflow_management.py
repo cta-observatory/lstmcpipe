@@ -16,6 +16,7 @@ from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from lstmcpipe.onsite_mc_train import main as train_pipe
 from lstmcpipe.onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
 from lstmcpipe.onsite_mc_dl2_to_irfs import main as dl2_to_irfs
+from lstmcpipe.stages.dl2_to_sensitivity import dl2_to_sensitivity
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
@@ -574,6 +575,46 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     jobid_for_check = ','.join(jobid_for_check)
 
     print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    return log_dl2_to_irfs, jobid_for_check, debug_log
+
+
+def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2,
+                             source_env, prod_id):
+    """
+
+    """
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_sensitivity = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_sensitivity()
+
+        # TODO finish here
+
+        # jobid_for_check.append(jobid)
+        # log_dl2_to_irfs[f'gamma_{off}'] = log
+        # debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+        #                    f'job_ids; {job_ids_from_dl1_dl2}'
+
+    if 'gamma-diffuse' in loop_particles:
+
+        log, jobid = dl2_to_sensitivity()
+
+
+        #
+        # jobid_for_check.append(jobid)
+        # log_dl2_to_irfs[f'gamma-diffuse'] = log
+        # debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+        #                    f'job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
 
     return log_dl2_to_irfs, jobid_for_check, debug_log
 

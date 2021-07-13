@@ -76,7 +76,7 @@ parser.add_argument('--electron-dl2', '-e',
                     help='Path to the dl2 electron file',
                     )
 
-parser.add_argument('--outfile', '-o', action='store', type=Path,
+parser.add_argument('--outfile', '-o', action='store', type=str,
                     dest='outfile',
                     help='Path where to save IRF FITS file',
                     default='.'
