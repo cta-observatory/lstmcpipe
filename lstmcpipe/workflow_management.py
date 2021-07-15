@@ -9,12 +9,11 @@ import yaml
 import pprint
 import calendar
 import lstchain
+from lstmcpipe.stages import onsite_mc_dl2_to_irfs, onsite_mc_dl1_to_dl2
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from lstmcpipe.onsite_mc_train import main as train_pipe
-from lstmcpipe.stages import onsite_mc_dl1_to_dl2
-from lstmcpipe.onsite_mc_dl2_to_irfs import main as dl2_to_irfs
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
@@ -533,14 +532,13 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     for off in offset_gammas:
 
-        log, jobid = dl2_to_irfs(
+        log, jobid = onsite_mc_dl2_to_irfs.dl2_to_irfs(
             dl2_directory,
+            config_file=config_file,
+            log_from_dl1_dl2=log_from_dl1_dl2,
             irf_point_like=True,
             irf_gamma_offset=off,
-            config_file=config_file,
             source_env=source_env,
-            flag_full_workflow=True,
-            log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id
         )
@@ -552,12 +550,11 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     if 'gamma-diffuse' in loop_particles:
 
-        log, jobid = dl2_to_irfs(
+        log, jobid = onsite_mc_dl2_to_irfs.dl2_to_irfs(
             dl2_directory,
             irf_point_like=False,
             config_file=config_file,
             source_env=source_env,
-            flag_full_workflow=True,
             log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id

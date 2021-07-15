@@ -91,7 +91,7 @@ def dl1_to_dl2(input_dir, path_models, config_file,  particle, wait_jobid_train_
             cmd += f' -c {config_file}'
 
         # TODO dry-run option ?
-        # if not dry_run:
+        # if dry_run:
         #     print(cmd)
 
         if 'training' in file:
