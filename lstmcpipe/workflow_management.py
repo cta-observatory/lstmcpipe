@@ -959,8 +959,8 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, prod_id, log_file, log_debug_file,
-                              scancel_file):
+                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, jobids_from_dl2_to_sensitivity,
+                              prod_id, log_file, log_debug_file, scancel_file):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -976,6 +976,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
     jobids_from_dl2_to_irf: str
+    jobids_from_dl2_to_sensitivity: str
     log_file: str
     log_debug_file: str
     scancel_file: str
@@ -991,17 +992,23 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     if jobids_from_r0_to_dl1 != '':
         all_pipeline_jobs.append(jobids_from_r0_to_dl1)
-    if jobids_from_merge != '':
+        last_stage = jobids_from_r0_to_dl1
+    elif jobids_from_merge != '':
         all_pipeline_jobs.append(jobids_from_merge)
-    if jobids_from_train_pipe != '':
+        last_stage = jobids_from_merge
+    elif jobids_from_train_pipe != '':
         all_pipeline_jobs.append(jobids_from_train_pipe)
-    if jobids_from_dl1_to_dl2 != '':
+        last_stage = jobids_from_train_pipe
+    elif jobids_from_dl1_to_dl2 != '':
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-
-    if jobids_from_dl2_to_irf != '':
+        last_stage = jobids_from_dl1_to_dl2
+    elif jobids_from_dl2_to_irf != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
         last_stage = jobids_from_dl2_to_irf
-    else:  # RTA case. Although this should be improved
+    elif jobids_from_dl2_to_sensitivity != '':
+        all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
+        last_stage = jobids_from_dl2_to_sensitivity
+    else:  # RTA case. #TODO wadAlthough this should be improved
         last_stage = jobids_from_dl1_to_dl2
 
     all_pipeline_jobs = ','.join(all_pipeline_jobs)
@@ -1030,6 +1037,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
     debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
     debug_log['SUMMARY_dl2_irfs'] = jobids_from_dl2_to_irf
+    debug_log['SUMMARY_dl2_sensitivity'] = jobids_from_dl2_to_sensitivity
 
     return jobid, debug_log
 

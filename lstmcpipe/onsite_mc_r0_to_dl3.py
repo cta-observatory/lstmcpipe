@@ -25,6 +25,7 @@ from lstmcpipe.workflow_management import (
     batch_train_pipe,
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
+    batch_dl2_to_sensitivity,
     save_log_to_file,
     create_dict_with_dl1_filenames,
     batch_mc_production_check,
@@ -216,7 +217,7 @@ if __name__ == '__main__':
             all_particles,
             gamma_offs,
             abspath(args.config_file_lst),
-            jobs_from_dl1_dl2,
+            jobs_from_dl1_dl2,           # Final dl2 names
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
             prod_id=prod_id
@@ -229,6 +230,26 @@ if __name__ == '__main__':
     else:
         jobs_from_dl2_irf = ''
 
+    # 6 STAGE --> DL2 to sensitivity curves
+    if 'dl2_to_sensitivity' in stages_to_run:
+        log_batch_dl2_sensitivity, jobs_from_dl2_sensitivity, debug_dl2_to_sensitivity = \
+            batch_dl2_to_sensitivity(
+                dl2_data_dir,
+                all_particles,
+                gamma_offs,
+                jobs_from_dl1_dl2,
+                log_batch_dl1_to_dl2,       # Final dl2 names
+                source_env=source_env,
+                prod_id=prod_id
+            )
+
+        save_log_to_file(log_batch_dl2_sensitivity, log_format='yml', workflow_step='dl2_to_sensitivity')
+        save_log_to_file(debug_dl2_to_sensitivity, log_format='yml', workflow_step='dl2_to_sensitivity')
+        update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
+
+    else:
+        jobs_from_dl2_sensitivity = ''
+
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check, debug_mc_check = batch_mc_production_check(
         jobs_all_r0_dl1,
@@ -236,6 +257,7 @@ if __name__ == '__main__':
         job_from_train_pipe,
         jobs_from_dl1_dl2,
         jobs_from_dl2_irf,
+        jobs_from_dl2_sensitivity,
         prod_id,
         log_file,
         debug_file,
