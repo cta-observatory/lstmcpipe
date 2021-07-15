@@ -9,10 +9,13 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.stages import onsite_mc_train, onsite_mc_dl2_to_irfs, onsite_mc_dl1_to_dl2
+from lstmcpipe.stages import (onsite_mc_merge_and_copy_dl1,
+                              onsite_mc_train,
+                              onsite_mc_dl2_to_irfs,
+                              onsite_mc_dl1_to_dl2
+                              )
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
-from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
@@ -257,9 +260,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
 
-                log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
+                log, jobid_mv_all_dl1, jobid_debug = onsite_mc_merge_and_copy_dl1.merge_dl1(
                     gamma_running_analysis_dir.format(particle),
-                    flag_full_workflow=True,
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
                     flag_merge=merge_flag,
@@ -283,9 +285,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         else:
             _particle = particle
 
-            log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
+            log, jobid_mv_all_dl1, jobid_debug = onsite_mc_merge_and_copy_dl1.merge_dl1(
                 running_analysis_dir.format(particle),
-                flag_full_workflow=True,
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
                 flag_merge=merge_flag,
