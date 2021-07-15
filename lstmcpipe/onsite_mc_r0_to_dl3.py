@@ -243,8 +243,8 @@ if __name__ == '__main__':
                 prod_id=prod_id
             )
 
-        save_log_to_file(log_batch_dl2_sensitivity, log_format='yml', workflow_step='dl2_to_sensitivity')
-        save_log_to_file(debug_dl2_to_sensitivity, log_format='yml', workflow_step='dl2_to_sensitivity')
+        save_log_to_file(log_batch_dl2_sensitivity, log_file, log_format='yml', workflow_step='dl2_to_sensitivity')
+        save_log_to_file(debug_dl2_to_sensitivity, debug_file, log_format='yml', workflow_step='dl2_to_sensitivity')
         update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
 
     else:

@@ -46,3 +46,4 @@ stages_to_be_run:
   - train_pipe
   - dl1_to_dl2
   - dl2_to_irfs
+  - dl2_to_sensitivity
