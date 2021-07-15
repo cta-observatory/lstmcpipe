@@ -104,7 +104,7 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma
     gamma_offset: str
         String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
     prod_id: str
-        String with prod_id prefix to complete 'filenaming'
+        String with prod_id prefix to complete 'file-naming'
 
     Returns
     -------
@@ -157,6 +157,8 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma
 def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2={}, gamma_point_like=True, gamma_offset='off0.0deg', prod_id=None,
                        source_env='', wait_jobs_dl1_dl2=''):
     """
+    Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse particles.
+    Creates the sensitivity *.fits.fz files and the corresponding sensitivity curve plot.
 
     Parameters
     ----------

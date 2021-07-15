@@ -515,13 +515,22 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     Parameters
     ----------
     dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
     config_file: str
+        Path to lstchain-like config file
     loop_particles: list
+        list with particles to be processed.
     offset_gammas: list
+        list off gamma offsets
     job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
     source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
     log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
     prod_id: str
+        String with prod_id prefix to complete 'file-naming'
 
     Returns
     -------
@@ -582,6 +591,35 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2,
                              source_env, prod_id):
     """
+    Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
+    dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    loop_particles: list
+        list with particles to be processed.
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_dl2_to_sensitivity: dict
+        Dictionary with job_id-slurm command key-value pair used for logging
+    jobid_for_check: str
+        String with single job_id batched by the dl2_to_sensitivity script
+    debug_log: dict
+        Dictionary with the job-id and stage explanation to be stored in the debug file
 
     """
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
@@ -592,31 +630,40 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
 
     for off in offset_gammas:
 
-        log, jobid = dl2_to_sensitivity()
+        log, jobid = dl2_to_sensitivity(dl2_directory,
+                                        log_from_dl1_dl2,
+                                        gamma_point_like=True,
+                                        gamma_offset=off,
+                                        prod_id=prod_id,
+                                        source_env=source_env,
+                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
+                                        )
 
-        # TODO finish here
-
-        # jobid_for_check.append(jobid)
-        # log_dl2_to_irfs[f'gamma_{off}'] = log
-        # debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-        #                    f'job_ids; {job_ids_from_dl1_dl2}'
+        jobid_for_check.append(jobid)
+        log_dl2_to_sensitivity[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_sensitivity stage that depends of the dl1_to_dl2 ' \
+                           f'stage job_ids; {job_ids_from_dl1_dl2}'
 
     if 'gamma-diffuse' in loop_particles:
 
-        log, jobid = dl2_to_sensitivity()
+        log, jobid = dl2_to_sensitivity(dl2_directory,
+                                        log_from_dl1_dl2,
+                                        gamma_point_like=False,
+                                        prod_id=prod_id,
+                                        source_env=source_env,
+                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
+                                        )
 
-
-        #
-        # jobid_for_check.append(jobid)
-        # log_dl2_to_irfs[f'gamma-diffuse'] = log
-        # debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-        #                    f'job_ids; {job_ids_from_dl1_dl2}'
+        jobid_for_check.append(jobid)
+        log_dl2_to_sensitivity[f'gamma-diffuse'] = log
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_sensitivity stage that depends of the dl1_to_dl2 ' \
+                           f'stage job_ids; {job_ids_from_dl1_dl2}'
 
     jobid_for_check = ','.join(jobid_for_check)
 
     print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
 
-    return log_dl2_to_irfs, jobid_for_check, debug_log
+    return log_dl2_to_sensitivity, jobid_for_check, debug_log
 
 
 def load_yml_config(yml_file):
