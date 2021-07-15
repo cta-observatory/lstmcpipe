@@ -13,7 +13,7 @@ from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from lstmcpipe.onsite_mc_train import main as train_pipe
-from lstmcpipe.onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
+from lstmcpipe.stages import onsite_mc_dl1_to_dl2
 from lstmcpipe.onsite_mc_dl2_to_irfs import main as dl2_to_irfs
 
 
@@ -460,11 +460,10 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
 
-                log, jobid = dl1_to_dl2(
+                log, jobid = onsite_mc_dl1_to_dl2.dl1_to_dl2(
                     gamma_dl1_directory.format(particle),
                     path_models=path_to_models,
                     config_file=config_file,
-                    flag_full_workflow=True,
                     particle=_particle,
                     wait_jobid_train_pipe=jobid_from_training,
                     wait_jobids_merge=jobids_from_merge,
@@ -480,11 +479,10 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
         else:
             _particle = particle
-            log, jobid = dl1_to_dl2(
+            log, jobid = onsite_mc_dl1_to_dl2.dl1_to_dl2(
                 dl1_directory.format(particle),
                 path_models=path_to_models,
                 config_file=config_file,
-                flag_full_workflow=True,
                 particle=_particle,
                 wait_jobid_train_pipe=jobid_from_training,
                 wait_jobids_merge=jobids_from_merge,
