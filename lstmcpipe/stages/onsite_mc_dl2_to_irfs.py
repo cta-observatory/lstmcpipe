@@ -166,7 +166,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
 
     # TODO dry-run option ?
     # if dry_run:
-    #     print (cmd)
+    #     print(cmd)
 
     print(f'\tOutput dir IRF {irf_kind}: {output_irfs_dir}')
 

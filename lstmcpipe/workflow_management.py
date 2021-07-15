@@ -9,11 +9,10 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.stages import onsite_mc_dl2_to_irfs, onsite_mc_dl1_to_dl2
+from lstmcpipe.stages import onsite_mc_train, onsite_mc_dl2_to_irfs, onsite_mc_dl1_to_dl2
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
-from lstmcpipe.onsite_mc_train import main as train_pipe
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
@@ -350,12 +349,11 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
     proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
 
-    log_train, jobid_4_dl1_to_dl2, model_path = train_pipe(
+    log_train, jobid_4_dl1_to_dl2, model_path = onsite_mc_train.train_pipe(
         gamma_dl1_train_file,
         proton_dl1_train_file,
         config_file=config_file,
         source_environment=source_env,
-        flag_full_workflow=True,
         wait_ids_proton_and_gammas=jobids_from_merge
     )
 
