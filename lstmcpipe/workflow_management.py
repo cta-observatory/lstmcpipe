@@ -960,7 +960,7 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
                               jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, jobids_from_dl2_to_sensitivity,
-                              prod_id, log_file, log_debug_file, scancel_file):
+                              prod_id, log_file, log_debug_file, scancel_file, prod_config_file, last_stage):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -980,6 +980,8 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     log_file: str
     log_debug_file: str
     scancel_file: str
+    prod_config_file: str
+    last_stage: str
 
     Returns
     -------
@@ -990,40 +992,42 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log = {}
     all_pipeline_jobs = []
 
+    jobids_stages = {
+        'r0_to_dl1': jobids_from_r0_to_dl1,
+        'merge_and_copy_dl1': jobids_from_merge,
+        'train_pipe': jobids_from_train_pipe,
+        'dl1_to_dl2': jobids_from_dl1_to_dl2,
+        'dl2_to_irfs': jobids_from_dl2_to_irf,
+        'dl2_to_sensitivity': jobids_from_dl2_to_sensitivity
+    }
+
     if jobids_from_r0_to_dl1 != '':
         all_pipeline_jobs.append(jobids_from_r0_to_dl1)
-        last_stage = jobids_from_r0_to_dl1
-    elif jobids_from_merge != '':
+    if jobids_from_merge != '':
         all_pipeline_jobs.append(jobids_from_merge)
-        last_stage = jobids_from_merge
-    elif jobids_from_train_pipe != '':
+    if jobids_from_train_pipe != '':
         all_pipeline_jobs.append(jobids_from_train_pipe)
-        last_stage = jobids_from_train_pipe
-    elif jobids_from_dl1_to_dl2 != '':
+    if jobids_from_dl1_to_dl2 != '':
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-        last_stage = jobids_from_dl1_to_dl2
-    elif jobids_from_dl2_to_irf != '':
+    if jobids_from_dl2_to_irf != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
-        last_stage = jobids_from_dl2_to_irf
-    elif jobids_from_dl2_to_sensitivity != '':
+    if jobids_from_dl2_to_sensitivity != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
-        last_stage = jobids_from_dl2_to_sensitivity
-    else:  # RTA case. #TODO wadAlthough this should be improved
-        last_stage = jobids_from_dl1_to_dl2
 
     all_pipeline_jobs = ','.join(all_pipeline_jobs)
+
+    which_last_stage = jobids_stages[last_stage]
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
                 f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
-                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id}; ' \
                 f'rm {scancel_file}; ' \
-                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
-                f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
+                f'cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
+                f'mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{last_stage} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
@@ -1031,7 +1035,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
-    debug_log['sbatch_cmd'] = cmd_wrap
+    debug_log['sbatch_cmd'] = batch_cmd
     debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
     debug_log['SUMMARY_merge'] = jobids_from_merge
     debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe

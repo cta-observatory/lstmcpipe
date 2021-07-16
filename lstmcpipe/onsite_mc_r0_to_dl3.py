@@ -261,7 +261,9 @@ if __name__ == '__main__':
         prod_id,
         log_file,
         debug_file,
-        scancel_file
+        scancel_file,
+        prod_config_file=args.config_mc_prod,
+        last_stage=stages_to_run[-1]
     )
 
     save_log_to_file(debug_mc_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
