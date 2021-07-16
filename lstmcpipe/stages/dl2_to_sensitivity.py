@@ -3,7 +3,7 @@
 import os
 
 
-def batch_plot_senstitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_name):
+def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_name, source_env):
     """
     Batches the the `plot_irfs` entry point after the computation of the `dl2_to_sensitivity` script
 
@@ -15,6 +15,8 @@ def batch_plot_senstitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_na
         Jobid from dl2_to_sensitivity stage to be used as a slurm dependency
     job_name: str
         Gamma type string for file-naming
+    source_env: str
+        Source environment (source .bashrc + conda activate env) to be used in the slurm cmd
 
     Returns
     -------
@@ -32,7 +34,7 @@ def batch_plot_senstitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_na
                         f'job_plot_sensitivity_g_{job_name}.o')
 
     base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobid_dl2_to_sens} -e {jobe} -o {jobo}' \
-               f' - J {job_name}_sens_plot --wrap="{cmd}"'
+               f' -J {job_name}_sens_plot --wrap="{source_env} {cmd}"'
 
     job_id = os.popen(base_cmd).read().strip('\n')
     log = {job_id: base_cmd}
@@ -249,7 +251,7 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_o
 
     # Create plot from sensitivity files
     log_plot_sens, job_id_plot_sens = \
-        batch_plot_senstitivity(out_file, job_id_dl2_sens, job_name)
+        batch_plot_sensitivity(out_file, job_id_dl2_sens, job_name, source_env)
 
     log_dl2_to_sensitivity.update(log_plot_sens)
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
