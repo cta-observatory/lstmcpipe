@@ -52,7 +52,7 @@ import argparse
 from pathlib import Path
 
 
-log = logging.getLogger("lstchain MC DL2 to IRF")
+log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
 
 
 parser = argparse.ArgumentParser(description="MC DL2 to IRF")

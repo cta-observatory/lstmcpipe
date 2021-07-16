@@ -39,15 +39,15 @@ def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, job_name, o
     cmd = f'lstmcpipe_dl2_to_sensitivity -g {gamma_file} -p {proton_file} -e {electron_file} ' \
           f' -o {output_filename}'
 
-    jobo = os.path.join(output_directory, f'job_sensitivity_{job_name}.o')
-    jobe = os.path.join(output_directory, f'job_sensitivity_{job_name}.e')
+    jobo = os.path.join(output_directory, f'job_dl2_to_sensitivity_{job_name}.o')
+    jobe = os.path.join(output_directory, f'job_dl2_to_sensitivity_{job_name}.e')
 
     base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -e {jobe} -o {jobo} ' \
                f' -J {job_name}_sensitivity --wrap="{source_env} {cmd}"'
 
     job_id = os.popen(base_cmd).read().strip('\n')
 
-    log = {job_id: cmd}
+    log = {job_id: base_cmd}
 
     return log, job_id
 
@@ -140,25 +140,26 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma
 
     # Create output filenames
     if prod_id is None:
-        output_sensitivity_filename = os.path.join(output_directory, 'sensitivity.fits.fz')
+        output_sensitivity_filename = os.path.join(output_directory, 'sensitivity.fits.gz')
     else:
         if gamma_point_like:
             output_sensitivity_filename = os.path.join(
                 output_directory,
-                f'{prod_id.replace(".", "")}_gamma_{gamma_offset.replace(".", "")}_sensitivity.fits.fz')
+                f'{prod_id.replace(".", "")}_gamma_{gamma_offset.replace(".", "")}_sensitivity.fits.gz')
         else:
             output_sensitivity_filename = os.path.join(
                 output_directory,
-                f'{prod_id.replace(".", "")}_gamma_diffuse_sensitivity.fits.fz')
+                f'{prod_id.replace(".", "")}_gamma_diffuse_sensitivity.fits.gz')
 
     return gamma_file, proton_file, electron_file, job_name, output_directory, output_sensitivity_filename
 
 
-def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2={}, gamma_point_like=True, gamma_offset='off0.0deg', prod_id=None,
+def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_offset='off0.0deg', prod_id=None,
                        source_env='', wait_jobs_dl1_dl2=''):
     """
-    Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse particles.
-    Creates the sensitivity *.fits.fz files and the corresponding sensitivity curve plot.
+    Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse
+    particles.
+    Creates the sensitivity *.fits.gz files and the corresponding sensitivity curve plot.
 
     Parameters
     ----------
