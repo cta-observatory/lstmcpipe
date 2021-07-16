@@ -640,8 +640,8 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
 
         jobid_for_check.append(jobid)
         log_dl2_to_sensitivity[f'gamma_{off}'] = log
-        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_sensitivity stage that depends of the dl1_to_dl2 ' \
-                           f'stage job_ids; {job_ids_from_dl1_dl2}'
+        debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
+                           f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
 
     if 'gamma-diffuse' in loop_particles:
 
@@ -655,8 +655,8 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
 
         jobid_for_check.append(jobid)
         log_dl2_to_sensitivity[f'gamma-diffuse'] = log
-        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_sensitivity stage that depends of the dl1_to_dl2 ' \
-                           f'stage job_ids; {job_ids_from_dl1_dl2}'
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_sensitivity stage and the plot_irfs script tthat ' \
+                           f'depends of the dl1_to_dl2 sstage job_ids; {job_ids_from_dl1_dl2}'
 
     jobid_for_check = ','.join(jobid_for_check)
 
