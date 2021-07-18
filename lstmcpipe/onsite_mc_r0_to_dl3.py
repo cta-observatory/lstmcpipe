@@ -227,7 +227,6 @@ if __name__ == '__main__':
         log_batch_dl2_sensitivity, jobs_from_dl2_sensitivity, debug_dl2_to_sensitivity = \
             batch_dl2_to_sensitivity(
                 dl2_data_dir,
-                all_particles,
                 gamma_offs,
                 jobs_from_dl1_dl2,
                 log_batch_dl1_to_dl2,       # Final dl2 names
