@@ -3,7 +3,7 @@
 import os
 
 
-def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_name, source_env):
+def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, gamma_offset, source_env):
     """
     Batches the the `plot_irfs` entry point after the computation of the `dl2_to_sensitivity` script
 
@@ -13,8 +13,8 @@ def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_nam
         Path to sensitivity.fits.gz file
     wait_jobid_dl2_to_sens: str
         Jobid from dl2_to_sensitivity stage to be used as a slurm dependency
-    job_name: str
-        Gamma type string for file-naming
+    gamma_offset: str
+        String to indicate the gamma offset. Either 'off0.0deg' or 'off0.4deg'
     source_env: str
         Source environment (source .bashrc + conda activate env) to be used in the slurm cmd
 
@@ -29,10 +29,11 @@ def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_nam
     cmd = f'lstmcpipe_plot_irfs -f {sensitivity_filename} -o {sensitivity_filename.replace(".fits.gz", ".png")}'
 
     jobe = os.path.join(os.path.abspath(os.path.dirname(sensitivity_filename)),
-                        f'job_plot_sensitivity_g_{job_name}.e')
+                        f'job_plot_sensitivity_gamma_{gamma_offset}.e')
     jobo = os.path.join(os.path.abspath(os.path.dirname(sensitivity_filename)),
-                        f'job_plot_sensitivity_g_{job_name}.o')
+                        f'job_plot_sensitivity_gamma_{gamma_offset}.o')
 
+    job_name = gamma_offset.replace(".", "").replace("off", "").replace("deg", "")
     base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobid_dl2_to_sens} -e {jobe} -o {jobo}' \
                f' -J {job_name}_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {cmd}"'
 
@@ -42,7 +43,7 @@ def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_nam
     return log, job_id
 
 
-def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, job_name, output_directory, output_filename,
+def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, gamma_offset, output_directory, output_filename,
                              source_env, wait_jobs_dl1dl2):
     """
     Batches the dl2_to_sensitivity slurm script with all the needed args
@@ -55,8 +56,8 @@ def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, job_name, o
         Path to DL2 proton test file
     electron_file: str
         Path to DL2 electron test file
-    job_name: str
-        Prefix (with the particle type) to be added in the name of the slurm job to be batched
+    gamma_offset: str
+        String to indicate the gamma offset. Either 'off0.0deg' or 'off0.4deg'
     output_directory: str
         Absolute path with output directory
     output_filename: str
@@ -78,9 +79,10 @@ def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, job_name, o
     cmd = f'lstmcpipe_dl2_to_sensitivity -g {gamma_file} -p {proton_file} -e {electron_file} ' \
           f' -o {output_filename}'
 
-    jobo = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{job_name}.o')
-    jobe = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{job_name}.e')
+    jobo = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.o')
+    jobe = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.e')
 
+    job_name = gamma_offset.replace(".", "").replace("off", "")
     base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -e {jobe} -o {jobo} ' \
                f' -J {job_name}_sensitivity --wrap="{source_env} {cmd}"'
 
@@ -100,7 +102,7 @@ def compose_sensitivity_outdir(dl2_dir, gamma_offset):
     dl2_dir: str
         Base path to DL2 directory
     gamma_offset: str
-        String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
+        String to indicate the gamma offset. Either 'off0.0deg' or 'off0.4deg'
 
     Returns
     -------
@@ -145,8 +147,6 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_offset='off0.0deg', pr
         Absolute path to DL2 proton test file
     electron_file: str
         Absolute path to DL2 electron test file
-    job_name: str
-        Prefix (with the particle type) to be added in the name of the slurm job to be batched
     output_directory: str
         Absolute path with output directory
     output_sensitivity_filename: str
@@ -161,11 +161,9 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_offset='off0.0deg', pr
 
     if gamma_offset == 'off0.0deg':
         gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
-        job_name = '00deg'
     else:
         # gamma_offset == 'off0.4deg'. No other case possible, it has been checked in 'compose_sensitivity_outdir'
         gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
-        job_name = '04deg'
 
     # Create output filenames
     if prod_id is None:
@@ -175,7 +173,7 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_offset='off0.0deg', pr
             output_directory,
             f'{prod_id.replace(".", "")}_gamma_{gamma_offset.replace(".", "")}_sensitivity.fits.gz')
 
-    return gamma_file, proton_file, electron_file, job_name, output_directory, output_sensitivity_filename
+    return gamma_file, proton_file, electron_file, output_directory, output_sensitivity_filename
 
 
 def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod_id=None, source_env='',
@@ -211,7 +209,7 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod
     log_dl2_to_sensitivity = {}
     jobids_dl2_to_sensitivity = []
 
-    g_file, p_file, e_file, job_name, out_dir, out_file = \
+    g_file, p_file, e_file, out_dir, out_file = \
         sensitivity_io(dl2_dir,
                        log_from_dl1_dl2,
                        gamma_offset,
@@ -222,7 +220,7 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod
         batch_dl2_to_sensitivity(g_file,
                                  p_file,
                                  e_file,
-                                 job_name,
+                                 gamma_offset,
                                  out_dir,
                                  out_file,
                                  source_env,
@@ -233,7 +231,10 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod
 
     # Create plot from sensitivity files
     log_plot_sens, job_id_plot_sens = \
-        batch_plot_sensitivity(out_file, job_id_dl2_sens, job_name, source_env)
+        batch_plot_sensitivity(out_file,
+                               job_id_dl2_sens,
+                               gamma_offset,
+                               source_env)
 
     log_dl2_to_sensitivity.update(log_plot_sens)
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
