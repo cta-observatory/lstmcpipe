@@ -217,7 +217,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
         this function) should be either True or False.
     gamma_offsets : list
-        list containig the offset of the gammas
+        list containing the offset of the gammas
     prod_id : str
         prod_id defined in config_MC_prod.yml
     source_env : str
@@ -587,8 +587,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     return log_dl2_to_irfs, jobid_for_check, debug_log
 
 
-def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2,
-                             source_env, prod_id):
+def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
     """
     Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
     dl1_to_dl2 stage had finished.
@@ -597,8 +596,6 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
     ----------
     dl2_directory: str
         Base path to DL2 directory to be formatted with particle type
-    loop_particles: list
-        list with particles to be processed.
     offset_gammas: list
         list off gamma offsets
     job_ids_from_dl1_dl2: str
@@ -607,7 +604,7 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
     log_from_dl1_dl2: dict
         Dictionary from dl1_to_dl2 stage with particle path information
     source_env: str
-        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
+        source environment to select the desired conda environment (source .bashrc + conda activate $ENV)
     prod_id: str
         String with prod_id prefix to complete 'file-naming'
 
@@ -616,7 +613,7 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
     log_dl2_to_sensitivity: dict
         Dictionary with job_id-slurm command key-value pair used for logging
     jobid_for_check: str
-        String with single job_id batched by the dl2_to_sensitivity script
+        Comma-separated jobids batched in the current stage
     debug_log: dict
         Dictionary with the job-id and stage explanation to be stored in the debug file
 
@@ -631,7 +628,6 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
 
         log, jobid = dl2_to_sensitivity(dl2_directory,
                                         log_from_dl1_dl2,
-                                        gamma_point_like=True,
                                         gamma_offset=off,
                                         prod_id=prod_id,
                                         source_env=source_env,
@@ -642,21 +638,6 @@ def batch_dl2_to_sensitivity(dl2_directory, loop_particles, offset_gammas, job_i
         log_dl2_to_sensitivity[f'gamma_{off}'] = log
         debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
                            f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
-
-    if 'gamma-diffuse' in loop_particles:
-
-        log, jobid = dl2_to_sensitivity(dl2_directory,
-                                        log_from_dl1_dl2,
-                                        gamma_point_like=False,
-                                        prod_id=prod_id,
-                                        source_env=source_env,
-                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
-                                        )
-
-        jobid_for_check.append(jobid)
-        log_dl2_to_sensitivity[f'gamma-diffuse'] = log
-        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_sensitivity stage and the plot_irfs script tthat ' \
-                           f'depends of the dl1_to_dl2 sstage job_ids; {job_ids_from_dl1_dl2}'
 
     jobid_for_check = ','.join(jobid_for_check)
 

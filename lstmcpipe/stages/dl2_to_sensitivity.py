@@ -34,7 +34,7 @@ def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, job_nam
                         f'job_plot_sensitivity_g_{job_name}.o')
 
     base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobid_dl2_to_sens} -e {jobe} -o {jobo}' \
-               f' -J {job_name}_sens_plot --wrap="{source_env} {cmd}"'
+               f' -J {job_name}_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {cmd}"'
 
     job_id = os.popen(base_cmd).read().strip('\n')
     log = {job_id: base_cmd}
@@ -91,7 +91,7 @@ def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, job_name, o
     return log, job_id
 
 
-def compose_sensitivity_outdir(dl2_dir, gamma_point_like, gamma_offset):
+def compose_sensitivity_outdir(dl2_dir, gamma_offset):
     """
     Compute the sensitivity output directory depending on the type of gamma file
 
@@ -99,8 +99,6 @@ def compose_sensitivity_outdir(dl2_dir, gamma_point_like, gamma_offset):
     ----------
     dl2_dir: str
         Base path to DL2 directory
-    gamma_point_like: bool
-        Boolean flag to indicate if particle is `gamma` or `gamma-diffuse`
     gamma_offset: str
         String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
 
@@ -116,19 +114,15 @@ def compose_sensitivity_outdir(dl2_dir, gamma_point_like, gamma_offset):
         print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
-    if gamma_point_like:
-        output_sensitivity_dir = os.path.join(dl2_dir.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
-                                              gamma_offset)
-    else:
-        output_sensitivity_dir = os.path.join(dl2_dir.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
-                                              'diffuse')
+    output_sensitivity_dir = os.path.join(dl2_dir.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
+                                          gamma_offset)
 
     os.makedirs(output_sensitivity_dir, exist_ok=True)
 
     return output_sensitivity_dir
 
 
-def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma_offset='off0.0deg', prod_id=None):
+def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_offset='off0.0deg', prod_id=None):
     """
     Manages the i/o arguments and parameters to be passed to the batch_dl2_to_sensitivity function.
 
@@ -138,8 +132,6 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma
         Base path to DL2 directory
     log_from_dl1_dl2: dict
         Dictionary with particle abs path created in previous stages #TODO to be changed by a glob.glob ?
-    gamma_point_like: bool
-        Boolean flag to indicate if particle is `gamma` or `gamma-diffuse`
     gamma_offset: str
         String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
     prod_id: str
@@ -161,40 +153,33 @@ def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_point_like=True, gamma
         Output filename
 
     """
-    output_directory = compose_sensitivity_outdir(dl2_directory, gamma_point_like, gamma_offset)
+    output_directory = compose_sensitivity_outdir(dl2_directory, gamma_offset)
 
     # Find paths to DL2 files
     proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
     electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
 
-    if gamma_point_like and gamma_offset == 'off0.0deg':
+    if gamma_offset == 'off0.0deg':
         gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
         job_name = '00deg'
-    elif gamma_point_like and gamma_offset == 'off0.4deg':
+    else:
+        # gamma_offset == 'off0.4deg'. No other case possible, it has been checked in 'compose_sensitivity_outdir'
         gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
         job_name = '04deg'
-    else:
-        gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
-        job_name = 'diff'
 
     # Create output filenames
     if prod_id is None:
         output_sensitivity_filename = os.path.join(output_directory, 'sensitivity.fits.gz')
     else:
-        if gamma_point_like:
-            output_sensitivity_filename = os.path.join(
-                output_directory,
-                f'{prod_id.replace(".", "")}_gamma_{gamma_offset.replace(".", "")}_sensitivity.fits.gz')
-        else:
-            output_sensitivity_filename = os.path.join(
-                output_directory,
-                f'{prod_id.replace(".", "")}_gamma_diffuse_sensitivity.fits.gz')
+        output_sensitivity_filename = os.path.join(
+            output_directory,
+            f'{prod_id.replace(".", "")}_gamma_{gamma_offset.replace(".", "")}_sensitivity.fits.gz')
 
     return gamma_file, proton_file, electron_file, job_name, output_directory, output_sensitivity_filename
 
 
-def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_offset='off0.0deg', prod_id=None,
-                       source_env='', wait_jobs_dl1_dl2=''):
+def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod_id=None, source_env='',
+                       wait_jobs_dl1_dl2=''):
     """
     Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse
     particles.
@@ -206,8 +191,6 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_o
         Base path to DL2 directory
     log_from_dl1_dl2: dict
         Dictionary with particle abs path created in previous stages #TODO to be changed by a glob.glob ?
-    gamma_point_like: bool
-        Boolean flag to indicate if particle is `gamma` or `gamma-diffuse`
     gamma_offset: str
         String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
     prod_id: str
@@ -222,7 +205,7 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_o
     log_dl2_to_sensitivity: dict
         Dictionary with job_id-slurm command key-value pair used for logging
     job_id: str
-        String with single job_id batched by the dl2_to_sensitivity script
+        String with job_ids batched by the dl2_to_sensitivity script
 
     """
     log_dl2_to_sensitivity = {}
@@ -231,7 +214,6 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_point_like=True, gamma_o
     g_file, p_file, e_file, job_name, out_dir, out_file = \
         sensitivity_io(dl2_dir,
                        log_from_dl1_dl2,
-                       gamma_point_like,
                        gamma_offset,
                        prod_id)
 
