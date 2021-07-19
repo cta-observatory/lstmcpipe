@@ -246,9 +246,20 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     if flag_full_workflow and 'off' in particle:
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
-        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
+        RUNNING_DIR = os.path.join(
+                DL0_DATA_DIR.replace(
+                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'running_analysis'),
+                PROD_ID,
+                offset
+                )
     else:
-        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+        RUNNING_DIR = os.path.join(
+                DL0_DATA_DIR.replace(
+                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'running_analysis'),
+                PROD_ID,
+                )
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
