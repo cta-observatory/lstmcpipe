@@ -19,6 +19,20 @@ from lstmcpipe.io.data_management import (
 )
 
 
+def batch_move_dir_content(source, destination, particle, wait_jobs, tag):
+    cmd = f'lstmcpipe_utils_move_dir -s {source} -d {destination}'
+
+    jobe = f'slurm-{particle}_{tag}.e'
+    jobo = f'slurm-{particle}_{tag}.o'
+
+    batch_cmd = f'sbatch --parsable -p short -J {particle}_{tag} -e {jobe} -o {jobo} --dependency=afterok:{wait_jobs} ' \
+                f'--wrap="{cmd}"'
+
+    job_id = os.popen(batch_cmd).read().strip('\n')
+
+    return job_id, batch_cmd
+
+
 def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, flag_no_image=True, prod_id=None,
               gamma_offset=None, source_environment=None):
     """
@@ -187,17 +201,12 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     wait_both_merges = ','.join(wait_both_merges)
 
     # 4 --> move DL1 files in final place
-    batch_mv_dl1 = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dl1',
-                                   f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_files.e',
-                                   f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_files.o',
-                                   wait_both_merges,
-                                   running_DL1_dir,
-                                   final_DL1_dir,
-                                   'False'
-                                   )
-
-    jobid_move_dl1 = os.popen(batch_mv_dl1).read().strip('\n')
-    log_merge[particle][set_type][jobid_move_dl1] = batch_mv_dl1
+    jobid_move_dl1, cmd_batched = batch_move_dir_content(running_DL1_dir,
+                                                         final_DL1_dir,
+                                                         job_name[particle].split('_')[0],
+                                                         wait_both_merges,
+                                                         tag='mv_dl1_files')
+    log_merge[particle][set_type][jobid_move_dl1] = cmd_batched
 
     print(f'\n\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
 
