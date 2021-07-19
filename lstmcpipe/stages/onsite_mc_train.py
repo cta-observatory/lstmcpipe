@@ -59,14 +59,15 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
     print(f"\tModels will be placed in {models_dir}")
     check_and_make_dir_without_verification(models_dir)
 
-    base_cmd = ''
+    cmd = ''
     if source_environment is not None:
-        base_cmd += source_environment
-    base_cmd += f'lstchain_mc_trainpipe --fg {os.path.abspath(gamma_dl1_train_file)}' \
-                f' --fp {os.path.abspath(proton_dl1_train_file)} -o {models_dir}'
+        cmd += source_environment
+
+    cmd += f' lstchain_mc_trainpipe --fg {os.path.abspath(gamma_dl1_train_file)}' \
+           f' --fp {os.path.abspath(proton_dl1_train_file)} -o {models_dir}'
 
     if config_file is not None:
-        base_cmd = base_cmd + ' -c {}'.format(config_file)
+        cmd = cmd + ' -c {}'.format(config_file)
 
     jobo = os.path.join(models_dir, "train_job.o")
     jobe = os.path.join(models_dir, "train_job.e")
@@ -76,10 +77,10 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
     #     print(cmd)
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    cmd = 'sbatch --parsable -p long'
+    batch_cmd = 'sbatch --parsable -p long'
     if wait_ids_proton_and_gammas != '':
-        cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
-    cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{base_cmd}" '
+        batch_cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
+    batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
 
     jobid_train = os.popen(cmd).read().strip('\n')
     log_train[jobid_train] = cmd
