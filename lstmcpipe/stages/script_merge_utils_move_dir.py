@@ -4,7 +4,7 @@ import argparse
 from lstmcpipe.io.data_management import move_dir_content, check_and_make_dir_without_verification
 
 parser = argparse.ArgumentParser(description="Script to move a directory and its content after creating the destination"
-                                             "directory.")
+                                             " directory.")
 
 parser.add_argument('--source', '-s', type=str,
                     dest='source',

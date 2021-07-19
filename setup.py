@@ -28,7 +28,9 @@ scripts_list = find_scripts('lstmcpipe', 'onsite_')
 
 entry_points = {
     'console_scripts': [
-        'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main'
+        'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main',
+        'lstmcpipe_utils_move_dir = lstmcpipe.stages.script_merge_utils_move_dir:main',
+        'lstmcpipe_utils_cp_config = lstmcpipe.stages.script_merge_utils_copy_config:main'
     ]
 }
 

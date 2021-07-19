@@ -19,18 +19,40 @@ from lstmcpipe.io.data_management import (
 )
 
 
-def batch_move_dir_content(source, destination, particle, wait_jobs, tag):
-    cmd = f'lstmcpipe_utils_move_dir -s {source} -d {destination}'
+def compose_batch_command_of_script(source, destination, script, particle, wait_jobs, suffix):
+    """
+    Creates the slurm command of the 'cmd' script
 
-    jobe = f'slurm-{particle}_{tag}.e'
-    jobo = f'slurm-{particle}_{tag}.o'
+    Parameters
+    ----------
+    source: str
+        Source directory
+    destination: str
+        Destination directory
+    script: str
+        Script to be used in the slurm command. Either 'lstmcpipe_utils_move_dir' or 'lstmcpipe_utils_cp_config'
+    particle: str
+        Particle type for slurm job-naming
+    suffix: str
+        Suffix to indicate the kind of job
+    wait_jobs: str
+        Job-id to be used as dependency in the batched slurm command
 
-    batch_cmd = f'sbatch --parsable -p short -J {particle}_{tag} -e {jobe} -o {jobo} --dependency=afterok:{wait_jobs} ' \
-                f'--wrap="{cmd}"'
+    Returns
+    -------
+    batch_cmd: str
+        Full slurm batch command ready to batched the script argument
 
-    job_id = os.popen(batch_cmd).read().strip('\n')
+    """
+    cmd = f'{script} -s {source} -d {destination}'
 
-    return job_id, batch_cmd
+    jobe = f'slurm-{particle}_{suffix}.e'
+    jobo = f'slurm-{particle}_{suffix}.o'
+
+    batch_cmd = f'sbatch --parsable -p short -J {particle}_{suffix} -e {jobe} -o {jobo} ' \
+                f'--dependency=afterok:{wait_jobs} --wrap="{cmd}"'
+
+    return batch_cmd
 
 
 def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, flag_no_image=True, prod_id=None,
@@ -195,48 +217,43 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
 
     print(f"\tDL1 files will be moved to {final_DL1_dir}")
 
-    base_cmd = 'sbatch --parsable -p short -J {} -e {} -o {} --dependency=afterok:{} ' \
-               '--wrap="onsite_utils_merge_and_copy_dl1.py -s {} -d {} --copy_conf {}"'
-
-    wait_both_merges = ','.join(wait_both_merges)
-
     # 4 --> move DL1 files in final place
-    jobid_move_dl1, cmd_batched = batch_move_dir_content(running_DL1_dir,
-                                                         final_DL1_dir,
-                                                         job_name[particle].split('_')[0],
-                                                         wait_both_merges,
-                                                         tag='mv_dl1_files')
-    log_merge[particle][set_type][jobid_move_dl1] = cmd_batched
+    wait_both_merges = ','.join(wait_both_merges)
+    cmd_mv_dl1 = compose_batch_command_of_script(running_DL1_dir,
+                                                 final_DL1_dir,
+                                                 script='lstmcpipe_utils_move_dir',
+                                                 particle=job_name[particle].split('_')[0],
+                                                 suffix='mv_dl1_files',
+                                                 wait_jobs=wait_both_merges)
+
+    jobid_move_dl1 = os.popen(cmd_mv_dl1).read().strip('\n')
+    log_merge[particle][set_type][jobid_move_dl1] = cmd_mv_dl1
 
     print(f'\n\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
 
     # 5 --> copy lstchain config file in final_dir too
-    batch_copy_conf = base_cmd.format(job_name[particle].split('_')[0] + '_cp_conf',
-                                      f'slurm-{job_name[particle].split("_")[0]}_cp_config.e',
-                                      f'slurm-{job_name[particle].split("_")[0]}_cp_config.o',
-                                      jobid_move_dl1,
-                                      input_dir,
-                                      final_DL1_dir,
-                                      'True'
-                                      )
+    cmd_cp_conf = compose_batch_command_of_script(input_dir,
+                                                  final_DL1_dir,
+                                                  script='lstmcpipe_utils_cp_config',
+                                                  particle=job_name[particle].split('_')[0],
+                                                  suffix='cp_config',
+                                                  wait_jobs=jobid_move_dl1)
 
-    jobid_copy_conf = os.popen(batch_copy_conf).read().strip('\n')
-    log_merge[particle][set_type][jobid_copy_conf] = batch_copy_conf
+    jobid_copy_conf = os.popen(cmd_cp_conf).read().strip('\n')
+    log_merge[particle][set_type][jobid_copy_conf] = cmd_cp_conf
 
     print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
     # 6 --> move running_dir to final analysis_logs
-    batch_mv_dir = base_cmd.format(job_name[particle].split('_')[0]+'_mv_dir',
-                                   f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_direct.e',
-                                   f'slurm-{job_name[particle].split("_")[0]}_mv_DL1_direct.o',
-                                   jobid_copy_conf,
-                                   input_dir,
-                                   logs_destination_dir,
-                                   'False'
-                                   )
+    cmd_mv_dir = compose_batch_command_of_script(input_dir,
+                                                 logs_destination_dir,
+                                                 script='lstmcpipe_utils_move_dir',
+                                                 particle=job_name[particle].split('_')[0],
+                                                 suffix='mv_dl1_dir',
+                                                 wait_jobs=jobid_copy_conf)
 
-    jobid_move_log = os.popen(batch_mv_dir).read().strip('\n')
-    log_merge[particle][set_type][jobid_move_log] = batch_mv_dir
+    jobid_move_log = os.popen(cmd_mv_dir).read().strip('\n')
+    log_merge[particle][set_type][jobid_move_log] = cmd_mv_dir
 
     print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
 

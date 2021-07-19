@@ -3,10 +3,9 @@
 import os
 import shutil
 import argparse
-from distutils.util import strtobool
 
-parser = argparse.ArgumentParser(description="Batch the check_and_make_dir and move_dir_content stage of the "
-                                             "merge_and_copy_dl1 script.")
+parser = argparse.ArgumentParser(description="Script to copy all the config files of the source directory into the "
+                                             "destination directory.")
 
 parser.add_argument('--source', '-s', type=str,
                     dest='source',
@@ -16,12 +15,6 @@ parser.add_argument('--source', '-s', type=str,
 parser.add_argument('--destination', '-d', type=str,
                     dest='dest',
                     help='destination argument of move_dir_content',
-                    )
-
-parser.add_argument('--copy_conf', type=lambda x: bool(strtobool(x)),
-                    dest='copy_conf',
-                    help='Boolean. Copy the config used to the args.dest directory',
-                    default=False
                     )
 
 
