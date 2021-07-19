@@ -143,22 +143,14 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     if not len(os.listdir(DL1_training_dir)) == len(read_lines_file(training_filelist)):
         tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
         if tf != []:
-            # TODO to fix this
-            print(f"\n\n\n ****!!!!! {len(tf)} files from the training list are not in the `DL1/training directory:\n{tf} "
-                  "Continuing\n\n\n")
-        # if tf != [] and not flag_full_workflow:
-        #     query_continue("{} files from the training list are not in the `DL1/training` directory:\n{} "
-        #                    "Continue ?".format(len(tf), tf))
+            raise Exception(f" * {len(tf)} files from the training list are not in the `DL1/training directory:\n{tf}"
+                  "\nContinuing.")
 
     if not len(os.listdir(DL1_testing_dir)) == len(read_lines_file(testing_filelist)):
         tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
         if tf != []:
-            # TODO to fix this
-            print(f"\n\n\n ****!!!!! {len(tf)} files from the testing list are not in the `DL1/testing directory:\n{tf} "
-                  "Continuing\n\n\n")
-        # if tf != [] and not flag_full_workflow:
-        #     query_continue("{} files from the testing list are not in the `DL1/testing directory:\n{} "
-        #                    "Continue ?".format(len(tf), tf))
+            raise Exception(f" * {len(tf)} files from the testing list are not in the `DL1/testing directory:\n{tf} "
+                  "\nContinuing.")
 
     print(f"\n\tmerging starts - {particle}")
 

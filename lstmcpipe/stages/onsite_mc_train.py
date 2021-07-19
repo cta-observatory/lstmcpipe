@@ -46,7 +46,6 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
     """
     log_train = {}
 
-    # dl1_gamma_dir = os.path.dirname(os.path.abspath(gamma_dl1_train_file))
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
 
     # check if it path follows the established paths (lstchain-like) or not (rta-like) ##

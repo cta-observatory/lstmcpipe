@@ -9,11 +9,7 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.stages import (onsite_mc_merge_and_copy_dl1,
-                              onsite_mc_train,
-                              onsite_mc_dl2_to_irfs,
-                              onsite_mc_dl1_to_dl2
-                              )
+from lstmcpipe.stages import merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
 from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 
@@ -260,7 +256,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
 
-                log, jobid_mv_all_dl1, jobid_debug = onsite_mc_merge_and_copy_dl1.merge_dl1(
+                log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                     gamma_running_analysis_dir.format(particle),
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
@@ -285,7 +281,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         else:
             _particle = particle
 
-            log, jobid_mv_all_dl1, jobid_debug = onsite_mc_merge_and_copy_dl1.merge_dl1(
+            log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                 running_analysis_dir.format(particle),
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
@@ -350,7 +346,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
     proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
 
-    log_train, jobid_4_dl1_to_dl2, model_path = onsite_mc_train.train_pipe(
+    log_train, jobid_4_dl1_to_dl2, model_path = train_pipe(
         gamma_dl1_train_file,
         proton_dl1_train_file,
         config_file=config_file,
@@ -458,7 +454,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
 
-                log, jobid = onsite_mc_dl1_to_dl2.dl1_to_dl2(
+                log, jobid = dl1_to_dl2(
                     gamma_dl1_directory.format(particle),
                     path_models=path_to_models,
                     config_file=config_file,
@@ -477,7 +473,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
         else:
             _particle = particle
-            log, jobid = onsite_mc_dl1_to_dl2.dl1_to_dl2(
+            log, jobid = dl1_to_dl2(
                 dl1_directory.format(particle),
                 path_models=path_to_models,
                 config_file=config_file,
@@ -531,7 +527,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     for off in offset_gammas:
 
-        log, jobid = onsite_mc_dl2_to_irfs.dl2_to_irfs(
+        log, jobid = dl2_to_irfs(
             dl2_directory,
             config_file=config_file,
             log_from_dl1_dl2=log_from_dl1_dl2,
@@ -549,7 +545,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     if 'gamma-diffuse' in loop_particles:
 
-        log, jobid = onsite_mc_dl2_to_irfs.dl2_to_irfs(
+        log, jobid = dl2_to_irfs(
             dl2_directory,
             irf_point_like=False,
             config_file=config_file,
