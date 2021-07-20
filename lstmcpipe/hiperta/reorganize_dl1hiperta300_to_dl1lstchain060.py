@@ -242,7 +242,7 @@ def create_hfile_out(input_filename, outfile_name, sim_pointer08, config_pointer
                                      dl1_event_node06,
                                      subarray_pointer
                                      )
-    if 'images' in dl1_event_node06.telescope:
+    if 'image' in dl1_event_node06.telescope:
         stack_and_write_images_table(input_filename,
                                      hfile_out,
                                      dl1_event_node06
