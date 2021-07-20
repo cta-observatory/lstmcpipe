@@ -15,6 +15,7 @@ import random
 import argparse
 import calendar
 import lstchain
+from distutils.util import strtobool
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
@@ -60,9 +61,14 @@ parser.add_argument('--prod_id', action='store', type=str,
                     default=None,
                     )
 
-
+parser.add_argument('--keep_rta_file', '-k',
+                    dest='keep_rta_file',
+                    type=lambda x: bool(strtobool(x)),
+                    help='Keep output of hiperta. Set by default to False',
+                    default=False
+                    )
 def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
-         flag_full_workflow=False, particle=None, prod_id=None, source_environment=None, offset=None):
+         flag_full_workflow=False, particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -104,7 +110,11 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
          to activate a certain conda environment.
          DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
-
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
+    keep_rta_file : bool
+        Argument to be passed to the hiperta_r0_to_dl1lstchain script, which runs the hiperta_r0_dl1 and
+        re-organiser stage
     Returns
     -------
 
@@ -136,13 +146,38 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
         print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
         # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
         today = calendar.datetime.date.today()
-        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+        if workflow_kind == 'lstchain':
+            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+        elif workflow_kind == 'ctapipe':
+            import ctapipe
+            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{ctapipe.__version__}'        
+        elif workflow_kind == 'hiperta':
+            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
         suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
         PROD_ID = base_prod_id + suffix_id
 
     else:
         # Full prod_id is passed as argument
         PROD_ID = prod_id
+
+
+    if workflow_kind == 'lstchain':
+        core_file = 'core_list.sh'
+        cc = ' -c {}'.format(config_file) if config_file is not None else ' '
+        base_cmd = f'{core_file} "lstchain_mc_r0_to_dl1 {cc}"'
+        jobtype_id = 'LST'
+    elif workflow_kind == 'ctapipe':
+        core_file = 'core_list_ctapipe.sh'
+        cc = ' --config {}'.format(config_file) if config_file is not None else ' '
+        base_cmd = f'{core_file} "ctapipe-stage1 {cc}"'
+        jobtype_id = 'CTA'
+    elif workflow_kind == 'hiperta':
+        # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
+        core_file = 'core_list_hiperta.sh'
+        cc = ' -c {}'.format(config_file) if config_file is not None else ' '
+        base_cmd = f'{core_file} "/home/enrique.garcia/software/lstmcpipe/lstmcpipe/hiperta/' \
+                  f'hiperta_r0_to_dl1lstchain.py  -k {keep_rta_file} {cc}"'
+        jobtype_id = 'RTA'
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
@@ -154,7 +189,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     DL0_DATA_DIR = input_dir
 
     if source_environment is not None:
-        manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath('./core_list.sh'))
+        manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath(f"./{core_file}"))
 
     ##############################################################################
 
@@ -211,9 +246,20 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     if flag_full_workflow and 'off' in particle:
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
-        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID, offset)
+        RUNNING_DIR = os.path.join(
+                DL0_DATA_DIR.replace(
+                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'running_analysis'),
+                PROD_ID,
+                offset
+                )
     else:
-        RUNNING_DIR = os.path.join(DL0_DATA_DIR.replace('DL0', 'running_analysis'), PROD_ID)
+        RUNNING_DIR = os.path.join(
+                DL0_DATA_DIR.replace(
+                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'running_analysis'),
+                PROD_ID,
+                )
 
     JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
     DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
@@ -273,24 +319,21 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
             else:
                 jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
                 jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
-            cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-
-            base_cmd = f'core_list.sh "lstchain_mc_r0_to_dl1 -o {output_dir} {cc}"'
 
             # recover or not the jobid depending of the workflow mode
             if not flag_full_workflow:  # Run interactively
 
-                cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
+                cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
                 # print(cmd)
                 os.system(cmd)
 
             else:  # flag_full_workflow == True !
-                job_name = {'electron': 'r0dl1_e',
-                            'gamma': 'r0dl1_g',
-                            'gamma-diffuse': 'r0dl1_gd',
-                            'proton': 'r0dl1_p',
-                            'gamma_off0.0deg': 'g0.0_r0dl1',
-                            'gamma_off0.4deg': 'g0.4_r0dl1'
+                job_name = {'electron': f'e_{jobtype_id}_r0dl1',
+                            'gamma': f'g_{jobtype_id}_r0dl1',
+                            'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
+                            'proton': f'p_{jobtype_id}_r0dl1',
+                            'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
+                            'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
                             }
 
                 if particle == 'proton':
@@ -299,7 +342,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
                     queue = 'short'
 
                 cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
-                      f'-e {jobe} -o {jobo} {base_cmd} {os.path.join(dir_lists, file)}'
+                      f'-e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
 
                 jobid = os.popen(cmd).read().strip('\n')
                 jobids_r0_dl1.append(jobid)
