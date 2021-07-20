@@ -9,19 +9,18 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.stages import merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs
+from lstmcpipe.stages import merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs, dl2_to_sensitivity
 from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
-from lstmcpipe.onsite_mc_hiperta_r0_to_dl1lstchain import main as r0_to_dl1_rta
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None):
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None, workflow_kind='lstchain'):
     """
     Batch the r0_to_dl1 jobs by particle type.
 
     Parameters
     ----------
     input_dir : str
-        Path to the DL0 files
+        Path to the r0/DL0 files
     conf_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
     prod_id : str
@@ -31,6 +30,8 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     source_env : str
         source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
     gamma_offsets : list
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
 
     Returns
     -------
@@ -46,151 +47,56 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
-    print("\n ==== START {} ==== \n".format('batch r0_to_dl1_workflow'))
+    print(f"\n ==== START {workflow_kind} r0 to dl1 processing ==== \n")
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
-
-                gamma_input_dir = os.path.join(input_dir, off)
+                particle_input_dir = os.path.join(input_dir, off).format(particle)
                 _particle = particle + '_' + off
-
                 log, jobids_by_particle = r0_to_dl1(
-                    gamma_input_dir.format(particle),  # Particle needs to be gamma w/o the off
+                    particle_input_dir,  # Particle needs to be gamma w/o the off
                     config_file=conf_file,
                     particle=_particle,
                     prod_id=prod_id,
                     flag_full_workflow=True,
                     source_environment=source_env,
-                    offset=off
+                    offset=off,
+                    workflow_kind=workflow_kind,
                 )
-
                 full_log['log_all_job_ids'].update(log)
                 full_log[_particle] = ','.join(jobids_by_particle)
                 all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
-                    debug_log[jid] = f'{_particle} job from r0_to_dl1'
-
+                    debug_log[jid] = f'{_particle} job from r0_to_dl1'        
         else:
+            particle_input_dir = input_dir.format(particle)
             _particle = particle
             log, jobids_by_particle = r0_to_dl1(
-                input_dir.format(particle),  # Input dir needs particle gamma w/o off
+                particle_input_dir,  # Particle needs to be gamma w/o the off
                 config_file=conf_file,
-                particle=_particle,  # However _particle will contain the gamma_off
+                particle=_particle,
                 prod_id=prod_id,
                 flag_full_workflow=True,
-                source_environment=source_env
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
             )
-
-            # Create dictionary : jobid to full log information, and
-            #  the inverse dictionary, particle to the list of all the jobids of that same particle
             full_log['log_all_job_ids'].update(log)
             full_log[_particle] = ','.join(jobids_by_particle)
             all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
             for jid in jobids_by_particle:
                 debug_log[jid] = f'{_particle} job from r0_to_dl1'
-
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
-    print("\n ==== END {} ==== \n".format('batch r0_to_dl1_workflow'))
+    print(f"\n ==== END {workflow_kind} r0 to dl1 processing ==== \n")
 
     return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 
 
-def batch_r0_to_dl1_rta(input_dir, conf_file_rta, prod_id, particles_loop, conf_file_lst, gamma_offsets=None):
-    """
-    Function to batch the r0_to_dl1 jobs by particle type, using the HiPeRTA code. Files in input_dir MUST had been
-     previously converted to *.h5
-
-    It will also create, arrange and return a dictionary with all the log of this stage.
-
-    Parameters
-    ----------
-    input_dir : str
-        Path to the R0 (h5 !) files
-    conf_file_rta : str
-        Path to a HiPeRTA configuration file. If none is given, a standard configuration is applied
-    prod_id : str
-        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    particles_loop : list
-        list with the particles to be processed. Takes the global variable ALL_PARTICLES
-    conf_file_lst : str
-        Path to a lstchain configuration. JUST to be copied at the same time as the rta_config to `/running_analysis/`.
-    gamma_offsets : list
-
-    Returns
-    -------
-    full_log : dict
-        Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
-        4 more keys (one by particle) with all the jobs associated with each particle.
-
-    debug_log : dict
-            dictionary containing minimum information - jobids -  for log_reduced.txt
-
-    all_jobids_from_r0_dl1_stage : str
-        string, separated by commas, containing all the jobids of this stage
-    """
-    full_log = {'log_all_job_ids': {}}
-    debug_log = {}
-    all_jobids_from_r0_dl1_stage = []
-
-    print("\n ==== START {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
-
-    for particle in particles_loop:
-        if particle == 'gamma' and gamma_offsets is not None:
-            for off in gamma_offsets:
-
-                gamma_input_dir = os.path.join(input_dir, off)
-                _particle = particle + '_' + off
-
-                log, jobids_by_particle = r0_to_dl1_rta(
-                    gamma_input_dir.format(particle),  # Input dir needs particle gamma w/o off
-                    particle=_particle,  # However _particle will contain the gamma_off
-                    config_rta_file=conf_file_rta,
-                    prod_id=prod_id,
-                    flag_full_workflow=True,
-                    lst_config=conf_file_lst,
-                    offset=off
-                )
-
-                full_log['log_all_job_ids'].update(log)
-                full_log[_particle] = ','.join(jobids_by_particle)
-                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
-
-                for jid in jobids_by_particle:
-                    debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
-
-        else:
-            _particle = particle
-            log, jobids_by_particle = r0_to_dl1_rta(
-                input_dir.format(particle),  # Input dir needs particle gamma w/o off
-                particle=_particle,  # However _particle will contain the gamma_off
-                config_rta_file=conf_file_rta,
-                prod_id=prod_id,
-                flag_full_workflow=True,
-                lst_config=conf_file_lst
-            )
-
-            # Create jobid to full log information dictionary.
-            # And the inverse dictionary, particle to the list of all the jobids of that same particle
-            full_log['log_all_job_ids'].update(log)
-            full_log[_particle] = ','.join(jobids_by_particle)
-            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
-
-            for jid in jobids_by_particle:
-                debug_log[jid] = f'{_particle} job from r0_to_dl1_RTA'
-
-    all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
-
-    print("\n ==== END {} ==== \n".format('HiPeRTA_r0_to_dl1_workflow'))
-
-    return full_log, debug_log, all_jobids_from_r0_dl1_stage
-
-
 def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
-                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None):
+                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None, workflow_kind='lstchain'):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -213,7 +119,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
         this function) should be either True or False.
     gamma_offsets : list
-        list containig the offset of the gammas
+        list containing the offset of the gammas
     prod_id : str
         prod_id defined in config_MC_prod.yml
     source_env : str
@@ -264,7 +170,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     flag_no_image=no_image_flag,
                     prod_id=prod_id,
                     gamma_offset=off,
-                    source_environment=source_env
+                    source_environment=source_env,
+                    workflow_kind=workflow_kind,
                 )
 
                 log_merge_and_copy.update(log)
@@ -288,7 +195,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 flag_merge=merge_flag,
                 flag_no_image=no_image_flag,
                 prod_id=prod_id,
-                source_environment=source_env
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
             )
 
             log_merge_and_copy.update(log)
@@ -505,13 +413,22 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     Parameters
     ----------
     dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
     config_file: str
+        Path to lstchain-like config file
     loop_particles: list
+        list with particles to be processed.
     offset_gammas: list
+        list off gamma offsets
     job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
     source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
     log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
     prod_id: str
+        String with prod_id prefix to complete 'file-naming'
 
     Returns
     -------
@@ -567,6 +484,65 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     return log_dl2_to_irfs, jobid_for_check, debug_log
 
 
+def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
+    """
+    Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
+    dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    source_env: str
+        source environment to select the desired conda environment (source .bashrc + conda activate $ENV)
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_dl2_to_sensitivity: dict
+        Dictionary with job_id-slurm command key-value pair used for logging
+    jobid_for_check: str
+        Comma-separated jobids batched in the current stage
+    debug_log: dict
+        Dictionary with the job-id and stage explanation to be stored in the debug file
+
+    """
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_sensitivity = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_sensitivity(dl2_directory,
+                                        log_from_dl1_dl2,
+                                        gamma_offset=off,
+                                        prod_id=prod_id,
+                                        source_env=source_env,
+                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
+                                        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_sensitivity[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
+                           f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    return log_dl2_to_sensitivity, jobid_for_check, debug_log
+
+
 def load_yml_config(yml_file):
     """
     Reads a yaml file and parses the global variables to run a MC production
@@ -611,7 +587,7 @@ def parse_config_and_handle_global_vars(yml_file):
     config = {}
 
     # Allowed options
-    allowed_workflows = ['hiperta', 'lstchain']
+    allowed_workflows = ['hiperta', 'lstchain', 'ctapipe']
     allowed_prods = ['prod3', 'prod5']
     allowed_obs_date = ['20190415', '20200629_prod5', '20200629_prod5_trans_80']
 
@@ -645,6 +621,9 @@ def parse_config_and_handle_global_vars(yml_file):
     today = calendar.datetime.date.today()
     if workflow_kind == 'lstchain':
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
+    elif workflow_kind == 'ctapipe':
+        import ctapipe
+        base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{ctapipe.__version__}'
     elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
         base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA300_v{lstchain.__version__}'
@@ -688,7 +667,7 @@ def parse_config_and_handle_global_vars(yml_file):
 
     # 6 - Global paths
     if prod_type == 'prod3':
-        if workflow_kind == 'lstchain':
+        if workflow_kind == 'lstchain' or workflow_kind =='ctapipe':
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', pointing)
         else:  # RTA
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', pointing)
@@ -721,7 +700,7 @@ def parse_config_and_handle_global_vars(yml_file):
 
         config['gammas_offsets'] = offset_gammas
 
-        if workflow_kind == 'lstchain':
+        if workflow_kind == 'lstchain' or workflow_kind =='ctapipe':
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'DL0', obs_date, '{}', zenith, pointing)
         else:  # RTA
             config['DL0_data_dir'] = os.path.join(base_path_dl0, 'R0', obs_date, '{}', zenith, pointing)
@@ -861,8 +840,8 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, prod_id, log_file, log_debug_file,
-                              scancel_file):
+                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, jobids_from_dl2_to_sensitivity,
+                              prod_id, log_file, log_debug_file, scancel_file, prod_config_file, last_stage):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -878,9 +857,12 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
     jobids_from_dl2_to_irf: str
+    jobids_from_dl2_to_sensitivity: str
     log_file: str
     log_debug_file: str
     scancel_file: str
+    prod_config_file: str
+    last_stage: str
 
     Returns
     -------
@@ -891,6 +873,15 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log = {}
     all_pipeline_jobs = []
 
+    jobids_stages = {
+        'r0_to_dl1': jobids_from_r0_to_dl1,
+        'merge_and_copy_dl1': jobids_from_merge,
+        'train_pipe': jobids_from_train_pipe,
+        'dl1_to_dl2': jobids_from_dl1_to_dl2,
+        'dl2_to_irfs': jobids_from_dl2_to_irf,
+        'dl2_to_sensitivity': jobids_from_dl2_to_sensitivity
+    }
+
     if jobids_from_r0_to_dl1 != '':
         all_pipeline_jobs.append(jobids_from_r0_to_dl1)
     if jobids_from_merge != '':
@@ -899,26 +890,25 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
         all_pipeline_jobs.append(jobids_from_train_pipe)
     if jobids_from_dl1_to_dl2 != '':
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-
     if jobids_from_dl2_to_irf != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
-        last_stage = jobids_from_dl2_to_irf
-    else:  # RTA case. Although this should be improved
-        last_stage = jobids_from_dl1_to_dl2
+    if jobids_from_dl2_to_sensitivity != '':
+        all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
 
     all_pipeline_jobs = ','.join(all_pipeline_jobs)
+
+    which_last_stage = jobids_stages[last_stage]
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
                 f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
-                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id}; ' \
                 f'rm {scancel_file}; ' \
-                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
-                f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
+                f'cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
+                f'mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{last_stage} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
@@ -926,12 +916,13 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
-    debug_log['sbatch_cmd'] = cmd_wrap
+    debug_log['sbatch_cmd'] = batch_cmd
     debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
     debug_log['SUMMARY_merge'] = jobids_from_merge
     debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
     debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
     debug_log['SUMMARY_dl2_irfs'] = jobids_from_dl2_to_irf
+    debug_log['SUMMARY_dl2_sensitivity'] = jobids_from_dl2_to_sensitivity
 
     return jobid, debug_log
 

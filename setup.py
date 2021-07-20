@@ -28,9 +28,17 @@ scripts_list = find_scripts('lstmcpipe', 'onsite_')
 
 entry_points = {
     'console_scripts': [
+<<<<<<< HEAD
         'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main',
         'lstmcpipe_utils_move_dir = lstmcpipe.stages.script_merge_utils_move_dir:main',
         'lstmcpipe_utils_cp_config = lstmcpipe.stages.script_merge_utils_copy_config:main'
+||||||| merged common ancestors
+        'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main'
+=======
+        'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main',
+        'lstmcpipe_plot_irfs = lstmcpipe.plots.plot_irfs:main',
+        'lstmcpipe_dl2_to_sensitivity = lstmcpipe.stages.script_dl2_to_sensitivity:main'
+>>>>>>> master
     ]
 }
 
@@ -39,6 +47,11 @@ setup(name='lstmcpipe',
       description="MC production with lstchain on LST cluster (La Palma)",
       install_requires=[
           'lstchain',
+          'pyyaml',
+          'numpy',
+          'astropy',
+          'ctaplot',
+          'pyirf',
           'matplotlib'
       ],
       packages=find_packages(),
