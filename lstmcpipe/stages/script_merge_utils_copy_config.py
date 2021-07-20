@@ -21,8 +21,9 @@ parser.add_argument('--destination', '-d', type=str,
 def main():
     args = parser.parse_args()
 
-    # HiPeRTA config is *.yml
-    config_files = [os.path.join(args.source, f) for f in os.listdir(args.source) if f.endswith(('.json', '.yml'))]
+    # HiPeRTA config is *.txt (<v4.0.0), otherwise is *.yml
+    config_files = [os.path.join(args.source, f) for f in os.listdir(args.source)
+                    if f.endswith(('.json', '.txt')) or f.startswith('hiperta_conf*.yml')]
 
     for file in config_files:
         shutil.copyfile(file, os.path.join(args.dest, os.path.basename(file)))
