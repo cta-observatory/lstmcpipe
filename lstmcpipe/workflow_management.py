@@ -14,6 +14,7 @@ from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
 from lstmcpipe.onsite_mc_train import main as train_pipe
 from lstmcpipe.onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
 from lstmcpipe.onsite_mc_dl2_to_irfs import main as dl2_to_irfs
+from lstmcpipe.stages.dl2_to_sensitivity import dl2_to_sensitivity
 
 
 def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None, workflow_kind='lstchain'):
@@ -122,7 +123,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
         this function) should be either True or False.
     gamma_offsets : list
-        list containig the offset of the gammas
+        list containing the offset of the gammas
     prod_id : str
         prod_id defined in config_MC_prod.yml
     source_env : str
@@ -421,13 +422,22 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     Parameters
     ----------
     dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
     config_file: str
+        Path to lstchain-like config file
     loop_particles: list
+        list with particles to be processed.
     offset_gammas: list
+        list off gamma offsets
     job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
     source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
     log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
     prod_id: str
+        String with prod_id prefix to complete 'file-naming'
 
     Returns
     -------
@@ -483,6 +493,65 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
 
     return log_dl2_to_irfs, jobid_for_check, debug_log
+
+
+def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
+    """
+    Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
+    dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    source_env: str
+        source environment to select the desired conda environment (source .bashrc + conda activate $ENV)
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_dl2_to_sensitivity: dict
+        Dictionary with job_id-slurm command key-value pair used for logging
+    jobid_for_check: str
+        Comma-separated jobids batched in the current stage
+    debug_log: dict
+        Dictionary with the job-id and stage explanation to be stored in the debug file
+
+    """
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_sensitivity = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_sensitivity(dl2_directory,
+                                        log_from_dl1_dl2,
+                                        gamma_offset=off,
+                                        prod_id=prod_id,
+                                        source_env=source_env,
+                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
+                                        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_sensitivity[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
+                           f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    return log_dl2_to_sensitivity, jobid_for_check, debug_log
 
 
 def load_yml_config(yml_file):
@@ -782,8 +851,8 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
 
 
 def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, prod_id, log_file, log_debug_file,
-                              scancel_file):
+                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, jobids_from_dl2_to_sensitivity,
+                              prod_id, log_file, log_debug_file, scancel_file, prod_config_file, last_stage):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -799,9 +868,12 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     jobids_from_train_pipe : str
     jobids_from_dl1_to_dl2: str
     jobids_from_dl2_to_irf: str
+    jobids_from_dl2_to_sensitivity: str
     log_file: str
     log_debug_file: str
     scancel_file: str
+    prod_config_file: str
+    last_stage: str
 
     Returns
     -------
@@ -812,6 +884,15 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     debug_log = {}
     all_pipeline_jobs = []
 
+    jobids_stages = {
+        'r0_to_dl1': jobids_from_r0_to_dl1,
+        'merge_and_copy_dl1': jobids_from_merge,
+        'train_pipe': jobids_from_train_pipe,
+        'dl1_to_dl2': jobids_from_dl1_to_dl2,
+        'dl2_to_irfs': jobids_from_dl2_to_irf,
+        'dl2_to_sensitivity': jobids_from_dl2_to_sensitivity
+    }
+
     if jobids_from_r0_to_dl1 != '':
         all_pipeline_jobs.append(jobids_from_r0_to_dl1)
     if jobids_from_merge != '':
@@ -820,26 +901,25 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
         all_pipeline_jobs.append(jobids_from_train_pipe)
     if jobids_from_dl1_to_dl2 != '':
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-
     if jobids_from_dl2_to_irf != '':
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
-        last_stage = jobids_from_dl2_to_irf
-    else:  # RTA case. Although this should be improved
-        last_stage = jobids_from_dl1_to_dl2
+    if jobids_from_dl2_to_sensitivity != '':
+        all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
 
     all_pipeline_jobs = ','.join(all_pipeline_jobs)
+
+    which_last_stage = jobids_stages[last_stage]
 
     # Save machine info into the check file
     cmd_wrap = f'touch check_MC_{prod_id}.txt; '
     cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
                 f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
                 f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
-                f'mv slurm-* check_MC_{prod_id}.txt logs_{prod_id}; ' \
                 f'rm {scancel_file}; ' \
-                f'cp config_MC_prod.yml logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
-                f'mv {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
+                f'cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
+                f'mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{last_stage} -J prod_check ' \
+    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check ' \
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
@@ -847,12 +927,13 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
-    debug_log['sbatch_cmd'] = cmd_wrap
+    debug_log['sbatch_cmd'] = batch_cmd
     debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
     debug_log['SUMMARY_merge'] = jobids_from_merge
     debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
     debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
     debug_log['SUMMARY_dl2_irfs'] = jobids_from_dl2_to_irf
+    debug_log['SUMMARY_dl2_sensitivity'] = jobids_from_dl2_to_sensitivity
 
     return jobid, debug_log
 

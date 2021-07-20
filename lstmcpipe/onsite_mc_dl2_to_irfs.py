@@ -222,10 +222,10 @@ def main(dl2_directory, config_file, irf_point_like=True, irf_gamma_offset='off0
 
         check_and_make_dir_without_verification(output_irfs_dir)
 
-        jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.e")
-        jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs.o")
+        jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.e")
+        jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.o")
 
-        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J MC_IRF_{irf_kind}' \
+        batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}' \
                     f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
 
         job_id_dl2_irfs = os.popen(batch_cmd).read().strip('\n')
