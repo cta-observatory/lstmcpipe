@@ -28,11 +28,11 @@ from lstmcpipe.workflow_management import (
     save_log_to_file,
     create_dict_with_dl1_filenames,
     batch_mc_production_check,
-    parse_config_and_handle_global_vars,
     create_log_files,
     update_scancel_file,
     batch_plot_rf_features
 )
+from lstmcpipe.config import parse_config_and_handle_global_vars
 
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
