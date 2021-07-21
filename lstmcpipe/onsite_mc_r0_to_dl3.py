@@ -16,6 +16,7 @@
 
 import argparse
 from os.path import abspath
+import logging
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.workflow_management import (
     batch_r0_to_dl1,
@@ -31,7 +32,7 @@ from lstmcpipe.workflow_management import (
     update_scancel_file,
     batch_plot_rf_features
 )
-from lstmcpipe.config import parse_config_and_handle_global_vars
+from lstmcpipe.config import load_config
 
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
@@ -72,6 +73,11 @@ parser.add_argument('--config_file_rta', '-conf_rta',
                     default=None
                     )
 
+parser.add_argument(
+    '--debug',
+    action='store_true', 
+    help='print debug messages to stderr'
+)        
 
 args = parser.parse_args()
 
@@ -79,8 +85,14 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
 
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)-8s %(thread)d %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+        )
+    log = logging.getLogger("My Module")
     # Read MC production configuration file
-    config = parse_config_and_handle_global_vars(args.config_mc_prod)
+    config = load_config(args.config_mc_prod)
     query_continue('Are you sure ?')
 
     # Load variables
