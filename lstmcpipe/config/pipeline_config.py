@@ -28,7 +28,7 @@ def load_config(config_path):
     with open(config_path) as f:
         loaded_config = yaml.safe_load(f)
 
-    valid, error = test_config_valid(loaded_config)
+    valid, error = config_valid(loaded_config)
     if not valid:
         raise Exception(error)
 
@@ -58,7 +58,7 @@ def load_config(config_path):
     return config
 
 
-def test_config_valid(loaded_config):
+def config_valid(loaded_config):
     """
     Test if the given dictionary contains valid values for the
     r0_to_dl3 processing.
