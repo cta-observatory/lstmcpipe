@@ -1,4 +1,4 @@
-from lstmcpipe.config import export_env, parse_config_and_handle_global_vars
+from lstmcpipe.config import export_env, load_config
 import tempfile
 import os
 import yaml
@@ -12,7 +12,9 @@ def test_export_env():
 
 def test_parse_config_and_handle_global_vars():
     config_path = "lstmcpipe/config_MC_prod.yml"
-    config = parse_config_and_handle_global_vars(config_path)
+    config = load_config(config_path)
     with open("lstmcpipe/config/tests/expected.yaml") as e:
         expected = yaml.safe_load(e)
-    assert config == expected
+    for k in config:
+        print(k)
+        assert config[k] == expected[k]

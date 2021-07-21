@@ -1,8 +1,8 @@
 import os
 from shutil import which
-from .pipeline_config import parse_config_and_handle_global_vars
+from .pipeline_config import load_config
 
-__all__ = ["parse_config_and_handle_global_vars"]
+__all__ = ["load_config"]
 
 def export_env(outdir='.'):
     if which('conda') is not None:
