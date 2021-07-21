@@ -3,72 +3,22 @@
 # T. Vuillaume,
 # Modifications by E. Garcia
 # Code to reduce R0 data to DL1 onsite (La Palma cluster)
-#
-# usage:
-# python onsite_mc_r0_dl1.py INPUT_DIR [-conf config_file] [-ratio train_test_ratio] [--sed random_seed] \
-#  [-nfdl1 n_files_per_dl1] [--prod_id prod_id]
+
 
 import os
 import time
 import shutil
 import random
-import argparse
-import calendar
-import lstchain
-from distutils.util import strtobool
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
-    check_and_make_dir,
     check_and_make_dir_without_verification,
     manage_source_env_r0_dl1
 )
 
-parser = argparse.ArgumentParser(description="R0 to DL1 MC onsite conversion ")
 
-parser.add_argument('input_dir', type=str,
-                    help='path to the files directory to analyse',
-                    )
-
-parser.add_argument('--config_file', '-conf', action='store', type=str,
-                    dest='config_file',
-                    help='Path to a configuration file. If none is given, a standard configuration is applied',
-                    default=None
-                    )
-
-parser.add_argument('--train_test_ratio', '-ratio', action='store', type=str,
-                    dest='train_test_ratio',
-                    help='Ratio of training data',
-                    default=0.5
-                    )
-
-parser.add_argument('--random_seed', '-seed', action='store', type=str,
-                    dest='random_seed',
-                    help='Random seed for random processes',
-                    default=42,
-                    )
-
-parser.add_argument('--n_r0_files_per_dl1_job', '-nfdl1', action='store', type=str,
-                    dest='n_r0_files_per_dl1_job',
-                    help='Number of r0 files processed by each r0_to_dl1 batched stage. '
-                         'Default values are defined in the script.',
-                    default=0,
-                    )
-
-parser.add_argument('--prod_id', action='store', type=str,
-                    dest='prod_id',
-                    help="Production ID. If None, _v00 will be used, indicating an official base production",
-                    default=None,
-                    )
-
-parser.add_argument('--keep_rta_file', '-k',
-                    dest='keep_rta_file',
-                    type=lambda x: bool(strtobool(x)),
-                    help='Keep output of hiperta. Set by default to False',
-                    default=False
-                    )
-def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
-         flag_full_workflow=False, particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False):
+def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
+              particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False):
     """
     R0 to DL1 MC onsite conversion.
 
@@ -103,8 +53,6 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
         gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    flag_full_workflow : bool
-        Boolean flag to indicate if this script is run as part of the workflow that converts r0 to dl2 files.
     source_environment : str
         path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script)
          to activate a certain conda environment.
@@ -141,25 +89,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
         A list of all the jobs sent by particle (including test and train set types).
 
     """
-    if not flag_full_workflow:
 
-        print(f"\n ==== START {os.path.basename(__file__)} ==== \n")
-        # This formatting should be the same as in `onsite_mc_r0_to_dl3.py`
-        today = calendar.datetime.date.today()
-        if workflow_kind == 'lstchain':
-            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{lstchain.__version__}'
-        elif workflow_kind == 'ctapipe':
-            import ctapipe
-            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_v{ctapipe.__version__}'        
-        elif workflow_kind == 'hiperta':
-            base_prod_id = f'{today.year:04d}{today.month:02d}{today.day:02d}_vRTA'
-        suffix_id = '_v00' if prod_id is None else '_{}'.format(prod_id)
-        PROD_ID = base_prod_id + suffix_id
-
-    else:
-        # Full prod_id is passed as argument
-        PROD_ID = prod_id
-
+    PROD_ID = prod_id
 
     if workflow_kind == 'lstchain':
         core_file = 'core_list.sh'
@@ -243,12 +174,12 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
             newfile.write(f)
             newfile.write('\n')
 
-    if flag_full_workflow and 'off' in particle:
+    if 'off' in particle:
         # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
         RUNNING_DIR = os.path.join(
                 DL0_DATA_DIR.replace(
-                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'R0' if workflow_kind == 'hiperta' else 'DL0',
                     'running_analysis'),
                 PROD_ID,
                 offset
@@ -256,7 +187,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     else:
         RUNNING_DIR = os.path.join(
                 DL0_DATA_DIR.replace(
-                    'R0' if workflow_kind=='hiperta' else 'DL0',
+                    'R0' if workflow_kind == 'hiperta' else 'DL0',
                     'running_analysis'),
                 PROD_ID,
                 )
@@ -271,10 +202,7 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     print("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
 
     for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
-        if flag_full_workflow:
-            check_and_make_dir_without_verification(directory)
-        else:
-            check_and_make_dir(directory)
+        check_and_make_dir_without_verification(directory)
 
     # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
 
@@ -290,12 +218,8 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
         output_dir = os.path.join(RUNNING_DIR, 'DL1')
         output_dir = os.path.join(output_dir, set_type)
 
-        if flag_full_workflow:
-            check_and_make_dir_without_verification(dir_lists)
-            check_and_make_dir_without_verification(output_dir)
-        else:
-            check_and_make_dir(dir_lists)
-            check_and_make_dir(output_dir)
+        check_and_make_dir_without_verification(dir_lists)
+        check_and_make_dir_without_verification(output_dir)
 
         print("\toutput dir: \t", output_dir)
 
@@ -320,54 +244,44 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
                 jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
                 jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
 
-            # recover or not the jobid depending of the workflow mode
-            if not flag_full_workflow:  # Run interactively
+            job_name = {'electron': f'e_{jobtype_id}_r0dl1',
+                        'gamma': f'g_{jobtype_id}_r0dl1',
+                        'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
+                        'proton': f'p_{jobtype_id}_r0dl1',
+                        'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
+                        'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
+                        }
 
-                cmd = f'sbatch -p short -e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
-                # print(cmd)
-                os.system(cmd)
+            if particle == 'proton':
+                queue = 'long'
+            else:
+                queue = 'short'
 
-            else:  # flag_full_workflow == True !
-                job_name = {'electron': f'e_{jobtype_id}_r0dl1',
-                            'gamma': f'g_{jobtype_id}_r0dl1',
-                            'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
-                            'proton': f'p_{jobtype_id}_r0dl1',
-                            'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
-                            'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
-                            }
+            cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
+                  f'-e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
 
-                if particle == 'proton':
-                    queue = 'long'
-                else:
-                    queue = 'short'
+            jobid = os.popen(cmd).read().strip('\n')
+            jobids_r0_dl1.append(jobid)
 
-                cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
-                      f'-e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
+            # Fill the dictionaries if IN workflow mode
+            jobid2log[jobid] = {}
+            jobid2log[jobid]['particle'] = particle
+            jobid2log[jobid]['set_type'] = set_type
+            jobid2log[jobid]['jobe_path'] = jobe
+            jobid2log[jobid]['jobo_path'] = jobo
+            jobid2log[jobid]['sbatch_command'] = cmd
 
-                jobid = os.popen(cmd).read().strip('\n')
-                jobids_r0_dl1.append(jobid)
-
-                # Fill the dictionaries if IN workflow mode
-                jobid2log[jobid] = {}
-                jobid2log[jobid]['particle'] = particle
-                jobid2log[jobid]['set_type'] = set_type
-                jobid2log[jobid]['jobe_path'] = jobe
-                jobid2log[jobid]['jobo_path'] = jobo
-                jobid2log[jobid]['sbatch_command'] = cmd
-
-                # print(f'\t\t{cmd}')
-                # print(f'\t\tSubmitted batch job {jobid}')
-                save_job_ids.append(jobid)
+            # print(f'\t\t{cmd}')
+            # print(f'\t\tSubmitted batch job {jobid}')
+            save_job_ids.append(jobid)
 
             counter += 1
 
-        if flag_full_workflow:
-            print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
-                  f"From jobid {save_job_ids[0]} - {save_job_ids[-1]}\n")
-            time.sleep(1)  # Avoid collapsing LP cluster
+        print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
+              f"From jobid {save_job_ids[0]} - {save_job_ids[-1]}\n")
+        time.sleep(1)  # Avoid collapsing LP cluster
 
-    # copy this script and config into working dir
-    shutil.copyfile(__file__, os.path.join(RUNNING_DIR, os.path.basename(__file__)))
+    # copy config into working dir
     if config_file is not None:
         shutil.copyfile(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
 
@@ -375,20 +289,5 @@ def main(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
     shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
 
-    # create log dictionary and return it if IN workflow mode
-    if flag_full_workflow:
-        return jobid2log, jobids_r0_dl1
-
-    else:
-        print(f"\n ==== END {os.path.basename(__file__)} ==== \n")
-
-
-if __name__ == '__main__':
-    args = parser.parse_args()
-    main(args.input_dir,
-         args.config_file,
-         args.train_test_ratio,
-         args.random_seed,
-         args.n_files_per_dl1,
-         args.flag_full_workflow
-         )
+    # return it log dictionary
+    return jobid2log, jobids_r0_dl1

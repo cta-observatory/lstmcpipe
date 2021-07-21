@@ -9,11 +9,11 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.stages import merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs, dl2_to_sensitivity
-from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
+from lstmcpipe.stages import r0_to_dl1, merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs, dl2_to_sensitivity
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None, workflow_kind='lstchain'):
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None,
+                    workflow_kind='lstchain'):
     """
     Batch the r0_to_dl1 jobs by particle type.
 
@@ -59,7 +59,6 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     config_file=conf_file,
                     particle=_particle,
                     prod_id=prod_id,
-                    flag_full_workflow=True,
                     source_environment=source_env,
                     offset=off,
                     workflow_kind=workflow_kind,
@@ -78,7 +77,6 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 config_file=conf_file,
                 particle=_particle,
                 prod_id=prod_id,
-                flag_full_workflow=True,
                 source_environment=source_env,
                 workflow_kind=workflow_kind,
             )
