@@ -56,7 +56,7 @@ def compose_batch_command_of_script(source, destination, script, particle, wait_
 
 
 def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, flag_no_image=True, prod_id=None,
-              gamma_offset=None, source_environment=None):
+              gamma_offset=None, source_environment=None, workflow_kind='lstchain'):
     """
     Merge and copy DL1 data after production.
 
@@ -93,6 +93,9 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
          to activate a certain conda environment.
          DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
+
 
     Returns
     -------
@@ -143,14 +146,14 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     if not len(os.listdir(DL1_training_dir)) == len(read_lines_file(training_filelist)):
         tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
         if tf != []:
-            raise Exception(f" * {len(tf)} files from the training list are not in the `DL1/training directory:\n{tf}"
-                  "\nContinuing.")
+            print(f" * {len(tf)} files from the training list are not in the `DL1/training directory:\n{tf}"
+                  f"\nContinuing.")
 
     if not len(os.listdir(DL1_testing_dir)) == len(read_lines_file(testing_filelist)):
         tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
         if tf != []:
-            raise Exception(f" * {len(tf)} files from the testing list are not in the `DL1/testing directory:\n{tf} "
-                  "\nContinuing.")
+            print(f" * {len(tf)} files from the testing list are not in the `DL1/testing directory:\n{tf} "
+                  f"\nContinuing.")
 
     print(f"\n\tmerging starts - {particle}")
 
@@ -187,10 +190,18 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         if wait_r0_dl1_jobs != '':
             cmd += ' --dependency=afterok:' + wait_r0_dl1_jobs
 
-        cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
-               f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} ' \
-               f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
-               f'--smart {flag_merge}"'
+        if workflow_kind == 'lstchain' or workflow_kind == 'hiperta':
+            cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
+                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} ' \
+                   f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
+                   f'--smart {flag_merge}"'
+        else:
+            cmd += f' -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o ' \
+                   f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
+            if flag_no_image:
+                cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images"'
+            else:
+                cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename}"'
 
         jobid_merge = os.popen(cmd).read().strip('\n')
         log_merge[particle][set_type][jobid_merge] = cmd
