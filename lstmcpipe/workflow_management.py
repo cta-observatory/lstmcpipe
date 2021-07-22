@@ -9,15 +9,11 @@ import yaml
 import pprint
 import calendar
 import lstchain
-from lstmcpipe.onsite_mc_r0_to_dl1 import main as r0_to_dl1
-from lstmcpipe.onsite_mc_merge_and_copy_dl1 import main as merge_and_copy_dl1
-from lstmcpipe.onsite_mc_train import main as train_pipe
-from lstmcpipe.onsite_mc_dl1_to_dl2 import main as dl1_to_dl2
-from lstmcpipe.onsite_mc_dl2_to_irfs import main as dl2_to_irfs
-from lstmcpipe.stages.dl2_to_sensitivity import dl2_to_sensitivity
+from lstmcpipe.stages import r0_to_dl1, merge_dl1, train_pipe, dl1_to_dl2, dl2_to_irfs, dl2_to_sensitivity
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None, workflow_kind='lstchain'):
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None,
+                    workflow_kind='lstchain'):
     """
     Batch the r0_to_dl1 jobs by particle type.
 
@@ -63,7 +59,6 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     config_file=conf_file,
                     particle=_particle,
                     prod_id=prod_id,
-                    flag_full_workflow=True,
                     source_environment=source_env,
                     offset=off,
                     workflow_kind=workflow_kind,
@@ -82,7 +77,6 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 config_file=conf_file,
                 particle=_particle,
                 prod_id=prod_id,
-                flag_full_workflow=True,
                 source_environment=source_env,
                 workflow_kind=workflow_kind,
             )
@@ -166,9 +160,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
 
-                log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
+                log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                     gamma_running_analysis_dir.format(particle),
-                    flag_full_workflow=True,
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
                     flag_merge=merge_flag,
@@ -193,9 +186,8 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         else:
             _particle = particle
 
-            log, jobid_mv_all_dl1, jobid_debug = merge_and_copy_dl1(
+            log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                 running_analysis_dir.format(particle),
-                flag_full_workflow=True,
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
                 flag_merge=merge_flag,
@@ -265,7 +257,6 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
         proton_dl1_train_file,
         config_file=config_file,
         source_environment=source_env,
-        flag_full_workflow=True,
         wait_ids_proton_and_gammas=jobids_from_merge
     )
 
@@ -373,7 +364,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                     gamma_dl1_directory.format(particle),
                     path_models=path_to_models,
                     config_file=config_file,
-                    flag_full_workflow=True,
                     particle=_particle,
                     wait_jobid_train_pipe=jobid_from_training,
                     wait_jobids_merge=jobids_from_merge,
@@ -393,7 +383,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 dl1_directory.format(particle),
                 path_models=path_to_models,
                 config_file=config_file,
-                flag_full_workflow=True,
                 particle=_particle,
                 wait_jobid_train_pipe=jobid_from_training,
                 wait_jobids_merge=jobids_from_merge,
@@ -455,12 +444,11 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
         log, jobid = dl2_to_irfs(
             dl2_directory,
+            config_file=config_file,
+            log_from_dl1_dl2=log_from_dl1_dl2,
             irf_point_like=True,
             irf_gamma_offset=off,
-            config_file=config_file,
             source_env=source_env,
-            flag_full_workflow=True,
-            log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id
         )
@@ -477,7 +465,6 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
             irf_point_like=False,
             config_file=config_file,
             source_env=source_env,
-            flag_full_workflow=True,
             log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id

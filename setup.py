@@ -31,7 +31,9 @@ entry_points = {
         'lstmcpipe_plot_models_importance = lstmcpipe.plots.plot_models_importance:main',
         'lstmcpipe_plot_irfs = lstmcpipe.plots.plot_irfs:main',
         'lstmcpipe_dl2_to_sensitivity = lstmcpipe.scripts.script_dl2_to_sensitivity:main',
-        'lstmcpipe_hiperta_r0_to_dl1lstchain = lstmcpipe.hiperta.hiperta_r0_to_dl1lstchain:main'
+        'lstmcpipe_hiperta_r0_to_dl1lstchain = lstmcpipe.hiperta.hiperta_r0_to_dl1lstchain:main',
+        'lstmcpipe_utils_move_dir = lstmcpipe.stages.script_merge_utils_move_dir:main',
+        'lstmcpipe_utils_cp_config = lstmcpipe.stages.script_merge_utils_copy_config:main'
     ]
 }
 
