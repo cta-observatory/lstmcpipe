@@ -3,6 +3,7 @@ from lstmcpipe.config.pipeline_config import config_valid, parse_config_and_hand
 import tempfile
 import os
 import yaml
+from datetime import datetime
 
 yaml_keys = [
     "prod_id",
@@ -29,17 +30,6 @@ def test_export_env():
     export_env(tmp_dir)
     if not os.path.exists(os.path.join(tmp_dir, 'requirements.txt')):
         assert os.path.exists(os.path.join(tmp_dir, 'conda_env.yml'))
-
-
-def test_load_config():
-    "Regression test for the refactoring of the config code"
-    config_path = "lstmcpipe/config_MC_prod.yml"
-    config = load_config(config_path)
-    with open("lstmcpipe/config/tests/expected.yaml") as e:
-        expected = yaml.safe_load(e)
-    for k in config:
-        print(k)
-        assert config[k] == expected[k]
 
 
 def test_config_valid():
@@ -90,13 +80,14 @@ def test_parse_config_and_handle_global_vars():
     config["base_path_dl0"] = "/dummy/path/to/files"
 
     parsed_config = parse_config_and_handle_global_vars(config)
+    date = datetime.today().strftime("%Y%m%d")
     assert (
         parsed_config["DL1_data_dir"] ==
-        "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/20210721_v0.7.3_prod5_trans_80_None"
+        "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"+date+"_v0.7.3_prod5_trans_80_None"
     )
     assert (
         parsed_config["model_dir"] ==
-        "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/20210721_v0.7.3_prod5_trans_80_None"
+        "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"+date+"_v0.7.3_prod5_trans_80_None"
     )
     assert (
         parsed_config["source_environment"] ==
