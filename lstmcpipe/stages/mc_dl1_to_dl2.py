@@ -76,8 +76,8 @@ def dl1_to_dl2(input_dir, path_models, config_file,  particle, wait_jobid_train_
                 'gamma': 'dl1-2_g',
                 'gamma-diffuse': 'dl1-2_gd',
                 'proton': 'dl1-2_p',
-                'gamma_off0.0deg': 'g.0_1-2dl',
-                'gamma_off0.4deg': 'g.4_1-2dl'
+                'gamma_off0.0deg': 'dl1-2_g.0',
+                'gamma_off0.4deg': 'dl1-2_g.4'
                 }
 
     for file in file_list:

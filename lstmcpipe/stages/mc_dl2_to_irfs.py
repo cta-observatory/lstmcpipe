@@ -110,7 +110,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
 
-    if log_from_dl1_dl2 == {}:  # Empty dict and thus no dl2 path files
+    if not log_from_dl1_dl2:  # Empty dict and thus no dl2 path files
         dl2_particle_paths = check_dl2_files(
             dl2_directory,
             irf_point_like,
