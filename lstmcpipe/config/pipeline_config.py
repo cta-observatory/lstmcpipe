@@ -34,26 +34,31 @@ def load_config(config_path):
 
     config = parse_config_and_handle_global_vars(loaded_config)
 
-    # TODO Split this up
-    log.info(f'\n\n\t ************ - {config["workflow_kind"]} {config["prod_type"]} - WORKFLOW KIND - ************ \n\n'
-             f'\nSimtel DL0 files are going to be searched at  \n\n   '
-             f'\t{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n\n'
-             f'The following directories and all the information within them will be either created or overwritten:\n'
-             f'[subdirectories with a same PROD_ID and analysed the same day]\n\n'
-             f'\t{config["running_analysis_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-             f'\t{config["DL1_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-             f'\t{config["DL2_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-             f'\t{config["analysis_log_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}\n'
-             f'\t{config["IRFs_dir"]}\n'
-             f'\t{config["model_dir"]}\n'
-             f'\n\tPROD_ID to be used: {config["prod_id"]}\n'
-             )
+    log.info(f'\n\n\t ************ - {config["workflow_kind"]} {config["prod_type"]} - WORKFLOW KIND - ************')
+    log.info(
+        'Simtel DL0 files are going to be searched at: '
+        f'{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}'
+    )
+    log.info(
+        'The following directories and all the information within them will be either created or overwritten:'
+        '[subdirectories with a same PROD_ID and analysed the same day]'
+    )
+    particle_dirs = [
+        "running_analysis_dir",
+        "DL1_data_dir",
+        "DL2_data_dir",
+        "analysis_log_dir",
+    ]
+    for pd in particle_dirs:
+        log.info(f'\t{config[pd].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}')
+    log.info(f'- {config["IRFs_dir"]}')
+    log.info(f'- {config["model_dir"]}')
+    log.info(f'- PROD_ID to be used: {config["prod_id"]}')
 
     log.info("Stages to be run:")
     for stage in config['stages_to_run']:
-        log.info(f" - {stage}")
-    log.info(f"   - Merging options. No-image argument: {config['merging_no_image']}")
-    log.info("\n")
+        log.info(f"- {stage}")
+    log.info(f"- Merging options: No-image argument: {config['merging_no_image']}")
 
     return config
 
