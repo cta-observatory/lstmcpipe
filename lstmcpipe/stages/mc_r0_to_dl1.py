@@ -12,8 +12,7 @@ import random
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
-    check_and_make_dir_without_verification,
-    manage_source_env_r0_dl1
+    check_and_make_dir_without_verification
 )
 
 
@@ -93,22 +92,18 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     PROD_ID = prod_id
 
     if workflow_kind == 'lstchain':
-        core_file = 'core_list.sh'
-        cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-        base_cmd = f'{core_file} "lstchain_mc_r0_to_dl1 {cc}"'
+        base_cmd = f'{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} '
         jobtype_id = 'LST'
     elif workflow_kind == 'ctapipe':
-        core_file = 'core_list_ctapipe.sh'
-        cc = ' --config {}'.format(config_file) if config_file is not None else ' '
-        base_cmd = f'{core_file} "ctapipe-stage1 {cc}"'
+        base_cmd = f'{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} '
         jobtype_id = 'CTA'
     elif workflow_kind == 'hiperta':
-        # TODO for the moment is only user enrique.garcia who has installed HiPeRTA  ##
-        core_file = 'core_list_hiperta.sh'
-        cc = ' -c {}'.format(config_file) if config_file is not None else ' '
-        base_cmd = f'{core_file} "/home/enrique.garcia/software/lstmcpipe/lstmcpipe/hiperta/' \
-                  f'hiperta_r0_to_dl1lstchain.py  -k {keep_rta_file} {cc}"'
+        rta_source_env = 'source /home/enrique.garcia/.bashrc; conda activate rta_2night'
+        base_cmd = f'{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False '
         jobtype_id = 'RTA'
+    else:
+        print("Please, selected an allowed workflow kind.")
+        exit(-1)
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
@@ -118,9 +113,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     #N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
 
     DL0_DATA_DIR = input_dir
-
-    if source_environment is not None:
-        manage_source_env_r0_dl1(source_and_env=source_environment, file=os.path.abspath(f"./{core_file}"))
 
     ##############################################################################
 
@@ -257,8 +249,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
             else:
                 queue = 'short'
 
-            cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} ' \
-                  f'-e {jobe} -o {jobo} {base_cmd} {output_dir} {os.path.join(dir_lists, file)}'
+            cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} -e {jobe} -o {jobo} ' \
+                  f'--wrap="{base_cmd} -f {file} -o {output_dir}"'
 
             jobid = os.popen(cmd).read().strip('\n')
             jobids_r0_dl1.append(jobid)
