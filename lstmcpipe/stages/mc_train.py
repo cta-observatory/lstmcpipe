@@ -81,8 +81,8 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
         batch_cmd += ' --dependency=afterok:' + wait_ids_proton_and_gammas
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
 
-    jobid_train = os.popen(cmd).read().strip('\n')
-    log_train[jobid_train] = cmd
+    jobid_train = os.popen(batch_cmd).read().strip('\n')
+    log_train[jobid_train] = batch_cmd
 
     # copy config into working dir
     if config_file is not None:
