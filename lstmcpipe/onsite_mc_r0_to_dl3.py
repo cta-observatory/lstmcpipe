@@ -14,7 +14,6 @@
 # > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
 #
 
-import sys
 import argparse
 from os.path import abspath
 from lstmcpipe.io.data_management import query_continue
@@ -106,7 +105,6 @@ if __name__ == '__main__':
     if any([step not in ('r0_to_dl1', 'merge_and_copy_dl1') for step in stages_to_run]):
         if args.config_file_lst is None:
             raise Exception('The lstchain config needs to be defined for all steps following dl1 processing')
-
 
     # 1 STAGE --> R0/1 to DL1
     if 'r0_to_dl1' in stages_to_run:
