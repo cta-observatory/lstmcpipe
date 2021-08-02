@@ -143,17 +143,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
 
     # 2. check that all files have been created in DL1 based on training and testing lists
     # just check number of files first:
-    if not len(os.listdir(DL1_training_dir)) == len(read_lines_file(training_filelist)):
-        tf = check_files_in_dir_from_file(DL1_training_dir, training_filelist)
-        if tf != []:
-            print(f" * {len(tf)} files from the training list are not in the `DL1/training directory:\n{tf}"
-                  f"\nContinuing.")
-
-    if not len(os.listdir(DL1_testing_dir)) == len(read_lines_file(testing_filelist)):
-        tf = check_files_in_dir_from_file(DL1_testing_dir, testing_filelist)
-        if tf != []:
-            print(f" * {len(tf)} files from the testing list are not in the `DL1/testing directory:\n{tf} "
-                  f"\nContinuing.")
+    # TODO Create check before merging files ?
 
     print(f"\n\tmerging starts - {particle}")
 
