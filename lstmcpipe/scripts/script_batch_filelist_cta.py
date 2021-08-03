@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#SBATCH --output=r0dl1_cta_%A_%a.out
+#SBATCH --error=r0dl1_cta_%A_%a.err
 
 import argparse
 import subprocess
@@ -22,9 +24,12 @@ def main():
                         required=True)
     args = parser.parse_args()
 
-    with open(args.file_list, 'r') as filelist:
+    task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
+    file_for_this_job =  args.file_list[task_id]
+    print("Using file: ", file_for_this_job)
+    
+    with open(args.file_for_this_job, 'r') as filelist:
         for file in filelist:
-
             file = file.strip('\n')
 
             cc = '--config {}'.format(args.config_file) if args.config_file is not None else ' '

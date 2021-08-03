@@ -105,12 +105,17 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         print("Please, selected an allowed workflow kind.")
         exit(-1)
 
+    job_name = {'electron': f'e_{jobtype_id}_r0dl1',
+                'gamma': f'g_{jobtype_id}_r0dl1',
+                'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
+                'proton': f'p_{jobtype_id}_r0dl1',
+                'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
+                'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
+                }
+
+
     TRAIN_TEST_RATIO = float(train_test_ratio)
     RANDOM_SEED = random_seed
-    #NFILES_PER_DL1 = n_files_per_dl1
-    #DESIRED_DL1_SIZE_MB = 1000
-
-    #N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
 
     DL0_DATA_DIR = input_dir
 
@@ -126,7 +131,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         N_R0_PER_DL1_JOB = 10
     elif n_r0_files_per_dl1_job == 0:
         if 'gamma' in input_dir:
-            N_R0_PER_DL1_JOB = 25
+            N_R0_PER_DL1_JOB = 2 # TODO: change back to 25, this is for testing the array 
         elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
             N_R0_PER_DL1_JOB = 50
         elif 'proton' in input_dir:
@@ -135,12 +140,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
             N_R0_PER_DL1_JOB = 50
     else:
         N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
-
-    # if NFILES_PER_DL1 == 0:
-    #     size_dl0 = os.stat(raw_files_list[0]).st_size / 1e6
-    #     reduction_dl0_dl1 = 5
-    #     size_dl1 = size_dl0 / reduction_dl0_dl1
-    #     NFILES_PER_DL1 = max(1, int(DESIRED_DL1_SIZE_MB / size_dl1))
 
     random.seed(RANDOM_SEED)
     random.shuffle(raw_files_list)
@@ -167,7 +166,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
             newfile.write('\n')
 
     if 'off' in particle:
-        # join(BASE_PATH, 'DL0', OBS_DATE, '{particle}', ZENITH, POINTING, 'PLACE_4_PROD_ID', GAMMA_OFF)
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
         RUNNING_DIR = os.path.join(
                 DL0_DATA_DIR.replace(
@@ -228,54 +226,57 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         counter = 0
         save_job_ids = []
 
-        for file in os.listdir(dir_lists):
-            if set_type == 'training':
-                jobo = os.path.join(JOB_LOGS, f"job{counter}_train.o")
-                jobe = os.path.join(JOB_LOGS, f"job{counter}_train.e")
-            else:
-                jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
-                jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
+        files = " ".join(os.listdir(dir_lists))
+        n_array = 3
 
-            job_name = {'electron': f'e_{jobtype_id}_r0dl1',
-                        'gamma': f'g_{jobtype_id}_r0dl1',
-                        'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
-                        'proton': f'p_{jobtype_id}_r0dl1',
-                        'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
-                        'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
-                        }
+        if set_type == 'training':
+            jobo = os.path.join(JOB_LOGS, "job_%A_%a_train.o")
+            jobe = os.path.join(JOB_LOGS, "job_%A_%a_train.e")
+        else:
+            jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
+            jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
 
-            if particle == 'proton':
-                queue = 'long'
-            else:
-                queue = 'short'
+        if particle == 'proton':
+            queue = 'long'
+        else:
+            queue = 'short'
 
-            cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} -e {jobe} -o {jobo} ' \
-                  f'--wrap="{base_cmd} -f {file} -o {output_dir}"'
+        slurm_options = f"--array=[0-{len(files)-1}]%{n_array} "
+        slurm_options += f"-p {queue} "
+        slurm_options += f"-e {jobe} "
+        slurm_options += f"-o {jobo} "
+        slurm_options += f"-J {job_name} "
+        slurm_options += f"-o {output_dir} "
 
-            jobid = os.popen(cmd).read().strip('\n')
-            jobids_r0_dl1.append(jobid)
+        cmd = f'sbatch --parsable --wrap="{base_cmd} -f {files}"'
 
-            # Fill the dictionaries if IN workflow mode
-            jobid2log[jobid] = {}
-            jobid2log[jobid]['particle'] = particle
-            jobid2log[jobid]['set_type'] = set_type
-            jobid2log[jobid]['jobe_path'] = jobe
-            jobid2log[jobid]['jobo_path'] = jobo
-            jobid2log[jobid]['sbatch_command'] = cmd
+        jobid = os.popen(cmd).read().strip('\n')
+        jobids_r0_dl1.append(jobid)
 
-            # print(f'\t\t{cmd}')
-            # print(f'\t\tSubmitted batch job {jobid}')
-            save_job_ids.append(jobid)
+        jobid = os.popen(cmd).read().strip('\n')
+        jobids_r0_dl1.append(jobid)
 
-            counter += 1
+        jobid2log[jobid] = {}
+        jobid2log[jobid]['particle'] = particle
+        jobid2log[jobid]['set_type'] = set_type
+        jobid2log[jobid]['jobe_path'] = jobe
+        jobid2log[jobid]['jobo_path'] = jobo
+        jobid2log[jobid]['sbatch_command'] = cmd
 
-        print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
-              f"From jobid {save_job_ids[0]} - {save_job_ids[-1]}\n")
+        # print(f'\t\t{cmd}')
+        # print(f'\t\tSubmitted batch job {jobid}')
+        save_job_ids.append(jobid)
+
+        # print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
+        #      f"From jobid {save_job_ids[0]} - {save_job_ids[-1]}\n")
         time.sleep(1)  # Avoid collapsing LP cluster
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
+        shutil.copyfile(
+            config_file,
+            os.path.join(RUNNING_DIR, os.path.basename(config_file))
+        )
 
     # save file lists into logs
     shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
