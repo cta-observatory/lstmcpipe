@@ -11,7 +11,8 @@
 #   - onsite_mc_dl2_to_irfs 
 #
 # usage:
-# > python onsite_mc_r0_to_dl3.py -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
+# > lstmcpipe -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
+#   [-conf_cta CTA_CONFIG_FILE]
 #
 
 import argparse
@@ -83,7 +84,8 @@ args = parser.parse_args()
 
 #######################################################################################################################
 
-if __name__ == '__main__':
+
+def main():
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
@@ -276,3 +278,7 @@ if __name__ == '__main__':
 
     save_log_to_file(debug_mc_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
     update_scancel_file(scancel_file, jobid_check)
+
+
+if __name__ == '__main__':
+    main()
