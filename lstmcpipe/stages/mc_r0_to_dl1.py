@@ -10,6 +10,7 @@ import time
 import shutil
 import random
 from pathlib import Path
+import subprocess
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
@@ -229,7 +230,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         counter = 0
         save_job_ids = []
 
-        files = " ".join(f.resolve().as_posix() for f in Path(dir_lists).glob("*"))
+        files = [f.resolve().as_posix() for f in Path(dir_lists).glob("*")]
         n_array = 3
 
         if set_type == 'training':
@@ -245,16 +246,12 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
             queue = 'short'
 
         slurm_options = f"--array=[0-{len(files)-1}]%{n_array} "
-        slurm_options += f"-p {queue} "
+        #slurm_options += f"-p {queue} "
         slurm_options += f"-e {jobe} "
         slurm_options += f"-o {jobo} "
-        slurm_options += f"-J {job_name} "
-        slurm_options += f"-o {output_dir} "
+        slurm_options += f"-J {job_name[particle]} "
 
-        cmd = f'sbatch --parsable --wrap="{base_cmd} -f {files}"'
-
-        jobid = os.popen(cmd).read().strip('\n')
-        jobids_r0_dl1.append(jobid)
+        cmd = f'sbatch --parsable {slurm_options} --wrap="{base_cmd} -f {" ".join(files)} --output_dir {output_dir}"'
 
         jobid = os.popen(cmd).read().strip('\n')
         jobids_r0_dl1.append(jobid)
