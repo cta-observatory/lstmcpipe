@@ -32,15 +32,16 @@ def main():
         for file in filelist:
             file = file.strip('\n')
 
-            cc = '--config {}'.format(args.config_file) if args.config_file is not None else ' '
+            cc = '--config={}'.format(args.config_file) if args.config_file is not None else ' '
             output = join(
                 args.output_dir,
                 basename(file.replace('.simtel.gz', '.dl1.h5'))
             )
 
-            cmd = [f'ctapipe-stage1 {cc}',
-                   f'--input {file}',
-                   f'--output {output}'
+            cmd = [f'ctapipe-stage1',
+                   f'{cc}',
+                   f'--input={file}',
+                   f'--output={output}'
                    ]
 
             subprocess.run(cmd)

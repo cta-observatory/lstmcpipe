@@ -9,6 +9,7 @@ import os
 import time
 import shutil
 import random
+from pathlib import Path
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
@@ -228,7 +229,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         counter = 0
         save_job_ids = []
 
-        files = " ".join(os.listdir(dir_lists))
+        files = " ".join(f.resolve().as_posix() for f in Path(dir_lists).glob("*"))
         n_array = 3
 
         if set_type == 'training':
@@ -269,8 +270,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         # print(f'\t\tSubmitted batch job {jobid}')
         save_job_ids.append(jobid)
 
-        # print(f"\n\t{counter} jobs submitted - {particle} {set_type}. "
-        #      f"From jobid {save_job_ids[0]} - {save_job_ids[-1]}\n")
         time.sleep(1)  # Avoid collapsing LP cluster
 
     # copy config into working dir
