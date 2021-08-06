@@ -11,11 +11,15 @@ import shutil
 import random
 from pathlib import Path
 import subprocess
+import logging
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
     check_and_make_dir_without_verification
 )
+
+
+log = logging.getLogger(__name__)
 
 
 def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
@@ -104,7 +108,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         base_cmd = f'{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False '
         jobtype_id = 'RTA'
     else:
-        print("Please, selected an allowed workflow kind.")
+        log.error("Please, selected an allowed workflow kind.")
         exit(-1)
 
     job_name = {'electron': f'e_{jobtype_id}_r0dl1',
@@ -123,7 +127,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
 
     ##############################################################################
 
-    print(f"Working on DL0 files in {DL0_DATA_DIR}")
+    log.info(f"Working on DL0 files in {DL0_DATA_DIR}")
 
     check_data_path(DL0_DATA_DIR)
 
@@ -156,9 +160,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     training_list = raw_files_list[:ntrain]
     testing_list = raw_files_list[ntrain:]
 
-    print("\t{} raw files".format(number_files))
-    print("\t{} files in training dataset".format(ntrain))
-    print("\t{} files in test dataset".format(ntest))
+    log.info("\t{} raw files".format(number_files))
+    log.info("\t{} files in training dataset".format(ntrain))
+    log.info("\t{} files in test dataset".format(ntest))
 
     with open('training.list', 'w+') as newfile:
         for f in training_list:
@@ -192,9 +196,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
-    print("\tRUNNING_DIR: \t", RUNNING_DIR)
-    print("\tJOB_LOGS DIR: \t", JOB_LOGS)
-    print("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
+    log.info("\tRUNNING_DIR: \t", RUNNING_DIR)
+    log.info("\tJOB_LOGS DIR: \t", JOB_LOGS)
+    log.info("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
 
     for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
         check_and_make_dir_without_verification(directory)
@@ -216,7 +220,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         check_and_make_dir_without_verification(dir_lists)
         check_and_make_dir_without_verification(output_dir)
 
-        print("\toutput dir: \t", output_dir)
+        log.info("\toutput dir: \t", output_dir)
 
         number_of_sublists = len(list_type) // N_R0_PER_DL1_JOB + int(len(list_type) % N_R0_PER_DL1_JOB > 0)
         for i in range(number_of_sublists):
@@ -225,7 +229,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
                 for line in list_type[i * N_R0_PER_DL1_JOB:N_R0_PER_DL1_JOB * (i + 1)]:
                     out.write(line)
                     out.write('\n')
-        print(f'\t{number_of_sublists} files generated for {set_type} list')
+        log.info(f'\t{number_of_sublists} files generated for {set_type} list')
 
         # LSTCHAIN #
         counter = 0
@@ -264,8 +268,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         jobid2log[jobid]['jobo_path'] = jobo
         jobid2log[jobid]['sbatch_command'] = cmd
 
-        # print(f'\t\t{cmd}')
-        # print(f'\t\tSubmitted batch job {jobid}')
+        log.info(f'\t\t{cmd}')
+        log.info(f'\t\tSubmitted batch job {jobid}')
         save_job_ids.append(jobid)
 
         time.sleep(1)  # Avoid collapsing LP cluster
