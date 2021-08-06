@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #SBATCH --output=r0dl1_cta_%A_%a.out
 #SBATCH --error=r0dl1_cta_%A_%a.err
-#SBATCH --partition short
+
 import argparse
 import subprocess
 from os.path import join, basename

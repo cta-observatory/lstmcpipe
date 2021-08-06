@@ -133,7 +133,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         N_R0_PER_DL1_JOB = 10
     elif n_r0_files_per_dl1_job == 0:
         if 'gamma' in input_dir:
-            N_R0_PER_DL1_JOB = 25
+            N_R0_PER_DL1_JOB = 2 # TODO: change back to 25, this is for testing the array 
         elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
             N_R0_PER_DL1_JOB = 50
         elif 'proton' in input_dir:
@@ -145,6 +145,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
 
     # for debugging, TODO remove later
     N_R0_PER_DL1_JOB = 2
+
     random.seed(RANDOM_SEED)
     random.shuffle(raw_files_list)
 
@@ -246,7 +247,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
             queue = 'short'
 
         slurm_options = f"--array=[0-{len(files)-1}]%{n_array} "
-        #slurm_options += f"-p {queue} "
+        slurm_options += f"-p {queue} "
         slurm_options += f"-e {jobe} "
         slurm_options += f"-o {jobo} "
         slurm_options += f"-J {job_name[particle]} "
