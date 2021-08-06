@@ -86,7 +86,7 @@ args = parser.parse_args()
 
 
 def main():
-    log = setup_logging(verbose=debug)
+    log = setup_logging(verbose=args.debug)
     # Read MC production configuration file
     config = load_config(args.config_mc_prod)
     query_continue('Are you sure ?')
