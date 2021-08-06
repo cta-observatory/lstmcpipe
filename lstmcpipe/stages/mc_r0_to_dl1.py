@@ -196,9 +196,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
-    log.info("RUNNING_DIR: ", RUNNING_DIR)
-    log.info("JOB_LOGS DIR: ", JOB_LOGS)
-    log.info("DL1 DATA DIR: ", DL1_DATA_DIR)
+    log.info("RUNNING_DIR: {}".format(RUNNING_DIR))
+    log.info("JOB_LOGS DIR: {}".format(JOB_LOGS))
+    log.info("DL1 DATA DIR: {}".format(DL1_DATA_DIR))
 
     for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
         check_and_make_dir_without_verification(directory)
@@ -220,7 +220,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         check_and_make_dir_without_verification(dir_lists)
         check_and_make_dir_without_verification(output_dir)
 
-        log.info("output dir: ", output_dir)
+        log.info("output dir: {}".format(output_dir))
 
         number_of_sublists = len(list_type) // N_R0_PER_DL1_JOB + int(len(list_type) % N_R0_PER_DL1_JOB > 0)
         for i in range(number_of_sublists):
