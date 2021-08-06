@@ -44,7 +44,7 @@ def main():
                    f'--input={file}',
                    f'--output={output}'
                    ]
-            if args.config_file
+            if args.config_file:
                 cmd += '--config={}'.format(args.config_file)
             subprocess.run(cmd)
 

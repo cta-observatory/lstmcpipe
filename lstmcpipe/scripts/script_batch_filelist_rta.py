@@ -45,7 +45,7 @@ def main():
                    f'-k {args.keep_file}',
                    f'-d {args.debug_mode}'
                    ]
-            if args.config_file
+            if args.config_file:
                 cmd += '--config={}'.format(args.config_file)
 
             subprocess.run(cmd)

@@ -30,7 +30,7 @@ def main():
                    f'--input-file {file}',
                    f'--output-dir {args.output_dir}'
                    ]
-            if args.config_file
+            if args.config_file:
                 cmd += '--config={}'.format(args.config_file)
 
             subprocess.run(cmd)
