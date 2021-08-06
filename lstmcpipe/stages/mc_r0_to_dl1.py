@@ -160,9 +160,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     training_list = raw_files_list[:ntrain]
     testing_list = raw_files_list[ntrain:]
 
-    log.info("\t{} raw files".format(number_files))
-    log.info("\t{} files in training dataset".format(ntrain))
-    log.info("\t{} files in test dataset".format(ntest))
+    log.info("{} raw files".format(number_files))
+    log.info("{} files in training dataset".format(ntrain))
+    log.info("{} files in test dataset".format(ntest))
 
     with open('training.list', 'w+') as newfile:
         for f in training_list:
@@ -196,9 +196,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
-    log.info("\tRUNNING_DIR: \t", RUNNING_DIR)
-    log.info("\tJOB_LOGS DIR: \t", JOB_LOGS)
-    log.info("\tDL1 DATA DIR: \t", DL1_DATA_DIR)
+    log.info("RUNNING_DIR: ", RUNNING_DIR)
+    log.info("JOB_LOGS DIR: ", JOB_LOGS)
+    log.info("DL1 DATA DIR: ", DL1_DATA_DIR)
 
     for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
         check_and_make_dir_without_verification(directory)
@@ -220,7 +220,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         check_and_make_dir_without_verification(dir_lists)
         check_and_make_dir_without_verification(output_dir)
 
-        log.info("\toutput dir: \t", output_dir)
+        log.info("output dir: ", output_dir)
 
         number_of_sublists = len(list_type) // N_R0_PER_DL1_JOB + int(len(list_type) % N_R0_PER_DL1_JOB > 0)
         for i in range(number_of_sublists):
@@ -229,7 +229,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
                 for line in list_type[i * N_R0_PER_DL1_JOB:N_R0_PER_DL1_JOB * (i + 1)]:
                     out.write(line)
                     out.write('\n')
-        log.info(f'\t{number_of_sublists} files generated for {set_type} list')
+        log.info(f'{number_of_sublists} files generated for {set_type} list')
 
         # LSTCHAIN #
         counter = 0
@@ -268,8 +268,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         jobid2log[jobid]['jobo_path'] = jobo
         jobid2log[jobid]['sbatch_command'] = cmd
 
-        log.info(f'\t\t{cmd}')
-        log.info(f'\t\tSubmitted batch job {jobid}')
+        log.info(f'{cmd}')
+        log.info(f'Submitted batch job {jobid}')
         save_job_ids.append(jobid)
 
         time.sleep(1)  # Avoid collapsing LP cluster
