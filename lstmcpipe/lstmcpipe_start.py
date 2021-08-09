@@ -79,6 +79,14 @@ parser.add_argument(
     action='store_true', 
     help='print debug messages to stderr'
 )        
+parser.add_argument(
+        '--log-file',
+        action='store',
+        type=str,
+        dest='log_file',
+        help='Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging'
+        default=None,
+        )
 
 args = parser.parse_args()
 
@@ -86,7 +94,7 @@ args = parser.parse_args()
 
 
 def main():
-    log = setup_logging(verbose=args.debug)
+    log = setup_logging(verbose=args.debug, logfile=args.log_file)
     # Read MC production configuration file
     config = load_config(args.config_mc_prod)
     query_continue('Are you sure ?')
