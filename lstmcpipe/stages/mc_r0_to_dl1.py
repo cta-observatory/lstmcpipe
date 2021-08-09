@@ -8,7 +8,7 @@
 import os
 import time
 import shutil
-import random
+from numpy.random import default_rng
 from pathlib import Path
 import subprocess
 import logging
@@ -22,10 +22,12 @@ from lstmcpipe.io.data_management import (
 log = logging.getLogger(__name__)
 
 
-def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42, n_r0_files_per_dl1_job=0,
-              particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False):
+def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_files_per_dl1_job=None,
+              particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False,
+              n_jobs_parallel=20):
     """
     R0 to DL1 MC onsite conversion.
+    Organizes files and launches slurm jobs in two slurm arrays.
 
 
     Parameters
@@ -33,46 +35,45 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     input_dir : str
         path to the files directory to analyse
     config_file :str
-        Path to a configuration file. If none is given, a standard configuration is applied
-    train_test_ratio :int
+        Path to a configuration file. If none is given, the standard configuration of the selected pipeline is applied
+    train_test_ratio: float
         Ratio of training data. Default = 0.5
     random_seed : int
         Random seed for random processes. Default = 42
     n_r0_files_per_dl1_job : int
-        Number of r0 files processed by each r0_to_dl1 batched stage. If set to 0 (Default), see below the `usual
+        Number of r0 files processed by each r0_to_dl1 batched stage. If set to None (Default), see below the `usual
         production` case.n_r0_files_per_dl1_job
 
         If the number of r0 files found in `input_dir` is less than 100, it is consider to be a test on a small
         production. Therefore, the number of r0 files treated per batched stage will be set to 10.
 
-        Usual productions have =>1000 r0 files, in this case, the number of batched jobs will be fixed to 50 (in case
-        of gamma and electrons), 80 for (gamma-diffuse) and 125 to protons. This means that there will be batched a
-        total of 50+50+80+125 = 305 jobs only for the r0_to_dl1 stage. (there are 1k r0 files for gammas (although 2
-        offsets, thus 2k files), 2k r0 files for gd and e- and 5k for protons).
-
-        Default = 0
-
+        Usual productions have =>1000 r0 files, in this case, the number of files per job will be fixed to 50 (in case
+        of gamma and electrons), and 100 for protons. Because of this protons end up in the long queue and other particles
+        are submitted to the short queue.
     particle : str
-        particle type for `flag_full_workflow` = True
+        particle type (gamma/gamma_off/proton/electron). Determines output directory structure, job naming
+        and n_r0_files_per_dl1_job if not set explicitly.
     offset : str
         gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script)
-         to activate a certain conda environment.
-         DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
+        path to a .bashrc file to source (can be configurable for custom runs @lstmcpipe_start script)
+        and command to activate a certain conda environment.
+        Passed to the core script of the selected pipeline and activated there.
+        Has no effect for hiperta currently
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
     keep_rta_file : bool
         Argument to be passed to the hiperta_r0_to_dl1lstchain script, which runs the hiperta_r0_dl1 and
         re-organiser stage
+    n_jobs_parallel: int
+        Number of jobs to be run at the same time per array.
+
     Returns
     -------
-
-    jobid2log : dict (if flag_full_workflow is True)
-
+    jobid2log : dict
         A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
         only the each jobid that the scripts has batched.
 
@@ -85,14 +86,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
                  when the job was send to the cluster
 
              dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
-
-             ****  otherwise : (if flag_full_workflow is False, by default) ****
-            None is returned -- THIS IS APPLIED FOR THE ARGUMENTS SHOWN BELOW TOO
-
     jobids_r0_dl1
-
         A list of all the jobs sent by particle (including test and train set types).
-
     """
 
     PROD_ID = prod_id
@@ -108,7 +103,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         base_cmd = f'{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False '
         jobtype_id = 'RTA'
     else:
-        log.error("Please, selected an allowed workflow kind.")
+        log.critical("Please, selected an allowed workflow kind.")
         exit(-1)
 
     job_name = {'electron': f'e_{jobtype_id}_r0dl1',
@@ -121,7 +116,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
 
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
-    RANDOM_SEED = random_seed
 
     DL0_DATA_DIR = input_dir
 
@@ -134,24 +128,28 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
     raw_files_list = get_input_filelist(DL0_DATA_DIR)
 
     if len(raw_files_list) < 100:
-        N_R0_PER_DL1_JOB = 10
-    elif n_r0_files_per_dl1_job == 0:
-        if 'gamma' in input_dir:
-            N_R0_PER_DL1_JOB = 2 # TODO: change back to 25, this is for testing the array 
-        elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
-            N_R0_PER_DL1_JOB = 50
-        elif 'proton' in input_dir:
-            N_R0_PER_DL1_JOB = 125
+        n_r0_per_dl1_job = 10
+    
+    if not n_r0_files_per_dl1_job:
+        if len(raw_files_list) < 100:
+            n_r0_per_dl1_job = 10
         else:
-            N_R0_PER_DL1_JOB = 50
-    else:
-        N_R0_PER_DL1_JOB = n_r0_files_per_dl1_job
+            if 'gamma' in input_dir:
+                n_r0_per_dl1_job = 2 # TODO: change back to 25, this is for testing the array 
+            elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
+                n_r0_per_dl1_job = 50
+            elif 'proton' in input_dir:
+                n_r0_per_dl1_job = 125
+            else:
+                n_r0_per_dl1_job = 50
 
     # for debugging, TODO remove later
-    N_R0_PER_DL1_JOB = 2
+    n_r0_per_dl1_job = 2
+    n_jobs_parallel = 3
 
-    random.seed(RANDOM_SEED)
-    random.shuffle(raw_files_list)
+    if rng is None:
+        rng = default_rng()
+    rng.shuffle(raw_files_list)
 
     number_files = len(raw_files_list)
     ntrain = int(number_files * TRAIN_TEST_RATIO)
@@ -222,35 +220,32 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
 
         log.info("output dir: {}".format(output_dir))
 
-        number_of_sublists = len(list_type) // N_R0_PER_DL1_JOB + int(len(list_type) % N_R0_PER_DL1_JOB > 0)
+        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(len(list_type) % n_r0_per_dl1_job > 0)
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
             with open(output_file, 'w+') as out:
-                for line in list_type[i * N_R0_PER_DL1_JOB:N_R0_PER_DL1_JOB * (i + 1)]:
+                for line in list_type[i * n_r0_per_dl1_job:n_r0_per_dl1_job * (i + 1)]:
                     out.write(line)
                     out.write('\n')
         log.info(f'{number_of_sublists} files generated for {set_type} list')
 
-        # LSTCHAIN #
-        counter = 0
         save_job_ids = []
 
         files = [f.resolve().as_posix() for f in Path(dir_lists).glob("*")]
-        n_array = 3
 
         if set_type == 'training':
             jobo = os.path.join(JOB_LOGS, "job_%A_%a_train.o")
             jobe = os.path.join(JOB_LOGS, "job_%A_%a_train.e")
         else:
-            jobo = os.path.join(JOB_LOGS, f"job{counter}_test.o")
-            jobe = os.path.join(JOB_LOGS, f"job{counter}_test.e")
+            jobo = os.path.join(JOB_LOGS, f"job_%A_%a_test.o")
+            jobe = os.path.join(JOB_LOGS, f"job_%A_%a_test.e")
 
         if particle == 'proton':
             queue = 'long'
         else:
             queue = 'short'
 
-        slurm_options = f"--array=[0-{len(files)-1}]%{n_array} "
+        slurm_options = f"--array=[0-{len(files)-1}]%{n_jobs_parallel} "
         slurm_options += f"-p {queue} "
         slurm_options += f"-e {jobe} "
         slurm_options += f"-o {jobo} "
@@ -271,8 +266,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
         log.info(f'{cmd}')
         log.info(f'Submitted batch job {jobid}')
         save_job_ids.append(jobid)
-
-        time.sleep(1)  # Avoid collapsing LP cluster
 
     # copy config into working dir
     if config_file is not None:
