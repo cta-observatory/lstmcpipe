@@ -84,7 +84,7 @@ parser.add_argument(
         action='store',
         type=str,
         dest='log_file',
-        help='Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging'
+        help='Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging',
         default=None,
         )
 
