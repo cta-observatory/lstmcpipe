@@ -39,8 +39,7 @@ def main():
                 basename(file.replace('.simtel.gz', '.dl1.h5'))
             )
 
-            cmd = [f'ctapipe-stage1',
-                   f'{cc}',
+            cmd = ['ctapipe-stage1',
                    f'--input={file}',
                    f'--output={output}'
                    ]

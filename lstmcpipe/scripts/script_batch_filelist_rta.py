@@ -39,7 +39,7 @@ def main():
 
             file = file.strip('\n')
 
-            cmd = [f'lstmcpipe_hiperta_r0_to_dl1lstchain',
+            cmd = ['lstmcpipe_hiperta_r0_to_dl1lstchain',
                    f'-i {file}',
                    f'-o {args.output_dir}',
                    f'-k {args.keep_file}',

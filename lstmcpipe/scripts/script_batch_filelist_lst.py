@@ -26,7 +26,7 @@ def main():
 
             file = file.strip('\n')
 
-            cmd = [f'lstchain_mc_r0_to_dl1',
+            cmd = ['lstchain_mc_r0_to_dl1',
                    f'--input-file {file}',
                    f'--output-dir {args.output_dir}'
                    ]
