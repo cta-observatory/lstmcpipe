@@ -14,6 +14,87 @@ import shutil
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
+
+def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
+                      log_from_dl1_dl2, source_env, prod_id):
+    """
+    Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    config_file: str
+        Path to lstchain-like config file
+    loop_particles: list
+        list with particles to be processed.
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_batch_dl2_to_irfs: dict
+    jobs_from_dl2_irf: str
+    debug_dl2_to_irfs: dict
+    """
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_irfs = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            config_file=config_file,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            irf_point_like=True,
+            irf_gamma_offset=off,
+            source_env=source_env,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    if 'gamma-diffuse' in loop_particles:
+
+        log, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=False,
+            config_file=config_file,
+            source_env=source_env,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma-diffuse'] = log
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
+
+    return log_dl2_to_irfs, jobid_for_check, debug_log
+
+
+
 def check_dl2_files(dl2_dir, pointlike, gamma_off):
     """
     Search DL2 testing files for each of the desired particles depending on the IRF configuration (point-like

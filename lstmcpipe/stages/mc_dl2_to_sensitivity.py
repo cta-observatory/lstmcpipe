@@ -3,6 +3,69 @@
 import os
 
 
+
+
+def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
+    """
+    Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
+    dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    source_env: str
+        source environment to select the desired conda environment (source .bashrc + conda activate $ENV)
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_dl2_to_sensitivity: dict
+        Dictionary with job_id-slurm command key-value pair used for logging
+    jobid_for_check: str
+        Comma-separated jobids batched in the current stage
+    debug_log: dict
+        Dictionary with the job-id and stage explanation to be stored in the debug file
+
+    """
+    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_sensitivity = {}
+
+    for off in offset_gammas:
+
+        log, jobid = dl2_to_sensitivity(dl2_directory,
+                                        log_from_dl1_dl2,
+                                        gamma_offset=off,
+                                        prod_id=prod_id,
+                                        source_env=source_env,
+                                        wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
+                                        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_sensitivity[f'gamma_{off}'] = log
+        debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
+                           f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+
+    return log_dl2_to_sensitivity, jobid_for_check, debug_log
+
+
+
+
 def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, gamma_offset, source_env):
     """
     Batches the the `plot_irfs` entry point after the computation of the `dl2_to_sensitivity` script

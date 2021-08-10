@@ -19,6 +19,130 @@ from lstmcpipe.io.data_management import (
 )
 
 
+
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
+                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None, workflow_kind='lstchain'):
+    """
+    Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
+    have finished.
+
+    Batch 8 merge_and_copy_dl1 jobs ([train, test] x particle) + the move_dl1 and move_dir jobs (2 per particle).
+
+    Parameters
+    ----------
+    running_analysis_dir : str
+        Directory to dl1 files
+    log_jobs_from_r0_to_dl1 : dict
+        dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
+        (onsite_mc_r0_to_dl1)
+    smart_merge : bool
+        flag to indicate whether the merge of the files should be done with `--smart True` or `--smart False`,
+        controlling the argument of the `lstchain_merge_hdf5_files.py` script (batched in this function).
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
+    no_image_flag : bool
+        flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
+        this function) should be either True or False.
+    gamma_offsets : list
+        list containing the offset of the gammas
+    prod_id : str
+        prod_id defined in config_MC_prod.yml
+    source_env : str
+        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+
+    Returns
+    -------
+    log_merge_and_copy : dict
+        Dictionary containing the log of the batched merge_and_copy_dl1 jobs
+    jobid_4_train : str
+         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+    all_merge : str
+        string containing all the jobs to indicate that all the dl1 are correctly finished (for dl1_to_dl2)
+    debug_log : dict
+        Debug purposes
+
+    """
+    log_merge_and_copy = {}
+    jobid_4_train = []
+    all_jobs_from_merge_stage = []
+    debug_log = {}
+
+    if smart_merge == 'lst' or smart_merge == 'lstchain':
+        merge_flag = True
+    elif smart_merge == 'rta' or smart_merge == 'hiperta':
+        merge_flag = False
+    elif smart_merge:
+        merge_flag = True
+    elif not smart_merge:
+        merge_flag = False
+    else:
+        merge_flag = False
+
+    print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
+
+    for particle in particles_loop:
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+
+                gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
+                _particle = particle + '_' + off
+
+                log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+                    gamma_running_analysis_dir.format(particle),
+                    particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                    particle=_particle,
+                    flag_merge=merge_flag,
+                    flag_no_image=no_image_flag,
+                    prod_id=prod_id,
+                    gamma_offset=off,
+                    source_environment=source_env,
+                    workflow_kind=workflow_kind,
+                )
+
+                log_merge_and_copy.update(log)
+                all_jobs_from_merge_stage.append(jobid_debug)
+                if _particle == 'gamma-diffuse' or _particle == 'proton':
+                    jobid_4_train.append(jobid_mv_all_dl1)
+
+                debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                              f'move_dl1 jobid - that will be send to the train pipe stage. They ' \
+                                              f'depend on the following {log_jobs_from_r0_to_dl1[_particle]} ' \
+                                              f'r0_t0_dl1 jobs.'
+                debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+
+        else:
+            _particle = particle
+
+            log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+                running_analysis_dir.format(particle),
+                particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                particle=_particle,
+                flag_merge=merge_flag,
+                flag_no_image=no_image_flag,
+                prod_id=prod_id,
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
+            )
+
+            log_merge_and_copy.update(log)
+            all_jobs_from_merge_stage.append(jobid_debug)
+            if _particle == 'gamma-diffuse' or _particle == 'proton':
+                jobid_4_train.append(jobid_mv_all_dl1)
+
+            debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                          f'move_dl1 jobid - that will be send to the train pipe stage. They depend ' \
+                                          f'on the following {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+            debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+
+    jobid_4_train = ','.join(jobid_4_train)
+    all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
+
+    print("\n ==== END {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
+
+    return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage, debug_log
+
+
+
 def compose_batch_command_of_script(source, destination, script, particle, wait_jobs, suffix):
     """
     Creates the slurm command of the 'cmd' script

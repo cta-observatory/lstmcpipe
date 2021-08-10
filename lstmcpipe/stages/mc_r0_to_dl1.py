@@ -22,7 +22,88 @@ from lstmcpipe.io.data_management import (
 log = logging.getLogger(__name__)
 
 
-def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_files_per_dl1_job=None,
+def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None,
+                    workflow_kind='lstchain'):
+    """
+    Batch the r0_to_dl1 jobs by particle type.
+
+    Parameters
+    ----------
+    input_dir : str
+        Path to the r0/DL0 files
+    conf_file : str
+        Path to a configuration file. If none is given, a standard configuration is applied
+    prod_id : str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
+    source_env : str
+        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+    gamma_offsets : list
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
+
+    Returns
+    -------
+    full_log : dict
+        Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
+        4 more keys (one by particle) with all the jobs associated with each particle.
+    debug_log : dict
+            dictionary containing minimum information - jobids -  for log_reduced.txt
+    all_jobids_from_r0_dl1_stage : str
+        string, separated by commas, containing all the jobids of this stage
+    """
+    full_log = {'log_all_job_ids': {}}
+    debug_log = {}
+    all_jobids_from_r0_dl1_stage = []
+
+    print(f"\n ==== START {workflow_kind} r0 to dl1 processing ==== \n")
+
+    for particle in particles_loop:
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+                particle_input_dir = os.path.join(input_dir, off).format(particle)
+                _particle = particle + '_' + off
+                log, jobids_by_particle = r0_to_dl1(
+                    particle_input_dir,  # Particle needs to be gamma w/o the off
+                    config_file=conf_file,
+                    particle=_particle,
+                    prod_id=prod_id,
+                    source_environment=source_env,
+                    offset=off,
+                    workflow_kind=workflow_kind,
+                )
+                full_log['log_all_job_ids'].update(log)
+                full_log[_particle] = ','.join(jobids_by_particle)
+                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+
+                for jid in jobids_by_particle:
+                    debug_log[jid] = f'{_particle} job from r0_to_dl1'        
+        else:
+            particle_input_dir = input_dir.format(particle)
+            _particle = particle
+            log, jobids_by_particle = r0_to_dl1(
+                particle_input_dir,  # Particle needs to be gamma w/o the off
+                config_file=conf_file,
+                particle=_particle,
+                prod_id=prod_id,
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
+            )
+            full_log['log_all_job_ids'].update(log)
+            full_log[_particle] = ','.join(jobids_by_particle)
+            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+
+            for jid in jobids_by_particle:
+                debug_log[jid] = f'{_particle} job from r0_to_dl1'
+    all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
+
+    print(f"\n ==== END {workflow_kind} r0 to dl1 processing ==== \n")
+
+    return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
+
+
+def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_per_dl1_job=None,
               particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False,
               n_jobs_parallel=20):
     """
