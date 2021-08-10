@@ -171,6 +171,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
         A list of all the jobs sent by particle (including test and train set types).
     """
 
+    log.info("Starting R0 to DL1 processing for particle {}".format(particle))
+
     PROD_ID = prod_id
 
     if workflow_kind == 'lstchain':
@@ -211,22 +213,18 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     if len(raw_files_list) < 100:
         n_r0_per_dl1_job = 10
     
-    if not n_r0_files_per_dl1_job:
+    if not n_r0_per_dl1_job:
         if len(raw_files_list) < 100:
             n_r0_per_dl1_job = 10
         else:
             if 'gamma' in input_dir:
-                n_r0_per_dl1_job = 2 # TODO: change back to 25, this is for testing the array 
+                n_r0_per_dl1_job = 25
             elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
                 n_r0_per_dl1_job = 50
             elif 'proton' in input_dir:
                 n_r0_per_dl1_job = 125
             else:
                 n_r0_per_dl1_job = 50
-
-    # for debugging, TODO remove later
-    n_r0_per_dl1_job = 2
-    n_jobs_parallel = 3
 
     if rng is None:
         rng = default_rng()
@@ -239,9 +237,9 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     training_list = raw_files_list[:ntrain]
     testing_list = raw_files_list[ntrain:]
 
-    log.info("{} raw files".format(number_files))
-    log.info("{} files in training dataset".format(ntrain))
-    log.info("{} files in test dataset".format(ntest))
+    log.info("{} raw R0 files".format(number_files))
+    log.info("{} R0 files in training dataset".format(ntrain))
+    log.info("{} R0 files in test dataset".format(ntest))
 
     with open('training.list', 'w+') as newfile:
         for f in training_list:
@@ -288,6 +286,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     jobids_r0_dl1 = []
 
     for set_type in 'training', 'testing':
+        log.debug("Generating list for {} step")
         if set_type == 'training':
             list_type = training_list
         else:
@@ -318,8 +317,8 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
             jobo = os.path.join(JOB_LOGS, "job_%A_%a_train.o")
             jobe = os.path.join(JOB_LOGS, "job_%A_%a_train.e")
         else:
-            jobo = os.path.join(JOB_LOGS, f"job_%A_%a_test.o")
-            jobe = os.path.join(JOB_LOGS, f"job_%A_%a_test.e")
+            jobo = os.path.join(JOB_LOGS, "job_%A_%a_test.o")
+            jobe = os.path.join(JOB_LOGS, "job_%A_%a_test.e")
 
         if particle == 'proton':
             queue = 'long'
@@ -332,9 +331,12 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
         slurm_options += f"-o {jobo} "
         slurm_options += f"-J {job_name[particle]} "
 
+        # start 1 jobarray with all files included. The job selects its file based on its task id
         cmd = f'sbatch --parsable {slurm_options} --wrap="{base_cmd} -f {" ".join(files)} --output_dir {output_dir}"'
+        log.debug(f'Slurm command to start the jobs: {cmd}')
 
         jobid = os.popen(cmd).read().strip('\n')
+        log.debug(f'Submitted batch job {jobid}')
         jobids_r0_dl1.append(jobid)
 
         jobid2log[jobid] = {}
@@ -344,8 +346,6 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
         jobid2log[jobid]['jobo_path'] = jobo
         jobid2log[jobid]['sbatch_command'] = cmd
 
-        log.info(f'{cmd}')
-        log.info(f'Submitted batch job {jobid}')
         save_job_ids.append(jobid)
 
     # copy config into working dir
