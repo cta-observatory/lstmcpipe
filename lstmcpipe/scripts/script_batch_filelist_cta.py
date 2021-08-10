@@ -34,6 +34,8 @@ def main():
         for file in filelist:
             file = file.strip('\n')
 
+            # ctapipe takes the output filename
+            # so we need to construct it first
             output = join(
                 args.output_dir,
                 basename(file.replace('.simtel.gz', '.dl1.h5'))
@@ -44,7 +46,7 @@ def main():
                    f'--output={output}'
                    ]
             if args.config_file:
-                cmd += '--config={}'.format(args.config_file)
+                cmd.append('--config={}'.format(args.config_file))
             subprocess.run(cmd)
 
 

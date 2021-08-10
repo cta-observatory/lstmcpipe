@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+from os import environ
 import subprocess
 
 
@@ -21,17 +22,22 @@ def main():
                         required=True)
     args = parser.parse_args()
 
+    task_id = int(environ["SLURM_ARRAY_TASK_ID"])
+    file_for_this_job =  args.file_list[task_id]
+    print("Using file: ", file_for_this_job)
+
+    # lstchain takes the output dir and constructs filenanmes itself
     with open(args.file_list, 'r') as filelist:
         for file in filelist:
 
             file = file.strip('\n')
 
             cmd = ['lstchain_mc_r0_to_dl1',
-                   f'--input-file {file}',
-                   f'--output-dir {args.output_dir}'
+                   f'--input-file={file}',
+                   f'--output-dir={args.output_dir}'
                    ]
             if args.config_file:
-                cmd += '--config={}'.format(args.config_file)
+                cmd.append('--config={}'.format(args.config_file))
 
             subprocess.run(cmd)
 
