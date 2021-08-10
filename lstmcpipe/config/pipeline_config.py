@@ -28,20 +28,14 @@ def load_config(config_path):
     with open(config_path) as f:
         loaded_config = yaml.safe_load(f)
 
-    valid, error = config_valid(loaded_config)
-    if not valid:
-        raise Exception(error)
+    config_valid(loaded_config)
 
     config = parse_config_and_handle_global_vars(loaded_config)
 
-    log.info(f'\n\n\t ************ - {config["workflow_kind"]} {config["prod_type"]} - WORKFLOW KIND - ************')
+    log.info(f'************ - Configuration for processing of {config["prod_type"]} using the {config["workflow_kind"]} pipeline:- ************')
     log.info(
         'Simtel DL0 files are going to be searched at: '
-        f'{config["DL0_data_dir"].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}'
-    )
-    log.info(
-        'The following directories and all the information within them will be either created or overwritten:'
-        '[subdirectories with a same PROD_ID and analysed the same day]'
+        f'{config["DL0_data_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
     )
     particle_dirs = [
         "running_analysis_dir",
@@ -49,16 +43,29 @@ def load_config(config_path):
         "DL2_data_dir",
         "analysis_log_dir",
     ]
-    for pd in particle_dirs:
-        log.info(f'\t{config[pd].format(str("""{""") + ",".join(config["all_particles"]) + str("""}"""))}')
-    log.info(f'- {config["IRFs_dir"]}')
-    log.info(f'- {config["model_dir"]}')
-    log.info(f'- PROD_ID to be used: {config["prod_id"]}')
+    log.info(
+        'The following directories and all the information within them will be either created or overwritten:\n - '
+        + '\n - '.join(
+            [config[pd].format(
+                "{" + ",".join(config["all_particles"]) + "}"
+                ) for pd in particle_dirs]
+            )
+        + f'\n - {config["IRFs_dir"]}'
+        + f'\n - {config["model_dir"]}'
+    )
 
-    log.info("Stages to be run:")
-    for stage in config['stages_to_run']:
-        log.info(f"- {stage}")
-    log.info(f"- Merging options: No-image argument: {config['merging_no_image']}")
+    log.warning('! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !')
+    log.info(f'PROD_ID to be used: {config["prod_id"]}')
+
+    log.info(
+            "Stages to be run:\n - "
+            + "\n - ".join(config["stages_to_run"]
+            )
+    )
+    log.info(
+        "Merging options:"
+        f"\n - No-image argument: {config['merging_no_image']}"
+        )
 
     return config
 
@@ -75,8 +82,7 @@ def config_valid(loaded_config):
 
     Returns:
     --------
-    True, None if config is valid
-    False, error message if config is not valid
+    True if config is valid
     """
     # Allowed options
     allowed_workflows = ['hiperta', 'lstchain', 'ctapipe']
@@ -86,20 +92,20 @@ def config_valid(loaded_config):
     # Check allowed cases
     workflow_kind = loaded_config['workflow_kind']
     if workflow_kind not in allowed_workflows:
-        return False, (
+        raise Exception(
             f'Please select an allowed `workflow_kind`: {allowed_workflows}'
         )
 
     prod_type = loaded_config['prod_type']
     if prod_type not in allowed_prods:
-        return False, (
+        raise Exception(
             f'Please selected an allowed production type: {allowed_prods}.'
         )
 
     obs_date = loaded_config['obs_date']
 
     if obs_date not in allowed_obs_date:
-        return False, (
+        raise Exception(
             f'Please select an allowed obs_date: {allowed_workflows}'
         )
 
@@ -108,10 +114,11 @@ def config_valid(loaded_config):
             (prod_type == 'prod3' and obs_date != '20190415')
             or (prod_type == 'prod5' and obs_date == '20190415')
     ):
-        return False,  (
+        raise Exception(
             'This prod_type and obs_date combination is not possible.'
         )
-    return True, None
+    log.debug("Configuration deemed valid")
+    return True
 
 
 def parse_config_and_handle_global_vars(loaded_config):
