@@ -14,17 +14,22 @@ def setup_logging(logfile=None, verbose=False):
     log = logging.getLogger()
     log.level = level
 
-    formatter = logging.Formatter(
-        fmt="%(asctime)s|%(levelname)s|%(name)s|%(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S",
-    )
-
-    stream = logging.StreamHandler()
-    stream.setFormatter(formatter)
-    log.addHandler(stream)
+    stream_formatter = logging.Formatter(
+            fmt="%(levelname)s\n%(message)s\n",
+            datefmt="%H:%M:%S",
+            )
+    stream_handler  = logging.StreamHandler()
+    stream_handler.setFormatter(stream_formatter)
+    log.addHandler(stream_handler)
 
     if logfile is not None:
-        filehandler = logging.FileHandler(logfile)
-        filehandler.setFormatter(formatter)
+        file_formatter = logging.Formatter(
+            fmt="%(asctime)s|%(levelname)s|%(name)s|%(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",
+        )
+        file_handler = logging.FileHandler(logfile)
+        file_handler.setFormatter(file_formatter)
+        log.addHandler(file_handler)
+        log.debug("Added logging handler with log file {}".format(logfile))
 
     return log
