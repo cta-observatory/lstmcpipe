@@ -10,3 +10,5 @@ build
 __pycache__/
 lstmcpipe/__pycache__/
 .coverage
+# vim swap files
+*.swp
