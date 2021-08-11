@@ -3,8 +3,6 @@
 import os
 
 
-
-
 def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
     """
     Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
@@ -34,7 +32,6 @@ def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2,
         Comma-separated jobids batched in the current stage
     debug_log: dict
         Dictionary with the job-id and stage explanation to be stored in the debug file
-
     """
     print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
 

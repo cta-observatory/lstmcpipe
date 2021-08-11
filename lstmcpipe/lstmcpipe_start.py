@@ -18,19 +18,21 @@
 import argparse
 from os.path import abspath
 from lstmcpipe.io.data_management import query_continue
-from lstmcpipe.workflow_management import (
+from lstmcpipe.stages import(
     batch_r0_to_dl1,
     batch_merge_and_copy_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
     batch_dl2_to_sensitivity,
+    batch_plot_rf_features,
+)
+from lstmcpipe.workflow_management import (
     save_log_to_file,
     create_dict_with_dl1_filenames,
     batch_mc_production_check,
     create_log_files,
     update_scancel_file,
-    batch_plot_rf_features
 )
 from lstmcpipe.config import load_config
 from lstmcpipe.logging import setup_logging
