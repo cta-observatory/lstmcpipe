@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import os
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2, log_from_dl1_dl2, source_env, prod_id):
@@ -33,7 +37,7 @@ def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2,
     debug_log: dict
         Dictionary with the job-id and stage explanation to be stored in the debug file
     """
-    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+    log.info("==== START {} ====".format('batch mc_dl2_to_sensitivity'))
 
     debug_log = {}
     jobid_for_check = []
@@ -56,7 +60,7 @@ def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2,
 
     jobid_for_check = ','.join(jobid_for_check)
 
-    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_sensitivity'))
+    log.info("==== END {} ====".format('batch mc_dl2_to_sensitivity'))
 
     return log_dl2_to_sensitivity, jobid_for_check, debug_log
 
@@ -173,7 +177,7 @@ def compose_sensitivity_outdir(dl2_dir, gamma_offset):
 
     allowed_gamma_off = ['off0.0deg', 'off0.4deg']
     if gamma_offset not in allowed_gamma_off:
-        print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
+        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
     output_sensitivity_dir = os.path.join(dl2_dir.replace('/DL2/', '/IRF/').replace('/{}/', '/'),

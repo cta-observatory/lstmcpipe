@@ -6,7 +6,11 @@
 
 import os
 import shutil
+import logging
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+
+
+log = logging.getLogger(__name__)
 
 
 def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env):
@@ -41,7 +45,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     """
     debug_log = {}
 
-    print("\n ==== START {} ==== \n".format('batch mc_train_workflow'))
+    log.info("==== START {} ====".format('batch mc_train_workflow'))
 
     gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
     proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
@@ -57,7 +61,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     debug_log[jobid_4_dl1_to_dl2] = f'The single jobid from train_pipe that depends of {jobids_from_merge} - merge' \
                                     f'_and_copy jobids'
 
-    print("\n ==== END {} ==== \n".format('batch mc_train_workflow'))
+    log.info("==== END {} ====".format('batch mc_train_workflow'))
 
     return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
 
@@ -86,7 +90,7 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
         Dictionary with lstmcpipe_plot_models_importance single job id to be passed to debug log.
     """
     log = {}
-    print("\n ==== START {} ==== \n".format('batch plot RF features importance'))
+    log.info("==== START {} ====".format('batch plot RF features importance'))
     jobe = os.path.join(dir_models, 'job_plot_rf_feat_importance.e')
     jobo = os.path.join(dir_models, 'job_plot_rf_feat_importance.o')
 
@@ -97,8 +101,8 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
 
     log[jobid] = 'Single job_id to plot RF feature s importance'
 
-    print(f" Random Forest importance's plot will be saved at:\n   {dir_models}")
-    print("\n ==== END {} ==== \n".format('batch plot RF features importance'))
+    log.info(f" Random Forest importance's plot will be saved at:  {dir_models}")
+    log.info("==== END {} ====".format('batch plot RF features importance'))
 
     return log
 
@@ -149,7 +153,7 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
         models_dir = dl1_proton_dir.replace('/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
-    print(f"\tModels will be placed in {models_dir}")
+    log.info(f"Models will be placed in {models_dir}")
     check_and_make_dir_without_verification(models_dir)
 
     cmd = ''

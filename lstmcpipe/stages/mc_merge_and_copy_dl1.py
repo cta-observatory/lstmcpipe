@@ -12,11 +12,15 @@
 # 5. move running_dir 
 
 import os
+import logging
 from lstmcpipe.io.data_management import (
     check_job_logs,
     read_lines_file,
     check_files_in_dir_from_file
 )
+
+
+log = logging.getLogger(__name__)
 
 
 
@@ -78,7 +82,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     else:
         merge_flag = False
 
-    print("\n ==== START {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
+    log.info("==== START {} ====".format('batch merge_and_copy_dl1_workflow'))
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
@@ -137,7 +141,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     jobid_4_train = ','.join(jobid_4_train)
     all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
 
-    print("\n ==== END {} ==== \n".format('batch merge_and_copy_dl1_workflow'))
+    log.info("==== END {} ====".format('batch merge_and_copy_dl1_workflow'))
 
     return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage, debug_log
 
@@ -269,7 +273,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # just check number of files first:
     # TODO Create check before merging files ?
 
-    print(f"\n\tmerging starts - {particle}")
+    log.info(f"merging starts - {particle}")
 
     # 3. merge DL1 files
     wait_both_merges = []
@@ -290,7 +294,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         output_filename += '.h5'
 
         output_filename = os.path.join(running_DL1_dir, output_filename)
-        print(f"\t\tmerge output: {output_filename}")
+        log.info(f"merge output: {output_filename}")
 
         # After the workflow the files will be moved, will not stay at output_filename
         if set_type == 'training':
@@ -320,7 +324,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         jobid_merge = os.popen(cmd).read().strip('\n')
         log_merge[particle][set_type][jobid_merge] = cmd
 
-        print(f'\t\tSubmitted batch job {jobid_merge} -- {particle}, {set_type}')
+        log.info(f'Submitted batch job {jobid_merge} -- {particle}, {set_type}')
 
         wait_both_merges.append(jobid_merge)
         return_jobids_debug.append(jobid_merge)
@@ -332,7 +336,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # 5 --> copy lstchain config file in final_dir too
     # 6 --> move running_dir as logs
 
-    print(f"\tDL1 files will be moved to {final_DL1_dir}")
+    log.info(f"DL1 files will be moved to {final_DL1_dir}")
 
     # 4 --> move DL1 files in final place
     wait_both_merges = ','.join(wait_both_merges)
@@ -346,7 +350,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_move_dl1 = os.popen(cmd_mv_dl1).read().strip('\n')
     log_merge[particle][set_type][jobid_move_dl1] = cmd_mv_dl1
 
-    print(f'\n\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+    log.info(f'Submitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
 
     # 5 --> copy lstchain config file in final_dir too
     cmd_cp_conf = compose_batch_command_of_script(input_dir,
@@ -359,7 +363,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_copy_conf = os.popen(cmd_cp_conf).read().strip('\n')
     log_merge[particle][set_type][jobid_copy_conf] = cmd_cp_conf
 
-    print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
+    log.info(f'Submitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
     # 6 --> move running_dir to final analysis_logs
     cmd_mv_dir = compose_batch_command_of_script(input_dir,
@@ -372,7 +376,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_move_log = os.popen(cmd_mv_dir).read().strip('\n')
     log_merge[particle][set_type][jobid_move_log] = cmd_mv_dir
 
-    print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
+    log.info(f'Submitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
 
     return_jobids4train.append(jobid_move_dl1)
 
@@ -380,7 +384,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     return_jobids_debug.append(jobid_move_log)
     return_jobids_debug.append(jobid_copy_conf)
 
-    print(f"\tLOGS will be moved to {logs_destination_dir}")
+    log.info(f"LOGS will be moved to {logs_destination_dir}")
 
     # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
     # 1 - train_pipe recover final dl1 names and path.

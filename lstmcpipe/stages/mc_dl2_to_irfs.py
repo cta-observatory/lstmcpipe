@@ -11,8 +11,11 @@
 import os
 import glob
 import shutil
+import logging
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
+
+log = logging.getLogger(__name__)
 
 
 def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
@@ -46,7 +49,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     jobs_from_dl2_irf: str
     debug_dl2_to_irfs: dict
     """
-    print("\n ==== START {} ==== \n".format('batch mc_dl2_to_irfs'))
+    log.info("==== START {} ====".format('batch mc_dl2_to_irfs'))
 
     debug_log = {}
     jobid_for_check = []
@@ -89,7 +92,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     jobid_for_check = ','.join(jobid_for_check)
 
-    print("\n ==== END {} ==== \n".format('batch mc_dl2_to_irfs'))
+    log.info("==== END {} ====".format('batch mc_dl2_to_irfs'))
 
     return log_dl2_to_irfs, jobid_for_check, debug_log
 
@@ -137,7 +140,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
                                        '*testing.h5')
                           )[0]
         else:
-            print(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
+            log.info(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
             exit(-1)
 
     return dl2_particle_paths
@@ -178,7 +181,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     """
     allowed_gamma_off = ['off0.0deg', 'off0.4deg']
     if irf_gamma_offset not in allowed_gamma_off:
-        print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
+        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
     if irf_point_like:
@@ -249,7 +252,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     # if dry_run:
     #     print(cmd)
 
-    print(f'\tOutput dir IRF {irf_kind}: {output_irfs_dir}')
+    log.info(f'Output dir IRF {irf_kind}: {output_irfs_dir}')
 
     check_and_make_dir_without_verification(output_irfs_dir)
 

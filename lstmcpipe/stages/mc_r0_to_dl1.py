@@ -57,7 +57,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
-    print(f"\n ==== START {workflow_kind} r0 to dl1 processing ==== \n")
+    log.info(f"==== START {workflow_kind} r0 to dl1 processing ====")
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
@@ -98,7 +98,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 debug_log[jid] = f'{_particle} job from r0_to_dl1'
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
-    print(f"\n ==== END {workflow_kind} r0 to dl1 processing ==== \n")
+    log.info(f"==== END {workflow_kind} r0 to dl1 processing ====")
 
     return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 

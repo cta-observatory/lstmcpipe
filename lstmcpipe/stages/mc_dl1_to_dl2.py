@@ -6,9 +6,13 @@
 
 import os
 import shutil
+import logging
 from lstmcpipe.io.data_management import (
     check_and_make_dir_without_verification
 )
+
+
+log = logging.getLogger(__name__)
 
 
 def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_training, jobids_from_merge,
@@ -54,10 +58,9 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     jobid_for_dl2_to_dl3 = []
     debug_log = {}
 
-    print("\n ==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
+    log.info("==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
 
     for particle in particles_loop:
-
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
@@ -79,7 +82,6 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
                 debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} ' \
                                    f'training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
-
         else:
             _particle = particle
             log, jobid = dl1_to_dl2(
@@ -101,7 +103,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
 
     jobid_4_dl2_to_dl3 = ','.join(jobid_for_dl2_to_dl3)
 
-    print("\n ==== END {} ==== \n".format('batch dl1_to_dl2_workflow'))
+    log.info("==== END {} ====".format('batch dl1_to_dl2_workflow'))
 
     return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
 
@@ -147,9 +149,10 @@ def dl1_to_dl2(input_dir, path_models, config_file,  particle, wait_jobid_train_
     """
 
     output_dir = input_dir.replace('DL1', 'DL2')
+    log.info(f"Working on DL1 files in {input_dir}")
 
     check_and_make_dir_without_verification(output_dir)
-    print(f"\tOutput dir {particle}: {output_dir}")
+    log.info(f"Output dir {particle}: {output_dir}")
 
     log_dl1_to_dl2 = {particle: {}}
 
