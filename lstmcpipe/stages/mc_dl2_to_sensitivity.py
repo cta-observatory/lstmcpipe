@@ -2,6 +2,8 @@
 
 import os
 import logging
+import time
+import subprocess
 
 
 log = logging.getLogger(__name__)
@@ -38,123 +40,35 @@ def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2,
         Dictionary with the job-id and stage explanation to be stored in the debug file
     """
     log.info("==== START {} ====".format('batch mc_dl2_to_sensitivity'))
+    time.sleep(1)
 
     debug_log = {}
     jobid_for_check = []
     log_dl2_to_sensitivity = {}
 
     for off in offset_gammas:
-
-        log, jobid = dl2_to_sensitivity(dl2_directory,
+        job_logs, jobid = dl2_to_sensitivity(dl2_directory,
                                         log_from_dl1_dl2,
                                         gamma_offset=off,
                                         prod_id=prod_id,
                                         source_env=source_env,
                                         wait_jobs_dl1_dl2=job_ids_from_dl1_dl2
                                         )
-
         jobid_for_check.append(jobid)
-        log_dl2_to_sensitivity[f'gamma_{off}'] = log
+        log_dl2_to_sensitivity[f'gamma_{off}'] = job_logs
         debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
                            f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
+        log.info("Jobs for gamma offset {} have been submitted".format(gamma_offset))
+        log.debug(
+            f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
+            f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
+        )
 
     jobid_for_check = ','.join(jobid_for_check)
 
     log.info("==== END {} ====".format('batch mc_dl2_to_sensitivity'))
 
     return log_dl2_to_sensitivity, jobid_for_check, debug_log
-
-
-
-
-def batch_plot_sensitivity(sensitivity_filename, wait_jobid_dl2_to_sens, gamma_offset, source_env):
-    """
-    Batches the the `plot_irfs` entry point after the computation of the `dl2_to_sensitivity` script
-
-    Parameters
-    ----------
-    sensitivity_filename: str
-        Path to sensitivity.fits.gz file
-    wait_jobid_dl2_to_sens: str
-        Jobid from dl2_to_sensitivity stage to be used as a slurm dependency
-    gamma_offset: str
-        String to indicate the gamma offset. Either 'off0.0deg' or 'off0.4deg'
-    source_env: str
-        Source environment (source .bashrc + conda activate env) to be used in the slurm cmd
-
-    Returns
-    -------
-    log: dict
-        Dictionary with job_id-slurm command key-value pair used for logging
-    job_id: str
-        String with single job_id batched by the lstmcpipe_plot_irfs entry point
-
-    """
-    cmd = f'lstmcpipe_plot_irfs -f {sensitivity_filename} -o {sensitivity_filename.replace(".fits.gz", ".png")}'
-
-    jobe = os.path.join(os.path.abspath(os.path.dirname(sensitivity_filename)),
-                        f'job_plot_sensitivity_gamma_{gamma_offset}.e')
-    jobo = os.path.join(os.path.abspath(os.path.dirname(sensitivity_filename)),
-                        f'job_plot_sensitivity_gamma_{gamma_offset}.o')
-
-    job_name = gamma_offset.replace(".", "").replace("off", "").replace("deg", "")
-    base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobid_dl2_to_sens} -e {jobe} -o {jobo}' \
-               f' -J {job_name}_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {cmd}"'
-
-    job_id = os.popen(base_cmd).read().strip('\n')
-    log = {job_id: base_cmd}
-
-    return log, job_id
-
-
-def batch_dl2_to_sensitivity(gamma_file, proton_file, electron_file, gamma_offset, output_directory, output_filename,
-                             source_env, wait_jobs_dl1dl2):
-    """
-    Batches the dl2_to_sensitivity slurm script with all the needed args
-
-    Parameters
-    ----------
-    gamma_file: str
-        Path to DL2 gamma test file
-    proton_file: str
-        Path to DL2 proton test file
-    electron_file: str
-        Path to DL2 electron test file
-    gamma_offset: str
-        String to indicate the gamma offset. Either 'off0.0deg' or 'off0.4deg'
-    output_directory: str
-        Absolute path with output directory
-    output_filename: str
-        Output filename
-    source_env: str
-        Source environment (source .bashrc + conda activate env) to be used in the slurm cmd
-    wait_jobs_dl1dl2: str
-        Comma-separated string with the jobs (dependency) to wait for before launching the cmd
-
-    Returns
-    -------
-    log: dict
-        Dictionary with job_id-slurm command key-value pair used for logging
-    job_id: str
-        String with single job_id batched by the dl2_to_sensitivity script
-
-    """
-
-    cmd = f'lstmcpipe_dl2_to_sensitivity -g {gamma_file} -p {proton_file} -e {electron_file} ' \
-          f' -o {output_filename}'
-
-    jobo = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.o')
-    jobe = os.path.join(output_directory, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.e')
-
-    job_name = gamma_offset.replace(".", "").replace("off", "")
-    base_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -e {jobe} -o {jobo} ' \
-               f' -J {job_name}_sensitivity --wrap="{source_env} {cmd}"'
-
-    job_id = os.popen(base_cmd).read().strip('\n')
-
-    log = {job_id: base_cmd}
-
-    return log, job_id
 
 
 def compose_sensitivity_outdir(dl2_dir, gamma_offset):
@@ -272,6 +186,7 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod
     """
     log_dl2_to_sensitivity = {}
     jobids_dl2_to_sensitivity = []
+    job_name = gamma_offset.replace(".", "").replace("off", "").replace("deg", "")
 
     g_file, p_file, e_file, out_dir, out_file = \
         sensitivity_io(dl2_dir,
@@ -279,29 +194,27 @@ def dl2_to_sensitivity(dl2_dir, log_from_dl1_dl2, gamma_offset='off0.0deg', prod
                        gamma_offset,
                        prod_id)
 
+    # TODO Move the base commands into scripts so that we can use subprocess properly(makes splitting the string easier)
     # create sensitivity files
-    log_dl2_sens, job_id_dl2_sens = \
-        batch_dl2_to_sensitivity(g_file,
-                                 p_file,
-                                 e_file,
-                                 gamma_offset,
-                                 out_dir,
-                                 out_file,
-                                 source_env,
-                                 wait_jobs_dl1_dl2)
+    base_cmd_sens = f'lstmcpipe_dl2_to_sensitivity -g {g_file} -p {p_file} -e {e_file} -o {out_file}'
+    jobo_sens = os.path.join(out_dir, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.o')
+    jobe_sens = os.path.join(out_dir, f'job_dl2_to_sensitivity_gamma_{gamma_offset}.e')
+    cmd_sens = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens} ' \
+               f' -J {job_name}_sensitivity --wrap="{source_env} {base_cmd_sens}"'
 
-    log_dl2_to_sensitivity.update(log_dl2_sens)
+    job_id_dl2_sens = os.popen(cmd_sens).read().strip('\n')
+    log_dl2_to_sensitivity[job_id_dl2_sens] = cmd_sens
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
 
     # Create plot from sensitivity files
-    log_plot_sens, job_id_plot_sens = \
-        batch_plot_sensitivity(out_file,
-                               job_id_dl2_sens,
-                               gamma_offset,
-                               source_env)
+    base_cmd_plot = f'lstmcpipe_plot_irfs -f {out_file} -o {out_file.replace(".fits.gz", ".png")}'
+    jobe_plot = os.path.join(out_dir, f'job_plot_sensitivity_gamma_{gamma_offset}.e')
+    jobo_plot = os.path.join(out_dir, f'job_plot_sensitivity_gamma_{gamma_offset}.o')
+    cmd_plot = f'sbatch --parsable -p short --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}' \
+               f' -J {job_name}_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd_plot}"'
 
-    log_dl2_to_sensitivity.update(log_plot_sens)
+    job_id_plot_sens = os.popen(cmd_plot).read().strip('\n')
+    log_dl2_to_sensitivity[job_id_plot_sens] = cmd_plot
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
-    jobids_dl2_to_sensitivity = ','.join(jobids_dl2_to_sensitivity)
 
-    return log_dl2_to_sensitivity, jobids_dl2_to_sensitivity
+    return log_dl2_to_sensitivity, ','.join(jobids_dl2_to_sensitivity)
