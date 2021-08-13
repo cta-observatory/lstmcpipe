@@ -71,19 +71,13 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     all_jobs_from_merge_stage = []
     debug_log = {}
 
-    if smart_merge == 'lst' or smart_merge == 'lstchain':
-        merge_flag = True
-    elif smart_merge == 'rta' or smart_merge == 'hiperta':
-        merge_flag = False
-    elif smart_merge:
-        merge_flag = True
-    elif not smart_merge:
-        merge_flag = False
-    else:
-        merge_flag = False
-
     log.info("==== START {} ====".format('batch merge_and_copy_dl1_workflow'))
     time.sleep()
+    if isinstance(smart_merge, str):
+        merge_flag = 'lst' in smart_merge
+    else:
+        merge_flag = smart_merge
+    log.debug("Merge flag set: {}".format(merge_flag))
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
