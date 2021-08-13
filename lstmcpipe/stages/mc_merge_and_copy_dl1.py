@@ -13,6 +13,7 @@
 
 import os
 import logging
+import time
 from lstmcpipe.io.data_management import (
     check_job_logs,
     read_lines_file,
@@ -21,7 +22,6 @@ from lstmcpipe.io.data_management import (
 
 
 log = logging.getLogger(__name__)
-
 
 
 def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
@@ -83,6 +83,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         merge_flag = False
 
     log.info("==== START {} ====".format('batch merge_and_copy_dl1_workflow'))
+    time.sleep()
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
@@ -91,7 +92,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
                 _particle = particle + '_' + off
 
-                log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+                job_logs, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                     gamma_running_analysis_dir.format(particle),
                     particle2jobs_dict=log_jobs_from_r0_to_dl1,
                     particle=_particle,
@@ -103,7 +104,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                     workflow_kind=workflow_kind,
                 )
 
-                log_merge_and_copy.update(log)
+                log_merge_and_copy.update(job_logs)
                 all_jobs_from_merge_stage.append(jobid_debug)
                 if _particle == 'gamma-diffuse' or _particle == 'proton':
                     jobid_4_train.append(jobid_mv_all_dl1)
@@ -117,7 +118,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
         else:
             _particle = particle
 
-            log, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+            job_logs, jobid_mv_all_dl1, jobid_debug = merge_dl1(
                 running_analysis_dir.format(particle),
                 particle2jobs_dict=log_jobs_from_r0_to_dl1,
                 particle=_particle,
@@ -128,7 +129,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
                 workflow_kind=workflow_kind,
             )
 
-            log_merge_and_copy.update(log)
+            log_merge_and_copy.update(job_logs)
             all_jobs_from_merge_stage.append(jobid_debug)
             if _particle == 'gamma-diffuse' or _particle == 'proton':
                 jobid_4_train.append(jobid_mv_all_dl1)

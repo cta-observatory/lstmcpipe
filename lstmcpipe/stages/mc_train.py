@@ -7,6 +7,7 @@
 import os
 import shutil
 import logging
+import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
@@ -46,6 +47,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     debug_log = {}
 
     log.info("==== START {} ====".format('batch mc_train_workflow'))
+    time.sleep(1)
 
     gamma_dl1_train_file = log_from_merge['gamma-diffuse']['training']['train_path_and_outname_dl1']
     proton_dl1_train_file = log_from_merge['proton']['training']['train_path_and_outname_dl1']
@@ -89,8 +91,9 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
     log: dict
         Dictionary with lstmcpipe_plot_models_importance single job id to be passed to debug log.
     """
-    log = {}
+    logs = {}
     log.info("==== START {} ====".format('batch plot RF features importance'))
+    time.sleep(1)
     jobe = os.path.join(dir_models, 'job_plot_rf_feat_importance.e')
     jobo = os.path.join(dir_models, 'job_plot_rf_feat_importance.o')
 
@@ -99,12 +102,12 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
           f' --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
     jobid = os.popen(cmd).read().strip('\n')
 
-    log[jobid] = 'Single job_id to plot RF feature s importance'
+    logs[jobid] = 'Single job_id to plot RF feature s importance'
 
     log.info(f" Random Forest importance's plot will be saved at:  {dir_models}")
     log.info("==== END {} ====".format('batch plot RF features importance'))
 
-    return log
+    return logs
 
 
 def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, source_environment=None,

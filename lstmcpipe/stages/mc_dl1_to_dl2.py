@@ -7,6 +7,7 @@
 import os
 import shutil
 import logging
+import time
 from lstmcpipe.io.data_management import (
     check_and_make_dir_without_verification
 )
@@ -59,6 +60,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
     debug_log = {}
 
     log.info("==== START {} ==== \n".format('batch dl1_to_dl2_workflow'))
+    time.sleep(1)
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
@@ -66,7 +68,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 gamma_dl1_directory = os.path.join(dl1_directory, off)
                 _particle = particle + '_' + off
 
-                log, jobid = dl1_to_dl2(
+                job_logs, jobid = dl1_to_dl2(
                     gamma_dl1_directory.format(particle),
                     path_models=path_to_models,
                     config_file=config_file,
@@ -77,14 +79,14 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                     source_environment=source_env
                 )
 
-                log_dl1_to_dl2.update(log)
+                log_dl1_to_dl2.update(job_logs)
                 jobid_for_dl2_to_dl3.append(jobid)
 
                 debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} ' \
                                    f'training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs'
         else:
             _particle = particle
-            log, jobid = dl1_to_dl2(
+            job_logs, jobid = dl1_to_dl2(
                 dl1_directory.format(particle),
                 path_models=path_to_models,
                 config_file=config_file,
@@ -95,7 +97,7 @@ def batch_dl1_to_dl2(dl1_directory, path_to_models, config_file, jobid_from_trai
                 source_environment=source_env
             )
 
-            log_dl1_to_dl2.update(log)
+            log_dl1_to_dl2.update(job_logs)
             jobid_for_dl2_to_dl3.append(jobid)
 
             debug_log[jobid] = f'{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} ' \

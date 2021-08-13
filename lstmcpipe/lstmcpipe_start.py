@@ -154,11 +154,8 @@ def main():
         for particle in all_particles:
             log_batch_r0_dl1[particle] = ''
 
-    import time
-    time.sleep(3)
     # 2 STAGE --> Merge,copy and move DL1 files
     if 'merge_and_copy_dl1' in stages_to_run:
-
         log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug_merge = batch_merge_and_copy_dl1(
             running_analysis_dir,
             log_batch_r0_dl1,
@@ -181,7 +178,6 @@ def main():
         jobs_to_train = ''
         jobs_all_dl1_finished = ''
 
-    time.sleep(3)
     # 3 STAGE --> Train pipe
     if 'train_pipe' in stages_to_run:
         train_config = abspath(args.config_file_lst)
@@ -205,7 +201,6 @@ def main():
         job_from_train_pipe = ''
         model_dir = config['model_dir']
 
-    time.sleep(3)
     # 4 STAGE --> DL1 to DL2 stage
     if 'dl1_to_dl2' in stages_to_run:
         dl1_to_dl2_config = abspath(args.config_file_lst)
@@ -229,7 +224,6 @@ def main():
         jobs_from_dl1_dl2 = ''
         log_batch_dl1_to_dl2 = {}  # Empty log will be manage inside onsite_dl2_irfs
 
-    time.sleep(3)
     # 5 STAGE --> DL2 to IRFs stage
     if 'dl2_to_irfs' in stages_to_run:
         dl2_to_irfs_config = abspath(args.config_file_lst)
@@ -251,7 +245,6 @@ def main():
     else:
         jobs_from_dl2_irf = ''
 
-    time.sleep(3)
     # 6 STAGE --> DL2 to sensitivity curves
     if 'dl2_to_sensitivity' in stages_to_run:
         log_batch_dl2_sensitivity, jobs_from_dl2_sensitivity, debug_dl2_to_sensitivity = \

@@ -12,6 +12,7 @@ import os
 import glob
 import shutil
 import logging
+import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
@@ -50,6 +51,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     debug_dl2_to_irfs: dict
     """
     log.info("==== START {} ====".format('batch mc_dl2_to_irfs'))
+    time.sleep(1)
 
     debug_log = {}
     jobid_for_check = []
@@ -57,7 +59,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
 
     for off in offset_gammas:
 
-        log, jobid = dl2_to_irfs(
+        job_logs, jobid = dl2_to_irfs(
             dl2_directory,
             config_file=config_file,
             log_from_dl1_dl2=log_from_dl1_dl2,
@@ -69,13 +71,13 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
         )
 
         jobid_for_check.append(jobid)
-        log_dl2_to_irfs[f'gamma_{off}'] = log
+        log_dl2_to_irfs[f'gamma_{off}'] = job_logs
         debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
                            f'job_ids; {job_ids_from_dl1_dl2}'
 
     if 'gamma-diffuse' in loop_particles:
 
-        log, jobid = dl2_to_irfs(
+        job_logs, jobid = dl2_to_irfs(
             dl2_directory,
             irf_point_like=False,
             config_file=config_file,
@@ -86,7 +88,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
         )
 
         jobid_for_check.append(jobid)
-        log_dl2_to_irfs[f'gamma-diffuse'] = log
+        log_dl2_to_irfs[f'gamma-diffuse'] = job_logs
         debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
                            f'job_ids; {job_ids_from_dl1_dl2}'
 

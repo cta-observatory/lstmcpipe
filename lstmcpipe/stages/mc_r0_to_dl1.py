@@ -12,6 +12,7 @@ from numpy.random import default_rng
 from pathlib import Path
 import subprocess
 import logging
+import time
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
@@ -58,13 +59,14 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     all_jobids_from_r0_dl1_stage = []
 
     log.info(f"==== START {workflow_kind} r0 to dl1 processing ====")
+    time.sleep(1)
 
     for particle in particles_loop:
         if particle == 'gamma' and gamma_offsets is not None:
             for off in gamma_offsets:
                 particle_input_dir = os.path.join(input_dir, off).format(particle)
                 _particle = particle + '_' + off
-                log, jobids_by_particle = r0_to_dl1(
+                job_logs, jobids_by_particle = r0_to_dl1(
                     particle_input_dir,  # Particle needs to be gamma w/o the off
                     config_file=conf_file,
                     particle=_particle,
@@ -73,7 +75,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     offset=off,
                     workflow_kind=workflow_kind,
                 )
-                full_log['log_all_job_ids'].update(log)
+                full_log['log_all_job_ids'].update(job_logs)
                 full_log[_particle] = ','.join(jobids_by_particle)
                 all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
@@ -82,7 +84,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
         else:
             particle_input_dir = input_dir.format(particle)
             _particle = particle
-            log, jobids_by_particle = r0_to_dl1(
+            job_logs, jobids_by_particle = r0_to_dl1(
                 particle_input_dir,  # Particle needs to be gamma w/o the off
                 config_file=conf_file,
                 particle=_particle,
@@ -90,7 +92,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 source_environment=source_env,
                 workflow_kind=workflow_kind,
             )
-            full_log['log_all_job_ids'].update(log)
+            full_log['log_all_job_ids'].update(job_logs)
             full_log[_particle] = ','.join(jobids_by_particle)
             all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
