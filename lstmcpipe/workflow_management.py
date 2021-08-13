@@ -7,8 +7,12 @@ import sys
 import glob
 import yaml
 import pprint
+import logging
 import calendar
 import lstchain
+
+
+log = logging.getLogger(__name__)
 
 
 def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
@@ -169,7 +173,7 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
                 f'--wrap="{cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip('\n')
-    print(f'\n\tSubmitted batch CHECK-job {jobid}\n')
+    log.info(f'Submitted batch CHECK-job {jobid}')
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
