@@ -72,7 +72,7 @@ def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, part
     debug_log = {}
 
     log.info("==== START {} ====".format('batch merge_and_copy_dl1_workflow'))
-    time.sleep()
+    time.sleep(1)
     if isinstance(smart_merge, str):
         merge_flag = 'lst' in smart_merge
     else:
