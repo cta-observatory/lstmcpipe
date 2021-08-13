@@ -58,7 +58,7 @@ def batch_dl2_to_sensitivity(dl2_directory, offset_gammas, job_ids_from_dl1_dl2,
         log_dl2_to_sensitivity[f'gamma_{off}'] = job_logs
         debug_log[jobid] = f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
                            f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
-        log.info("Jobs for gamma offset {} have been submitted".format(gamma_offset))
+        log.info("Jobs for gamma offset {} have been submitted".format(off))
         log.debug(
             f'Gamma_{off} job_ids from the dl2_to_sensitivity stage and the plot_irfs script that ' \
             f'depends on the dl1_to_dl2 stage job_ids; {job_ids_from_dl1_dl2}'
