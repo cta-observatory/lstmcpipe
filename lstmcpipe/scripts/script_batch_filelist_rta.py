@@ -39,15 +39,14 @@ def main():
 
             file = file.strip('\n')
 
-            cc = '--config {}'.format(args.config_file) if args.config_file is not None else ' '
-
-            cmd = [f'lstmcpipe_hiperta_r0_to_dl1lstchain {cc}',
-                   f'-i {file}',
-                   f'-o {args.output_dir}',
-                   f'-k {args.keep_file}',
-                   f'-d {args.debug_mode}'
+            cmd = [f'lstmcpipe_hiperta_r0_to_dl1lstchain',
+                   f'-i={file}',
+                   f'-o={args.output_dir}',
+                   f'-k={args.keep_file}',
+                   f'-d={args.debug_mode}'
                    ]
-
+            if args.config_file:
+                cmd.append('--config={}'.format(args.config_file))
             subprocess.run(cmd)
 
 

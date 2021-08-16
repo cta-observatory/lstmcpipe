@@ -250,7 +250,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, random_seed=42,
                 queue = 'short'
 
             cmd = f'sbatch --parsable -p {queue} -J {job_name[particle]} -e {jobe} -o {jobo} ' \
-                  f'--wrap="{base_cmd} -f {file} -o {output_dir}"'
+                  f'--wrap="{base_cmd} -f {os.path.join(dir_lists, file)} -o {output_dir}"'
 
             jobid = os.popen(cmd).read().strip('\n')
             jobids_r0_dl1.append(jobid)

@@ -26,13 +26,12 @@ def main():
 
             file = file.strip('\n')
 
-            cc = '--config {}'.format(args.config_file) if args.config_file is not None else ' '
-
-            cmd = [f'lstchain_mc_r0_to_dl1 {cc}',
-                   f'--input-file {file}',
-                   f'--output-dir {args.output_dir}'
+            cmd = [f'lstchain_mc_r0_to_dl1',
+                   f'--input-file={file}',
+                   f'--output-dir={args.output_dir}'
                    ]
-
+            if args.config_file:
+                cmd.append('--config={}'.format(args.config_file))
             subprocess.run(cmd)
 
 
