@@ -9,7 +9,6 @@ import yaml
 import pprint
 import logging
 import calendar
-import lstchain
 
 
 log = logging.getLogger(__name__)

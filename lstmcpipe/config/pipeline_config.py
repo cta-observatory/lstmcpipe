@@ -1,7 +1,6 @@
 import os
 import yaml
 import calendar
-import lstchain
 import logging
 
 
@@ -158,12 +157,14 @@ def parse_config_and_handle_global_vars(loaded_config):
     t = calendar.datetime.date.today()
     year, month, day = f"{t.year:04d}", f"{t.month:02d}", f"{t.day:02d}"
     if workflow_kind == 'lstchain':
+        import lstchain
         base_prod_id = f'{year}{month}{day}_v{lstchain.__version__}'
     elif workflow_kind == 'ctapipe':
         import ctapipe
         base_prod_id = f'{year}{month}{day}_vctapipe{ctapipe.__version__}'
     elif workflow_kind == 'hiperta':  # RTA
         # TODO parse version from hiPeRTA module
+        import lstchain
         base_prod_id = f'{year}{month}{day}_vRTA300_v{lstchain.__version__}'
 
     # Create the final config structure to be passed to the pipeline
