@@ -151,10 +151,10 @@ def dl1_to_dl2(input_dir, path_models, config_file,  particle, wait_jobid_train_
     """
 
     output_dir = input_dir.replace('DL1', 'DL2')
-    log.info(f"Working on DL1 files in {input_dir}")
+    log.info("Working on DL1 files in {}".format(input_dir))
 
     check_and_make_dir_without_verification(output_dir)
-    log.info(f"Output dir {particle}: {output_dir}")
+    log.info("Output dir {}: {}".format(particle, output_dir))
 
     log_dl1_to_dl2 = {particle: {}}
 

@@ -104,7 +104,7 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
 
     logs[jobid] = 'Single job_id to plot RF feature s importance'
 
-    log.info(f" Random Forest importance's plot will be saved at:  {dir_models}")
+    log.info(" Random Forest importance's plot will be saved at: {}".format(dir_models))
     log.info("==== END {} ====".format('batch plot RF features importance'))
 
     return logs
@@ -156,7 +156,7 @@ def train_pipe(gamma_dl1_train_file, proton_dl1_train_file, config_file=None, so
         models_dir = dl1_proton_dir.replace('/DL1', '/models')
     models_dir = models_dir.replace('/proton/', '/')
 
-    log.info(f"Models will be placed in {models_dir}")
+    log.info("Models will be placed in {}".format(models_dir))
     check_and_make_dir_without_verification(models_dir)
 
     cmd = ''

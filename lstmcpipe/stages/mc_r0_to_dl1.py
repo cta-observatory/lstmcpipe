@@ -58,7 +58,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
-    log.info(f"==== START {workflow_kind} r0 to dl1 processing ====")
+    log.info("==== START {} r0 to dl1 processing ====".format(workflow_kind))
     time.sleep(1)
 
     for particle in particles_loop:
@@ -100,7 +100,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 debug_log[jid] = f'{_particle} job from r0_to_dl1'
     all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
-    log.info(f"==== END {workflow_kind} r0 to dl1 processing ====")
+    log.info("==== END {} r0 to dl1 processing ====".format(workflow_kind))
 
     return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 
@@ -206,7 +206,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
 
     ##############################################################################
 
-    log.info(f"Working on DL0 files in {DL0_DATA_DIR}")
+    log.info("Working on DL0 files in {}".format(DL0_DATA_DIR))
 
     check_data_path(DL0_DATA_DIR)
 

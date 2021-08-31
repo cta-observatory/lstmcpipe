@@ -268,7 +268,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # just check number of files first:
     # TODO Create check before merging files ?
 
-    log.info(f"merging starts - {particle}")
+    log.info("merging starts - {}".format(particle))
 
     # 3. merge DL1 files
     wait_both_merges = []
@@ -289,7 +289,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         output_filename += '.h5'
 
         output_filename = os.path.join(running_DL1_dir, output_filename)
-        log.info(f"merge output: {output_filename}")
+        log.info("merge output: {}".format(output_filename))
 
         # After the workflow the files will be moved, will not stay at output_filename
         if set_type == 'training':
@@ -331,7 +331,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # 5 --> copy lstchain config file in final_dir too
     # 6 --> move running_dir as logs
 
-    log.info(f"DL1 files will be moved to {final_DL1_dir}")
+    log.info("DL1 files will be moved to {}".format(final_DL1_dir))
 
     # 4 --> move DL1 files in final place
     wait_both_merges = ','.join(wait_both_merges)
@@ -379,7 +379,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     return_jobids_debug.append(jobid_move_log)
     return_jobids_debug.append(jobid_copy_conf)
 
-    log.info(f"LOGS will be moved to {logs_destination_dir}")
+    log.info("LOGS will be moved to {}".format(logs_destination_dir))
 
     # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
     # 1 - train_pipe recover final dl1 names and path.
