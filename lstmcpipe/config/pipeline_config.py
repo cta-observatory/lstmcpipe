@@ -177,8 +177,6 @@ def parse_config_and_handle_global_vars(loaded_config):
     config['source_environment'] = src_env
     config['all_particles'] = particles
 
-    # 3.1 - Gammas' offsets
-
     # 4 - Stages to be run
     config['stages_to_run'] = stages_to_be_run
     config['merging_no_image'] = merging_options
