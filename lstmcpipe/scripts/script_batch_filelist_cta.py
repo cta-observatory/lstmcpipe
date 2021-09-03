@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-#SBATCH --output=r0dl1_cta_%A_%a.out
-#SBATCH --error=r0dl1_cta_%A_%a.err
 
 import argparse
 import subprocess
@@ -48,7 +46,3 @@ def main():
             if args.config_file:
                 cmd.append('--config={}'.format(args.config_file))
             subprocess.run(cmd)
-
-
-if __name__ == '__main__':
-    main()
