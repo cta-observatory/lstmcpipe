@@ -17,6 +17,7 @@
 
 import argparse
 from os.path import abspath
+import logging
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import(
     batch_r0_to_dl1,
