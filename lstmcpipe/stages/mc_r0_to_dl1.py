@@ -288,7 +288,7 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     jobids_r0_dl1 = []
 
     for set_type in 'training', 'testing':
-        log.debug("Generating list for {} step")
+        log.debug("Generating list for {} step".format(set_type))
         if set_type == 'training':
             list_type = training_list
         else:
