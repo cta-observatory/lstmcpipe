@@ -16,15 +16,22 @@ import time
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
-    check_and_make_dir_without_verification
+    check_and_make_dir_without_verification,
 )
 
 
 log = logging.getLogger(__name__)
 
 
-def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, gamma_offsets=None,
-                    workflow_kind='lstchain'):
+def batch_r0_to_dl1(
+    input_dir,
+    conf_file,
+    prod_id,
+    particles_loop,
+    source_env,
+    gamma_offsets=None,
+    workflow_kind="lstchain",
+):
     """
     Batch the r0_to_dl1 jobs by particle type.
 
@@ -54,7 +61,7 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {'log_all_job_ids': {}}
+    full_log = {"log_all_job_ids": {}}
     debug_log = {}
     all_jobids_from_r0_dl1_stage = []
 
@@ -62,10 +69,10 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
     time.sleep(1)
 
     for particle in particles_loop:
-        if particle == 'gamma' and gamma_offsets is not None:
+        if particle == "gamma" and gamma_offsets is not None:
             for off in gamma_offsets:
                 particle_input_dir = os.path.join(input_dir, off).format(particle)
-                _particle = particle + '_' + off
+                _particle = particle + "_" + off
                 job_logs, jobids_by_particle = r0_to_dl1(
                     particle_input_dir,  # Particle needs to be gamma w/o the off
                     config_file=conf_file,
@@ -75,12 +82,14 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                     offset=off,
                     workflow_kind=workflow_kind,
                 )
-                full_log['log_all_job_ids'].update(job_logs)
-                full_log[_particle] = ','.join(jobids_by_particle)
-                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+                full_log["log_all_job_ids"].update(job_logs)
+                full_log[_particle] = ",".join(jobids_by_particle)
+                all_jobids_from_r0_dl1_stage.append(
+                    full_log[_particle]
+                )  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
-                    debug_log[jid] = f'{_particle} job from r0_to_dl1'        
+                    debug_log[jid] = f"{_particle} job from r0_to_dl1"
         else:
             particle_input_dir = input_dir.format(particle)
             _particle = particle
@@ -92,22 +101,37 @@ def batch_r0_to_dl1(input_dir, conf_file, prod_id, particles_loop, source_env, g
                 source_environment=source_env,
                 workflow_kind=workflow_kind,
             )
-            full_log['log_all_job_ids'].update(job_logs)
-            full_log[_particle] = ','.join(jobids_by_particle)
-            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
+            full_log["log_all_job_ids"].update(job_logs)
+            full_log[_particle] = ",".join(jobids_by_particle)
+            all_jobids_from_r0_dl1_stage.append(
+                full_log[_particle]
+            )  # Create a list with particles elements
 
             for jid in jobids_by_particle:
-                debug_log[jid] = f'{_particle} job from r0_to_dl1'
-    all_jobids_from_r0_dl1_stage = ','.join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
+                debug_log[jid] = f"{_particle} job from r0_to_dl1"
+    all_jobids_from_r0_dl1_stage = ",".join(
+        all_jobids_from_r0_dl1_stage
+    )  # Create a string to be directly passed
 
     log.info("==== END {} r0 to dl1 processing ====".format(workflow_kind))
 
     return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
 
 
-def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_per_dl1_job=None,
-              particle=None, prod_id=None, source_environment=None, offset=None, workflow_kind='lstchain', keep_rta_file=False,
-              n_jobs_parallel=20):
+def r0_to_dl1(
+    input_dir,
+    config_file=None,
+    train_test_ratio=0.5,
+    rng=None,
+    n_r0_per_dl1_job=None,
+    particle=None,
+    prod_id=None,
+    source_environment=None,
+    offset=None,
+    workflow_kind="lstchain",
+    keep_rta_file=False,
+    n_jobs_parallel=20,
+):
     """
     R0 to DL1 MC onsite conversion.
     Organizes files and launches slurm jobs in two slurm arrays.
@@ -177,28 +201,32 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
 
     PROD_ID = prod_id
 
-    if workflow_kind == 'lstchain':
-        base_cmd = f'{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} '
-        jobtype_id = 'LST'
-    elif workflow_kind == 'ctapipe':
-        base_cmd = f'{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} '
-        jobtype_id = 'CTA'
-    elif workflow_kind == 'hiperta':
-        rta_source_env = 'source /home/enrique.garcia/.bashrc; conda activate rta_2night'
-        base_cmd = f'{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False '
-        jobtype_id = 'RTA'
+    if workflow_kind == "lstchain":
+        base_cmd = f"{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} "
+        jobtype_id = "LST"
+    elif workflow_kind == "ctapipe":
+        base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
+        jobtype_id = "CTA"
+    elif workflow_kind == "hiperta":
+        rta_source_env = (
+            "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
+        )
+        base_cmd = (
+            f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
+        )
+        jobtype_id = "RTA"
     else:
         log.critical("Please, selected an allowed workflow kind.")
         exit(-1)
 
-    job_name = {'electron': f'e_{jobtype_id}_r0dl1',
-                'gamma': f'g_{jobtype_id}_r0dl1',
-                'gamma-diffuse': f'gd_{jobtype_id}_r0dl1',
-                'proton': f'p_{jobtype_id}_r0dl1',
-                'gamma_off0.0deg': f'g0.0_{jobtype_id}_r0dl1',
-                'gamma_off0.4deg': f'g0.4_{jobtype_id}_r0dl1'
-                }
-
+    job_name = {
+        "electron": f"e_{jobtype_id}_r0dl1",
+        "gamma": f"g_{jobtype_id}_r0dl1",
+        "gamma-diffuse": f"gd_{jobtype_id}_r0dl1",
+        "proton": f"p_{jobtype_id}_r0dl1",
+        "gamma_off0.0deg": f"g0.0_{jobtype_id}_r0dl1",
+        "gamma_off0.4deg": f"g0.4_{jobtype_id}_r0dl1",
+    }
 
     TRAIN_TEST_RATIO = float(train_test_ratio)
 
@@ -214,16 +242,16 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
 
     if len(raw_files_list) < 100:
         n_r0_per_dl1_job = 10
-    
+
     if not n_r0_per_dl1_job:
         if len(raw_files_list) < 100:
             n_r0_per_dl1_job = 10
         else:
-            if 'gamma' in input_dir:
+            if "gamma" in input_dir:
                 n_r0_per_dl1_job = 25
-            elif 'gamma-diffuse' in input_dir or 'electron' in input_dir:
+            elif "gamma-diffuse" in input_dir or "electron" in input_dir:
                 n_r0_per_dl1_job = 50
-            elif 'proton' in input_dir:
+            elif "proton" in input_dir:
                 n_r0_per_dl1_job = 125
             else:
                 n_r0_per_dl1_job = 50
@@ -243,35 +271,35 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     log.info("{} R0 files in training dataset".format(ntrain))
     log.info("{} R0 files in test dataset".format(ntest))
 
-    with open('training.list', 'w+') as newfile:
+    with open("training.list", "w+") as newfile:
         for f in training_list:
             newfile.write(f)
-            newfile.write('\n')
+            newfile.write("\n")
 
-    with open('testing.list', 'w+') as newfile:
+    with open("testing.list", "w+") as newfile:
         for f in testing_list:
             newfile.write(f)
-            newfile.write('\n')
+            newfile.write("\n")
 
-    if 'off' in particle:
-        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]   # Take out /off0.Xdeg
+    if "off" in particle:
+        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]  # Take out /off0.Xdeg
         RUNNING_DIR = os.path.join(
-                DL0_DATA_DIR.replace(
-                    'R0' if workflow_kind == 'hiperta' else 'DL0',
-                    'running_analysis'),
-                PROD_ID,
-                offset
-                )
+            DL0_DATA_DIR.replace(
+                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
+            ),
+            PROD_ID,
+            offset,
+        )
     else:
         RUNNING_DIR = os.path.join(
-                DL0_DATA_DIR.replace(
-                    'R0' if workflow_kind == 'hiperta' else 'DL0',
-                    'running_analysis'),
-                PROD_ID,
-                )
+            DL0_DATA_DIR.replace(
+                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
+            ),
+            PROD_ID,
+        )
 
-    JOB_LOGS = os.path.join(RUNNING_DIR, 'job_logs')
-    DL1_DATA_DIR = os.path.join(RUNNING_DIR, 'DL1')
+    JOB_LOGS = os.path.join(RUNNING_DIR, "job_logs")
+    DL1_DATA_DIR = os.path.join(RUNNING_DIR, "DL1")
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
@@ -287,14 +315,14 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
     jobid2log = {}
     jobids_r0_dl1 = []
 
-    for set_type in 'training', 'testing':
+    for set_type in "training", "testing":
         log.debug("Generating list for {} step".format(set_type))
-        if set_type == 'training':
+        if set_type == "training":
             list_type = training_list
         else:
             list_type = testing_list
-        dir_lists = os.path.join(RUNNING_DIR, 'file_lists_' + set_type)
-        output_dir = os.path.join(RUNNING_DIR, 'DL1')
+        dir_lists = os.path.join(RUNNING_DIR, "file_lists_" + set_type)
+        output_dir = os.path.join(RUNNING_DIR, "DL1")
         output_dir = os.path.join(output_dir, set_type)
 
         check_and_make_dir_without_verification(dir_lists)
@@ -302,30 +330,34 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
 
         log.info("output dir: {}".format(output_dir))
 
-        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(len(list_type) % n_r0_per_dl1_job > 0)
+        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(
+            len(list_type) % n_r0_per_dl1_job > 0
+        )
         for i in range(number_of_sublists):
-            output_file = os.path.join(dir_lists, '{}_{}.list'.format(set_type, i))
-            with open(output_file, 'w+') as out:
-                for line in list_type[i * n_r0_per_dl1_job:n_r0_per_dl1_job * (i + 1)]:
+            output_file = os.path.join(dir_lists, "{}_{}.list".format(set_type, i))
+            with open(output_file, "w+") as out:
+                for line in list_type[
+                    i * n_r0_per_dl1_job : n_r0_per_dl1_job * (i + 1)
+                ]:
                     out.write(line)
-                    out.write('\n')
-        log.info(f'{number_of_sublists} files generated for {set_type} list')
+                    out.write("\n")
+        log.info(f"{number_of_sublists} files generated for {set_type} list")
 
         save_job_ids = []
 
         files = [f.resolve().as_posix() for f in Path(dir_lists).glob("*")]
 
-        if set_type == 'training':
+        if set_type == "training":
             jobo = os.path.join(JOB_LOGS, "job_%A_%a_train.o")
             jobe = os.path.join(JOB_LOGS, "job_%A_%a_train.e")
         else:
             jobo = os.path.join(JOB_LOGS, "job_%A_%a_test.o")
             jobe = os.path.join(JOB_LOGS, "job_%A_%a_test.e")
 
-        if particle == 'proton':
-            queue = 'long'
+        if particle == "proton":
+            queue = "long"
         else:
-            queue = 'short'
+            queue = "short"
 
         slurm_options = f"--array=0-{len(files)-1}%{n_jobs_parallel} "
         slurm_options += f"-p {queue} "
@@ -335,31 +367,30 @@ def r0_to_dl1(input_dir, config_file=None, train_test_ratio=0.5, rng=None, n_r0_
 
         # start 1 jobarray with all files included. The job selects its file based on its task id
         cmd = f'sbatch --parsable {slurm_options} --wrap="{base_cmd} -f {" ".join(files)} --output_dir {output_dir}"'
-        log.debug(f'Slurm command to start the jobs: {cmd}')
+        log.debug(f"Slurm command to start the jobs: {cmd}")
 
-        jobid = os.popen(cmd).read().strip('\n')
-        log.debug(f'Submitted batch job {jobid}')
+        jobid = os.popen(cmd).read().strip("\n")
+        log.debug(f"Submitted batch job {jobid}")
         jobids_r0_dl1.append(jobid)
 
         jobid2log[jobid] = {}
-        jobid2log[jobid]['particle'] = particle
-        jobid2log[jobid]['set_type'] = set_type
-        jobid2log[jobid]['jobe_path'] = jobe
-        jobid2log[jobid]['jobo_path'] = jobo
-        jobid2log[jobid]['sbatch_command'] = cmd
+        jobid2log[jobid]["particle"] = particle
+        jobid2log[jobid]["set_type"] = set_type
+        jobid2log[jobid]["jobe_path"] = jobe
+        jobid2log[jobid]["jobo_path"] = jobo
+        jobid2log[jobid]["sbatch_command"] = cmd
 
         save_job_ids.append(jobid)
 
     # copy config into working dir
     if config_file is not None:
         shutil.copyfile(
-            config_file,
-            os.path.join(RUNNING_DIR, os.path.basename(config_file))
+            config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file))
         )
 
     # save file lists into logs
-    shutil.move('testing.list', os.path.join(RUNNING_DIR, 'testing.list'))
-    shutil.move('training.list', os.path.join(RUNNING_DIR, 'training.list'))
+    shutil.move("testing.list", os.path.join(RUNNING_DIR, "testing.list"))
+    shutil.move("training.list", os.path.join(RUNNING_DIR, "training.list"))
 
     # return it log dictionary
     return jobid2log, jobids_r0_dl1

@@ -19,8 +19,16 @@ from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 log = logging.getLogger(__name__)
 
 
-def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
-                      log_from_dl1_dl2, source_env, prod_id):
+def batch_dl2_to_irfs(
+    dl2_directory,
+    loop_particles,
+    offset_gammas,
+    config_file,
+    job_ids_from_dl1_dl2,
+    log_from_dl1_dl2,
+    source_env,
+    prod_id,
+):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -50,7 +58,7 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
     jobs_from_dl2_irf: str
     debug_dl2_to_irfs: dict
     """
-    log.info("==== START {} ====".format('batch mc_dl2_to_irfs'))
+    log.info("==== START {} ====".format("batch mc_dl2_to_irfs"))
     time.sleep(1)
 
     debug_log = {}
@@ -67,15 +75,17 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
             irf_gamma_offset=off,
             source_env=source_env,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-            prod_id=prod_id
+            prod_id=prod_id,
         )
 
         jobid_for_check.append(jobid)
-        log_dl2_to_irfs[f'gamma_{off}'] = job_logs
-        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-                           f'job_ids; {job_ids_from_dl1_dl2}'
+        log_dl2_to_irfs[f"gamma_{off}"] = job_logs
+        debug_log[jobid] = (
+            f"Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage "
+            f"job_ids; {job_ids_from_dl1_dl2}"
+        )
 
-    if 'gamma-diffuse' in loop_particles:
+    if "gamma-diffuse" in loop_particles:
 
         job_logs, jobid = dl2_to_irfs(
             dl2_directory,
@@ -84,20 +94,21 @@ def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file,
             source_env=source_env,
             log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-            prod_id=prod_id
+            prod_id=prod_id,
         )
 
         jobid_for_check.append(jobid)
-        log_dl2_to_irfs[f'gamma-diffuse'] = job_logs
-        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
-                           f'job_ids; {job_ids_from_dl1_dl2}'
+        log_dl2_to_irfs[f"gamma-diffuse"] = job_logs
+        debug_log[jobid] = (
+            f"Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage "
+            f"job_ids; {job_ids_from_dl1_dl2}"
+        )
 
-    jobid_for_check = ','.join(jobid_for_check)
+    jobid_for_check = ",".join(jobid_for_check)
 
-    log.info("==== END {} ====".format('batch mc_dl2_to_irfs'))
+    log.info("==== END {} ====".format("batch mc_dl2_to_irfs"))
 
     return log_dl2_to_irfs, jobid_for_check, debug_log
-
 
 
 def check_dl2_files(dl2_dir, pointlike, gamma_off):
@@ -121,35 +132,44 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
 
     """
     # Make particle loop depending on gamma point like
-    particles_irfs = ['electron', 'proton']
+    particles_irfs = ["electron", "proton"]
     if pointlike:
-        particles_irfs.append('gamma')
+        particles_irfs.append("gamma")
     else:
-        particles_irfs.append('gamma-diffuse')
+        particles_irfs.append("gamma-diffuse")
 
     dl2_particle_paths = {}
     for particle in particles_irfs:
         dl2_particle_paths[particle] = {}
 
-        if particle == 'gamma':
-            particle_dir_dl2 = os.path.join(dl2_dir.format(particle), f'{gamma_off}')
+        if particle == "gamma":
+            particle_dir_dl2 = os.path.join(dl2_dir.format(particle), f"{gamma_off}")
         else:
             particle_dir_dl2 = dl2_dir.format(particle)
 
         if os.path.isdir(particle_dir_dl2):
-            dl2_particle_paths[particle] = \
-                glob.glob(os.path.join(particle_dir_dl2,
-                                       '*testing.h5')
-                          )[0]
+            dl2_particle_paths[particle] = glob.glob(
+                os.path.join(particle_dir_dl2, "*testing.h5")
+            )[0]
         else:
-            log.info(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
+            log.info(
+                f"DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}"
+            )
             exit(-1)
 
     return dl2_particle_paths
 
 
-def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=True, irf_gamma_offset='off0.0deg',
-                source_env=None, wait_jobs_dl1dl2=None, prod_id=None):
+def dl2_to_irfs(
+    dl2_directory,
+    config_file,
+    log_from_dl1_dl2,
+    irf_point_like=True,
+    irf_gamma_offset="off0.0deg",
+    source_env=None,
+    wait_jobs_dl1dl2=None,
+    prod_id=None,
+):
     """
     Batches interactively the lstchain `lstchain_create_irf_files` entry point.
 
@@ -181,72 +201,80 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     list_job_id_dl2_irfs: str
         Job-ids of the batched job to be passed to the last (MC prod check) stage of the workflow.
     """
-    allowed_gamma_off = ['off0.0deg', 'off0.4deg']
+    allowed_gamma_off = ["off0.0deg", "off0.4deg"]
     if irf_gamma_offset not in allowed_gamma_off:
-        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
+        log.info(
+            f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}'
+        )
         exit(-1)
 
     if irf_point_like:
-        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
-                                       irf_gamma_offset)
+        output_irfs_dir = os.path.join(
+            dl2_directory.replace("/DL2/", "/IRF/").replace("/{}/", "/"),
+            irf_gamma_offset,
+        )
     else:
-        output_irfs_dir = os.path.join(dl2_directory.replace('/DL2/', '/IRF/').replace('/{}/', '/'),
-                                       'diffuse')
+        output_irfs_dir = os.path.join(
+            dl2_directory.replace("/DL2/", "/IRF/").replace("/{}/", "/"), "diffuse"
+        )
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
 
     if not log_from_dl1_dl2:  # Empty dict and thus no dl2 path files
         dl2_particle_paths = check_dl2_files(
-            dl2_directory,
-            irf_point_like,
-            irf_gamma_offset)
+            dl2_directory, irf_point_like, irf_gamma_offset
+        )
 
         # Comprehension list to find gamma or gamma-diffuse
-        gamma_kind = [g for g in dl2_particle_paths.keys() if g.startswith('gamma')][0]
+        gamma_kind = [g for g in dl2_particle_paths.keys() if g.startswith("gamma")][0]
 
         gamma_file = dl2_particle_paths[gamma_kind]
-        proton_file = dl2_particle_paths['proton']
-        electron_file = dl2_particle_paths['electron']
+        proton_file = dl2_particle_paths["proton"]
+        electron_file = dl2_particle_paths["electron"]
 
         irf_kind = gamma_kind
 
     else:
-        proton_file = log_from_dl1_dl2['proton']['dl2_test_path']
-        electron_file = log_from_dl1_dl2['electron']['dl2_test_path']
+        proton_file = log_from_dl1_dl2["proton"]["dl2_test_path"]
+        electron_file = log_from_dl1_dl2["electron"]["dl2_test_path"]
 
-        if irf_point_like and irf_gamma_offset == 'off0.0deg':
-            gamma_file = log_from_dl1_dl2['gamma_off0.0deg']['dl2_test_path']
+        if irf_point_like and irf_gamma_offset == "off0.0deg":
+            gamma_file = log_from_dl1_dl2["gamma_off0.0deg"]["dl2_test_path"]
             irf_kind = irf_gamma_offset
-        elif irf_point_like and irf_gamma_offset == 'off0.4deg':
-            gamma_file = log_from_dl1_dl2['gamma_off0.4deg']['dl2_test_path']
+        elif irf_point_like and irf_gamma_offset == "off0.4deg":
+            gamma_file = log_from_dl1_dl2["gamma_off0.4deg"]["dl2_test_path"]
             irf_kind = irf_gamma_offset
         else:
-            gamma_file = log_from_dl1_dl2['gamma-diffuse']['dl2_test_path']
-            irf_kind = 'diffuse'
+            gamma_file = log_from_dl1_dl2["gamma-diffuse"]["dl2_test_path"]
+            irf_kind = "diffuse"
 
     if irf_point_like:
-        point_like = '--point-like'
+        point_like = "--point-like"
     else:
-        point_like = ''
+        point_like = ""
 
     # Final outfile name with IRF kind
     if prod_id is None:
-        output_filename_irf = os.path.join(output_irfs_dir, 'irf.fits.gz')
+        output_filename_irf = os.path.join(output_irfs_dir, "irf.fits.gz")
     else:
         if irf_point_like:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz'
+                "irf_"
+                + prod_id.replace(".", "")
+                + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz',
             )
         else:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                'irf_' + prod_id.replace('.', '') + f'_gamma_diffuse.fits.gz'
+                "irf_" + prod_id.replace(".", "") + f"_gamma_diffuse.fits.gz",
             )
 
-    cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
-          f' -o {output_filename_irf}'
+    cmd = (
+        f"lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}"
+        f" -o {output_filename_irf}"
+    )
     if config_file:
         cmd += f" --config={config_file}"
 
@@ -254,17 +282,19 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     # if dry_run:
     #     print(cmd)
 
-    log.info(f'Output dir IRF {irf_kind}: {output_irfs_dir}')
+    log.info(f"Output dir IRF {irf_kind}: {output_irfs_dir}")
 
     check_and_make_dir_without_verification(output_irfs_dir)
 
     jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.e")
     jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.o")
 
-    batch_cmd = f'sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}' \
-                f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
+    batch_cmd = (
+        f"sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
+        f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
+    )
 
-    job_id_dl2_irfs = os.popen(batch_cmd).read().strip('\n')
+    job_id_dl2_irfs = os.popen(batch_cmd).read().strip("\n")
 
     log_dl2_to_irfs[job_id_dl2_irfs] = batch_cmd
     list_job_id_dl2_irfs.append(job_id_dl2_irfs)
@@ -275,6 +305,6 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
             config_file, os.path.join(output_irfs_dir, os.path.basename(config_file))
         )
 
-    list_job_id_dl2_irfs = ','.join(list_job_id_dl2_irfs)
+    list_job_id_dl2_irfs = ",".join(list_job_id_dl2_irfs)
 
     return log_dl2_to_irfs, list_job_id_dl2_irfs

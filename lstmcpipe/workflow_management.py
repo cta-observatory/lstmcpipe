@@ -34,18 +34,18 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
         None
     """
     if workflow_step is None:
-        workflow_step = 'NoKEY'
+        workflow_step = "NoKEY"
 
     dict2log = {workflow_step: dictionary}
 
-    if log_format == 'yml':
-        with open(output_file, 'a+') as fileout:
+    if log_format == "yml":
+        with open(output_file, "a+") as fileout:
             yaml.dump(dict2log, fileout)
     else:
-        with open(output_file, 'a+') as fout:
-            fout.write('\n\n  *******************************************\n')
-            fout.write(f'   *** Log from the {workflow_step} stage \n')
-            fout.write('  *******************************************\n')
+        with open(output_file, "a+") as fout:
+            fout.write("\n\n  *******************************************\n")
+            fout.write(f"   *** Log from the {workflow_step} stage \n")
+            fout.write("  *******************************************\n")
             fout.write(pprint.pformat(dict2log))
 
 
@@ -74,34 +74,63 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
     dl1_filename_directory = {}
 
     for particle in particles_loop:
-        if gamma_offsets is not None and particle == 'gamma':
+        if gamma_offsets is not None and particle == "gamma":
             for off in gamma_offsets:
                 _particle = particle + off
-                dl1_filename_directory[_particle] = {'training': {}, 'testing': {}}
+                dl1_filename_directory[_particle] = {"training": {}, "testing": {}}
 
-                dl1_filename_directory[_particle]['training']['train_path_and_outname_dl1'] = \
-                    glob.glob(os.path.join(
+                dl1_filename_directory[_particle]["training"][
+                    "train_path_and_outname_dl1"
+                ] = glob.glob(
+                    os.path.join(
                         os.path.join(off, dl1_directory.format(particle)),
-                        '*training*.h5'
-                    ))[0]
-                dl1_filename_directory[_particle]['testing']['test_path_and_outname_dl1'] = \
-                    glob.glob(os.path.join(
+                        "*training*.h5",
+                    )
+                )[
+                    0
+                ]
+                dl1_filename_directory[_particle]["testing"][
+                    "test_path_and_outname_dl1"
+                ] = glob.glob(
+                    os.path.join(
                         os.path.join(off, dl1_directory.format(particle)),
-                        '*testing*.h5'
-                    ))[0]
+                        "*testing*.h5",
+                    )
+                )[
+                    0
+                ]
         else:
-            dl1_filename_directory[particle] = {'training': {}, 'testing': {}}
-            dl1_filename_directory[particle]['training']['train_path_and_outname_dl1'] = \
-                glob.glob(os.path.join(dl1_directory.format(particle), '*training*.h5'))[0]
-            dl1_filename_directory[particle]['testing']['test_path_and_outname_dl1'] = \
-                glob.glob(os.path.join(dl1_directory.format(particle), '*testing*.h5'))[0]
+            dl1_filename_directory[particle] = {"training": {}, "testing": {}}
+            dl1_filename_directory[particle]["training"][
+                "train_path_and_outname_dl1"
+            ] = glob.glob(
+                os.path.join(dl1_directory.format(particle), "*training*.h5")
+            )[
+                0
+            ]
+            dl1_filename_directory[particle]["testing"][
+                "test_path_and_outname_dl1"
+            ] = glob.glob(os.path.join(dl1_directory.format(particle), "*testing*.h5"))[
+                0
+            ]
 
     return dl1_filename_directory
 
 
-def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_from_train_pipe,
-                              jobids_from_dl1_to_dl2, jobids_from_dl2_to_irf, jobids_from_dl2_to_sensitivity,
-                              prod_id, log_file, log_debug_file, scancel_file, prod_config_file, last_stage):
+def batch_mc_production_check(
+    jobids_from_r0_to_dl1,
+    jobids_from_merge,
+    jobids_from_train_pipe,
+    jobids_from_dl1_to_dl2,
+    jobids_from_dl2_to_irf,
+    jobids_from_dl2_to_sensitivity,
+    prod_id,
+    log_file,
+    log_debug_file,
+    scancel_file,
+    prod_config_file,
+    last_stage,
+):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
     The machine information of each job will be dumped to the file.
@@ -134,55 +163,61 @@ def batch_mc_production_check(jobids_from_r0_to_dl1, jobids_from_merge, jobids_f
     all_pipeline_jobs = []
 
     jobids_stages = {
-        'r0_to_dl1': jobids_from_r0_to_dl1,
-        'merge_and_copy_dl1': jobids_from_merge,
-        'train_pipe': jobids_from_train_pipe,
-        'dl1_to_dl2': jobids_from_dl1_to_dl2,
-        'dl2_to_irfs': jobids_from_dl2_to_irf,
-        'dl2_to_sensitivity': jobids_from_dl2_to_sensitivity
+        "r0_to_dl1": jobids_from_r0_to_dl1,
+        "merge_and_copy_dl1": jobids_from_merge,
+        "train_pipe": jobids_from_train_pipe,
+        "dl1_to_dl2": jobids_from_dl1_to_dl2,
+        "dl2_to_irfs": jobids_from_dl2_to_irf,
+        "dl2_to_sensitivity": jobids_from_dl2_to_sensitivity,
     }
 
-    if jobids_from_r0_to_dl1 != '':
+    if jobids_from_r0_to_dl1 != "":
         all_pipeline_jobs.append(jobids_from_r0_to_dl1)
-    if jobids_from_merge != '':
+    if jobids_from_merge != "":
         all_pipeline_jobs.append(jobids_from_merge)
-    if jobids_from_train_pipe != '':
+    if jobids_from_train_pipe != "":
         all_pipeline_jobs.append(jobids_from_train_pipe)
-    if jobids_from_dl1_to_dl2 != '':
+    if jobids_from_dl1_to_dl2 != "":
         all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-    if jobids_from_dl2_to_irf != '':
+    if jobids_from_dl2_to_irf != "":
         all_pipeline_jobs.append(jobids_from_dl2_to_irf)
-    if jobids_from_dl2_to_sensitivity != '':
+    if jobids_from_dl2_to_sensitivity != "":
         all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
 
-    all_pipeline_jobs = ','.join(all_pipeline_jobs)
+    all_pipeline_jobs = ",".join(all_pipeline_jobs)
 
     which_last_stage = jobids_stages[last_stage]
 
     # Save machine info into the check file
-    cmd_wrap = f'touch check_MC_{prod_id}.txt; '
-    cmd_wrap += f'sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,' \
-                f'maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> ' \
-                f'check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; ' \
-                f'rm {scancel_file}; ' \
-                f'cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; ' \
-                f'mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};'
+    cmd_wrap = f"touch check_MC_{prod_id}.txt; "
+    cmd_wrap += (
+        f"sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,"
+        f"maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> "
+        f"check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; "
+        f"rm {scancel_file}; "
+        f"cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
+        f"mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};"
+    )
 
-    batch_cmd = f'sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check ' \
-                f'--wrap="{cmd_wrap}"'
+    batch_cmd = (
+        f"sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check "
+        f'--wrap="{cmd_wrap}"'
+    )
 
-    jobid = os.popen(batch_cmd).read().strip('\n')
-    log.info(f'Submitted batch CHECK-job {jobid}')
+    jobid = os.popen(batch_cmd).read().strip("\n")
+    log.info(f"Submitted batch CHECK-job {jobid}")
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[jobid] = 'single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly.'
-    debug_log['sbatch_cmd'] = batch_cmd
-    debug_log['SUMMARY_r0_dl1'] = jobids_from_r0_to_dl1
-    debug_log['SUMMARY_merge'] = jobids_from_merge
-    debug_log['SUMMARY_train_pipe'] = jobids_from_train_pipe
-    debug_log['SUMMARY_dl1_dl2'] = jobids_from_dl1_to_dl2
-    debug_log['SUMMARY_dl2_irfs'] = jobids_from_dl2_to_irf
-    debug_log['SUMMARY_dl2_sensitivity'] = jobids_from_dl2_to_sensitivity
+    debug_log[
+        jobid
+    ] = "single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly."
+    debug_log["sbatch_cmd"] = batch_cmd
+    debug_log["SUMMARY_r0_dl1"] = jobids_from_r0_to_dl1
+    debug_log["SUMMARY_merge"] = jobids_from_merge
+    debug_log["SUMMARY_train_pipe"] = jobids_from_train_pipe
+    debug_log["SUMMARY_dl1_dl2"] = jobids_from_dl1_to_dl2
+    debug_log["SUMMARY_dl2_irfs"] = jobids_from_dl2_to_irf
+    debug_log["SUMMARY_dl2_sensitivity"] = jobids_from_dl2_to_sensitivity
 
     return jobid, debug_log
 
@@ -205,12 +240,12 @@ def create_log_files(production_id):
     scancel_file: str
         path and filename of bash file to cancel all the scheduled jobs
     """
-    log_file = f'./log_onsite_mc_r0_to_dl3_{production_id}.yml'
-    debug_file = f'./log_reduced_{production_id}.yml'
-    scancel_file = f'./scancel_{production_id}.sh'
+    log_file = f"./log_onsite_mc_r0_to_dl3_{production_id}.yml"
+    debug_file = f"./log_reduced_{production_id}.yml"
+    scancel_file = f"./scancel_{production_id}.sh"
 
     # scancel prod file needs chmod +x rights !
-    open(scancel_file, 'w').close()
+    open(scancel_file, "w").close()
     os.chmod(scancel_file, 0o755)  # -rwxr-xr-x
 
     # If the file exists, i,e., the pipeline has been relaunched, erase it
@@ -236,10 +271,9 @@ def update_scancel_file(scancel_filename, jobids_to_update):
         job_ids to be included into the the file
     """
     if os.stat(scancel_filename).st_size == 0:
-        with open(scancel_filename, 'r+') as f:
-            f.write(f'scancel {jobids_to_update}')
+        with open(scancel_filename, "r+") as f:
+            f.write(f"scancel {jobids_to_update}")
 
     else:
-        with open(scancel_filename, 'a') as f:
-            f.write(f',{jobids_to_update}')
-
+        with open(scancel_filename, "a") as f:
+            f.write(f",{jobids_to_update}")
