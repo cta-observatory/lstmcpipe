@@ -44,8 +44,6 @@ jobs:
           echo "pip install ."
           pip install .
 
-          pip freeze
-
       - name: Static codechecks
         run: |
             source $CONDA/etc/profile.d/conda.sh
