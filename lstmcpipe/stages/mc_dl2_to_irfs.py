@@ -247,8 +247,8 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
 
     cmd = f'lstchain_create_irf_files {point_like} -g {gamma_file} -p {proton_file} -e {electron_file}' \
           f' -o {output_filename_irf}'
-    if config_file is not None:
-        cmd += f' --config={config_file}'
+    if config_file:
+        cmd += f" --config={config_file}"
 
     # TODO dry-run option ?
     # if dry_run:
@@ -270,8 +270,10 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     list_job_id_dl2_irfs.append(job_id_dl2_irfs)
 
     # Copy config into working dir
-    if config_file is not None or config_file is not '':
-        shutil.copyfile(config_file, os.path.join(output_irfs_dir, os.path.basename(config_file)))
+    if config_file:
+        shutil.copyfile(
+            config_file, os.path.join(output_irfs_dir, os.path.basename(config_file))
+        )
 
     list_job_id_dl2_irfs = ','.join(list_job_id_dl2_irfs)
 
