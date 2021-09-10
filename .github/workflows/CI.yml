@@ -43,8 +43,14 @@ jobs:
           echo "pip install ."
           pip install .
 
+      - name: Static codechecks
+      # need to use a login shell for the conda setup to work
+      shell: bash -leo pipefail {0}
+      run: |
+          pyflakes lstmcpipe
+
       - name: Tests
-        run: |
+      run: |
           source $CONDA/etc/profile.d/conda.sh
           conda activate ci
           pytest --cov --cov-report=xml lstmcpipe
