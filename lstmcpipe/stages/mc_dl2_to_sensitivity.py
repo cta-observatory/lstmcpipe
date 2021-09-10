@@ -3,7 +3,6 @@
 import os
 import logging
 import time
-import subprocess
 
 
 log = logging.getLogger(__name__)

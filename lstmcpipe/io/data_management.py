@@ -192,7 +192,7 @@ def check_job_logs(job_logs_dir):
                     break
 
     if not logs_with_error == []:
-        answer = query_continue(
+        query_continue(
             "There are errors in the following log files:\n {}\n "
             "Are you sure you want to continue?".format(logs_with_error),
             default="no",

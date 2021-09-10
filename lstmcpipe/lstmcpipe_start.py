@@ -17,7 +17,6 @@
 
 import argparse
 from os.path import abspath
-import logging
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import (
     batch_r0_to_dl1,
@@ -111,7 +110,6 @@ def main():
 
     # Load variables
     prod_id = config["prod_id"]
-    prod_type = config["prod_type"]
     workflow_kind = config["workflow_kind"]
     source_env = config["source_environment"]
     stages_to_run = config["stages_to_run"]
@@ -272,7 +270,6 @@ def main():
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
-        dl2_to_irfs_config = abspath(args.config_file_lst)
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
             dl2_data_dir,
             all_particles,

@@ -1,4 +1,4 @@
-from lstmcpipe.config import export_env, load_config
+from lstmcpipe.config import export_env
 from lstmcpipe.config.pipeline_config import (
     config_valid,
     parse_config_and_handle_global_vars,
@@ -6,7 +6,6 @@ from lstmcpipe.config.pipeline_config import (
 import tempfile
 import os
 import pytest
-import yaml
 from datetime import datetime
 
 yaml_keys = [
@@ -23,10 +22,7 @@ yaml_keys = [
 ]
 dummy_config = {k: None for k in yaml_keys}
 dummy_config["merging_options"] = {"no_image": False}
-dummy_config["source_environment"] = {
-    "source_file": "src_file",
-    "conda_env": "env",
-}
+dummy_config["source_environment"] = {"source_file": "src_file", "conda_env": "env"}
 
 
 def test_export_env():

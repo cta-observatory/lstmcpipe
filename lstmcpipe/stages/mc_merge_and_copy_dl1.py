@@ -14,11 +14,7 @@
 import os
 import logging
 import time
-from lstmcpipe.io.data_management import (
-    check_job_logs,
-    # read_lines_file,
-    # check_files_in_dir_from_file
-)
+from lstmcpipe.io.data_management import check_job_logs
 
 
 log = logging.getLogger(__name__)
@@ -284,10 +280,7 @@ def merge_dl1(
 
     JOB_LOGS = os.path.join(input_dir, "job_logs")
     training_filelist = os.path.join(input_dir, "training.list")
-    testing_filelist = os.path.join(input_dir, "testing.list")
     running_DL1_dir = os.path.join(input_dir, "DL1")
-    DL1_training_dir = os.path.join(running_DL1_dir, "training")
-    DL1_testing_dir = os.path.join(running_DL1_dir, "testing")
     final_DL1_dir = input_dir.replace("running_analysis", "DL1")
     logs_destination_dir = input_dir.replace("running_analysis", "analysis_logs")
 

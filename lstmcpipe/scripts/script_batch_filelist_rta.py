@@ -54,7 +54,7 @@ def main():
     )
     args = parser.parse_args()
 
-    task_id = int(environ["SLURM_ARRAY_TASK_ID"])
+    task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
     file_for_this_job = args.file_list[task_id]
     print("Using file: ", file_for_this_job)
 

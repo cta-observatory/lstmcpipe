@@ -1,6 +1,5 @@
 import argparse
 import os
-import shutil
 import pandas as pd
 from lstchain.io.io import dl2_params_lstcam_key
 import matplotlib.pyplot as plt
@@ -12,11 +11,7 @@ parser = argparse.ArgumentParser(description="Reconstruct events")
 
 # Required arguments
 parser.add_argument(
-    "--gamma_file",
-    "-fg",
-    type=str,
-    dest="gamma_file",
-    help="path to a DL1 HDF5 file",
+    "--gamma_file", "-fg", type=str, dest="gamma_file", help="path to a DL1 HDF5 file"
 )
 
 # Required arguments
@@ -122,12 +117,7 @@ def plot_binned_stat_grid(data, x_col, **binned_stat_args):
     for ii, k in enumerate(cols):
         ax = raxes[ii]
 
-        plot_binned_stat(
-            data[x_col],
-            data[k],
-            ax=ax,
-            **binned_stat_args,
-        )
+        plot_binned_stat(data[x_col], data[k], ax=ax, **binned_stat_args)
 
         ax.set_title(f"{k}", fontsize=15)
         ax.grid("on")
@@ -159,7 +149,7 @@ if __name__ == "__main__":
     plot_histograms(gamma, save_dir=os.path.join(args.outdir, "hist"), bins=100)
 
     fig = plot_binned_stat_grid(gamma, "log_mc_energy", errorbar=True)
-    fig.savefig(os.path.join(args.outdir, f"means_per_energy.png"))
+    fig.savefig(os.path.join(args.outdir, "means_per_energy.png"))
 
     fig, ax = plt.subplots(figsize=(10, 7))
     ax = ctaplot.plot_angular_resolution_cta_performance("north", color="black", ax=ax)
@@ -189,10 +179,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(figsize=(10, 7))
     ax = ctaplot.plot_energy_resolution_cta_performance("north", color="black", ax=ax)
     ax = ctaplot.plot_energy_resolution(
-        gamma.mc_energy,
-        gamma.reco_energy,
-        label="all gammas",
-        ax=ax,
+        gamma.mc_energy, gamma.reco_energy, label="all gammas", ax=ax
     )
     ax = ctaplot.plot_energy_resolution(
         selected_gamma.mc_energy,

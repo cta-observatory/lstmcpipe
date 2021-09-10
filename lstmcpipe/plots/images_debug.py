@@ -1,7 +1,6 @@
 # to run this script you need a DL1 debug files of hipeRTA and a DL1 file from lstchain from the same run
 
 
-import tables
 import numpy as np
 import matplotlib.pyplot as plt
 from ctapipe.visualization import CameraDisplay
@@ -11,18 +10,13 @@ from lstchain.io.io import (
     dl1_params_lstcam_key,
     read_camera_geometries,
 )
-from astropy.table import Table, join, Column, hstack
+from astropy.table import Table, join
 from ctapipe.containers import HillasParametersContainer
 from matplotlib.backends.backend_pdf import PdfPages
 import astropy.units as u
 from astropy.coordinates import Angle
 from lstchain.io.config import get_standard_config
 from lstchain.io.config import read_configuration_file
-
-
-def tailcuts_clean_teltype(image, camera_name="LSTCam", **kwargs):
-
-    return tailcuts_clean(geom, image, **kwargs)
 
 
 def get_hillas_container(row):
@@ -68,7 +62,7 @@ def main(filename, config_file=None):
     selected_table = dl1_table[np.isfinite(dl1_table["intensity"])]
     selected_table = dl1_table[dl1_table["intensity"] > 500]
 
-    with PdfPages(f"images_examples.pdf") as pp:
+    with PdfPages("images_examples.pdf") as pp:
 
         for ii, row in enumerate(selected_table[:10]):
             h = get_hillas_container(row)

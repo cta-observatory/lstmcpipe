@@ -3,12 +3,10 @@
 # Enrique Garcia Nov 2019
 
 import os
-import sys
 import glob
 import yaml
 import pprint
 import logging
-import calendar
 
 
 log = logging.getLogger(__name__)

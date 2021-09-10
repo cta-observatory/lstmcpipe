@@ -98,7 +98,7 @@ def batch_dl2_to_irfs(
         )
 
         jobid_for_check.append(jobid)
-        log_dl2_to_irfs[f"gamma-diffuse"] = job_logs
+        log_dl2_to_irfs["gamma-diffuse"] = job_logs
         debug_log[jobid] = (
             f"Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage "
             f"job_ids; {job_ids_from_dl1_dl2}"
@@ -268,7 +268,7 @@ def dl2_to_irfs(
         else:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                "irf_" + prod_id.replace(".", "") + f"_gamma_diffuse.fits.gz",
+                "irf_" + prod_id.replace(".", "") + "_gamma_diffuse.fits.gz",
             )
 
     cmd = (

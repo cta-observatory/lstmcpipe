@@ -10,9 +10,7 @@ import time
 import shutil
 from numpy.random import default_rng
 from pathlib import Path
-import subprocess
 import logging
-import time
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,

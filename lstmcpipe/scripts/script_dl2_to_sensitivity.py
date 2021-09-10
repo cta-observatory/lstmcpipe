@@ -9,7 +9,6 @@ import numpy as np
 from astropy import table
 import astropy.units as u
 from astropy.io import fits
-from astropy.io.misc.hdf5 import write_table_hdf5
 
 from pyirf.binning import (
     create_bins_per_decade,
@@ -47,9 +46,7 @@ from pyirf.io import (
 )
 
 from lstchain.io.io import read_mc_dl2_to_QTable
-from lstchain.reco.utils import filter_events
 import argparse
-from pathlib import Path
 
 
 log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
@@ -59,11 +56,7 @@ parser = argparse.ArgumentParser(description="MC DL2 to IRF")
 
 # Required arguments
 parser.add_argument(
-    "--gamma-dl2",
-    "-g",
-    type=str,
-    dest="gamma_file",
-    help="Path to the dl2 gamma file",
+    "--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file"
 )
 
 parser.add_argument(
@@ -131,14 +124,8 @@ source_az = 180 * u.deg
 
 
 particles = {
-    "gamma": {
-        "file": args.gamma_file,
-        "target_spectrum": CRAB_HEGRA,
-    },
-    "proton": {
-        "file": args.proton_file,
-        "target_spectrum": IRFDOC_PROTON_SPECTRUM,
-    },
+    "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
+    "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
     "electron": {
         "file": args.electron_file,
         "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
@@ -176,9 +163,7 @@ def main():
         # we handle only ON observations here, so the assumed source pos
         # is the pointing position
         p["events"]["theta"] = calculate_theta(
-            p["events"],
-            assumed_source_az=source_az,
-            assumed_source_alt=source_alt,
+            p["events"], assumed_source_az=source_az, assumed_source_alt=source_alt
         )
         log.info(p["simulation_info"])
         log.info("")
@@ -195,11 +180,7 @@ def main():
     # event display uses much finer bins for the theta cut than
     # for the sensitivity
     theta_bins = add_overflow_bins(
-        create_bins_per_decade(
-            MIN_ENERGY,
-            MAX_ENERGY,
-            N_BIN_PER_DECADE,
-        )
+        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
     )
 
     # theta cut is 68 percent containmente of the gammas
@@ -344,10 +325,7 @@ def main():
         true_energy_bins,
         resolution_function=energy_resolution_absolute_68,
     )
-    ang_res = angular_resolution(
-        gammas[gammas["selected_gh"]],
-        true_energy_bins,
-    )
+    ang_res = angular_resolution(gammas[gammas["selected_gh"]], true_energy_bins)
     psf = psf_table(
         gammas[gammas["selected_gh"]],
         true_energy_bins,
@@ -364,18 +342,11 @@ def main():
 
     hdus.append(
         create_background_2d_hdu(
-            background_rate,
-            reco_energy_bins,
-            fov_offset_bins=np.arange(0, 11) * u.deg,
+            background_rate, reco_energy_bins, fov_offset_bins=np.arange(0, 11) * u.deg
         )
     )
     hdus.append(
-        create_psf_table_hdu(
-            psf,
-            true_energy_bins,
-            source_offset_bins,
-            fov_offset_bins,
-        )
+        create_psf_table_hdu(psf, true_energy_bins, source_offset_bins, fov_offset_bins)
     )
     hdus.append(
         create_rad_max_hdu(
