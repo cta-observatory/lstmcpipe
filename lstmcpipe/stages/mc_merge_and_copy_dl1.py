@@ -12,11 +12,134 @@
 # 5. move running_dir 
 
 import os
+import logging
+import time
 from lstmcpipe.io.data_management import (
     check_job_logs,
     # read_lines_file,
     # check_files_in_dir_from_file
 )
+
+
+log = logging.getLogger(__name__)
+
+
+def batch_merge_and_copy_dl1(running_analysis_dir, log_jobs_from_r0_to_dl1, particles_loop, source_env,
+                             smart_merge=False, no_image_flag=True, prod_id=None, gamma_offsets=None, workflow_kind='lstchain'):
+    """
+    Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
+    have finished.
+
+    Batch 8 merge_and_copy_dl1 jobs ([train, test] x particle) + the move_dl1 and move_dir jobs (2 per particle).
+
+    Parameters
+    ----------
+    running_analysis_dir : str
+        Directory to dl1 files
+    log_jobs_from_r0_to_dl1 : dict
+        dictionary of dictionaries containing the log (jobids organized by particle) from the previous stage
+        (onsite_mc_r0_to_dl1)
+    smart_merge : bool
+        flag to indicate whether the merge of the files should be done with `--smart True` or `--smart False`,
+        controlling the argument of the `lstchain_merge_hdf5_files.py` script (batched in this function).
+    particles_loop : list
+        list with the particles to be processed. Takes the global variable ALL_PARTICLES
+    no_image_flag : bool
+        flag to indicate whether the --no-image argument of the `lstchain_merge_hdf5_files.py` script (batched in
+        this function) should be either True or False.
+    gamma_offsets : list
+        list containing the offset of the gammas
+    prod_id : str
+        prod_id defined in config_MC_prod.yml
+    source_env : str
+        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+
+    Returns
+    -------
+    log_merge_and_copy : dict
+        Dictionary containing the log of the batched merge_and_copy_dl1 jobs
+    jobid_4_train : str
+         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+    all_merge : str
+        string containing all the jobs to indicate that all the dl1 are correctly finished (for dl1_to_dl2)
+    debug_log : dict
+        Debug purposes
+
+    """
+    log_merge_and_copy = {}
+    jobid_4_train = []
+    all_jobs_from_merge_stage = []
+    debug_log = {}
+
+    log.info("==== START {} ====".format('batch merge_and_copy_dl1_workflow'))
+    time.sleep(1)
+    if isinstance(smart_merge, str):
+        merge_flag = 'lst' in smart_merge
+    else:
+        merge_flag = smart_merge
+    log.debug("Merge flag set: {}".format(merge_flag))
+
+    for particle in particles_loop:
+        if particle == 'gamma' and gamma_offsets is not None:
+            for off in gamma_offsets:
+
+                gamma_running_analysis_dir = os.path.join(running_analysis_dir, off)
+                _particle = particle + '_' + off
+
+                job_logs, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+                    gamma_running_analysis_dir.format(particle),
+                    particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                    particle=_particle,
+                    flag_merge=merge_flag,
+                    flag_no_image=no_image_flag,
+                    prod_id=prod_id,
+                    gamma_offset=off,
+                    source_environment=source_env,
+                    workflow_kind=workflow_kind,
+                )
+
+                log_merge_and_copy.update(job_logs)
+                all_jobs_from_merge_stage.append(jobid_debug)
+                if _particle == 'gamma-diffuse' or _particle == 'proton':
+                    jobid_4_train.append(jobid_mv_all_dl1)
+
+                debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                              f'move_dl1 jobid - that will be send to the train pipe stage. They ' \
+                                              f'depend on the following {log_jobs_from_r0_to_dl1[_particle]} ' \
+                                              f'r0_t0_dl1 jobs.'
+                debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+
+        else:
+            _particle = particle
+
+            job_logs, jobid_mv_all_dl1, jobid_debug = merge_dl1(
+                running_analysis_dir.format(particle),
+                particle2jobs_dict=log_jobs_from_r0_to_dl1,
+                particle=_particle,
+                flag_merge=merge_flag,
+                flag_no_image=no_image_flag,
+                prod_id=prod_id,
+                source_environment=source_env,
+                workflow_kind=workflow_kind,
+            )
+
+            log_merge_and_copy.update(job_logs)
+            all_jobs_from_merge_stage.append(jobid_debug)
+            if _particle == 'gamma-diffuse' or _particle == 'proton':
+                jobid_4_train.append(jobid_mv_all_dl1)
+
+            debug_log[jobid_mv_all_dl1] = f'{_particle} merge_and_copy-job - INDEED IT IS JUST PASSED the ' \
+                                          f'move_dl1 jobid - that will be send to the train pipe stage. They depend ' \
+                                          f'on the following {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs.'
+            debug_log[jobid_debug] = f'Are all the {_particle} jobs that have been launched in merge_and_copy_dl1.'
+
+    jobid_4_train = ','.join(jobid_4_train)
+    all_jobs_from_merge_stage = ','.join(all_jobs_from_merge_stage)
+
+    log.info("==== END {} ====".format('batch merge_and_copy_dl1_workflow'))
+
+    return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage, debug_log
+
 
 
 def compose_batch_command_of_script(source, destination, script, particle, wait_jobs, suffix):
@@ -131,7 +254,10 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
 
     JOB_LOGS = os.path.join(input_dir, 'job_logs')
     training_filelist = os.path.join(input_dir, 'training.list')
+    testing_filelist = os.path.join(input_dir, 'testing.list')
     running_DL1_dir = os.path.join(input_dir, 'DL1')
+    DL1_training_dir = os.path.join(running_DL1_dir, 'training')
+    DL1_testing_dir = os.path.join(running_DL1_dir, 'testing')
     final_DL1_dir = input_dir.replace('running_analysis', 'DL1')
     logs_destination_dir = input_dir.replace('running_analysis', 'analysis_logs')
 
@@ -142,7 +268,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # just check number of files first:
     # TODO Create check before merging files ?
 
-    print(f"\n\tmerging starts - {particle}")
+    log.info("merging starts - {}".format(particle))
 
     # 3. merge DL1 files
     wait_both_merges = []
@@ -163,7 +289,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         output_filename += '.h5'
 
         output_filename = os.path.join(running_DL1_dir, output_filename)
-        print(f"\t\tmerge output: {output_filename}")
+        log.info("merge output: {}".format(output_filename))
 
         # After the workflow the files will be moved, will not stay at output_filename
         if set_type == 'training':
@@ -193,7 +319,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
         jobid_merge = os.popen(cmd).read().strip('\n')
         log_merge[particle][set_type][jobid_merge] = cmd
 
-        print(f'\t\tSubmitted batch job {jobid_merge} -- {particle}, {set_type}')
+        log.info(f'Submitted batch job {jobid_merge} -- {particle}, {set_type}')
 
         wait_both_merges.append(jobid_merge)
         return_jobids_debug.append(jobid_merge)
@@ -205,7 +331,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     # 5 --> copy lstchain config file in final_dir too
     # 6 --> move running_dir as logs
 
-    print(f"\tDL1 files will be moved to {final_DL1_dir}")
+    log.info("DL1 files will be moved to {}".format(final_DL1_dir))
 
     # 4 --> move DL1 files in final place
     wait_both_merges = ','.join(wait_both_merges)
@@ -219,7 +345,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_move_dl1 = os.popen(cmd_mv_dl1).read().strip('\n')
     log_merge[particle][set_type][jobid_move_dl1] = cmd_mv_dl1
 
-    print(f'\n\t\tSubmitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
+    log.info(f'Submitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.')
 
     # 5 --> copy lstchain config file in final_dir too
     cmd_cp_conf = compose_batch_command_of_script(input_dir,
@@ -232,7 +358,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_copy_conf = os.popen(cmd_cp_conf).read().strip('\n')
     log_merge[particle][set_type][jobid_copy_conf] = cmd_cp_conf
 
-    print(f'\t\tSubmitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
+    log.info(f'Submitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.')
 
     # 6 --> move running_dir to final analysis_logs
     cmd_mv_dir = compose_batch_command_of_script(input_dir,
@@ -245,7 +371,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     jobid_move_log = os.popen(cmd_mv_dir).read().strip('\n')
     log_merge[particle][set_type][jobid_move_log] = cmd_mv_dir
 
-    print(f'\t\tSubmitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
+    log.info(f'Submitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.')
 
     return_jobids4train.append(jobid_move_dl1)
 
@@ -253,7 +379,7 @@ def merge_dl1(input_dir, particle2jobs_dict, particle=None, flag_merge=False, fl
     return_jobids_debug.append(jobid_move_log)
     return_jobids_debug.append(jobid_copy_conf)
 
-    print(f"\tLOGS will be moved to {logs_destination_dir}")
+    log.info("LOGS will be moved to {}".format(logs_destination_dir))
 
     # Little clarification (it will not be clear in log). These keys are stored here for 2 purposes:
     # 1 - train_pipe recover final dl1 names and path.

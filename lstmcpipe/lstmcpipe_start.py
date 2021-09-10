@@ -19,21 +19,24 @@ import argparse
 from os.path import abspath
 import logging
 from lstmcpipe.io.data_management import query_continue
-from lstmcpipe.workflow_management import (
+from lstmcpipe.stages import(
     batch_r0_to_dl1,
     batch_merge_and_copy_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
     batch_dl2_to_sensitivity,
+    batch_plot_rf_features,
+)
+from lstmcpipe.workflow_management import (
     save_log_to_file,
     create_dict_with_dl1_filenames,
     batch_mc_production_check,
     create_log_files,
     update_scancel_file,
-    batch_plot_rf_features
 )
 from lstmcpipe.config import load_config
+from lstmcpipe.logging import setup_logging
 
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
@@ -79,6 +82,14 @@ parser.add_argument(
     action='store_true', 
     help='print debug messages to stderr'
 )        
+parser.add_argument(
+        '--log-file',
+        action='store',
+        type=str,
+        dest='log_file',
+        help='Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging',
+        default=None,
+        )
 
 args = parser.parse_args()
 
@@ -86,13 +97,8 @@ args = parser.parse_args()
 
 
 def main():
-
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format="%(asctime)s %(name)s %(levelname)-8s %(thread)d %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-        )
-    log = logging.getLogger("My Module")
+    log = setup_logging(verbose=args.debug, logfile=args.log_file)
+    log.info("Starting lstmcpipe processing script")
     # Read MC production configuration file
     config = load_config(args.config_mc_prod)
     query_continue('Are you sure ?')
@@ -151,7 +157,6 @@ def main():
 
     # 2 STAGE --> Merge,copy and move DL1 files
     if 'merge_and_copy_dl1' in stages_to_run:
-
         log_batch_merge_and_copy, jobs_to_train, jobs_all_dl1_finished, debug_merge = batch_merge_and_copy_dl1(
             running_analysis_dir,
             log_batch_r0_dl1,
@@ -278,6 +283,7 @@ def main():
 
     save_log_to_file(debug_mc_check, debug_file, log_format='yml', workflow_step='check_full_workflow')
     update_scancel_file(scancel_file, jobid_check)
+    log.info("Finished lstmcpipe processing script. All jobs have been submitted")
 
 
 if __name__ == '__main__':

@@ -11,7 +11,93 @@
 import os
 import glob
 import shutil
+import logging
+import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+
+
+log = logging.getLogger(__name__)
+
+
+def batch_dl2_to_irfs(dl2_directory, loop_particles, offset_gammas, config_file, job_ids_from_dl1_dl2,
+                      log_from_dl1_dl2, source_env, prod_id):
+    """
+    Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
+
+    Parameters
+    ----------
+    dl2_directory: str
+        Base path to DL2 directory to be formatted with particle type
+    config_file: str
+        Path to lstchain-like config file
+    loop_particles: list
+        list with particles to be processed.
+    offset_gammas: list
+        list off gamma offsets
+    job_ids_from_dl1_dl2: str
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        to schedule the current stage
+    source_env: str
+        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
+    log_from_dl1_dl2: dict
+        Dictionary from dl1_to_dl2 stage with particle path information
+    prod_id: str
+        String with prod_id prefix to complete 'file-naming'
+
+    Returns
+    -------
+    log_batch_dl2_to_irfs: dict
+    jobs_from_dl2_irf: str
+    debug_dl2_to_irfs: dict
+    """
+    log.info("==== START {} ====".format('batch mc_dl2_to_irfs'))
+    time.sleep(1)
+
+    debug_log = {}
+    jobid_for_check = []
+    log_dl2_to_irfs = {}
+
+    for off in offset_gammas:
+
+        job_logs, jobid = dl2_to_irfs(
+            dl2_directory,
+            config_file=config_file,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            irf_point_like=True,
+            irf_gamma_offset=off,
+            source_env=source_env,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma_{off}'] = job_logs
+        debug_log[jobid] = f'Gamma_{off} job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    if 'gamma-diffuse' in loop_particles:
+
+        job_logs, jobid = dl2_to_irfs(
+            dl2_directory,
+            irf_point_like=False,
+            config_file=config_file,
+            source_env=source_env,
+            log_from_dl1_dl2=log_from_dl1_dl2,
+            wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            prod_id=prod_id
+        )
+
+        jobid_for_check.append(jobid)
+        log_dl2_to_irfs[f'gamma-diffuse'] = job_logs
+        debug_log[jobid] = f'Gamma-diffuse job_id from the dl2_to_irfs stage that depends of the dl1_to_dl2 stage ' \
+                           f'job_ids; {job_ids_from_dl1_dl2}'
+
+    jobid_for_check = ','.join(jobid_for_check)
+
+    log.info("==== END {} ====".format('batch mc_dl2_to_irfs'))
+
+    return log_dl2_to_irfs, jobid_for_check, debug_log
+
 
 
 def check_dl2_files(dl2_dir, pointlike, gamma_off):
@@ -56,7 +142,7 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
                                        '*testing.h5')
                           )[0]
         else:
-            print(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
+            log.info(f'DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}')
             exit(-1)
 
     return dl2_particle_paths
@@ -97,7 +183,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     """
     allowed_gamma_off = ['off0.0deg', 'off0.4deg']
     if irf_gamma_offset not in allowed_gamma_off:
-        print(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
+        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
     if irf_point_like:
@@ -168,7 +254,7 @@ def dl2_to_irfs(dl2_directory, config_file, log_from_dl1_dl2, irf_point_like=Tru
     # if dry_run:
     #     print(cmd)
 
-    print(f'\tOutput dir IRF {irf_kind}: {output_irfs_dir}')
+    log.info(f'Output dir IRF {irf_kind}: {output_irfs_dir}')
 
     check_and_make_dir_without_verification(output_irfs_dir)
 

@@ -2,6 +2,7 @@ from lstmcpipe.config import export_env, load_config
 from lstmcpipe.config.pipeline_config import config_valid, parse_config_and_handle_global_vars
 import tempfile
 import os
+import pytest
 import yaml
 from datetime import datetime
 
@@ -39,30 +40,35 @@ def test_config_valid():
     This does not test if no valid configuration is marked
     as invalid!
     """
-    assert config_valid(dummy_config)[0] is False
+    with pytest.raises(Exception):
+        config_valid(dummy_config)
 
     valid = dummy_config.copy()
     valid["prod_type"] = "prod5"
     valid["workflow_kind"] = "lstchain"
     valid["obs_date"] = "20200629_prod5_trans_80"
-    assert config_valid(valid)[0] is True
+    assert config_valid(valid)
 
     invalid_workflow = valid.copy()
     invalid_workflow["workflow_kind"] = "MARS"
-    assert config_valid(invalid_workflow)[0] is False
+    with pytest.raises(Exception):
+        config_valid(invalid_workflow)
 
     invalid_date = valid.copy()
     invalid_date["obs_date"] = "1970-01-01"
-    assert config_valid(invalid_date)[0] is False
+    with pytest.raises(Exception):
+        config_valid(invalid_date)
 
     invalid_prod = valid.copy()
     invalid_prod["prod_type"] = "prod42"
-    assert config_valid(invalid_prod)[0] is False
+    with pytest.raises(Exception):
+        config_valid(invalid_prod)
 
     invalid_date_prod = valid.copy()
     # this should only be allowed with prod3, which is not chosen here
     invalid_date_prod["obs_date"] = "20190415"
-    assert config_valid(invalid_date_prod)[0] is False
+    with pytest.raises(Exception):
+        config_valid(invalid_date_prod)
 
 
 def test_parse_config_and_handle_global_vars():

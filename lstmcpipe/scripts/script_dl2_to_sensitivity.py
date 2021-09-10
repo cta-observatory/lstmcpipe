@@ -147,7 +147,7 @@ def main():
     logging.getLogger("pyirf").setLevel(logging.DEBUG)
 
     for particle_type, p in particles.items():
-        log.info(f"Simulated {particle_type.title()} Events:")
+        log.info("Simulated Events: {}".format(particle_type.title()))
         p["events"], p["simulation_info"] = read_mc_dl2_to_QTable(p["file"])
         # p['events'] = filter_events(p['events'], filters)
 
@@ -180,7 +180,7 @@ def main():
     )
 
     INITIAL_GH_CUT = np.quantile(gammas['gh_score'], (1 - INITIAL_GH_CUT_EFFICENCY))
-    log.info(f"Using fixed G/H cut of {INITIAL_GH_CUT} to calculate theta cuts")
+    log.info("Using fixed G/H cut of {} to calculate theta cuts".format(INITIAL_GH_CUT))
 
     # event display uses much finer bins for the theta cut than
     # for the sensitivity

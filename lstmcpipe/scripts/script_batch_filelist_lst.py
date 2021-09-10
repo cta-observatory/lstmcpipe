@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+from os import environ
 import subprocess
 
 
@@ -10,7 +11,8 @@ def main():
     parser.add_argument('--file_list', '-f', type=str,
                         dest='file_list',
                         help='Path to file containing list of DL0 lstchain file to be processed.',
-                        required=True)
+                        required=True,
+                        nargs="+",)
     parser.add_argument('--output_dir', '-o', type=str,
                         dest='output_dir',
                         help='lstchain_mc_r0_to_dl1 output directory argument.',
@@ -21,17 +23,22 @@ def main():
                         required=True)
     args = parser.parse_args()
 
-    with open(args.file_list, 'r') as filelist:
-        for file in filelist:
+    task_id = int(environ["SLURM_ARRAY_TASK_ID"])
+    file_for_this_job =  args.file_list[task_id]
+    print("Using file: ", file_for_this_job)
 
+    # lstchain takes the output dir and constructs filenanmes itself
+    with open(file_for_this_job, 'r') as filelist:
+        for file in filelist:
             file = file.strip('\n')
 
-            cmd = [f'lstchain_mc_r0_to_dl1',
+            cmd = ['lstchain_mc_r0_to_dl1',
                    f'--input-file={file}',
                    f'--output-dir={args.output_dir}'
                    ]
             if args.config_file:
                 cmd.append('--config={}'.format(args.config_file))
+
             subprocess.run(cmd)
 
 
