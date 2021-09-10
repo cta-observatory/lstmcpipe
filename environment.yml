@@ -7,6 +7,7 @@ dependencies:
   - python=3.7
   - astropy~=4.2
   - pip
+  - pre-commit
   - ctapipe~=0.10.5
   - pip:
 #      - pytest_runner
