@@ -17,11 +17,6 @@ from lstchain.io.config import read_configuration_file
 
 
 
-def tailcuts_clean_teltype(image, camera_name='LSTCam', **kwargs):
-
-    return tailcuts_clean(geom, image, **kwargs)
-
-
 def get_hillas_container(row):
     h = HillasParametersContainer()        
     h.x = row['x'] * 28 * u.m
