@@ -355,7 +355,7 @@ def r0_to_dl1(
         if particle == "proton":
             queue = "long"
         else:
-            queue = "short"
+            queue = "long"
 
         slurm_options = f"--array=0-{len(files)-1}%{n_jobs_parallel} "
         slurm_options += f"-p {queue} "
