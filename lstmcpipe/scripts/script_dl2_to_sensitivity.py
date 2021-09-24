@@ -5,6 +5,7 @@ import logging
 import operator
 
 import os
+from pathlib import Path
 import numpy as np
 from astropy import table
 import astropy.units as u
@@ -359,7 +360,7 @@ def main():
     hdus.append(fits.BinTableHDU(bias_resolution, name="ENERGY_BIAS_RESOLUTION"))
 
     log.info('Writing output file')
-    os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
+    Path(args.outfile).parent.mkdir(exist_ok=True)
     fits.HDUList(hdus).writeto(args.outfile, overwrite=True)
 
 
