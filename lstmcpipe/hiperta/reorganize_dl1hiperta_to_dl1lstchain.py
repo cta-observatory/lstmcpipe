@@ -25,31 +25,37 @@ from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 # Make the hiperta side of lst_scripts independent of lstchian. Thus the reorganizer contains all the functions
 #  from lstchain that needs to run
 
-dl1_params_lstcam_key = 'dl1/event/telescope/parameters/LST_LSTCam'
-dl1_images_lstcam_key = 'dl1/event/telescope/image/LST_LSTCam'
+dl1_params_lstcam_key = "dl1/event/telescope/parameters/LST_LSTCam"
+dl1_images_lstcam_key = "dl1/event/telescope/image/LST_LSTCam"
 # position of the LST1
 location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
-obstime = Time('2018-11-01T02:00')
+obstime = Time("2018-11-01T02:00")
 horizon_frame = AltAz(location=location, obstime=obstime)
 
 
-parser = argparse.ArgumentParser(description="Re-organize the dl1 `standard` output file from either the "
-                                             "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure")
+parser = argparse.ArgumentParser(
+    description="Re-organize the dl1 `standard` output file from either the "
+    "hiptecta_r1_to_dl1 or hiperta_r1_dl1 to the lstchain DL1 structure"
+)
 
-parser.add_argument('--infile', '-i',
-                    type=str,
-                    dest='infile',
-                    help='dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script '
-                         'to be re-organized',
-                    default=None
-                    )
+parser.add_argument(
+    "--infile",
+    "-i",
+    type=str,
+    dest="infile",
+    help="dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script "
+    "to be re-organized",
+    default=None,
+)
 
-parser.add_argument('--outfile', '-o',
-                    type=str,
-                    dest='outfile',
-                    help='Output filename. dl1_reorganized.h5 by default.',
-                    default='./dl1_reorganized.h5'
-                    )
+parser.add_argument(
+    "--outfile",
+    "-o",
+    type=str,
+    dest="outfile",
+    help="Output filename. dl1_reorganized.h5 by default.",
+    default="./dl1_reorganized.h5",
+)
 
 
 def add_column_table(table, ColClass, col_label, values):
@@ -74,7 +80,9 @@ def add_column_table(table, ColClass, col_label, values):
     d[col_label] = ColClass()  # add column
 
     # Step 2: Create new temporary table:
-    newtable = tables.Table(table._v_file.root, '_temp_table', d, filters=table.filters)  # new table
+    newtable = tables.Table(
+        table._v_file.root, "_temp_table", d, filters=table.filters
+    )  # new table
     table.attrs._f_copy(newtable)  # copy attributes
     # Copy table rows, also add new column values:
     for row, value in zip(table, values):
@@ -114,15 +122,15 @@ def disp(cog_x, cog_y, src_x, src_y):
     """
     disp_dx = src_x - cog_x
     disp_dy = src_y - cog_y
-    disp_norm = np.sqrt(disp_dx**2 + disp_dy**2)
-    if hasattr(disp_dx, '__len__'):
+    disp_norm = np.sqrt(disp_dx ** 2 + disp_dy ** 2)
+    if hasattr(disp_dx, "__len__"):
         disp_angle = np.arctan(disp_dy / disp_dx)
-        disp_angle[disp_dx == 0] = np.pi / 2. * np.sign(disp_dy[disp_dx == 0])
+        disp_angle[disp_dx == 0] = np.pi / 2.0 * np.sign(disp_dy[disp_dx == 0])
     else:
         if disp_dx == 0:
-            disp_angle = np.pi/2. * np.sign(disp_dy)
+            disp_angle = np.pi / 2.0 * np.sign(disp_dy)
         else:
-            disp_angle = np.arctan(disp_dy/disp_dx)
+            disp_angle = np.arctan(disp_dy / disp_dx)
 
     disp_sign = np.sign(disp_dx)
 
@@ -136,7 +144,7 @@ def clip_alt(alt):
     Make sure altitude is not larger than 90 deg (it happens in some MC files for zenith=0),
     to keep astropy happy
     """
-    return np.clip(alt, -90.*u.deg, 90.*u.deg)
+    return np.clip(alt, -90.0 * u.deg, 90.0 * u.deg)
 
 
 def sky_to_camera(alt, az, focal, pointing_alt, pointing_az):
@@ -156,9 +164,13 @@ def sky_to_camera(alt, az, focal, pointing_alt, pointing_az):
     -------
     camera frame: `astropy.coordinates.sky_coordinate.SkyCoord`
     """
-    pointing_direction = SkyCoord(alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame)
+    pointing_direction = SkyCoord(
+        alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame
+    )
 
-    camera_frame = CameraFrame(focal_length=focal, telescope_pointing=pointing_direction)
+    camera_frame = CameraFrame(
+        focal_length=focal, telescope_pointing=pointing_direction
+    )
 
     event_direction = SkyCoord(alt=clip_alt(alt), az=az, frame=horizon_frame)
 
@@ -190,51 +202,62 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         None
     """
     with tables.open_file(dl1_file) as hfile:
-        run_array_dir = copy.copy(hfile.root.simulation.run_config.col('run_array_direction')[0])
+        run_array_dir = copy.copy(
+            hfile.root.simulation.run_config.col("run_array_direction")[0]
+        )
         # Remember that /telescope has been moved previously
-        focal = copy.copy(hfile.root.instrument.telescope.optics.col('equivalent_focal_length')[0])
+        focal = copy.copy(
+            hfile.root.instrument.telescope.optics.col("equivalent_focal_length")[0]
+        )
 
     df = pd.read_hdf(dl1_file, key=table_path)
-    source_pos_in_camera = sky_to_camera(df.mc_alt.values * u.rad,
-                                         df.mc_az.values * u.rad,
-                                         focal * u.m,
-                                         run_array_dir[1] * u.rad,
-                                         run_array_dir[0] * u.rad,
-                                         )
+    source_pos_in_camera = sky_to_camera(
+        df.mc_alt.values * u.rad,
+        df.mc_az.values * u.rad,
+        focal * u.m,
+        run_array_dir[1] * u.rad,
+        run_array_dir[0] * u.rad,
+    )
 
-    disp_parameters = disp(df.x.values * u.m,
-                           df.y.values * u.m,
-                           source_pos_in_camera.x,
-                           source_pos_in_camera.y)
+    disp_parameters = disp(
+        df.x.values * u.m,
+        df.y.values * u.m,
+        source_pos_in_camera.x,
+        source_pos_in_camera.y,
+    )
 
     with tables.open_file(dl1_file, mode="a") as file:
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'disp_dx', disp_parameters[0].value)
+        add_column_table(tab, tables.Float32Col, "disp_dx", disp_parameters[0].value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'disp_dy', disp_parameters[1].value)
+        add_column_table(tab, tables.Float32Col, "disp_dy", disp_parameters[1].value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'disp_norm', disp_parameters[2].value)
+        add_column_table(tab, tables.Float32Col, "disp_norm", disp_parameters[2].value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'disp_angle', disp_parameters[3].value)
+        add_column_table(tab, tables.Float32Col, "disp_angle", disp_parameters[3].value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'disp_sign', disp_parameters[4])
+        add_column_table(tab, tables.Float32Col, "disp_sign", disp_parameters[4])
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'src_x', source_pos_in_camera.x.value)
+        add_column_table(tab, tables.Float32Col, "src_x", source_pos_in_camera.x.value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'src_y', source_pos_in_camera.y.value)
+        add_column_table(tab, tables.Float32Col, "src_y", source_pos_in_camera.y.value)
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'mc_alt_tel', np.ones(len(df)) * run_array_dir[1])
+        add_column_table(
+            tab, tables.Float32Col, "mc_alt_tel", np.ones(len(df)) * run_array_dir[1]
+        )
         tab = file.root[table_path]
-        add_column_table(tab, tables.Float32Col, 'mc_az_tel', np.ones(len(df)) * run_array_dir[0])
-        if 'gamma' in dl1_file:
+        add_column_table(
+            tab, tables.Float32Col, "mc_az_tel", np.ones(len(df)) * run_array_dir[0]
+        )
+        if "gamma" in dl1_file:
             tab = file.root[table_path]
-            add_column_table(tab, tables.Float32Col, 'mc_type', np.zeros(len(df)))
-        if 'electron' in dl1_file:
+            add_column_table(tab, tables.Float32Col, "mc_type", np.zeros(len(df)))
+        if "electron" in dl1_file:
             tab = file.root[table_path]
-            add_column_table(tab, tables.Float32Col, 'mc_type', np.ones(len(df)))
-        if 'proton' in dl1_file:
+            add_column_table(tab, tables.Float32Col, "mc_type", np.ones(len(df)))
+        if "proton" in dl1_file:
             tab = file.root[table_path]
-            add_column_table(tab, tables.Float32Col, 'mc_type', 101*np.ones(len(df)))
+            add_column_table(tab, tables.Float32Col, "mc_type", 101 * np.ones(len(df)))
 
 
 def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
@@ -261,16 +284,32 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
 
     """
     # The complevel MUST be set to zero, otherwise this version of libhdf5 does NOT accept the copy_node()
-    filter = tables.Filters(complevel=0, complib='blosc:zstd', shuffle=False, bitshuffle=False, fletcher32=False)
+    filter = tables.Filters(
+        complevel=0,
+        complib="blosc:zstd",
+        shuffle=False,
+        bitshuffle=False,
+        fletcher32=False,
+    )
 
-    hfile_out = tables.open_file(output_filename, 'w')
-    hfile_out.copy_node(hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter)
-    hfile_out.copy_node(hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter)
+    hfile_out = tables.open_file(output_filename, "w")
+    hfile_out.copy_node(
+        hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter
+    )
+    hfile_out.copy_node(
+        hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter
+    )
     hfile_out.copy_node(hfile_tmp.root.dl1, newparent=hfile_out.root, recursive=True)
-    hfile_out.copy_children(hfile_tmp2.root.dl1.event.telescope, hfile_out.root.dl1.event.telescope, recursive=True)
+    hfile_out.copy_children(
+        hfile_tmp2.root.dl1.event.telescope,
+        hfile_out.root.dl1.event.telescope,
+        recursive=True,
+    )
 
     # Move the telescope table from /instrument/subarray to /instrument (lstchain output file dl1 format)
-    hfile_out.move_node('/instrument/subarray/telescope', newparent='/instrument', createparents=True)
+    hfile_out.move_node(
+        "/instrument/subarray/telescope", newparent="/instrument", createparents=True
+    )
     hfile_out.close()
 
 
@@ -290,16 +329,16 @@ def modify_params_table(table, tel_id, focal=28):
     """
     # Create the column tel_id
 
-    table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name='tel_id')
+    table.add_column(Column(tel_id * np.ones(len(table)), dtype=int), name="tel_id")
 
     # Rename `leakage_intensity2` --> `leakage`  # lstchain v0.4.5
     # Rename `leakage_pixel1` --> `leakage1_pixel`          #lstchain v0.5.x
     # Rename `leakage_intensity2` --> `leakage2_intensity`  #lstchain v0.5.x
-    table.rename_column('leakage_intensity1', 'leakage_intensity_width_1')
-    table.rename_column('leakage_intensity2', 'leakage_intensity_width_2')
-    table.rename_column('leakage_pixel1', 'leakage_pixels_width_1')
-    table.rename_column('leakage_pixel2', 'leakage_pixels_width_2')
-    table.rename_column('nb_selected_pixel', 'n_pixels')
+    table.rename_column("leakage_intensity1", "leakage_intensity_width_1")
+    table.rename_column("leakage_intensity2", "leakage_intensity_width_2")
+    table.rename_column("leakage_pixel1", "leakage_pixels_width_1")
+    table.rename_column("leakage_pixel2", "leakage_pixels_width_2")
+    table.rename_column("nb_selected_pixel", "n_pixels")
 
     # X and Y in meters
     # table['x'] *= focal
@@ -307,8 +346,8 @@ def modify_params_table(table, tel_id, focal=28):
 
     # mc_energy must be computed after merging
     # log of intensity and computation of wl
-    table.add_column(np.log10(table['intensity']), name='log_intensity')
-    table.add_column(table['width'] / table['length'], name='wl')
+    table.add_column(np.log10(table["intensity"]), name="log_intensity")
+    table.add_column(table["width"] / table["length"], name="wl")
 
 
 def stack_by_telid(dl1_pointer, focal=28):
@@ -330,10 +369,10 @@ def stack_by_telid(dl1_pointer, focal=28):
 
     tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
     try:
-        tel_ids = [tel['telId'][0] for tel in dl1_pointer]
+        tel_ids = [tel["telId"][0] for tel in dl1_pointer]
     except:
         # if the tel_id column does not exist, we assign tel ids by simple iteration
-        tel_ids = [i+1 for i in range(len(tels_params))]
+        tel_ids = [i + 1 for i in range(len(tels_params))]
 
     for tab, tel_id in zip(tels_params, tel_ids):
         modify_params_table(tab, tel_id, focal=focal)
@@ -346,15 +385,17 @@ def stack_by_telid(dl1_pointer, focal=28):
 
     # adding stupid tel_id to the image table as well
     for image_tab, tel_id in zip(images, tel_ids):
-        image_tab.add_column(Column(tel_id * np.ones(len(image_tab)), dtype=int), name='tel_id')
+        image_tab.add_column(
+            Column(tel_id * np.ones(len(image_tab)), dtype=int), name="tel_id"
+        )
 
     stacked_images = vstack(images)
-    if 'event_id' not in stacked_images.columns:
-        stacked_images.add_column(stacked_param['event_id'])
+    if "event_id" not in stacked_images.columns:
+        stacked_images.add_column(stacked_param["event_id"])
 
     try:
         #  HiPeCTA case
-        stacked_images.rename_column('eventId', 'event_id')
+        stacked_images.rename_column("eventId", "event_id")
     except KeyError:
         #  HiPeRTA case
         pass
@@ -377,34 +418,44 @@ def reorganize_dl1(input_filename, output_filename):
         None. It dumps the final hdf5 file with the correct structure.
 
     """
-    hfile = tables.open_file(input_filename, 'r')
+    hfile = tables.open_file(input_filename, "r")
 
     # Pointers
     dl1 = hfile.root.dl1
     mc_event = Table(hfile.root.simulation.mc_event.read())
 
     # Temporal names for temporal files, later erased
-    _param = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_prams_tmp_' + str(
-        os.path.basename(input_filename))
-    _images = str(os.path.abspath(output_filename).rsplit('/', 1)[0]) + '/dl1_imags_tmp_' + str(
-        os.path.basename(input_filename))
+    _param = (
+        str(os.path.abspath(output_filename).rsplit("/", 1)[0])
+        + "/dl1_prams_tmp_"
+        + str(os.path.basename(input_filename))
+    )
+    _images = (
+        str(os.path.abspath(output_filename).rsplit("/", 1)[0])
+        + "/dl1_imags_tmp_"
+        + str(os.path.basename(input_filename))
+    )
 
     # File has not been reorganized yet ! Thus, the path for optics is inside /instrument/subarray/telescope
     # only valid for LSTs !
-    focal = hfile.root.instrument.subarray.telescope.optics.col('equivalent_focal_length')[0]
+    focal = hfile.root.instrument.subarray.telescope.optics.col(
+        "equivalent_focal_length"
+    )[0]
     table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
-    table_dl1 = join(table_dl1, mc_event, keys='event_id')
-    table_dl1.add_column(np.log10(table_dl1['mc_energy']), name='log_mc_energy')
+    table_dl1 = join(table_dl1, mc_event, keys="event_id")
+    table_dl1.add_column(np.log10(table_dl1["mc_energy"]), name="log_mc_energy")
 
     # write tmp files
-    table_dl1.write(_param, format='hdf5', path=dl1_params_lstcam_key, overwrite=True)
-    table_imags.write(_images, format='hdf5', path=dl1_images_lstcam_key, overwrite=True)
+    table_dl1.write(_param, format="hdf5", path=dl1_params_lstcam_key, overwrite=True)
+    table_imags.write(
+        _images, format="hdf5", path=dl1_images_lstcam_key, overwrite=True
+    )
 
     # open tmp files
-    _hfile_param = tables.open_file(_param, 'r')
-    _hfile_imags = tables.open_file(_images, 'r')
+    _hfile_param = tables.open_file(_param, "r")
+    _hfile_imags = tables.open_file(_images, "r")
 
     create_final_h5(hfile, _hfile_param, _hfile_imags, output_filename)
 
@@ -420,7 +471,6 @@ def reorganize_dl1(input_filename, output_filename):
     hfile.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parser.parse_args()
-    reorganize_dl1(args.infile,
-                   args.outfile)
+    reorganize_dl1(args.infile, args.outfile)

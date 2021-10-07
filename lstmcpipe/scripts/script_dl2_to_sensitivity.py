@@ -4,13 +4,11 @@ Procedure adapted from pyirf v0.4 example one (used with eventdisplay)
 import logging
 import operator
 
-import os
 from pathlib import Path
 import numpy as np
 from astropy import table
 import astropy.units as u
 from astropy.io import fits
-from astropy.io.misc.hdf5 import write_table_hdf5
 
 from pyirf.binning import (
     create_bins_per_decade,
@@ -48,9 +46,7 @@ from pyirf.io import (
 )
 
 from lstchain.io.io import read_mc_dl2_to_QTable
-from lstchain.reco.utils import filter_events
 import argparse
-from pathlib import Path
 
 
 log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
@@ -59,29 +55,35 @@ log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
 parser = argparse.ArgumentParser(description="MC DL2 to IRF")
 
 # Required arguments
-parser.add_argument('--gamma-dl2', '-g',
-                    type=str,
-                    dest='gamma_file',
-                    help='Path to the dl2 gamma file',
-                    )
+parser.add_argument(
+    "--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file"
+)
 
-parser.add_argument('--proton-dl2', '-p',
-                    type=str,
-                    dest='proton_file',
-                    help='Path to the dl2 proton file',
-                    )
+parser.add_argument(
+    "--proton-dl2",
+    "-p",
+    type=str,
+    dest="proton_file",
+    help="Path to the dl2 proton file",
+)
 
-parser.add_argument('--electron-dl2', '-e',
-                    type=str,
-                    dest='electron_file',
-                    help='Path to the dl2 electron file',
-                    )
+parser.add_argument(
+    "--electron-dl2",
+    "-e",
+    type=str,
+    dest="electron_file",
+    help="Path to the dl2 electron file",
+)
 
-parser.add_argument('--outfile', '-o', action='store', type=str,
-                    dest='outfile',
-                    help='Path where to save IRF FITS file',
-                    default='.'
-                    )
+parser.add_argument(
+    "--outfile",
+    "-o",
+    action="store",
+    type=str,
+    dest="outfile",
+    help="Path where to save IRF FITS file",
+    default=".",
+)
 
 # Optional arguments
 # parser.add_argument('--config', '-c', action='store', type=Path,
@@ -122,14 +124,8 @@ source_az = 180 * u.deg
 
 
 particles = {
-    "gamma": {
-        "file": args.gamma_file,
-        "target_spectrum": CRAB_HEGRA,
-    },
-    "proton": {
-        "file": args.proton_file,
-        "target_spectrum": IRFDOC_PROTON_SPECTRUM,
-    },
+    "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
+    "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
     "electron": {
         "file": args.electron_file,
         "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
@@ -152,14 +148,14 @@ def main():
         p["events"], p["simulation_info"] = read_mc_dl2_to_QTable(p["file"])
         # p['events'] = filter_events(p['events'], filters)
 
-        print('=====', particle_type, '=====')
+        print("=====", particle_type, "=====")
         # p["events"]["particle_type"] = particle_type
 
         p["simulated_spectrum"] = PowerLaw.from_simulation(p["simulation_info"], T_OBS)
         p["events"]["weight"] = calculate_event_weights(
             p["events"]["true_energy"], p["target_spectrum"], p["simulated_spectrum"]
         )
-        for prefix in ('true', 'reco'):
+        for prefix in ("true", "reco"):
             k = f"{prefix}_source_fov_offset"
             p["events"][k] = calculate_source_fov_offset(p["events"], prefix=prefix)
 
@@ -167,9 +163,7 @@ def main():
         # we handle only ON observations here, so the assumed source pos
         # is the pointing position
         p["events"]["theta"] = calculate_theta(
-            p["events"],
-            assumed_source_az=source_az,
-            assumed_source_alt=source_alt,
+            p["events"], assumed_source_az=source_az, assumed_source_alt=source_alt
         )
         log.info(p["simulation_info"])
         log.info("")
@@ -180,13 +174,13 @@ def main():
         [particles["proton"]["events"], particles["electron"]["events"]]
     )
 
-    INITIAL_GH_CUT = np.quantile(gammas['gh_score'], (1 - INITIAL_GH_CUT_EFFICENCY))
+    INITIAL_GH_CUT = np.quantile(gammas["gh_score"], (1 - INITIAL_GH_CUT_EFFICENCY))
     log.info("Using fixed G/H cut of {} to calculate theta cuts".format(INITIAL_GH_CUT))
 
     # event display uses much finer bins for the theta cut than
     # for the sensitivity
     theta_bins = add_overflow_bins(
-        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE,)
+        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
     )
 
     # theta cut is 68 percent containmente of the gammas
@@ -203,13 +197,15 @@ def main():
     )
 
     # same number of bins per decade than EventDisplay
-    sensitivity_bins = add_overflow_bins(create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, bins_per_decade=N_BIN_PER_DECADE))
- 
+    sensitivity_bins = add_overflow_bins(
+        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, bins_per_decade=N_BIN_PER_DECADE)
+    )
+
     log.info("Optimizing G/H separation cut for best sensitivity")
     gh_cut_efficiencies = np.arange(
         GH_CUT_EFFICIENCY_STEP,
         MAX_GH_CUT_EFFICIENCY + GH_CUT_EFFICIENCY_STEP / 2,
-        GH_CUT_EFFICIENCY_STEP
+        GH_CUT_EFFICIENCY_STEP,
     )
     sensitivity_step_2, gh_cuts = optimize_gh_cut(
         gammas,
@@ -224,15 +220,15 @@ def main():
 
     # now that we have the optimized gh cuts, we recalculate the theta
     # cut as 68 percent containment on the events surviving these cuts.
-    log.info('Recalculating theta cut for optimized GH Cuts')
+    log.info("Recalculating theta cut for optimized GH Cuts")
     for tab in (gammas, background):
         tab["selected_gh"] = evaluate_binned_cut(
             tab["gh_score"], tab["reco_energy"], gh_cuts, operator.ge
         )
 
     theta_cuts_opt = calculate_percentile_cut(
-        gammas[gammas['selected_gh']]["theta"],
-        gammas[gammas['selected_gh']]["reco_energy"],
+        gammas[gammas["selected_gh"]]["theta"],
+        gammas[gammas["selected_gh"]]["reco_energy"],
         theta_bins,
         percentile=68,
         fill_value=MAX_THETA_CUT,
@@ -256,18 +252,16 @@ def main():
         alpha=ALPHA,
         background_radius=MAX_BG_RADIUS,
     )
-    sensitivity = calculate_sensitivity(
-        signal_hist, background_hist, alpha=ALPHA
-    )
+    sensitivity = calculate_sensitivity(signal_hist, background_hist, alpha=ALPHA)
 
     # scale relative sensitivity by Crab flux to get the flux sensitivity
-    spectrum = particles['gamma']['target_spectrum']
+    spectrum = particles["gamma"]["target_spectrum"]
     for s in (sensitivity_step_2, sensitivity):
-        s["flux_sensitivity"] = (
-            s["relative_sensitivity"] * spectrum(s['reco_energy_center'])
+        s["flux_sensitivity"] = s["relative_sensitivity"] * spectrum(
+            s["reco_energy_center"]
         )
 
-    log.info('Calculating IRFs')
+    log.info("Calculating IRFs")
     hdus = [
         fits.PrimaryHDU(),
         fits.BinTableHDU(sensitivity, name="SENSITIVITY"),
@@ -327,10 +321,11 @@ def main():
         )
 
     bias_resolution = energy_bias_resolution(
-        gammas[gammas["selected"]], true_energy_bins,
+        gammas[gammas["selected"]],
+        true_energy_bins,
         resolution_function=energy_resolution_absolute_68,
     )
-    ang_res = angular_resolution(gammas[gammas["selected_gh"]], true_energy_bins,)
+    ang_res = angular_resolution(gammas[gammas["selected_gh"]], true_energy_bins)
     psf = psf_table(
         gammas[gammas["selected_gh"]],
         true_energy_bins,
@@ -339,27 +334,29 @@ def main():
     )
 
     background_rate = background_2d(
-        background[background['selected_gh']],
+        background[background["selected_gh"]],
         reco_energy_bins,
         fov_offset_bins=np.arange(0, 11) * u.deg,
         t_obs=T_OBS,
     )
 
-    hdus.append(create_background_2d_hdu(
-        background_rate,
-        reco_energy_bins,
-        fov_offset_bins=np.arange(0, 11) * u.deg,
-    ))
-    hdus.append(create_psf_table_hdu(
-        psf, true_energy_bins, source_offset_bins, fov_offset_bins,
-    ))
-    hdus.append(create_rad_max_hdu(
-        theta_cuts_opt["cut"][:, np.newaxis], theta_bins, fov_offset_bins
-    ))
+    hdus.append(
+        create_background_2d_hdu(
+            background_rate, reco_energy_bins, fov_offset_bins=np.arange(0, 11) * u.deg
+        )
+    )
+    hdus.append(
+        create_psf_table_hdu(psf, true_energy_bins, source_offset_bins, fov_offset_bins)
+    )
+    hdus.append(
+        create_rad_max_hdu(
+            theta_cuts_opt["cut"][:, np.newaxis], theta_bins, fov_offset_bins
+        )
+    )
     hdus.append(fits.BinTableHDU(ang_res, name="ANGULAR_RESOLUTION"))
     hdus.append(fits.BinTableHDU(bias_resolution, name="ENERGY_BIAS_RESOLUTION"))
 
-    log.info('Writing output file')
+    log.info("Writing output file")
     Path(args.outfile).parent.mkdir(exist_ok=True)
     fits.HDUList(hdus).writeto(args.outfile, overwrite=True)
 

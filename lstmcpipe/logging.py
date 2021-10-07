@@ -15,10 +15,10 @@ def setup_logging(logfile=None, verbose=False):
     log.level = level
 
     stream_formatter = logging.Formatter(
-            fmt="%(levelname)s\n%(message)s\n",
-            datefmt="%H:%M:%S",
-            )
-    stream_handler  = logging.StreamHandler()
+        fmt="%(levelname)s\n%(message)s\n",
+        datefmt="%H:%M:%S",
+    )
+    stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(stream_formatter)
     log.addHandler(stream_handler)
 
@@ -34,6 +34,6 @@ def setup_logging(logfile=None, verbose=False):
 
     # numba produces a ton of logs when set to debug and the solution of using enviroment variables seems to be inconsistent
     # We dont expect to look through thousands of lines of numba logging anytime soon, so it gets ignored explicitly
-    logging.getLogger('numba').setLevel(logging.WARNING)
+    logging.getLogger("numba").setLevel(logging.WARNING)
 
     return log

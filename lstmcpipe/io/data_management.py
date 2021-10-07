@@ -25,8 +25,7 @@ def query_yes_no(question, default="yes"):
     -------
     bool - True for "yes", False for "no"
     """
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
@@ -39,14 +38,15 @@ def query_yes_no(question, default="yes"):
     while True:
         sys.stdout.write(question + prompt)
         choice = input().lower()
-        if default is not None and choice == '':
+        if default is not None and choice == "":
             return valid[default]
         else:
             try:
                 return bool(strtobool(choice))
             except:
-                sys.stdout.write("Please respond with 'yes' or 'no' "
-                                 "(or 'y' or 'n').\n")
+                sys.stdout.write(
+                    "Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n"
+                )
 
 
 def query_continue(question, default="no"):
@@ -99,13 +99,13 @@ def query_continue(question, default="no"):
 
 def check_data_path(data_path):
     """
-        Check if the path to some data exists.
-        Raise an Error if the path does not exist, is not a directory or does not contain data.
+    Check if the path to some data exists.
+    Raise an Error if the path does not exist, is not a directory or does not contain data.
 
-        Parameters
-        ----------
-        data_path: str
-        """
+    Parameters
+    ----------
+    data_path: str
+    """
     if not os.path.exists(data_path):
         raise ValueError("The input directory must exist")
     if get_input_filelist(data_path) == []:
@@ -116,33 +116,40 @@ def check_data_path(data_path):
 
 def get_input_filelist(data_path):
     """
-        Return list of files in `data_path`
+    Return list of files in `data_path`
 
-        Parameters
-        ----------
-        data_path: str
+    Parameters
+    ----------
+    data_path: str
 
-        Returns
-        -------
-        list of str
-        """
-    return [os.path.abspath(os.path.join(data_path, f)) for f in os.listdir(data_path) if
-            os.path.isfile(os.path.join(data_path, f))]
+    Returns
+    -------
+    list of str
+    """
+    return [
+        os.path.abspath(os.path.join(data_path, f))
+        for f in os.listdir(data_path)
+        if os.path.isfile(os.path.join(data_path, f))
+    ]
 
 
 def check_and_make_dir(directory):
     """
-        Check if a directory exists or contains data before to makedir.
-        If exists, query the user to remove its content.
+    Check if a directory exists or contains data before to makedir.
+    If exists, query the user to remove its content.
 
-        Parameters
-        ----------
-        directory: str
-            path to a directory
-        """
+    Parameters
+    ----------
+    directory: str
+        path to a directory
+    """
     if os.path.exists(directory) and os.listdir(directory) != []:
-        clean = query_continue("The directory {} is not empty. Do you want to remove its content?".format(directory),
-                               default='no')
+        clean = query_continue(
+            "The directory {} is not empty. Do you want to remove its content?".format(
+                directory
+            ),
+            default="no",
+        )
         if clean:
             shutil.rmtree(directory)
     os.makedirs(directory, exist_ok=True)
@@ -155,26 +162,41 @@ def check_and_make_dir_without_verification(directory):
 
 
 def check_job_logs(job_logs_dir):
-    job_logs = [os.path.join(job_logs_dir, f) for f in os.listdir(job_logs_dir) if f.endswith('.e')]
+    job_logs = [
+        os.path.join(job_logs_dir, f)
+        for f in os.listdir(job_logs_dir)
+        if f.endswith(".e")
+    ]
     logs_with_error = []
     for log_filename in job_logs:
         with open(log_filename) as log_file:
             for line in log_file.readlines():
 
-                if 'Remote data cache could not be accessed due to FileNotFoundError' in line or \
-                        "URLError(" in line or \
-                        "<urlopen error Unable to open any source!" in line or \
-                        "ftp error: timeout(" in line:
+                if (
+                    "Remote data cache could not be accessed due to FileNotFoundError"
+                    in line
+                    or "URLError(" in line
+                    or "<urlopen error Unable to open any source!" in line
+                    or "ftp error: timeout(" in line
+                ):
 
                     continue  # Known astropy errors, they do not break the workflow
 
-                elif line.startswith('Error') or line.startswith('ERROR') or 'ERROR' in line or 'Error' in line:
+                elif (
+                    line.startswith("Error")
+                    or line.startswith("ERROR")
+                    or "ERROR" in line
+                    or "Error" in line
+                ):
                     logs_with_error.append(os.path.basename(log_filename))
                     break
 
     if not logs_with_error == []:
-        answer = query_continue("There are errors in the following log files:\n {}\n "
-                                "Are you sure you want to continue?".format(logs_with_error), default="no")
+        query_continue(
+            "There are errors in the following log files:\n {}\n "
+            "Are you sure you want to continue?".format(logs_with_error),
+            default="no",
+        )
 
 
 def check_files_in_dir_from_file(directory, file):
@@ -196,7 +218,7 @@ def check_files_in_dir_from_file(directory, file):
     files_in_dir = os.listdir(directory)
     files_not_in_dir = []
     for line in lines:
-        filename = os.path.basename(line.rstrip('\n'))
+        filename = os.path.basename(line.rstrip("\n"))
         if filename not in files_in_dir:
             files_not_in_dir.append(filename)
 
@@ -205,7 +227,7 @@ def check_files_in_dir_from_file(directory, file):
 
 def read_lines_file(file):
     with open(file) as f:
-        lines = [line.rstrip('\n') for line in f]
+        lines = [line.rstrip("\n") for line in f]
     return lines
 
 
@@ -216,5 +238,5 @@ def move_dir_content(src, dest):
     os.rmdir(src)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

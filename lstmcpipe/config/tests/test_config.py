@@ -1,9 +1,11 @@
-from lstmcpipe.config import export_env, load_config
-from lstmcpipe.config.pipeline_config import config_valid, parse_config_and_handle_global_vars
+from lstmcpipe.config import export_env
+from lstmcpipe.config.pipeline_config import (
+    config_valid,
+    parse_config_and_handle_global_vars,
+)
 import tempfile
 import os
 import pytest
-import yaml
 from datetime import datetime
 
 yaml_keys = [
@@ -20,17 +22,14 @@ yaml_keys = [
 ]
 dummy_config = {k: None for k in yaml_keys}
 dummy_config["merging_options"] = {"no_image": False}
-dummy_config["source_environment"] = {
-    "source_file": "src_file",
-    "conda_env": "env",
-}
+dummy_config["source_environment"] = {"source_file": "src_file", "conda_env": "env"}
 
 
 def test_export_env():
     tmp_dir = tempfile.mkdtemp()
     export_env(tmp_dir)
-    if not os.path.exists(os.path.join(tmp_dir, 'requirements.txt')):
-        assert os.path.exists(os.path.join(tmp_dir, 'conda_env.yml'))
+    if not os.path.exists(os.path.join(tmp_dir, "requirements.txt")):
+        assert os.path.exists(os.path.join(tmp_dir, "conda_env.yml"))
 
 
 def test_config_valid():
@@ -88,16 +87,19 @@ def test_parse_config_and_handle_global_vars():
     parsed_config = parse_config_and_handle_global_vars(config)
     date = datetime.today().strftime("%Y%m%d")
     assert (
-        parsed_config["DL1_data_dir"] ==
-        "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"+date+"_v0.7.3_prod5_trans_80_None"
+        parsed_config["DL1_data_dir"]
+        == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"
+        + date
+        + "_v0.7.3_prod5_trans_80_None"
     )
     assert (
-        parsed_config["model_dir"] ==
-        "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"+date+"_v0.7.3_prod5_trans_80_None"
+        parsed_config["model_dir"]
+        == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"
+        + date
+        + "_v0.7.3_prod5_trans_80_None"
     )
     assert (
-        parsed_config["source_environment"] ==
-        "source src_file; conda activate env; "
+        parsed_config["source_environment"] == "source src_file; conda activate env; "
     )
     assert parsed_config["stages_to_run"] is None
     assert parsed_config["workflow_kind"] == "lstchain"

@@ -38,15 +38,22 @@ jobs:
 
           echo "Installing additional pip packages"
           pip install \
-            pytest-cov
+            pytest-cov \
+            pyflakes
 
           echo "pip install ."
           pip install .
 
+      - name: Static codechecks
+        run: |
+            source $CONDA/etc/profile.d/conda.sh
+            conda activate ci
+            pyflakes lstmcpipe
+
       - name: Tests
         run: |
-          source $CONDA/etc/profile.d/conda.sh
-          conda activate ci
-          pytest --cov --cov-report=xml lstmcpipe
+            source $CONDA/etc/profile.d/conda.sh
+            conda activate ci
+            pytest --cov=lstmcpipe --cov-report=xml lstmcpipe
 
       - uses: codecov/codecov-action@v1
