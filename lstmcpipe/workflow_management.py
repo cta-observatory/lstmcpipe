@@ -7,6 +7,7 @@ import glob
 import yaml
 import pprint
 import logging
+from pathlib import Path
 
 
 log = logging.getLogger(__name__)
@@ -79,38 +80,22 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
 
                 dl1_filename_directory[_particle]["training"][
                     "train_path_and_outname_dl1"
-                ] = glob.glob(
-                    os.path.join(
-                        os.path.join(off, dl1_directory.format(particle)),
-                        "*training*.h5",
-                    )
-                )[
-                    0
-                ]
+                ] = next(
+                    Path(off) / dl1_directory.format(particle).glob("*training*.h5")
+                )
                 dl1_filename_directory[_particle]["testing"][
                     "test_path_and_outname_dl1"
-                ] = glob.glob(
-                    os.path.join(
-                        os.path.join(off, dl1_directory.format(particle)),
-                        "*testing*.h5",
-                    )
-                )[
-                    0
-                ]
+                ] = next(
+                    Path(off) / dl1_directory.format(particle).glob("*testing*.h5")
+                )
         else:
             dl1_filename_directory[particle] = {"training": {}, "testing": {}}
             dl1_filename_directory[particle]["training"][
                 "train_path_and_outname_dl1"
-            ] = glob.glob(
-                os.path.join(dl1_directory.format(particle), "*training*.h5")
-            )[
-                0
-            ]
+            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5"))
             dl1_filename_directory[particle]["testing"][
                 "test_path_and_outname_dl1"
-            ] = glob.glob(os.path.join(dl1_directory.format(particle), "*testing*.h5"))[
-                0
-            ]
+            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5"))
 
     return dl1_filename_directory
 
@@ -193,7 +178,7 @@ def batch_mc_production_check(
         f"maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> "
         f"check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; "
         f"rm {scancel_file}; "
-        f"cp {os.path.abspath(prod_config_file)} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
+        f"cp {Path(prod_config_file).resolve()} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
         f"mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};"
     )
 
@@ -238,24 +223,24 @@ def create_log_files(production_id):
     scancel_file: str
         path and filename of bash file to cancel all the scheduled jobs
     """
-    log_file = f"./log_onsite_mc_r0_to_dl3_{production_id}.yml"
-    debug_file = f"./log_reduced_{production_id}.yml"
-    scancel_file = f"./scancel_{production_id}.sh"
+    log_file = Path(f"./log_onsite_mc_r0_to_dl3_{production_id}.yml")
+    debug_file = Path(f"./log_reduced_{production_id}.yml")
+    scancel_file = Path(f"./scancel_{production_id}.sh")
 
     # scancel prod file needs chmod +x rights !
-    open(scancel_file, "w").close()
-    os.chmod(scancel_file, 0o755)  # -rwxr-xr-x
+    scancel_file.touch()
+    scancel_file.chmod(0o755)  # -rwxr-xr-x
 
     # If the file exists, i,e., the pipeline has been relaunched, erase it
-    if os.path.exists(log_file):
-        os.remove(log_file)
-    if os.path.exists(debug_file):
-        os.remove(debug_file)
+    if log_file.exists():
+        log_file.unlink()
+    if debug_file.exists():
+        debug_file.unlink()
 
     return log_file, debug_file, scancel_file
 
 
-def update_scancel_file(scancel_filename, jobids_to_update):
+def update_scancel_file(scancel_file, jobids_to_update):
     """
     Bash file containing the slurm command to cancel multiple jobs.
     The file will be updated after every batched stage and will be erased in case the whole MC prod succeed without
@@ -263,15 +248,15 @@ def update_scancel_file(scancel_filename, jobids_to_update):
 
     Parameters
     ----------
-    scancel_filename: str
+    scancel_file: pathlib.Path
         filename that cancels the whole MC production
     jobids_to_update: str
         job_ids to be included into the the file
     """
-    if os.stat(scancel_filename).st_size == 0:
-        with open(scancel_filename, "r+") as f:
+    if scancel_file.stat().st_size == 0:
+        with open(scancel_file, "r+") as f:
             f.write(f"scancel {jobids_to_update}")
 
     else:
-        with open(scancel_filename, "a") as f:
+        with open(scancel_file, "a") as f:
             f.write(f",{jobids_to_update}")
