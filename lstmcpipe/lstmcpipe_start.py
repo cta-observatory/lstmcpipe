@@ -135,7 +135,7 @@ def main():
     # 1 STAGE --> R0/1 to DL1
     if "r0_to_dl1" in stages_to_run:
         if workflow_kind == "lstchain":
-            r0_to_dl1_config = Path(args.config_file_lst), resolve()
+            r0_to_dl1_config = Path(args.config_file_lst).resolve()
         elif workflow_kind == "hiperta":
             r0_to_dl1_config = Path(args.config_file_rta).resolve()
         else:  # if this wasnt ctapipe, the config parsing would have failed
