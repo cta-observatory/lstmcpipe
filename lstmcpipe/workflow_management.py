@@ -3,7 +3,6 @@
 # Enrique Garcia Nov 2019
 
 import os
-import glob
 import yaml
 import pprint
 import logging
