@@ -18,11 +18,13 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 Install
 -------
 
+As as user:
 .. code-block::
 
     git clone https://github.com/cta-observatory/lstmcpipe.git
     cd lstmcpipe
     conda env create -n lstmcpipe -f environment.yml
+    conda activate lstmcpipe
     pip install .
 
 This will setup a new enviroment with lstchain and other needed tools available in supported versions.
@@ -34,6 +36,20 @@ Alternatively, you can install `lstmcpipe` in your own enviroment to use differe
 analysis pipelines.
 WARNING: Due to changing APIs and data models, we cannot support other versions than the ones specified in
 the enviroment.
+
+As as developer:
+.. code-block::
+
+    git clone https://github.com/cta-observatory/lstmcpipe.git
+    cd lstmcpipe
+    conda env create -n lstmcpipe_dev -f environment.yml
+    conda activate lstmcpipe_dev
+    pip install -e .
+    pre-commit install
+
+This will setup a pre-commit hook: Given that you are in the right enviroment, it will run and format files you are about
+to commit with `black`. (You need to stage the changes again after that). This ensures the formatting of the
+code follows our guidelines and there is less work dealing with the code checker in the CI.
 
 
 Quickstart
