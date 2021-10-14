@@ -196,3 +196,20 @@ Real Data analysis
 ------------------
 
 Real data analysis is not supposed to be supported by these scripts. Use at your own risk.
+
+
+Pipeline Support
+----------------
+
+So far the reference pipeline is ``lstchain`` and only with it a full analysis is possible.
+There is however support for ``ctapipe`` and ``hiperta`` as well.
+The processing up to dl1 is relatively agnostic of the pipeline; working implementations exist for all of them.
+
+In the case of ``hiperta`` a custom script converts the dl1 output to ``lstchain`` compatible files and the later stages
+run using ``lstchain`` scripts.
+
+In the case of ``ctapipe`` dl1 files can be produced using ``ctapipe-stage1``. Once the dependency issues are solved and
+ctapipe 0.12 is released, this will most likely switch to using ``ctapipe-process``. We do not have plans to keep supporting older
+versions longer than necessary currently.
+Because the files are not compatible to ``lstchain`` and there is no support for higher datalevels in ``ctapipe`` yet, it is not possible
+to use any of the following stages. This might change in the future.
