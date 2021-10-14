@@ -6,6 +6,26 @@ import logging
 
 
 def setup_logging(logfile=None, verbose=False):
+    """
+    Setup logging using the logging module
+    from the python standard library. A handler for 
+    the terminal and optionally a file handler get setup, 
+    the logger is using INFO or DEBUG depending on the 
+    value of `verbose`.
+    Numba logs are filtered if they are not WARNING or above,
+    because numba creates thousands of lines in the output.
+
+    Parameters:
+    -----------
+    logfile: str or path-like
+        File to save logs to.
+    verbose: boolean
+        Whether to enable debug logging
+
+    Returns:
+    --------
+    logging.Logger
+    """
 
     level = logging.INFO
     if verbose is True:
@@ -15,8 +35,7 @@ def setup_logging(logfile=None, verbose=False):
     log.level = level
 
     stream_formatter = logging.Formatter(
-        fmt="%(levelname)s\n%(message)s\n",
-        datefmt="%H:%M:%S",
+        fmt="%(levelname)s\n%(message)s\n", datefmt="%H:%M:%S"
     )
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(stream_formatter)
