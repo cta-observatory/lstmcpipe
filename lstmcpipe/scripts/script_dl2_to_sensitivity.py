@@ -82,7 +82,7 @@ parser.add_argument(
     type=str,
     dest="outfile",
     help="Path where to save IRF FITS file",
-    default=".",
+    default="sensitivity.fits.gz",
 )
 
 # Optional arguments
