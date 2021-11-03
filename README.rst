@@ -19,6 +19,7 @@ Install
 -------
 
 As as user:
+
 .. code-block::
 
     git clone https://github.com/cta-observatory/lstmcpipe.git
@@ -38,6 +39,7 @@ WARNING: Due to changing APIs and data models, we cannot support other versions 
 the enviroment.
 
 As as developer:
+
 .. code-block::
 
     git clone https://github.com/cta-observatory/lstmcpipe.git
