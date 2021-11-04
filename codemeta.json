@@ -39,6 +39,18 @@
                 "@type": "Organization",
                 "name": "Univ. Savoie Mont-Blanc, CNRS, LAPP"
             }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0001-7110-0533",
+            "givenName": "Lukas",
+            "familyName": "Nickel",
+            "email": "lukas.nickel@tu-dortmund.de",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "TU Dortmund University, Department of Physics"
+            }
         }
+
     ]
 }
