@@ -37,7 +37,8 @@ entry_points = {
         'lstmcpipe_utils_cp_config = lstmcpipe.scripts.script_merge_utils_copy_config:main',
         'lstmcpipe_lst_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_lst:main',
         'lstmcpipe_cta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_cta:main',
-        'lstmcpipe_rta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_rta:main'
+        'lstmcpipe_rta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_rta:main',
+        'lstmcpipe_compare_irfs = lstmcpipe.scripts.script_compare_irfs:main',
     ]
 }
 
