@@ -41,6 +41,17 @@
             }
         },
         {
+          "@type": "Person",
+            "@id": "https://orcid.org/0000-0003-2224-4594",
+            "givenName": "Enrique",
+            "familyName": "Garcia",
+            "email": "enrique.garcia@lapp.in2p3.fr",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Univ. Savoie Mont Blanc, CNRS, LAPP"
+            }
+        },
+        {
             "@type": "Person",
             "@id": "https://orcid.org/0000-0001-7110-0533",
             "givenName": "Lukas",
@@ -51,6 +62,16 @@
                 "name": "TU Dortmund University, Department of Physics"
             }
         }
-
-    ]
+    ],
+    "maintainer": {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0003-2224-4594",
+        "givenName": "Enrique",
+        "familyName": "Garcia",
+        "email": "enrique.garcia@lapp.in2p3.fr",
+        "affiliation": {
+            "@type": "Organization",
+            "name": "Univ. Savoie Mont Blanc, CNRS, LAPP"
+        }
+    }
 }
