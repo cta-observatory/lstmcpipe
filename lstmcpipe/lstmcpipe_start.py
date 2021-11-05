@@ -102,6 +102,28 @@ args = parser.parse_args()
 
 
 def main():
+    """
+    Main lstmcpipe script. This will launch the selected stages and start the processing.
+    The jobs are submitted, but not awaited meaning that the analysis will be going on after
+    the script has exited. To look at the submitted jobs, you can use e.g. `squeue -u $USER`.
+    
+    Arguments, that can be passed via the command line:
+    ---------------------------------------------------
+    --config_mc_prod / -c
+        path to a yaml configuration file containing lstmcpipe settings
+        This defines the stages run, the files processed, ...
+    --config_file_lst / -conf_lst
+        path to a yaml configuration file containing lstchain settings
+        This defines the processing parameters like cleaning, models...
+    --config_file_ctapipe / -conf_cta
+        same for ctapipe
+    --config_file_rat / -conf_rta
+        same for HIPERTA
+    --log-file
+        Optional: path to a file where lstmcpipe logging will be written to.
+    --debug
+        Toggle to enable debug print messages.
+    """
     log = setup_logging(verbose=args.debug, logfile=args.log_file)
     log.info("Starting lstmcpipe processing script")
     # Read MC production configuration file
