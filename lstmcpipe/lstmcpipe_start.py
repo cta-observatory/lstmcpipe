@@ -16,7 +16,7 @@
 #
 
 import argparse
-from os.path import abspath
+from pathlib import Path
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import (
     batch_r0_to_dl1,
@@ -157,11 +157,11 @@ def main():
     # 1 STAGE --> R0/1 to DL1
     if "r0_to_dl1" in stages_to_run:
         if workflow_kind == "lstchain":
-            r0_to_dl1_config = abspath(args.config_file_lst)
+            r0_to_dl1_config = Path(args.config_file_lst).resolve()
         elif workflow_kind == "hiperta":
-            r0_to_dl1_config = abspath(args.config_file_rta)
+            r0_to_dl1_config = Path(args.config_file_rta).resolve()
         else:  # if this wasnt ctapipe, the config parsing would have failed
-            r0_to_dl1_config = abspath(args.config_file_ctapipe)
+            r0_to_dl1_config = Path(args.config_file_ctapipe).resolve()
 
         log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
             input_dir=dl0_data_dir,
@@ -230,7 +230,7 @@ def main():
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
-        train_config = abspath(args.config_file_lst)
+        train_config = Path(args.config_file_lst).resolve()
         (
             log_batch_train_pipe,
             job_from_train_pipe,
@@ -265,7 +265,7 @@ def main():
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
-        dl1_to_dl2_config = abspath(args.config_file_lst)
+        dl1_to_dl2_config = Path(args.config_file_lst).resolve()
         log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
             dl1_data_dir,
             model_dir,
@@ -296,7 +296,7 @@ def main():
             dl2_data_dir,
             all_particles,
             gamma_offs,
-            abspath(args.config_file_lst),
+            Path(args.config_file_lst).resolve(),
             jobs_from_dl1_dl2,  # Final dl2 names
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
