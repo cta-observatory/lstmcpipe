@@ -16,12 +16,13 @@ from lstmcpipe.io.data_management import (
     get_input_filelist,
     check_and_make_dir_without_verification,
 )
+from lstmcpipe.workflow_management import create_slurm_job
 
 
 log = logging.getLogger(__name__)
 
 
-def batch_r0_to_dl1(
+def batch_process_dl1(
     input_dir,
     conf_file,
     prod_id,
@@ -29,6 +30,7 @@ def batch_r0_to_dl1(
     source_env,
     gamma_offsets=None,
     workflow_kind="lstchain",
+    new_production=True,
 ):
     """
     Batch the r0_to_dl1 jobs by particle type.
@@ -48,6 +50,8 @@ def batch_r0_to_dl1(
     gamma_offsets : list
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
+    new_production: bool
+        Whether to analysis simtels or reprocess existing dl1 files.
 
     Returns
     -------
@@ -71,15 +75,26 @@ def batch_r0_to_dl1(
             for off in gamma_offsets:
                 particle_input_dir = os.path.join(input_dir, off).format(particle)
                 _particle = particle + "_" + off
-                job_logs, jobids_by_particle = r0_to_dl1(
-                    particle_input_dir,  # Particle needs to be gamma w/o the off
-                    config_file=conf_file,
-                    particle=_particle,
-                    prod_id=prod_id,
-                    source_environment=source_env,
-                    offset=off,
-                    workflow_kind=workflow_kind,
-                )
+                if new_production:
+                    job_logs, jobids_by_particle = r0_to_dl1(
+                        particle_input_dir,  # Particle needs to be gamma w/o the off
+                        config_file=conf_file,
+                        particle=_particle,
+                        prod_id=prod_id,
+                        source_environment=source_env,
+                        offset=off,
+                        workflow_kind=workflow_kind,
+                    )
+                else:
+                    job_logs, jobids_by_particle = reprocess_dl1(
+                        particle_input_dir,  # Particle needs to be gamma w/o the off
+                        config_file=conf_file,
+                        particle=_particle,
+                        prod_id=prod_id,
+                        source_environment=source_env,
+                        offset=off,
+                        workflow_kind=workflow_kind,
+                    )
                 full_log["log_all_job_ids"].update(job_logs)
                 full_log[_particle] = ",".join(jobids_by_particle)
                 all_jobids_from_r0_dl1_stage.append(
@@ -91,14 +106,26 @@ def batch_r0_to_dl1(
         else:
             particle_input_dir = input_dir.format(particle)
             _particle = particle
-            job_logs, jobids_by_particle = r0_to_dl1(
-                particle_input_dir,  # Particle needs to be gamma w/o the off
-                config_file=conf_file,
-                particle=_particle,
-                prod_id=prod_id,
-                source_environment=source_env,
-                workflow_kind=workflow_kind,
-            )
+            if new_production:
+                job_logs, jobids_by_particle = r0_to_dl1(
+                    particle_input_dir,  # Particle needs to be gamma w/o the off
+                    config_file=conf_file,
+                    particle=_particle,
+                    prod_id=prod_id,
+                    source_environment=source_env,
+                    offset=off,
+                    workflow_kind=workflow_kind,
+                )
+            else:
+                job_logs, jobids_by_particle = reprocess_dl1(
+                    particle_input_dir,  # Particle needs to be gamma w/o the off
+                    config_file=conf_file,
+                    particle=_particle,
+                    prod_id=prod_id,
+                    source_environment=source_env,
+                    offset=off,
+                    workflow_kind=workflow_kind,
+                )
             full_log["log_all_job_ids"].update(job_logs)
             full_log[_particle] = ",".join(jobids_by_particle)
             all_jobids_from_r0_dl1_stage.append(
@@ -121,7 +148,7 @@ def r0_to_dl1(
     config_file=None,
     train_test_ratio=0.5,
     rng=None,
-    n_r0_per_dl1_job=None,
+    n_parallel_dl1_jobs=None,
     particle=None,
     prod_id=None,
     source_environment=None,
@@ -198,6 +225,8 @@ def r0_to_dl1(
     log.info("Starting R0 to DL1 processing for particle {}".format(particle))
 
     PROD_ID = prod_id
+    TRAIN_TEST_RATIO = float(train_test_ratio)
+    DL0_INPUT_DIR = input_dir
 
     if workflow_kind == "lstchain":
         base_cmd = f"{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} "
@@ -226,33 +255,26 @@ def r0_to_dl1(
         "gamma_off0.4deg": f"g0.4_{jobtype_id}_r0dl1",
     }
 
-    TRAIN_TEST_RATIO = float(train_test_ratio)
+    log.info("Working on DL0 files in {}".format(DL0_INPUT_DIR))
 
-    DL0_DATA_DIR = input_dir
-
-    ##############################################################################
-
-    log.info("Working on DL0 files in {}".format(DL0_DATA_DIR))
-
-    check_data_path(DL0_DATA_DIR)
-
-    raw_files_list = get_input_filelist(DL0_DATA_DIR)
+    check_data_path(DL0_INPUT_DIR)
+    raw_files_list = get_input_filelist(DL0_INPUT_DIR)
 
     if len(raw_files_list) < 100:
-        n_r0_per_dl1_job = 10
+        n_parallel_dl1_jobs = 10
 
-    if not n_r0_per_dl1_job:
+    if not n_parallel_dl1_jobs:
         if len(raw_files_list) < 100:
-            n_r0_per_dl1_job = 10
+            n_parallel_dl1_jobs = 10
         else:
             if "gamma" in input_dir:
-                n_r0_per_dl1_job = 25
+                n_parallel_dl1_jobs = 25
             elif "gamma-diffuse" in input_dir or "electron" in input_dir:
-                n_r0_per_dl1_job = 50
+                n_parallel_dl1_jobs = 50
             elif "proton" in input_dir:
-                n_r0_per_dl1_job = 125
+                n_parallel_dl1_jobs = 125
             else:
-                n_r0_per_dl1_job = 50
+                n_parallel_dl1_jobs = 50
 
     if rng is None:
         rng = default_rng()
@@ -280,105 +302,41 @@ def r0_to_dl1(
             newfile.write("\n")
 
     if "off" in particle:
-        DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]  # Take out /off0.Xdeg
-        RUNNING_DIR = os.path.join(
-            DL0_DATA_DIR.replace(
-                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
-            ),
-            PROD_ID,
-            offset,
+        # Take out /off0.Xdeg
+        RUNNING_DIR = (
+            Path(str(DL0_INPUT_DIR).replace("DL0", "running_analysis")).parent
+            / PROD_ID
+            / offset
         )
     else:
-        RUNNING_DIR = os.path.join(
-            DL0_DATA_DIR.replace(
-                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
-            ),
-            PROD_ID,
+        RUNNING_DIR = (
+            Path(str(DL0_INPUT_DIR).replace("DL0", "running_analysis")) / PROD_ID
         )
 
     JOB_LOGS = os.path.join(RUNNING_DIR, "job_logs")
-    DL1_DATA_DIR = os.path.join(RUNNING_DIR, "DL1")
+    DL1_OUTPUT_DIR = os.path.join(RUNNING_DIR, "DL1")
     # DIR_LISTS_BASE = os.path.join(RUNNING_DIR, 'file_lists')
     # ADD CLEAN QUESTION
 
     log.info("RUNNING_DIR: {}".format(RUNNING_DIR))
     log.info("JOB_LOGS DIR: {}".format(JOB_LOGS))
-    log.info("DL1 DATA DIR: {}".format(DL1_DATA_DIR))
+    log.info("DL1 DATA DIR: {}".format(DL1_OUTPUT_DIR))
 
-    for directory in [RUNNING_DIR, DL1_DATA_DIR, JOB_LOGS]:
+    for directory in [RUNNING_DIR, DL1_OUTPUT_DIR, JOB_LOGS]:
         check_and_make_dir_without_verification(directory)
 
     # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
 
-    jobid2log = {}
-    jobids_r0_dl1 = []
-
-    for set_type in "training", "testing":
-        log.debug("Generating list for {} step".format(set_type))
-        if set_type == "training":
-            list_type = training_list
-        else:
-            list_type = testing_list
-        dir_lists = os.path.join(RUNNING_DIR, "file_lists_" + set_type)
-        output_dir = os.path.join(RUNNING_DIR, "DL1")
-        output_dir = os.path.join(output_dir, set_type)
-
-        check_and_make_dir_without_verification(dir_lists)
-        check_and_make_dir_without_verification(output_dir)
-
-        log.info("output dir: {}".format(output_dir))
-
-        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(
-            len(list_type) % n_r0_per_dl1_job > 0
-        )
-        for i in range(number_of_sublists):
-            output_file = os.path.join(dir_lists, "{}_{}.list".format(set_type, i))
-            with open(output_file, "w+") as out:
-                for line in list_type[
-                    i * n_r0_per_dl1_job : n_r0_per_dl1_job * (i + 1)
-                ]:
-                    out.write(line)
-                    out.write("\n")
-        log.info(f"{number_of_sublists} files generated for {set_type} list")
-
-        save_job_ids = []
-
-        files = [f.resolve().as_posix() for f in Path(dir_lists).glob("*")]
-
-        if set_type == "training":
-            jobo = os.path.join(JOB_LOGS, "job_%A_%a_train.o")
-            jobe = os.path.join(JOB_LOGS, "job_%A_%a_train.e")
-        else:
-            jobo = os.path.join(JOB_LOGS, "job_%A_%a_test.o")
-            jobe = os.path.join(JOB_LOGS, "job_%A_%a_test.e")
-
-        if particle == "proton":
-            queue = "long"
-        else:
-            queue = "long"
-
-        slurm_options = f"--array=0-{len(files)-1}%{n_jobs_parallel} "
-        slurm_options += f"-p {queue} "
-        slurm_options += f"-e {jobe} "
-        slurm_options += f"-o {jobo} "
-        slurm_options += f"-J {job_name[particle]} "
-
-        # start 1 jobarray with all files included. The job selects its file based on its task id
-        cmd = f'sbatch --parsable {slurm_options} --wrap="{base_cmd} -f {" ".join(files)} --output_dir {output_dir}"'
-        log.debug(f"Slurm command to start the jobs: {cmd}")
-
-        jobid = os.popen(cmd).read().strip("\n")
-        log.debug(f"Submitted batch job {jobid}")
-        jobids_r0_dl1.append(jobid)
-
-        jobid2log[jobid] = {}
-        jobid2log[jobid]["particle"] = particle
-        jobid2log[jobid]["set_type"] = set_type
-        jobid2log[jobid]["jobe_path"] = jobe
-        jobid2log[jobid]["jobo_path"] = jobo
-        jobid2log[jobid]["sbatch_command"] = cmd
-
-        save_job_ids.append(jobid)
+    jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
+        base_cmd,
+        {"testing": testing_list, "training": training_list},
+        particle,
+        job_name[particle],
+        n_parallel_dl1_jobs,
+        DL1_OUTPUT_DIR,
+        RUNNING_DIR,
+        JOB_LOGS,
+    )
 
     # copy config into working dir
     if config_file is not None:
@@ -391,4 +349,236 @@ def r0_to_dl1(
     shutil.move("training.list", os.path.join(RUNNING_DIR, "training.list"))
 
     # return it log dictionary
+    return jobid2log, jobids_r0_dl1
+
+
+def reprocess_dl1(
+    input_dir,
+    config_file=None,
+    n_parallel_dl1_jobs=50,
+    particle=None,
+    prod_id=None,
+    source_environment=None,
+    offset=None,
+    workflow_kind="lstchain",
+    n_jobs_parallel=20,
+):
+    """
+    R0 to DL1 MC onsite conversion.
+    Organizes files and launches slurm jobs in two slurm arrays.
+
+
+    Parameters
+    ----------
+    input_dir : str
+        path to the files directory to analyse
+    config_file :str
+        Path to a configuration file. If none is given, the standard configuration of the selected pipeline is applied
+    n_r0_files_per_dl1_job : int
+        Number of r0 files processed by each reprocess_dl1 batched stage. 
+        TODO: Determine a useful number here. This will be much faster than r0 to dl1, so this could be much higher probably 
+    particle : str
+        particle type (gamma/gamma_off/proton/electron). Determines output directory structure, job naming
+        and n_r0_files_per_dl1_job if not set explicitly.
+    offset : str
+        gamma offset
+    prod_id :str
+        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
+    source_environment : str
+        path to a .bashrc file to source (can be configurable for custom runs @lstmcpipe_start script)
+        and command to activate a certain conda environment.
+        Passed to the core script of the selected pipeline and activated there.
+        Has no effect for hiperta currently
+        ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
+    workflow_kind: str
+        One of the supported pipelines. Defines the command to be run on r0 files
+    n_jobs_parallel: int
+        Number of jobs to be run at the same time per array.
+
+    Returns
+    -------
+    jobid2log : dict
+        A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
+        only the each jobid that the scripts has batched.
+
+            dict[jobid] = information
+
+        The second layer contains, organized by jobid,
+             - the kind of particle that corresponded to the jobid
+             - the command that was run to batch the job into the server
+             - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
+                 when the job was send to the cluster
+
+             dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
+    jobids_r0_dl1
+        A list of all the jobs sent by particle (including test and train set types).
+    """
+
+    log.info("Starting DL1 to DL1 processing for particle {}".format(particle))
+
+    PROD_ID = prod_id
+    DL1_INPUT_DIR = Path(input_dir)
+
+    if workflow_kind == "lstchain":
+        base_cmd = f"{source_environment} lstmcpipe_lst_core_dl1_dl1 -c {config_file} "
+        jobtype_id = "LST"
+    elif workflow_kind == "ctapipe":
+        base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
+        jobtype_id = "CTA"
+    else:
+        log.critical("Please, selected an allowed workflow kind.")
+        exit(-1)
+
+    job_name = {
+        "electron": f"e_{jobtype_id}_r0dl1",
+        "gamma": f"g_{jobtype_id}_r0dl1",
+        "gamma-diffuse": f"gd_{jobtype_id}_r0dl1",
+        "proton": f"p_{jobtype_id}_r0dl1",
+        "gamma_off0.0deg": f"g0.0_{jobtype_id}_r0dl1",
+        "gamma_off0.4deg": f"g0.4_{jobtype_id}_r0dl1",
+    }
+
+    log.info("Working on DL1 files in {}".format(DL1_INPUT_DIR))
+    training_input_path = DL1_INPUT_DIR / "training"
+    check_data_path(training_input_path)
+    training_list = get_input_filelist(training_input_path)
+    ntrain = len(training_list)
+    testing_input_path = DL1_INPUT_DIR / "testing"
+    check_data_path(testing_input_path)
+    testing_list = get_input_filelist(testing_input_path)
+    ntest = len(testing_list)
+
+    log.info("{} DL1 files in training dataset".format(ntrain))
+    log.info("{} DL1 files in test dataset".format(ntest))
+
+    with open("training.list", "w+") as newfile:
+        for f in training_list:
+            newfile.write(f)
+            newfile.write("\n")
+
+    with open("testing.list", "w+") as newfile:
+        for f in testing_list:
+            newfile.write(f)
+            newfile.write("\n")
+
+    if "off" in particle:
+        # Take out /off0.Xdeg
+        RUNNING_DIR = (
+            Path(str(DL1_INPUT_DIR).replace("DL1", "running_analysis")).parent.parent
+            / PROD_ID
+            / offset
+        )
+    else:
+        RUNNING_DIR = (
+            Path(str(DL1_INPUT_DIR).replace("DL1", "running_analysis")).parent / PROD_ID
+        )
+
+    JOB_LOGS = RUNNING_DIR / "job_logs"
+    DL1_OUTPUT_DIR = RUNNING_DIR / "DL1"
+    # DIR_LISTS_BASE = RUNNING_DIR / 'file_lists'
+    # ADD CLEAN QUESTION
+
+    log.info("RUNNING_DIR: {}".format(RUNNING_DIR))
+    log.info("JOB_LOGS DIR: {}".format(JOB_LOGS))
+    log.info("DL1 DATA DIR: {}".format(DL1_OUTPUT_DIR))
+
+    for directory in [RUNNING_DIR, DL1_OUTPUT_DIR, JOB_LOGS]:
+        check_and_make_dir_without_verification(directory)
+
+    # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
+    # copy config into working dir
+    if config_file is not None:
+        shutil.copyfile(
+            config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file))
+        )
+
+    # save file lists into logs
+    shutil.move("testing.list", os.path.join(RUNNING_DIR, "testing.list"))
+    shutil.move("training.list", os.path.join(RUNNING_DIR, "training.list"))
+
+    jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
+        base_cmd,
+        {"testing": testing_list, "training": training_list},
+        particle,
+        job_name[particle],
+        n_parallel_dl1_jobs,
+        DL1_OUTPUT_DIR,
+        RUNNING_DIR,
+        JOB_LOGS,
+    )
+
+    # return it log dictionary
+    return jobid2log, jobids_r0_dl1
+
+
+def submit_dl1_jobs(
+    base_cmd,
+    file_lists,
+    particle,
+    job_name,
+    n_parallel_dl1_jobs,
+    DL1_DATA_DIR,
+    RUNNING_DIR,
+    JOB_LOGS,
+):
+    jobid2log = {}
+    jobids_r0_dl1 = []
+
+    # types should be training and testing
+    for set_type, list_type in file_lists.items():
+        log.debug("Generating list for {} step".format(set_type))
+        dir_lists = os.path.join(RUNNING_DIR, "file_lists_" + set_type)
+        output_dir = os.path.join(RUNNING_DIR, "DL1")
+        output_dir = os.path.join(output_dir, set_type)
+
+        check_and_make_dir_without_verification(dir_lists)
+        check_and_make_dir_without_verification(output_dir)
+
+        log.info("output dir: {}".format(output_dir))
+
+        number_of_sublists = len(list_type) // n_parallel_dl1_jobs + int(
+            len(list_type) % n_parallel_dl1_jobs > 0
+        )
+        for i in range(number_of_sublists):
+            output_file = os.path.join(dir_lists, "{}_{}.list".format(set_type, i))
+            with open(output_file, "w+") as out:
+                for line in list_type[
+                    i * n_parallel_dl1_jobs : n_parallel_dl1_jobs * (i + 1)
+                ]:
+                    out.write(line)
+                    out.write("\n")
+        log.info(f"{number_of_sublists} files generated for {set_type} list")
+
+        files = [f.as_posix() for f in Path(dir_lists).glob("*")]
+
+        slurm_options = {}
+        slurm_options["output"] = os.path.join(
+            JOB_LOGS, f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o"
+        )
+        slurm_options["error"] = os.path.join(
+            JOB_LOGS, f"job_%A_%a_{'train' if set_type=='training' else 'test'}.e"
+        )
+        if particle == "proton":
+            slurm_options["partition"] = "long"
+        else:
+            slurm_options["partition"] = "long"
+        slurm_options["array"] = f"0-{len(files)-1}%{n_parallel_dl1_jobs}"
+        slurm_options["job-name"] = f"{job_name}"
+
+        # start 1 jobarray with all files included. The job selects its file based on its task id
+        cmd = f'{base_cmd} -f {" ".join(files)} --output_dir {output_dir}'
+        slurm_cmd = create_slurm_job(cmd, slurm_options)
+        log.debug(f"Slurm command to start the jobs: {slurm_cmd}")
+
+        jobid = os.popen(slurm_cmd).read().strip("\n")
+        log.debug(f"Submitted batch job {jobid}")
+        jobids_r0_dl1.append(jobid)
+
+        jobid2log[jobid] = {}
+        jobid2log[jobid]["particle"] = particle
+        jobid2log[jobid]["set_type"] = set_type
+        jobid2log[jobid]["jobe_path"] = slurm_options["error"]
+        jobid2log[jobid]["jobo_path"] = slurm_options["output"]
+        jobid2log[jobid]["sbatch_command"] = slurm_cmd
+
     return jobid2log, jobids_r0_dl1
