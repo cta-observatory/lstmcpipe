@@ -7,6 +7,7 @@ import tempfile
 import os
 import pytest
 from datetime import datetime
+import pytest
 
 yaml_keys = [
     "prod_id",
@@ -46,6 +47,10 @@ def test_config_valid():
     valid["prod_type"] = "prod5"
     valid["workflow_kind"] = "lstchain"
     valid["obs_date"] = "20200629_prod5_trans_80"
+    # we are still missing a base path
+    with pytest.raises(KeyError):
+        config_valid(valid)
+    valid["base_path_dl0"] = "/path/to/dl0"
     assert config_valid(valid)
 
     invalid_workflow = valid.copy()
@@ -69,6 +74,21 @@ def test_config_valid():
     with pytest.raises(Exception):
         config_valid(invalid_date_prod)
 
+    two_input_dirs = valid.copy()
+    two_input_dirs["base_path_dl1"] = "/path/to/dl1"
+    with pytest.raises(KeyError):
+        config_valid(two_input_dirs)
+
+    missing_reference = valid.copy()
+    missing_reference["base_path_dl1"] = "/path/to/dl1"
+    del missing_reference["base_path_dl0"]
+    with pytest.raises(KeyError):
+        config_valid(missing_reference)
+
+    dl1_input_valid = missing_reference.copy()
+    dl1_input_valid["dl1_reference_id"] = 1337
+    config_valid(dl1_input_valid)
+
 
 def test_parse_config_and_handle_global_vars():
     """
@@ -87,13 +107,13 @@ def test_parse_config_and_handle_global_vars():
     parsed_config = parse_config_and_handle_global_vars(config)
     date = datetime.today().strftime("%Y%m%d")
     assert (
-        parsed_config["DL1_data_dir"]
+        parsed_config["DL1_output_dir"]
         == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"
         + date
         + "_v0.7.3_prod5_trans_80_None"
     )
     assert (
-        parsed_config["model_dir"]
+        parsed_config["model_output_dir"]
         == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"
         + date
         + "_v0.7.3_prod5_trans_80_None"
