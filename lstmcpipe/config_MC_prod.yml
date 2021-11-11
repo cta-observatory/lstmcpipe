@@ -15,7 +15,7 @@
 workflow_kind: lstchain  # Not expected to be changed by the user
 #prod_id:                 # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
-base_path_dl0: /fefs/aswg/workspace/MC_data_simlink  # Default user path
+base_path: /fefs/aswg/workspace/MC_data_simlink  # Default user path
   # lstanalyzer user : /fefs/aswg/data/mc
 prod_type: prod5
   # Choose between {prod5, prod3}

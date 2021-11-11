@@ -47,10 +47,17 @@ def load_config(config_path):
     log.info(
         f'************ - Configuration for processing of {config["prod_type"]} using the {config["workflow_kind"]} pipeline:- ************'
     )
-    log.info(
-        "Simtel DL0 files are going to be searched at: "
-        f'{config["DL0_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
-    )
+    if config.get("DL0_input_dir"):
+        log.info(
+            "Simtel DL0 files are going to be searched at: "
+            f'{config["DL0_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+        )
+    elif config.get("DL1_input_dir"):
+        log.info(
+            "DL1 base files are going to be searched at: "
+            f'{config["DL1_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+        )
+
     particle_dirs = [
         "running_analysis_dir",
         "DL1_output_dir",
@@ -123,31 +130,13 @@ def config_valid(loaded_config):
     ):
         raise Exception("This prod_type and obs_date combination is not possible.")
 
-    base_path_dl0 = loaded_config.get("base_path_dl0")
-    base_path_dl1 = loaded_config.get("base_path_dl1")
-    dl1_reference_id = loaded_config.get("dl1_reference_id")
-    base_path_explanation = (
-        "Choose base_path_dl0 if you want to process the simtel files.\n"
-        "Choose base_path_dl1 if you want to reevaluate dl1 files."
-    )
-    if not base_path_dl0 and not base_path_dl1:
-        raise KeyError(
-            "One of base_path_dl0 or base_path_dl1 needs to be specified.\n"
-            + base_path_explanation
-        )
-    elif bool(base_path_dl0) and bool(base_path_dl1):
-        raise KeyError(
-            "You must only specify one of base_path_dl0 or base_path_dl1.\n"
-            " We can not resolve the source files if both are defined.\n"
-            + base_path_explanation
-        )
-    elif base_path_dl1:
-        if not dl1_reference_id:
+    stages_to_be_run = loaded_config["stages_to_be_run"]
+    if "dl1_to_dl1" in stages_to_be_run:
+        if not "dl1_reference_id" in loaded_config:
             raise KeyError(
-                "If you want to reprocess dl1 files, you must give "
-                "specify the input files by setting 'dl1_reference_id'"
+                "The key dl1_reference_id has to be set in order to locate "
+                "the input files for the dl1_to_dl1 stage"
             )
-
     log.debug("Configuration deemed valid")
     return True
 
@@ -176,9 +165,8 @@ def parse_config_and_handle_global_vars(loaded_config):
     prod_id = loaded_config.get("prod_id", "v00")
     stages_to_be_run = loaded_config["stages_to_be_run"]
     merging_options = loaded_config["merging_options"]["no_image"]
-    # dl0 for processing simtels, dl1 to reprocess older productions (dl1ab)
-    base_path_dl0 = loaded_config.get("base_path_dl0")
-    base_path_dl1 = loaded_config.get("base_path_dl1")
+    base_path = loaded_config.get("base_path")
+    # to locate the source dl1 files
     dl1_reference_id = loaded_config.get("dl1_reference_id")
 
     pointing = loaded_config["pointing"]
@@ -246,19 +234,15 @@ def parse_config_and_handle_global_vars(loaded_config):
         pointing_zenith = os.path.join(zenith, pointing)
         config["gamma_offs"] = offset_gammas
 
-    if base_path_dl0:
-        if workflow_kind == "lstchain" or workflow_kind == "ctapipe":
-            config["DL0_input_dir"] = create_path(
-                base_path_dl0, "DL0", obs_date, pointing_zenith
-            )
-        else:  # RTA
-            config["DL0_input_dir"] = create_path(
-                base_path_dl0, "R0", obs_date, pointing_zenith
-            )
-    elif base_path_dl1:
-        config["DL1_input_dir"] = create_path(
-            base_path_dl1, "DL1", obs_date, pointing_zenith, dl1_reference_id
+    if workflow_kind == "lstchain" or workflow_kind == "ctapipe":
+        config["DL0_input_dir"] = create_path(
+            base_path, "DL0", obs_date, pointing_zenith
         )
+    else:  # RTA
+        config["DL0_input_dir"] = create_path(
+            base_path, "R0", obs_date, pointing_zenith
+        )
+    config["dl1_reference_id"] = dl1_reference_id
 
     directories = {
         "running_analysis_dir": "running_analysis",
@@ -268,20 +252,15 @@ def parse_config_and_handle_global_vars(loaded_config):
     }
     for key, value in directories.items():
         config[key] = create_path(
-            base_path_dl0, value, obs_date, pointing_zenith, config["prod_id"]
+            base_path, value, obs_date, pointing_zenith, config["prod_id"]
         )
 
     config["IRF_output_dir"] = create_path(
-        base_path_dl0,
-        "IRF",
-        obs_date,
-        pointing_zenith,
-        config["prod_id"],
-        particles=False,
+        base_path, "IRF", obs_date, pointing_zenith, config["prod_id"], particles=False
     )
     # small difference if the user is the lstanalyzer
     config["model_output_dir"] = create_path(
-        "fefs/aswg/data" if base_path_dl0 == "/fefs/aswg/data/mc" else base_path_dl0,
+        "fefs/aswg/data" if base_path == "/fefs/aswg/data/mc" else base_path,
         "models",
         obs_date,
         pointing_zenith,
