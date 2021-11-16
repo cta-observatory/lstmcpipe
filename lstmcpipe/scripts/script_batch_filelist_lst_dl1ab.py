@@ -48,9 +48,7 @@ def main():
             file = file.strip("\n")
             # TODO: We need ways to set the pedestal cleaning!
             # or do we? is that not only for observed data?
-            output = join(
-                args.output_dir, basename(file.replace(".simtel.gz", ".dl1.h5"))
-            )
+            output = join(args.output_dir, basename(file))
             cmd = ["lstchain_dl1ab", f"--input-file={file}", f"--output-file={output}"]
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
