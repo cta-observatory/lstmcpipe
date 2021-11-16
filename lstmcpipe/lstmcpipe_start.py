@@ -177,7 +177,7 @@ def main():
         if dl1_to_dl1:
             stage_input_dir /= config["dl1_reference_id"]
         log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
-            input_dir=stage_input_dir,
+            input_dir=stage_input_dir.as_posix(),
             conf_file=dl1_config,
             prod_id=prod_id,
             particles_loop=all_particles,
