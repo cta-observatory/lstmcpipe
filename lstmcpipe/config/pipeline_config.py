@@ -234,14 +234,16 @@ def parse_config_and_handle_global_vars(loaded_config):
         pointing_zenith = os.path.join(zenith, pointing)
         config["gamma_offs"] = offset_gammas
 
+    if "r0_to_dl1" in stages_to_be_run:
+        source_datalevel = "DL0"
+    elif "dl1_to_dl1" in stages_to_be_run:
+        source_datalevel = "DL1"
     if workflow_kind == "lstchain" or workflow_kind == "ctapipe":
-        config["DL0_input_dir"] = create_path(
-            base_path, "DL0", obs_date, pointing_zenith
+        config["input_dir"] = create_path(
+            base_path, source_datalevel, obs_date, pointing_zenith
         )
     else:  # RTA
-        config["DL0_input_dir"] = create_path(
-            base_path, "R0", obs_date, pointing_zenith
-        )
+        config["input_dir"] = create_path(base_path, "R0", obs_date, pointing_zenith)
     config["dl1_reference_id"] = dl1_reference_id
 
     directories = {
