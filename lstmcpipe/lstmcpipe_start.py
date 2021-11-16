@@ -17,6 +17,7 @@
 
 import argparse
 from pathlib import Path
+import os
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import (
     batch_process_dl1,
@@ -136,10 +137,9 @@ def main():
     source_env = config["source_environment"]
     stages_to_run = config["stages_to_run"]
     all_particles = config["all_particles"]
-    dl0_input_dir = config.get("DL0_input_dir")
-    dl1_input_dir = config.get("DL1_input_dir")
-    dl1_output_dir = config.get("DL1_output_dir")
-    dl2_output_dir = config.get("DL2_output_dir")
+    input_dir = config["input_dir"]
+    dl1_output_dir = config["DL1_output_dir"]
+    dl2_output_dir = config["DL2_output_dir"]
     running_analysis_dir = config["running_analysis_dir"]
     gamma_offs = config.get("gamma_offs")
     no_image_merging = config.get("merging_no_image")
@@ -173,10 +173,11 @@ def main():
             dl1_config = Path(args.config_file_rta)
         else:  # if this wasnt ctapipe, the config parsing would have failed
             dl1_config = Path(args.config_file_ctapipe)
+        stage_input_dir = Path(input_dir)
+        if dl1_to_dl1:
+            stage_input_dir /= config["dl1_reference_id"]
         log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
-            input_dir=dl0_input_dir
-            if r0_to_dl1
-            else dl1_input_dir + "/" + config["dl1_reference_id"],
+            input_dir=stage_input_dir,
             conf_file=dl1_config,
             prod_id=prod_id,
             particles_loop=all_particles,
