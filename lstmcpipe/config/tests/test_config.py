@@ -7,7 +7,6 @@ import tempfile
 import os
 import pytest
 from datetime import datetime
-import pytest
 
 yaml_keys = [
     "prod_id",

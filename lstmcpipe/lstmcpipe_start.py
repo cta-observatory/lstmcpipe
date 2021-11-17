@@ -17,7 +17,6 @@
 
 import argparse
 from pathlib import Path
-import os
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import (
     batch_process_dl1,
