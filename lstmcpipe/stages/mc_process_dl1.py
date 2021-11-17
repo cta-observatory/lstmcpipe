@@ -33,7 +33,7 @@ def batch_process_dl1(
     new_production=True,
 ):
     """
-    Batch the r0_to_dl1 jobs by particle type.
+    Batch the dl1 processing jobs by particle type.
 
     Parameters
     ----------
@@ -65,9 +65,9 @@ def batch_process_dl1(
     """
     full_log = {"log_all_job_ids": {}}
     debug_log = {}
-    all_jobids_from_r0_dl1_stage = []
+    all_jobids_from_dl1_processing_stage = []
 
-    log.info("==== START {} r0 to dl1 processing ====".format(workflow_kind))
+    log.info("==== START {} dl1 processing ====".format(workflow_kind))
     time.sleep(1)
 
     for particle in particles_loop:
@@ -97,12 +97,12 @@ def batch_process_dl1(
                     )
                 full_log["log_all_job_ids"].update(job_logs)
                 full_log[_particle] = ",".join(jobids_by_particle)
-                all_jobids_from_r0_dl1_stage.append(
+                all_jobids_from_dl1_processing_stage.append(
                     full_log[_particle]
                 )  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
-                    debug_log[jid] = f"{_particle} job from r0_to_dl1"
+                    debug_log[jid] = f"{_particle} job from process_dl1"
         else:
             particle_input_dir = input_dir.format(particle)
             _particle = particle
@@ -128,19 +128,19 @@ def batch_process_dl1(
                 )
             full_log["log_all_job_ids"].update(job_logs)
             full_log[_particle] = ",".join(jobids_by_particle)
-            all_jobids_from_r0_dl1_stage.append(
+            all_jobids_from_dl1_processing_stage.append(
                 full_log[_particle]
             )  # Create a list with particles elements
 
             for jid in jobids_by_particle:
                 debug_log[jid] = f"{_particle} job from r0_to_dl1"
-    all_jobids_from_r0_dl1_stage = ",".join(
-        all_jobids_from_r0_dl1_stage
+    all_jobids_from_dl1_processing_stage = ",".join(
+        all_jobids_from_dl1_processing_stage
     )  # Create a string to be directly passed
 
-    log.info("==== END {} r0 to dl1 processing ====".format(workflow_kind))
+    log.info("==== END {} dl1 processing ====".format(workflow_kind))
 
-    return full_log, debug_log, all_jobids_from_r0_dl1_stage  # ids_by_particle_ok
+    return full_log, debug_log, all_jobids_from_dl1_processing_stage
 
 
 def r0_to_dl1(
@@ -364,9 +364,10 @@ def reprocess_dl1(
     n_jobs_parallel=20,
 ):
     """
-    R0 to DL1 MC onsite conversion.
+    Reprocessing of existing dl1 files.
     Organizes files and launches slurm jobs in two slurm arrays.
-
+    The same train/test split performed with the earlier r0 to dl1
+    processing is used.
 
     Parameters
     ----------
@@ -374,9 +375,6 @@ def reprocess_dl1(
         path to the files directory to analyse
     config_file :str
         Path to a configuration file. If none is given, the standard configuration of the selected pipeline is applied
-    n_r0_files_per_dl1_job : int
-        Number of r0 files processed by each reprocess_dl1 batched stage. 
-        TODO: Determine a useful number here. This will be much faster than r0 to dl1, so this could be much higher probably 
     particle : str
         particle type (gamma/gamma_off/proton/electron). Determines output directory structure, job naming
         and n_r0_files_per_dl1_job if not set explicitly.
@@ -410,7 +408,7 @@ def reprocess_dl1(
                  when the job was send to the cluster
 
              dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
-    jobids_r0_dl1
+    jobids_dl1_dl1
         A list of all the jobs sent by particle (including test and train set types).
     """
 
@@ -430,12 +428,12 @@ def reprocess_dl1(
         exit(-1)
 
     job_name = {
-        "electron": f"e_{jobtype_id}_r0dl1",
-        "gamma": f"g_{jobtype_id}_r0dl1",
-        "gamma-diffuse": f"gd_{jobtype_id}_r0dl1",
-        "proton": f"p_{jobtype_id}_r0dl1",
-        "gamma_off0.0deg": f"g0.0_{jobtype_id}_r0dl1",
-        "gamma_off0.4deg": f"g0.4_{jobtype_id}_r0dl1",
+        "electron": f"e_{jobtype_id}_dl1dl1",
+        "gamma": f"g_{jobtype_id}_dl1dl1",
+        "gamma-diffuse": f"gd_{jobtype_id}_dl1dl1",
+        "proton": f"p_{jobtype_id}_dl1dl1",
+        "gamma_off0.0deg": f"g0.0_{jobtype_id}_dl1dl1",
+        "gamma_off0.4deg": f"g0.4_{jobtype_id}_dl1dl1",
     }
 
     log.info("Working on DL1 files in {}".format(DL1_INPUT_DIR))
@@ -475,8 +473,6 @@ def reprocess_dl1(
 
     JOB_LOGS = RUNNING_DIR / "job_logs"
     DL1_OUTPUT_DIR = RUNNING_DIR / "DL1"
-    # DIR_LISTS_BASE = RUNNING_DIR / 'file_lists'
-    # ADD CLEAN QUESTION
 
     log.info("RUNNING_DIR: {}".format(RUNNING_DIR))
     log.info("JOB_LOGS DIR: {}".format(JOB_LOGS))
@@ -496,7 +492,7 @@ def reprocess_dl1(
     shutil.move("testing.list", os.path.join(RUNNING_DIR, "testing.list"))
     shutil.move("training.list", os.path.join(RUNNING_DIR, "training.list"))
 
-    jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
+    jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(
         base_cmd,
         {"testing": testing_list, "training": training_list},
         particle,
@@ -508,7 +504,7 @@ def reprocess_dl1(
     )
 
     # return it log dictionary
-    return jobid2log, jobids_r0_dl1
+    return jobid2log, jobids_dl1_dl1
 
 
 def submit_dl1_jobs(
@@ -522,7 +518,7 @@ def submit_dl1_jobs(
     JOB_LOGS,
 ):
     jobid2log = {}
-    jobids_r0_dl1 = []
+    jobids_dl1 = []
 
     # types should be training and testing
     for set_type, list_type in file_lists.items():
@@ -572,7 +568,7 @@ def submit_dl1_jobs(
 
         jobid = os.popen(slurm_cmd).read().strip("\n")
         log.debug(f"Submitted batch job {jobid}")
-        jobids_r0_dl1.append(jobid)
+        jobids_dl1.append(jobid)
 
         jobid2log[jobid] = {}
         jobid2log[jobid]["particle"] = particle
@@ -581,4 +577,4 @@ def submit_dl1_jobs(
         jobid2log[jobid]["jobo_path"] = slurm_options["output"]
         jobid2log[jobid]["sbatch_command"] = slurm_cmd
 
-    return jobid2log, jobids_r0_dl1
+    return jobid2log, jobids_dl1

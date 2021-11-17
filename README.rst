@@ -102,6 +102,18 @@ processing tool. These are:
 
 Results can be found in ``running_analysis``
 
+**dl1_to_dl1**
+
+As an alternative to the processing of simtel r0 files, existing dl1 files can be reprocessed.
+This can be useful to apply different cleanings or alter the images by adding noise etc.
+For this to work the old files have to contain images, i.e. they need to ahve been processed
+using the ``no_image: False`` flag in the config.
+The config key ``dl1_reference_id`` is used to determine the input files.
+Its value needs to be the full prod_id including software versions (i.e. the name of the
+directories directly above the dl1 files).
+For lstchain the dl1ab script is used, ctapipe can use the same script as for simtel
+processing. There is no support for hiperta!
+
 
 **merge_and_copy_dl1**
 

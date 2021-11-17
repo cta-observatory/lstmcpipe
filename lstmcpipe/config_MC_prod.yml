@@ -17,6 +17,9 @@ workflow_kind: lstchain  # Not expected to be changed by the user
 
 base_path: /fefs/aswg/workspace/MC_data_simlink  # Default user path
   # lstanalyzer user : /fefs/aswg/data/mc
+  #
+# Only for dl1 reprocessing
+#dl1_reference_id: #old id including versions (full directory name)
 prod_type: prod5
   # Choose between {prod5, prod3}
 obs_date: 20200629_prod5_trans_80
