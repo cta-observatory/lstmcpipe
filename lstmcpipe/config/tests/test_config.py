@@ -90,7 +90,7 @@ def test_parse_config_and_handle_global_vars():
     config["pointing"] = "90"
     config["zenith"] = "45"
     config["base_path"] = "/dummy/path/to/files"
-    config["stages_to_be_run"] = []
+    config["stages_to_be_run"] = ["r0_to_dl1"]
 
     parsed_config = parse_config_and_handle_global_vars(config)
     date = datetime.today().strftime("%Y%m%d")
@@ -109,5 +109,5 @@ def test_parse_config_and_handle_global_vars():
     assert (
         parsed_config["source_environment"] == "source src_file; conda activate env; "
     )
-    assert not parsed_config["stages_to_run"]
+    assert parsed_config["stages_to_run"] == ["r0_to_dl1"]
     assert parsed_config["workflow_kind"] == "lstchain"
