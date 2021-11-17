@@ -178,7 +178,6 @@ def dl1_to_dl2(
 
     # path to dl1 files by particle type
     file_list = [
-        dictionary_with_dl1_paths[particle]["training"]["train_path_and_outname_dl1"],
         dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"],
     ]
 
@@ -216,9 +215,7 @@ def dl1_to_dl2(
         # if dry_run:
         #     print(cmd)
 
-        if "training" in file:
-            ftype = "train"
-        elif "testing" in file:
+        if "testing" in file:
             ftype = "test"
         else:
             ftype = "-"
