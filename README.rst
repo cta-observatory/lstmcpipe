@@ -62,7 +62,7 @@ the same; you should run the same command/launch the same script in any case;
 
 .. code-block:: python
 
-    python lstmcpipe_start -c config_MC_prod.yml -conf_lst lstchain_*.json
+    lstmcpipe -c config_MC_prod.yml -conf_lst lstchain_*.json [-conf_cta CONFIG_FILE_CTA] [-conf_rta CONFIG_FILE_RTA] [--debug] [--log-file LOG_FILE]
 
 The ``lstmcpipe_start.py`` script is the **orchestrator** of the pipeline, it schedules the stages specified in the
 ``onsite_MC_prod.yml`` file. All the configuration related with the MC pipe must be declared in this file (stages,
