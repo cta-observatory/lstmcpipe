@@ -58,6 +58,7 @@ setup(
         "ctaplot",
         "pyirf",
         "matplotlib",
+        "pytest"
     ],
     packages=find_packages(),
     # tests_require=['pytest'],
