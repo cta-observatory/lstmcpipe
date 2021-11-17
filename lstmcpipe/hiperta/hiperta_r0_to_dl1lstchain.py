@@ -11,108 +11,80 @@ from lstmcpipe.hiperta.reorganize_dl1hiperta300_to_dl1lstchain060 import (
 )
 
 
-parser = argparse.ArgumentParser(
-    description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_v300_to_dl1lstchain_v060"
-)
+def main():
+    """Run hiperta_r0_dl1 and reorganize_dl1hipertaV300_to_dl1lstchain060"""
+    parser = argparse.ArgumentParser(
+        description="Run hiperta_r0_dl1 and reorganize_dl1hiperta_v300_to_dl1lstchain_v060"
+    )
 
-parser.add_argument(
-    "--infile",
-    "-i",
-    type=str,
-    dest="infile",
-    help="mc r0 file to be run with hiperta_r0_dl1",
-)
+    parser.add_argument(
+        "--infile",
+        "-i",
+        type=str,
+        dest="infile",
+        help="mc r0 file to be run with hiperta_r0_dl1",
+        required=True
+    )
 
-parser.add_argument(
-    "--outdir",
-    "-o",
-    type=str,
-    dest="outdir",
-    help="Path where to store the dl1 files.",
-    default="./dl1_data/",
-)
+    parser.add_argument(
+        "--outdir",
+        "-o",
+        type=str,
+        dest="outdir",
+        help="Path where to store the dl1 files.",
+        default="./dl1_data/",
+    )
 
-parser.add_argument(
-    "--config",
-    "-c",
-    type=str,
-    dest="config",
-    help="Configuration file for hiperta_r1_dl1",
-    default="./default_PConfigCut.txt",
-)
-
-parser.add_argument(
-    "--keep_file",
-    "-k",
-    type=lambda x: bool(strtobool(x)),
-    dest="keep_file",
-    help="Keep output of hiperta. Set by default to False",
-    default=False,
-)
-
-parser.add_argument(
-    "--debug_mode",
-    "-d",
-    type=lambda x: bool(strtobool(x)),
-    dest="debug_mode",
-    help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
-    default=False,
-)
-
-
-def main(
-    infile,
-    outdir="./dl1_data/",
-    config="./hiperta_configuration.yml",
-    keep_file=False,
-    debug_mode=False,
-):
-    """
-    Run hiperta_r0_dl1 and reorganize_dl1hipertaV300_to_dl1lstchain060
-
-    Parameters
-    ----------
-    infile: str
-        Path to the file to analyse
-    outdir: str
-        Path to the OUTPUT DIRECTORY to store the outfile. Default = './dl1_data/'
-    config: str
-        path to a configuration file. If none, the default './hiperta_configuration.yml' config is applied.
+    parser.add_argument(
+        "--config",
+        "-c",
+        type=str,
+        dest="config",
+        help="Configuration file for hiperta_r1_dl1",
+        default="./default_PConfigCut.txt",
         # TODO : set a way of creating the small config file that it is needed
-    keep_file: bool
-        Boolean flag to indicate if the output of the hiperta_r1_to_dl1 code should be kept or not. The
-        dl1_reorganized_*.h5 will be always created.
-    debug_mode : bool
-        Activate debug mode in HiPeRTA (add cleaned mask in the output hdf5). Set by default to False
+    )
 
-    Returns
-    -------
-    none
-        It creates the dl1_reorganized_rta_INFILE_NAME.h5 file. If keep_file is set to True, it will also keep the
-        output of hiperta_r0_to_dl1
+    parser.add_argument(
+        "--keep_file",
+        "-k",
+        type=lambda x: bool(strtobool(x)),
+        dest="keep_file",
+        help="Keep output of hiperta. Set by default to False",
+        default=False,
+    )
 
-    """
-    os.makedirs(outdir, exist_ok=True)
+    parser.add_argument(
+        "--debug_mode",
+        "-d",
+        type=lambda x: bool(strtobool(x)),
+        dest="debug_mode",
+        help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
+        default=False,
+    )
+    args = parser.parse_args()
 
-    cmd_hiperta = f"hiperta_r0_dl1 -i {infile} -c {config} -o {outdir} --selectedtel 1"  # TODO. Harcoded. Change when various tels available
-    if debug_mode:  # in HiPeRTA
+    os.makedirs(args.outdir, exist_ok=True)
+
+    # TODO. Hardcoded. Change `--selectedtel 1` when various tels available
+    cmd_hiperta = f"hiperta_r0_dl1 -i {args.infile} -c {args.config} -o {args.outdir} --selectedtel 1"
+    if args.debug_mode:  # in HiPeRTA
         cmd_hiperta += " -g"
     os.system(cmd_hiperta)
 
     # We know in advance the name of the output
-    output_hiperta_filename = os.path.join(outdir, "dl1_" + os.path.basename(infile))
+    output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
     output_reorganized_filename = os.path.join(
-        outdir, "dl1v06_reorganized_" + os.path.basename(infile)
+        args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile)
     )
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
-    if not keep_file:
+    if not args.keep_file:
         os.remove(output_hiperta_filename)
 
     print("\nDone.")
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    main(args.infile, args.outdir, args.config, args.keep_file, args.debug_mode)
+    main()
