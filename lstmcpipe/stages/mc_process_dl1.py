@@ -113,7 +113,6 @@ def batch_process_dl1(
                     particle=_particle,
                     prod_id=prod_id,
                     source_environment=source_env,
-                    offset=off,
                     workflow_kind=workflow_kind,
                 )
             else:
@@ -123,7 +122,6 @@ def batch_process_dl1(
                     particle=_particle,
                     prod_id=prod_id,
                     source_environment=source_env,
-                    offset=off,
                     workflow_kind=workflow_kind,
                 )
             full_log["log_all_job_ids"].update(job_logs)
