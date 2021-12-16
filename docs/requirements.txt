@@ -3,4 +3,3 @@ sphinx-autopackagesummary
 sphinx-automodapi
 sphinx-argparse
 sphinxcontrib-napoleon
-m2r2

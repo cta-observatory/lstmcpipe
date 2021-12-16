@@ -50,7 +50,6 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinxarg.ext",
     "sphinx.ext.napoleon",
-    "m2r2",
 ]
 
 autosummary_generate = True
