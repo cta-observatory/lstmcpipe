@@ -16,14 +16,27 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 
 
+
 # -- Project information -----------------------------------------------------
 
-project = 'lstmcpipe'
-copyright = '2021, Thomas Vuillaume, Enrique Garcia, Luka Nickel'
-author = 'Thomas Vuillaume, Enrique Garcia, Luka Nickel'
+import json
+import datetime
+with open(os.path.join(os.path.dirname(__file__), "..", "codemeta.json")) as file:
+    metadata = json.load(file)
+
+# General information about the project.
+project = metadata["name"]
+author = ""
+for aut in metadata["author"]:
+    author += f"{aut['givenName']} {aut['familyName']},"
+
+copyright = "{}.  Last updated {}".format(
+   author, datetime.datetime.now().strftime("%d %b %Y %H:%M")
+)
 
 # The full version, including alpha/beta/rc tags
-release = '0.4.1'
+release = metadata['version']
+
 
 
 # -- General configuration ---------------------------------------------------
