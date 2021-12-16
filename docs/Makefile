@@ -18,5 +18,6 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	pip install ..
+	pip install -U -r requirements.txt
 	sphinx-apidoc -o api ../lstmcpipe
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
