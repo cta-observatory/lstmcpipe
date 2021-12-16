@@ -11,9 +11,9 @@ jobs:
       with:
         docs-folder: "docs/"
     - uses: actions/upload-artifact@v1
-        with:
-          name: DocumentationHTML
-          path: docs/_build/html/
+      with:
+        name: DocumentationHTML
+        path: docs/_build/html/
     - name: Commit documentation changes
       run: |
         git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
