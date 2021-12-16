@@ -1,9 +1,10 @@
 lstMCpipe
 =========
 
-|CI| |coverage|
+|code| |documentation| |CI| |coverage|
 
-
+.. |code| image:: https://img.shields.io/badge/lstmcpipe-code-green
+  :target: https://github.com/cta-observatory/lstmcpipe/
 .. |CI| image:: https://github.com/cta-observatory/lstmcpipe/workflows/CI/badge.svg?branch=master
   :target: https://github.com/cta-observatory/lstmcpipe/actions?query=workflow%3ACI
 .. |coverage| image:: https://codecov.io/gh/cta-observatory/lstmcpipe/branch/master/graph/badge.svg
