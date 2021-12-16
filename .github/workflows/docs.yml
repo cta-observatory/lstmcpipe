@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: |
+        . $CONDA/etc/profile.d/conda.sh
+        conda config --set always_yes yes --set changeps1 no
+        conda env update -n base -f environment.yml
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
@@ -14,10 +18,6 @@ jobs:
       with:
         name: DocumentationHTML
         path: docs/_build/html/
-    - run: |
-        . $CONDA/etc/profile.d/conda.sh
-        conda config --set always_yes yes --set changeps1 no
-        conda env update -n base -f environment.yml
     - name: Deploy to gihub pages
       # only run on push to master
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
