@@ -1,0 +1,5 @@
+sphinx
+sphinx-autopackagesummary
+sphinx-automodapi
+sphinx-argparse
+sphinxcontrib-napoleon

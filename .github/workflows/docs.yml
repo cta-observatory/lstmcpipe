@@ -1,0 +1,26 @@
+name: "Pull Request Docs Check"
+on:
+- pull_request
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "docs/"
+    - uses: actions/upload-artifact@v1
+      with:
+        name: DocumentationHTML
+        path: docs/_build/html/
+    - name: Deploy to gihub pages
+      # only run on push to master
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs/_build/html
+        CLEAN: true
+        SINGLE_COMMIT: true

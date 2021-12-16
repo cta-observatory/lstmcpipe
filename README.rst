@@ -1,10 +1,16 @@
-lstMCpipe |CI| |coverage|
-=========================
+lstMCpipe
+=========
 
+|code| |documentation| |CI| |coverage|
+
+.. |code| image:: https://img.shields.io/badge/lstmcpipe-code-green
+  :target: https://github.com/cta-observatory/lstmcpipe/
 .. |CI| image:: https://github.com/cta-observatory/lstmcpipe/workflows/CI/badge.svg?branch=master
   :target: https://github.com/cta-observatory/lstmcpipe/actions?query=workflow%3ACI
 .. |coverage| image:: https://codecov.io/gh/cta-observatory/lstmcpipe/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/cta-observatory/lstmcpipe
+.. |documentation| image:: https://img.shields.io/badge/lstmcpipe-documentation-orange
+  :target: https://cta-observatory.github.io/lstmcpipe/
 
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 With this package, the analysis/creation of R1/DL0/DL1/DL2/IRFs can be orchestrated.
