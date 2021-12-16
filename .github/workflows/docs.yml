@@ -15,10 +15,10 @@ jobs:
         name: DocumentationHTML
         path: docs/_build/html/
     - name: Deploy to gihub pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: docs/_build/html
-          CLEAN: true
-          SINGLE_COMMIT: true
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs/_build/html
+        CLEAN: true
+        SINGLE_COMMIT: true
