@@ -1,5 +1,8 @@
-lstMCpipe |CI| |coverage|
-=========================
+lstMCpipe
+=========
+
+|CI| |coverage|
+
 
 .. |CI| image:: https://github.com/cta-observatory/lstmcpipe/workflows/CI/badge.svg?branch=master
   :target: https://github.com/cta-observatory/lstmcpipe/actions?query=workflow%3ACI
