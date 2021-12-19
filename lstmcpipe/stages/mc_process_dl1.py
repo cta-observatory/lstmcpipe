@@ -270,7 +270,7 @@ def r0_to_dl1(
             elif "gamma-diffuse" in input_dir or "electron" in input_dir:
                 n_parallel_dl1_jobs = 50
             elif "proton" in input_dir:
-                n_parallel_dl1_jobs = 125
+                n_parallel_dl1_jobs = 100
             else:
                 n_parallel_dl1_jobs = 50
 
@@ -553,9 +553,9 @@ def submit_dl1_jobs(
             JOB_LOGS, f"job_%A_%a_{'train' if set_type=='training' else 'test'}.e"
         )
         if particle == "proton":
-            slurm_options["partition"] = "long"
+            slurm_options["partition"] = "short"
         else:
-            slurm_options["partition"] = "long"
+            slurm_options["partition"] = "short"
         slurm_options["array"] = f"0-{len(files)-1}%{n_parallel_dl1_jobs}"
         slurm_options["job-name"] = f"{job_name}"
 
