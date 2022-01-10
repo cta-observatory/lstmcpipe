@@ -10,9 +10,7 @@ dependencies:
   - pre-commit
   - ctapipe~=0.10.5
   - pip:
-#      - pytest_runner
-#      - pytest-ordering
-#      - ctaplot
+      - ctaplot>=0.5
       - ctapipe_io_lst~=0.9.2
       - lstchain==0.7.3
       - pyirf~=0.4.0
