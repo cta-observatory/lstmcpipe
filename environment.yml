@@ -9,7 +9,6 @@ dependencies:
   - pip
   - pre-commit
   - ctapipe~=0.10.5
-  - gammapy
   - pip:
       - ctaplot>=0.5
       - ctapipe_io_lst~=0.9.2
