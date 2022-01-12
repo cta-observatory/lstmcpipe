@@ -104,7 +104,7 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
 
     base_cmd = f"lstmcpipe_plot_models_importance {dir_models} -cf {config_file}"
     cmd = (
-        f"sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance "
+        f"sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance --mem 32G"
         f' --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
     )
     jobid = os.popen(cmd).read().strip("\n")
