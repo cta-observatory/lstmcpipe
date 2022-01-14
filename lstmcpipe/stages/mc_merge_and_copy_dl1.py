@@ -328,20 +328,16 @@ def merge_dl1(
         if wait_r0_dl1_jobs != "":
             cmd += " --dependency=afterok:" + wait_r0_dl1_jobs
 
-        if workflow_kind == "lstchain" or workflow_kind == "hiperta":
-            cmd += (
-                f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
-                f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
-                f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}"'
-            )
-        # HiPeRTA workflow still uses --smart flag
+        cmd += (
+            f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
+            f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
+            f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}'
+        )
+
+        if workflow_kind == "lstchain":
+            cmd += '"'  # Close " of wrap
         elif workflow_kind == "hiperta":
-            cmd += (
-                f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
-                f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
-                f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} '
-                f'--smart {flag_merge}"'
-            )
+            cmd += f'--smart {flag_merge}"'  # HiPeRTA workflow still uses --smart flag
         else:
             cmd += (
                 f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
