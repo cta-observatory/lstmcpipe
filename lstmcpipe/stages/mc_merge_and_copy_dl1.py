@@ -332,7 +332,15 @@ def merge_dl1(
             cmd += (
                 f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
                 f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
-                f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} "
+                f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}"'
+            )
+        # HiPeRTA workflow still uses --smart flag
+        elif workflow_kind == "hiperta":
+            cmd += (
+                f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
+                f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
+                f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} '
+                f'--smart {flag_merge}"'
             )
         else:
             cmd += (
@@ -343,10 +351,6 @@ def merge_dl1(
                 cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images"'
             else:
                 cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename}"'
-
-        # HiPeRTA workflow still uses --smart flag
-        if workflow_kind == "hiperta":
-            cmd += f'--smart {flag_merge}"'
 
         jobid_merge = os.popen(cmd).read().strip("\n")
         log_merge[particle][set_type][jobid_merge] = cmd
