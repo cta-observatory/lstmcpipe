@@ -6,9 +6,6 @@ import ctaplot
 import matplotlib.pyplot as plt
 from lstmcpipe.plots.plot_irfs import plot_summary_from_file
 
-parser = argparse.ArgumentParser(description="Produce IRFs comparative plots")
-
-
 def plot_comparison(filelist, outfile, cta_north=False):
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
@@ -33,6 +30,8 @@ def plot_comparison(filelist, outfile, cta_north=False):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Produce IRFs comparative plots")
+
     # Required arguments
     parser.add_argument('--filelist', '-f',
                         type=str,
@@ -47,9 +46,11 @@ def main():
                         default='compare_irfs.png',
                         )
 
+    # optional
     parser.add_argument('--add-cta-north',
                         action='store_true',
                         dest='cta_north',
+                        help='add CTA north performances curves'
                         )
 
     args = parser.parse_args()
