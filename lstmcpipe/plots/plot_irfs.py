@@ -2,7 +2,7 @@
 
 # T. Vuillaume & E. Garcia - 2021
 
-import os
+from pathlib import Path
 import argparse
 from astropy.table import QTable
 import matplotlib.pyplot as plt
@@ -410,14 +410,14 @@ def main():
         "--filename", "-f", type=str, dest="filename", help="Input filename"
     )
     parser.add_argument(
-        "--outfile", "-o", type=str, dest="outfile", help="Output filename"
+        "--outfile", "-o", type=Path, dest="outfile", help="Output filename"
     )
 
     args = parser.parse_args()
 
     plot_summary_from_file(args.filename)
 
-    os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
+    args.outfile.parent.mkdir(exist_ok=True)
     plt.savefig(args.outfile)
 
 
