@@ -85,6 +85,24 @@ parser.add_argument(
     default="sensitivity.fits.gz",
 )
 
+parser.add_argument(
+    "--source_alt",
+    action="store",
+    type=float,
+    dest="source_alt",
+    help="Source altitude (optional). If not provided, it will be guessed from the gammas true altitude",
+    default=None
+)
+
+parser.add_argument(
+    "--source_az",
+    action="store",
+    type=float,
+    dest="source_az",
+    help="Source azimuth (optional). If not provided, it will be guessed from the gammas true altitude",
+    default=None
+)
+
 # Optional arguments
 # parser.add_argument('--config', '-c', action='store', type=Path,
 #                     dest='config_file',
@@ -118,9 +136,10 @@ MAX_ENERGY = 20.05 * u.TeV
 
 N_BIN_PER_DECADE = 5
 
-# source position
-source_alt = 70 * u.deg
-source_az = 180 * u.deg
+filters = {
+    'intensity': [20, np.inf],
+    # 'leakage_intensity_width_2': [0, 0.2],
+}
 
 
 particles = {
@@ -133,10 +152,23 @@ particles = {
 }
 
 
-# filters = {
-#     'intensity': [50, np.inf],
-#     'leakage_intensity_width_2': [0, 0.2],
-# }
+
+def determine_source_position(gamma_events, args):
+    if args.source_alt is None and len(set(gamma_events['true_alt'].value)) == 1:
+        source_alt = gamma_events['true_alt'][0]
+    elif args.source_alt is None:
+        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
+    else:
+        source_alt = args.source_alt
+
+    if args.source_az is None and len(set(gamma_events['true_az'].value)) == 1:
+        source_az = gamma_events['true_az'][0]
+    elif args.source_az is None:
+        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
+    else:
+        source_az = args.source_az
+
+    return source_alt, source_az
 
 
 def main():
@@ -159,20 +191,20 @@ def main():
             k = f"{prefix}_source_fov_offset"
             p["events"][k] = calculate_source_fov_offset(p["events"], prefix=prefix)
 
-        # calculate theta / distance between reco and assuemd source positoin
-        # we handle only ON observations here, so the assumed source pos
-        # is the pointing position
-        p["events"]["theta"] = calculate_theta(
-            p["events"], assumed_source_az=source_az, assumed_source_alt=source_alt
-        )
-        log.info(p["simulation_info"])
-        log.info("")
-
     gammas = particles["gamma"]["events"]
     # background table composed of both electrons and protons
     background = table.vstack(
         [particles["proton"]["events"], particles["electron"]["events"]]
     )
+
+    source_alt, source_az = determine_source_position(gammas, args)
+    for particle_type, p in particles.items():
+        # calculate theta / distance between reco and assumed source position
+        # we handle only ON observations here, so the assumed source pos is the pointing position
+        p["events"]["theta"] = calculate_theta(p["events"], assumed_source_az=source_az, assumed_source_alt=source_alt)
+        log.info(p["simulation_info"])
+        log.info("")
+
 
     INITIAL_GH_CUT = np.quantile(gammas["gh_score"], (1 - INITIAL_GH_CUT_EFFICENCY))
     log.info("Using fixed G/H cut of {} to calculate theta cuts".format(INITIAL_GH_CUT))
@@ -183,7 +215,7 @@ def main():
         create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
     )
 
-    # theta cut is 68 percent containmente of the gammas
+    # theta cut is 68 percent containment of the gammas
     # for now with a fixed global, unoptimized score cut
     mask_theta_cuts = gammas["gh_score"] >= INITIAL_GH_CUT
     theta_cuts = calculate_percentile_cut(
@@ -196,7 +228,7 @@ def main():
         percentile=68,
     )
 
-    # same number of bins per decade than EventDisplay
+    # same number of bins per decade than official CTA IRFs
     sensitivity_bins = add_overflow_bins(
         create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, bins_per_decade=N_BIN_PER_DECADE)
     )
