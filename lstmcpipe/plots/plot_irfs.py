@@ -2,7 +2,7 @@
 
 # T. Vuillaume & E. Garcia - 2021
 
-import os
+from pathlib import Path
 import argparse
 from astropy.table import QTable
 import matplotlib.pyplot as plt
@@ -417,7 +417,7 @@ def main():
 
     plot_summary_from_file(args.filename)
 
-    os.makedirs(os.path.dirname(args.outfile), exist_ok=True)
+    Path(args.outfile).parent.mkdir(exist_ok=True)
     plt.savefig(args.outfile)
 
 
