@@ -143,9 +143,9 @@ def r0_to_dl1(
         Path to a configuration file. If none is given, the standard configuration of the selected pipeline is applied
     train_test_ratio: float
         Ratio of training data. Default = 0.5
-    random_seed : int
+    rng : int
         Random seed for random processes. Default = 42
-    n_r0_files_per_dl1_job : int
+    n_r0_per_dl1_job : int
         Number of r0 files processed by each r0_to_dl1 batched stage. If set to None (Default), see below the `usual
         production` case.n_r0_files_per_dl1_job
 
@@ -206,11 +206,9 @@ def r0_to_dl1(
         base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
-        rta_source_env = (
-            "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
-        )
         base_cmd = (
-            f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
+            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
+            f"--debug_mode False -k {keep_rta_file}"
         )
         jobtype_id = "RTA"
     else:
