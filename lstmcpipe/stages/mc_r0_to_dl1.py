@@ -207,7 +207,7 @@ def r0_to_dl1(
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
         rta_source_env = (
-            "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
+            "source /home/enrique.garcia/.bashrc; conda activate rta_2night; "
         )
         base_cmd = (
             f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
