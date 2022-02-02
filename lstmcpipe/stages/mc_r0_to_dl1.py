@@ -207,7 +207,8 @@ def r0_to_dl1(
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
         base_cmd = (
-            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
+            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} "
+            f"--debug_mode False -c {config_file}"
         )
         jobtype_id = "RTA"
     else:
