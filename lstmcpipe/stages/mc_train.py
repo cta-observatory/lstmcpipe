@@ -191,7 +191,7 @@ def train_pipe(
     #     print(cmd)
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long"
+    batch_cmd = "sbatch --parsable -p long --mem=16G"
     if wait_ids_proton_and_gammas != "":
         batch_cmd += " --dependency=afterok:" + wait_ids_proton_and_gammas
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
