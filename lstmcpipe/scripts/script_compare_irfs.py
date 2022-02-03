@@ -2,13 +2,15 @@
 import os
 import logging
 import argparse
+from pathlib import Path
+
 import ctaplot
 import matplotlib.pyplot as plt
 from lstmcpipe.plots.plot_irfs import plot_summary_from_file
-from distutils.util import strtobool
 
 
-def plot_comparison(filelist, outfile, cta_north=False, save_figure=True):
+
+def plot_comparison(filelist, outfile=None, cta_north=False):
     """
     Create a 2x2 plot comparing different sensitivity curves
 
@@ -16,13 +18,12 @@ def plot_comparison(filelist, outfile, cta_north=False, save_figure=True):
     ----------
     filelist: list
         File list with sensitivity curves to be compared.
-    outfile: str or Path
-        for the output file to be savec
+    outfile: str or Path or None
+        path to the output file to be saved.
+        if None, the figure is not saved
     cta_north: Bool
         Flag to superpose/add (True) or not (False - Default) the CTA North.
         Imported from ctaplot
-    save_figure: Bool
-        Flag to indicate if to save the final plot or not
     """
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
@@ -42,8 +43,13 @@ def plot_comparison(filelist, outfile, cta_north=False, save_figure=True):
         ctaplot.plot_energy_resolution_cta_performance('north', ax=axes.ravel()[2])
         ctaplot.plot_effective_area_cta_performance('north', ax=axes.ravel()[3])
 
-    if save_figure:
-        plt.savefig(outfile, dpi=300, bbox_inches='tight')
+    fig.tight_layout()
+    if outfile is not None:
+        fig.savefig(outfile, dpi=200, bbox_inches='tight')
+    else:
+        fig.show()
+
+    return axes
 
 
 def main():
@@ -59,7 +65,7 @@ def main():
                         )
 
     # optional
-    parser.add_argument('--outfile', '-o', action='store', type=str,
+    parser.add_argument('--outfile', '-o', action='store', type=Path,
                         dest='outfile',
                         help='Path of the outfile',
                         default='compare_irfs.png',
@@ -71,16 +77,8 @@ def main():
                         help='add CTA north performances curves'
                         )
 
-    parser.add_argument('--save-figure', '-s',
-                        action='store',
-                        type=lambda x: bool(strtobool(x)),
-                        dest='save_figure',
-                        help='Save resulting figure',
-                        default=True
-                        )
-
     args = parser.parse_args()
-    plot_comparison(args.filelist, args.outfile,  args.cta_north, args.save_figure)
+    plot_comparison(args.filelist, args.outfile,  args.cta_north)
 
 
 if __name__ == '__main__':
