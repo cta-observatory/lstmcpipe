@@ -52,7 +52,7 @@ setup(
     version=version,
     description=description,
     install_requires=[
-        "lstchain>=0.6",
+        "lstchain",
         "pyyaml",
         "numpy",
         "astropy",
