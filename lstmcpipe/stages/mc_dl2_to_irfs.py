@@ -290,7 +290,7 @@ def dl2_to_irfs(
     jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.o")
 
     batch_cmd = (
-        f"sbatch --parsable -p short --mem 32G --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
+        f"sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
         f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
     )
 
