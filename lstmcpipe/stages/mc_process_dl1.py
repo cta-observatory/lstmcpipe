@@ -16,7 +16,6 @@ from lstmcpipe.io.data_management import (
     get_input_filelist,
     check_and_make_dir_without_verification,
 )
-from lstmcpipe.workflow_management import create_slurm_job
 
 
 log = logging.getLogger(__name__)
@@ -559,7 +558,10 @@ def submit_dl1_jobs(
 
         # start 1 jobarray with all files included. The job selects its file based on its task id
         cmd = f'{base_cmd} -f {" ".join(files)} --output_dir {output_dir}'
-        slurm_cmd = create_slurm_job(cmd, slurm_options)
+        slurm_cmd = "sbatch --parsable "
+        for key, value in slurm_options.items():
+            slurm_cmd += f"--{key} {value} "
+        slurm_cmd += f'--wrap="{base_cmd}"'
         log.debug(f"Slurm command to start the jobs: {slurm_cmd}")
 
         jobid = os.popen(slurm_cmd).read().strip("\n")

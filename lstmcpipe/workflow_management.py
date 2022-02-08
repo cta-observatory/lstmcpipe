@@ -12,17 +12,6 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 
-def create_slurm_job(base_cmd, options={}):
-    """
-    Setup the string for the slurm job submission
-    """
-    cmd = "sbatch --parsable "
-    for key, value in options.items():
-        cmd += f"--{key} {value} "
-    cmd += f'--wrap="{base_cmd}"'
-    return cmd
-
-
 def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
     """
     Dumps a dictionary (log) into a dicts of dicts with keys each of the pipeline stages.
