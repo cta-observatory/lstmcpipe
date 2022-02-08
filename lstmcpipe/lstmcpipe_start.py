@@ -150,7 +150,7 @@ def main():
     # It is not exactly required if you process only up to dl1
     if any(
         [
-            step not in ("r0_to_dl1", "dl1_to_dl1", "merge_and_copy_dl1")
+            step not in ("r0_to_dl1", "dl1ab", "merge_and_copy_dl1")
             for step in stages_to_run
         ]
     ):
@@ -164,8 +164,8 @@ def main():
 
     # 1 STAGE --> R0/1 to DL1 or reprocessing of existing dl1a files
     r0_to_dl1 = "r0_to_dl1" in stages_to_run
-    dl1_to_dl1 = "dl1_to_dl1" in stages_to_run
-    if r0_to_dl1 or dl1_to_dl1:
+    dl1ab = "dl1ab" in stages_to_run
+    if r0_to_dl1 or dl1ab:
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst)
         elif workflow_kind == "hiperta":
@@ -173,7 +173,7 @@ def main():
         else:  # if this wasnt ctapipe, the config parsing would have failed
             dl1_config = Path(args.config_file_ctapipe)
         stage_input_dir = Path(input_dir)
-        if dl1_to_dl1:
+        if dl1ab:
             stage_input_dir /= config["dl1_reference_id"]
         log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
             input_dir=stage_input_dir.as_posix(),

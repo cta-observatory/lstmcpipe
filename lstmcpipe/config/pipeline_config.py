@@ -131,11 +131,11 @@ def config_valid(loaded_config):
         raise Exception("This prod_type and obs_date combination is not possible.")
 
     stages_to_be_run = loaded_config["stages_to_be_run"]
-    if "dl1_to_dl1" in stages_to_be_run:
+    if "dl1ab" in stages_to_be_run:
         if not "dl1_reference_id" in loaded_config:
             raise KeyError(
                 "The key dl1_reference_id has to be set in order to locate "
-                "the input files for the dl1_to_dl1 stage"
+                "the input files for the dl1ab stage"
             )
     log.debug("Configuration deemed valid")
     return True
@@ -236,7 +236,7 @@ def parse_config_and_handle_global_vars(loaded_config):
 
     if "r0_to_dl1" in stages_to_be_run:
         source_datalevel = "DL0"
-    elif "dl1_to_dl1" in stages_to_be_run:
+    elif "dl1ab" in stages_to_be_run:
         source_datalevel = "DL1"
     else:
         raise NotImplementedError(
