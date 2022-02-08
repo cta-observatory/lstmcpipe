@@ -561,7 +561,7 @@ def submit_dl1_jobs(
         slurm_cmd = "sbatch --parsable "
         for key, value in slurm_options.items():
             slurm_cmd += f"--{key} {value} "
-        slurm_cmd += f'--wrap="{base_cmd}"'
+        slurm_cmd += f'--wrap="{cmd}"'
         log.debug(f"Slurm command to start the jobs: {slurm_cmd}")
 
         jobid = os.popen(slurm_cmd).read().strip("\n")
