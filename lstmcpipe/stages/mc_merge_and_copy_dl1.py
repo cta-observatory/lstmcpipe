@@ -330,18 +330,20 @@ def merge_dl1(
         if wait_r0_dl1_jobs != "":
             cmd += " --dependency=afterok:" + wait_r0_dl1_jobs
 
-        if workflow_kind == "lstchain" or workflow_kind == "hiperta":
+        cmd += (
+            f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
+            f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
+        )
+
+        # Close " of wrap
+        if workflow_kind == "lstchain":
+            cmd += f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}"'
+        elif workflow_kind == "hiperta":
             cmd += (
-                f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
-                f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
                 f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} "
                 f'--smart {flag_merge}"'
-            )
-        else:
-            cmd += (
-                f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
-                f'-o slurm-{job_name[particle]}-{set_type}.e --wrap="{source_environment} '
-            )
+            )  # HiPeRTA workflow still uses --smart flag
+        else:  # ctapipe case
             if flag_no_image:
                 cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images"'
             else:

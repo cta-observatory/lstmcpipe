@@ -3,11 +3,7 @@
 
 import os
 from pathlib import Path
-import re
 from setuptools import setup, find_packages
-
-with open("lstmcpipe/__init__.py") as f:
-    __version__ = re.search('^__version__ = "(.*)"$', f.read()).group(1)
 
 
 def find_scripts(script_dir, prefix):
@@ -15,17 +11,24 @@ def find_scripts(script_dir, prefix):
     return script_list
 
 
-def get_property(prop, project):
-    result = re.search(
-        r'{}\s*=\s*[\'"]([^\'"]*)[\'"]'.format(prop),
-        open(project + "/__init__.py").read(),
-    )
-    return result.group(1)
-
-
 def readfile(filename):
     with open(filename, "r+") as f:
         return f.read()
+
+
+### Read package info from codemeta.json ###
+import json
+
+with open(os.path.join(os.path.dirname(__file__), "codemeta.json")) as file:
+    metadata = json.load(file)
+
+project_name = metadata["name"]
+author_names = ""
+for aut in metadata["author"]:
+    author_names += f"{aut['givenName']} {aut['familyName']},"
+
+version = metadata["version"]
+description = metadata["description"]
 
 
 scripts_list = find_scripts("lstmcpipe", "onsite_")
@@ -48,21 +51,22 @@ entry_points = {
 }
 
 setup(
-    name="lstmcpipe",
-    version=get_property("__version__", "lstmcpipe"),
-    description="MC production with lstchain on LST cluster (La Palma)",
+    name=project_name,
+    version=version,
+    description=description,
     install_requires=[
         "lstchain",
         "pyyaml",
         "numpy",
         "astropy",
-        "ctaplot",
-        "pyirf",
+        "ctaplot>=0.5",
+        "pyirf>=0.4",
         "matplotlib",
+        "pytest",
     ],
     packages=find_packages(),
-    # tests_require=['pytest'],
-    author="Thomas Vuillaume",
+    tests_require=["pytest"],
+    author=author_names,
     author_email="thomas.vuillaume@lapp.in2p3.fr",
     url="https://github.com/cta-observatory/lstmcpipe",
     long_description=readfile("README.rst"),

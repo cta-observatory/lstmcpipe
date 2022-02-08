@@ -37,8 +37,8 @@ offset_gammas:  # Taken into account only when `prod_type: prod5` [ thus `obs_da
   - off0.4deg
 
 source_environment:
-  source_file: /fefs/aswg/software/virtual_env/.bashrc
-  conda_env: cta
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.8.3
   # user example: "source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev" should be writen:
   #   source_file: /fefs/home/enrique.garcia/.bashrc
   #   conda_env: lst-dev

@@ -192,7 +192,7 @@ def parse_config_and_handle_global_vars(loaded_config):
         # TODO parse version from hiPeRTA module
         import lstchain
 
-        base_prod_id = f"{year}{month}{day}_vRTA300_v{lstchain.__version__}"
+        base_prod_id = f"{year}{month}{day}_vRTA320_v{lstchain.__version__}"
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id

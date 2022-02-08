@@ -104,8 +104,8 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
 
     base_cmd = f"lstmcpipe_plot_models_importance {dir_models} -cf {config_file}"
     cmd = (
-        f"sbatch --parsable --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} -J RF_importance --mem 32G"
-        f' --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
+        f"sbatch --parsable --mem=16G --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} "
+        f' -J RF_importance --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
     )
     jobid = os.popen(cmd).read().strip("\n")
 
@@ -191,7 +191,7 @@ def train_pipe(
     #     print(cmd)
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long --mem 128G --cpus-per-task 16"
+    batch_cmd = "sbatch --parsable -p long --mem=16G"
     if wait_ids_proton_and_gammas != "":
         batch_cmd += " --dependency=afterok:" + wait_ids_proton_and_gammas
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '

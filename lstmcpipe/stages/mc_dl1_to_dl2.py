@@ -178,8 +178,7 @@ def dl1_to_dl2(
 
     # path to dl1 files by particle type
     file_list = [
-        dictionary_with_dl1_paths[particle]["training"]["train_path_and_outname_dl1"],
-        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"],
+        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"]
     ]
 
     return_jobids = []
@@ -216,9 +215,7 @@ def dl1_to_dl2(
         # if dry_run:
         #     print(cmd)
 
-        if "training" in file:
-            ftype = "train"
-        elif "testing" in file:
+        if "testing" in file:
             ftype = "test"
         else:
             ftype = "-"
@@ -228,8 +225,8 @@ def dl1_to_dl2(
 
         # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
         batch_cmd = (
-            f"sbatch --parsable -p short --mem 64G --dependency=afterok:{wait_jobs} -J {job_name[particle]}"
-            f' -e {jobe} -o {jobo} --wrap="{cmd}"'
+            f"sbatch --parsable -p short --mem=16G --dependency=afterok:{wait_jobs}"
+            f' -J {job_name[particle]} -e {jobe} -o {jobo} --wrap="{cmd}"'
         )
 
         # Batch the job at La Palma
