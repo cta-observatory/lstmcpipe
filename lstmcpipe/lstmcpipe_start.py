@@ -19,7 +19,7 @@ import argparse
 from pathlib import Path
 from lstmcpipe.io.data_management import query_continue
 from lstmcpipe.stages import (
-    batch_r0_to_dl1,
+    batch_process_dl1,
     batch_merge_and_copy_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
@@ -136,56 +136,68 @@ def main():
     source_env = config["source_environment"]
     stages_to_run = config["stages_to_run"]
     all_particles = config["all_particles"]
-    dl0_data_dir = config["DL0_data_dir"]
-    dl1_data_dir = config["DL1_data_dir"]
-    dl2_data_dir = config["DL2_data_dir"]
+    input_dir = config["input_dir"]
+    dl1_output_dir = config["DL1_output_dir"]
+    dl2_output_dir = config["DL2_output_dir"]
     running_analysis_dir = config["running_analysis_dir"]
-    gamma_offs = config["gamma_offs"]
-    no_image_merging = config["merging_no_image"]
+    gamma_offs = config.get("gamma_offs")
+    no_image_merging = config.get("merging_no_image")
 
     # Create log files
     log_file, debug_file, scancel_file = create_log_files(prod_id)
 
     # Make sure the lstchain config is defined if needed
     # It is not exactly required if you process only up to dl1
-    if any([step not in ("r0_to_dl1", "merge_and_copy_dl1") for step in stages_to_run]):
+    if any(
+        [
+            step not in ("r0_to_dl1", "dl1ab", "merge_and_copy_dl1")
+            for step in stages_to_run
+        ]
+    ):
         if args.config_file_lst is None:
             raise Exception(
                 "The lstchain config needs to be defined for all steps following dl1 processing"
             )
 
-    # 1 STAGE --> R0/1 to DL1
-    if "r0_to_dl1" in stages_to_run:
-        if workflow_kind == "lstchain":
-            r0_to_dl1_config = Path(args.config_file_lst).resolve()
-        elif workflow_kind == "hiperta":
-            r0_to_dl1_config = Path(args.config_file_rta).resolve()
-        else:  # if this wasnt ctapipe, the config parsing would have failed
-            r0_to_dl1_config = Path(args.config_file_ctapipe).resolve()
+    if "r0_to_dl1" in stages_to_run and "reprocess_dl1" in stages_to_run:
+        raise Exception("There can only be one stage producing dl1 files")
 
-        log_batch_r0_dl1, debug_r0dl1, jobs_all_r0_dl1 = batch_r0_to_dl1(
-            input_dir=dl0_data_dir,
-            conf_file=r0_to_dl1_config,
+    # 1 STAGE --> R0/1 to DL1 or reprocessing of existing dl1a files
+    r0_to_dl1 = "r0_to_dl1" in stages_to_run
+    dl1ab = "dl1ab" in stages_to_run
+    if r0_to_dl1 or dl1ab:
+        if workflow_kind == "lstchain":
+            dl1_config = Path(args.config_file_lst)
+        elif workflow_kind == "hiperta":
+            dl1_config = Path(args.config_file_rta)
+        else:  # if this wasnt ctapipe, the config parsing would have failed
+            dl1_config = Path(args.config_file_ctapipe)
+        stage_input_dir = Path(input_dir)
+        if dl1ab:
+            stage_input_dir /= config["dl1_reference_id"]
+        log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
+            input_dir=stage_input_dir.as_posix(),
+            conf_file=dl1_config,
             prod_id=prod_id,
             particles_loop=all_particles,
             source_env=source_env,
             gamma_offsets=gamma_offs,
             workflow_kind=workflow_kind,
+            new_production=r0_to_dl1,
         )
-
         save_log_to_file(
-            log_batch_r0_dl1, log_file, log_format="yml", workflow_step="r0_to_dl1"
+            log_batch_dl1, log_file, log_format="yml", workflow_step="r0_to_dl1"
         )
         save_log_to_file(
             debug_r0dl1, debug_file, log_format="yml", workflow_step="r0_to_dl1"
         )
-        update_scancel_file(scancel_file, jobs_all_r0_dl1)
+        update_scancel_file(scancel_file, jobs_all_dl1)
 
     else:
-        jobs_all_r0_dl1 = ""
-        log_batch_r0_dl1 = {}
+        jobs_all_dl1 = ""
+        log_batch_dl1 = {}
         for particle in all_particles:
-            log_batch_r0_dl1[particle] = ""
+            log_batch_dl1[particle] = ""
 
     # 2 STAGE --> Merge,copy and move DL1 files
     if "merge_and_copy_dl1" in stages_to_run:
@@ -196,7 +208,7 @@ def main():
             debug_merge,
         ) = batch_merge_and_copy_dl1(
             running_analysis_dir,
-            log_batch_r0_dl1,
+            log_batch_dl1,
             all_particles,
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=no_image_merging,
@@ -223,14 +235,14 @@ def main():
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
         log_batch_merge_and_copy = create_dict_with_dl1_filenames(
-            dl1_data_dir, all_particles, gamma_offs
+            dl1_output_dir, all_particles, gamma_offs
         )
         jobs_to_train = ""
         jobs_all_dl1_finished = ""
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
-        train_config = Path(args.config_file_lst).resolve()
+        train_config = Path(args.config_file_lst)
         (
             log_batch_train_pipe,
             job_from_train_pipe,
@@ -261,13 +273,13 @@ def main():
 
     else:
         job_from_train_pipe = ""
-        model_dir = config["model_dir"]
+        model_dir = config["model_output_dir"]
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
-        dl1_to_dl2_config = Path(args.config_file_lst).resolve()
+        dl1_to_dl2_config = Path(args.config_file_lst)
         log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
-            dl1_data_dir,
+            dl1_output_dir,
             model_dir,
             dl1_to_dl2_config,
             job_from_train_pipe,  # Single jobid from train
@@ -293,10 +305,10 @@ def main():
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
-            dl2_data_dir,
+            dl2_output_dir,
             all_particles,
             gamma_offs,
-            Path(args.config_file_lst).resolve(),
+            Path(args.config_file_lst),
             jobs_from_dl1_dl2,  # Final dl2 names
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             source_env=source_env,
@@ -324,7 +336,7 @@ def main():
             jobs_from_dl2_sensitivity,
             debug_dl2_to_sensitivity,
         ) = batch_dl2_to_sensitivity(
-            dl2_data_dir,
+            dl2_output_dir,
             gamma_offs,
             jobs_from_dl1_dl2,
             log_batch_dl1_to_dl2,  # Final dl2 names
@@ -351,7 +363,7 @@ def main():
 
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check, debug_mc_check = batch_mc_production_check(
-        jobs_all_r0_dl1,
+        jobs_all_dl1,
         jobs_all_dl1_finished,
         job_from_train_pipe,
         jobs_from_dl1_dl2,

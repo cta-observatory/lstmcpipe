@@ -1,4 +1,4 @@
-name: lstMCpipe
+name: lstmcpipe
 channels:
   - default
   - cta-observatory
