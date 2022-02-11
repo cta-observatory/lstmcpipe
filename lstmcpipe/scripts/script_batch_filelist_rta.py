@@ -67,9 +67,9 @@ def main():
             ]
 
             if args.keep_file:
-                cmd.append(f"--keep_file")
+                cmd.append("--keep_file")
             if args.debug_mode:
-                cmd.append(f"--debug_mode")
+                cmd.append("--debug_mode")
 
             subprocess.run(cmd)
 
