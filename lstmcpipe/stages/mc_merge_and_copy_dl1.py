@@ -303,7 +303,9 @@ def merge_dl1(
         with open(training_filelist, "r") as f:
             output_filename = f.readline()
 
-        output_filename = "dl1_" + os.path.basename(output_filename.split("_run")[0])
+        output_filename = os.path.basename(output_filename.split("_run")[0])
+        if not output_filename.startswith("dl1_"):
+            output_filename = "dl1_" + output_filename
         if particle == "gamma-diffuse":
             output_filename = output_filename.replace("gamma", "gamma-diffuse")
         if "_off" in particle:
@@ -337,8 +339,10 @@ def merge_dl1(
         if workflow_kind == "lstchain":
             cmd += f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}"'
         elif workflow_kind == "hiperta":
-            cmd += f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} ' \
-                   f'--smart {flag_merge}"'  # HiPeRTA workflow still uses --smart flag
+            cmd += (
+                f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} "
+                f'--smart {flag_merge}"'
+            )  # HiPeRTA workflow still uses --smart flag
         else:  # ctapipe case
             if flag_no_image:
                 cmd += f'ctapipe-merge --input-dir {tdir} --output {output_filename} --skip-images --skip-simu-images"'

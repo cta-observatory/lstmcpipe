@@ -2,9 +2,22 @@ import os
 import yaml
 import calendar
 import logging
+from pathlib import Path
 
 
 log = logging.getLogger(__name__)
+
+
+def create_path(
+    parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
+):
+    p = Path(parent_path) / stage / obs_date
+    if particles:
+        p /= "{}"
+    p /= pointing_zenith
+    if prod_id:
+        p /= prod_id
+    return p.as_posix()  # lets play it safe for now
 
 
 def load_config(config_path):
@@ -34,14 +47,21 @@ def load_config(config_path):
     log.info(
         f'************ - Configuration for processing of {config["prod_type"]} using the {config["workflow_kind"]} pipeline:- ************'
     )
-    log.info(
-        "Simtel DL0 files are going to be searched at: "
-        f'{config["DL0_data_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
-    )
+    if config.get("DL0_input_dir"):
+        log.info(
+            "Simtel DL0 files are going to be searched at: "
+            f'{config["DL0_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+        )
+    elif config.get("DL1_input_dir"):
+        log.info(
+            "DL1 base files are going to be searched at: "
+            f'{config["DL1_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+        )
+
     particle_dirs = [
         "running_analysis_dir",
-        "DL1_data_dir",
-        "DL2_data_dir",
+        "DL1_output_dir",
+        "DL2_output_dir",
         "analysis_log_dir",
     ]
     log.info(
@@ -52,8 +72,8 @@ def load_config(config_path):
                 for pd in particle_dirs
             ]
         )
-        + f'\n - {config["IRFs_dir"]}'
-        + f'\n - {config["model_dir"]}'
+        + f'\n - {config["IRF_output_dir"]}'
+        + f'\n - {config["model_output_dir"]}'
     )
 
     log.warning(
@@ -71,6 +91,8 @@ def config_valid(loaded_config):
     """
     Test if the given dictionary contains valid values for the
     r0_to_dl3 processing.
+    TODO: The stages should be checked aswell.
+    Not all combinations are sensible!
 
     Parameters:
     -----------
@@ -107,6 +129,14 @@ def config_valid(loaded_config):
         prod_type == "prod5" and obs_date == "20190415"
     ):
         raise Exception("This prod_type and obs_date combination is not possible.")
+
+    stages_to_be_run = loaded_config["stages_to_be_run"]
+    if "dl1ab" in stages_to_be_run:
+        if not "dl1_reference_id" in loaded_config:
+            raise KeyError(
+                "The key dl1_reference_id has to be set in order to locate "
+                "the input files for the dl1ab stage"
+            )
     log.debug("Configuration deemed valid")
     return True
 
@@ -135,7 +165,10 @@ def parse_config_and_handle_global_vars(loaded_config):
     prod_id = loaded_config.get("prod_id", "v00")
     stages_to_be_run = loaded_config["stages_to_be_run"]
     merging_options = loaded_config["merging_options"]["no_image"]
-    base_path_dl0 = loaded_config["base_path_dl0"]
+    base_path = loaded_config.get("base_path")
+    # to locate the source dl1 files
+    dl1_reference_id = loaded_config.get("dl1_reference_id")
+
     pointing = loaded_config["pointing"]
     zenith = loaded_config["zenith"]
     particles = loaded_config["particles"]
@@ -201,38 +234,43 @@ def parse_config_and_handle_global_vars(loaded_config):
         pointing_zenith = os.path.join(zenith, pointing)
         config["gamma_offs"] = offset_gammas
 
+    if "r0_to_dl1" in stages_to_be_run:
+        source_datalevel = "DL0"
+    elif "dl1ab" in stages_to_be_run:
+        source_datalevel = "DL1"
+    else:
+        raise NotImplementedError(
+            "Starting the processing from higher stages is not supported"
+        )
     if workflow_kind == "lstchain" or workflow_kind == "ctapipe":
-        config["DL0_data_dir"] = os.path.join(
-            base_path_dl0, "DL0", obs_date, "{}", pointing_zenith
+        config["input_dir"] = create_path(
+            base_path, source_datalevel, obs_date, pointing_zenith
         )
     else:  # RTA
-        config["DL0_data_dir"] = os.path.join(
-            base_path_dl0, "R0", obs_date, "{}", pointing_zenith
-        )
+        config["input_dir"] = create_path(base_path, "R0", obs_date, pointing_zenith)
+    config["dl1_reference_id"] = dl1_reference_id
 
     directories = {
         "running_analysis_dir": "running_analysis",
         "analysis_log_dir": "analysis_logs",
-        "DL1_data_dir": "DL1",
-        "DL2_data_dir": "DL2",
+        "DL1_output_dir": "DL1",
+        "DL2_output_dir": "DL2",
     }
     for key, value in directories.items():
-        config[key] = os.path.join(
-            base_path_dl0, value, obs_date, "{}", pointing_zenith, config["prod_id"]
+        config[key] = create_path(
+            base_path, value, obs_date, pointing_zenith, config["prod_id"]
         )
 
-    config["IRFs_dir"] = os.path.join(
-        base_path_dl0, "IRF", obs_date, pointing_zenith, config["prod_id"]
+    config["IRF_output_dir"] = create_path(
+        base_path, "IRF", obs_date, pointing_zenith, config["prod_id"], particles=False
     )
-
-    if base_path_dl0 == "/fefs/aswg/data/mc":  # lstanalyzer user
-        config["model_dir"] = os.path.join(
-            "/fefs/aswg/data/", "models", obs_date, pointing_zenith, config["prod_id"]
-        )
-    else:
-        # user case, model dir in same dir as DL0, DL1, DL2, running...
-        config["model_dir"] = os.path.join(
-            base_path_dl0, "models", obs_date, pointing_zenith, config["prod_id"]
-        )
-
+    # small difference if the user is the lstanalyzer
+    config["model_output_dir"] = create_path(
+        "fefs/aswg/data" if base_path == "/fefs/aswg/data/mc" else base_path,
+        "models",
+        obs_date,
+        pointing_zenith,
+        config["prod_id"],
+        particles=False,
+    )
     return config
