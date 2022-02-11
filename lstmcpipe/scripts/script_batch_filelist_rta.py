@@ -63,11 +63,13 @@ def main():
                 "lstmcpipe_hiperta_r0_to_dl1lstchain",
                 f"--infile={file}",
                 f"--outdir={args.output_dir}",
-                f"--keep_file={args.keep_file}",
-                f"--debug_mode={args.debug_mode}",
+                f"--config={args.config_file}",
             ]
-            if args.config_file:
-                cmd.append(f"--config={args.config_file}")
+
+            if args.keep_file:
+                cmd.append(f"--keep_file")
+            if args.debug_mode:
+                cmd.append(f"--debug_mode")
 
             subprocess.run(cmd)
 

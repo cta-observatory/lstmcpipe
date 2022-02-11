@@ -129,6 +129,7 @@ def r0_to_dl1(
     workflow_kind="lstchain",
     keep_rta_file=False,
     n_jobs_parallel=20,
+    debug_mode=False,
 ):
     """
     R0 to DL1 MC onsite conversion.
@@ -170,11 +171,17 @@ def r0_to_dl1(
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
-    keep_rta_file : bool
-        Argument to be passed to the hiperta_r0_to_dl1lstchain script, which runs the hiperta_r0_dl1 and
-        re-organiser stage
     n_jobs_parallel: int
         Number of jobs to be run at the same time per array.
+
+    # HIPERTA ARGUMENTS
+    keep_rta_file : bool
+        Flag to indicate whether to keep (keep_rta_file = True) or remove (keep_rta_file = Flase ) the
+        `dl1v06_reorganized_*.h5` output file (hiperta_r0_dl1 and re-organiser stages).
+        Argument to be passed to the hiperta_r0_to_dl1lstchain script.
+    debug_mode : bool
+        Flag to activate debug_mode. Only compatible with `hiperta` workflow kind, i.e.,
+        HiPeRTA functionality. DEFAULT=False.
 
     Returns
     -------
@@ -207,10 +214,13 @@ def r0_to_dl1(
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
         base_cmd = (
-            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} --debug_mode False "
+            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
         )
         if keep_rta_file:
-            base_cmd += "--keep_rta_file "
+            base_cmd += " --keep_rta_file"
+        if debug_mode:
+            base_cmd += " --debug_mode"
+
         jobtype_id = "RTA"
     else:
         log.critical("Please, selected an allowed workflow kind.")
