@@ -178,7 +178,7 @@ def dl1_to_dl2(
 
     # path to dl1 files by particle type
     file_list = [
-        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"],
+        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"]
     ]
 
     return_jobids = []

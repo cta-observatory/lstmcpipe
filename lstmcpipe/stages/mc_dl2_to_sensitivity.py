@@ -227,7 +227,7 @@ def dl2_to_sensitivity(
     jobo_sens = os.path.join(out_dir, f"job_dl2_to_sensitivity_gamma_{gamma_offset}.o")
     jobe_sens = os.path.join(out_dir, f"job_dl2_to_sensitivity_gamma_{gamma_offset}.e")
     cmd_sens = (
-        f"sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens} "
+        f"sbatch --parsable -p short --mem 32G --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens} "
         f' -J {job_name}_sensitivity --wrap="{source_env} {base_cmd_sens}"'
     )
 
