@@ -1,12 +1,30 @@
+# #!/usr/bin/env python
 import os
 import logging
 import argparse
+from pathlib import Path
 
 import ctaplot
 import matplotlib.pyplot as plt
 from lstmcpipe.plots.plot_irfs import plot_summary_from_file
 
-def plot_comparison(filelist, outfile, cta_north=False):
+
+
+def plot_comparison(filelist, outfile=None, cta_north=False):
+    """
+    Create a 2x2 plot comparing different sensitivity curves
+
+    Parameters
+    ----------
+    filelist: list
+        File list with sensitivity curves to be compared.
+    outfile: str or Path or None
+        path to the output file to be saved.
+        if None, the figure is not saved
+    cta_north: Bool
+        Flag to superpose/add (True) or not (False - Default) the CTA North.
+        Imported from ctaplot
+    """
     logging.basicConfig(level=logging.INFO)
     log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
 
@@ -25,8 +43,13 @@ def plot_comparison(filelist, outfile, cta_north=False):
         ctaplot.plot_energy_resolution_cta_performance('north', ax=axes.ravel()[2])
         ctaplot.plot_effective_area_cta_performance('north', ax=axes.ravel()[3])
 
+    fig.tight_layout()
+    if outfile is not None:
+        fig.savefig(outfile, dpi=200, bbox_inches='tight')
+    else:
+        fig.show()
 
-    plt.savefig(outfile, dpi=300, bbox_inches='tight')
+    return axes
 
 
 def main():
@@ -38,15 +61,16 @@ def main():
                         nargs='*',
                         dest='filelist',
                         help='List of IRF files',
+                        required=True
                         )
 
-    parser.add_argument('--outfile', '-o', action='store', type=str,
+    # optional
+    parser.add_argument('--outfile', '-o', action='store', type=Path,
                         dest='outfile',
                         help='Path of the outfile',
                         default='compare_irfs.png',
                         )
 
-    # optional
     parser.add_argument('--add-cta-north',
                         action='store_true',
                         dest='cta_north',
@@ -56,6 +80,6 @@ def main():
     args = parser.parse_args()
     plot_comparison(args.filelist, args.outfile,  args.cta_north)
 
+
 if __name__ == '__main__':
     main()
-
