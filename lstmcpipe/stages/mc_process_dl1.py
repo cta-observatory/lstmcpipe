@@ -188,11 +188,8 @@ def r0_to_dl1(
         gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @lstmcpipe_start script)
-        and command to activate a certain conda environment.
-        Passed to the core script of the selected pipeline and activated there.
-        Has no effect for hiperta currently
+    batch_config : dict
+        Dictionary containing the full (source + env) source_environment and the slurm_account strings.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
