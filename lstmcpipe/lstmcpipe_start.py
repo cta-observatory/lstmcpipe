@@ -249,7 +249,10 @@ def main():
             model_dir,
             debug_train,
         ) = batch_train_pipe(
-            log_batch_merge_and_copy, train_config, jobs_to_train, env_config=env_config
+            log_batch_merge_and_copy,
+            train_config,
+            jobs_to_train,
+            batch_config=batch_config
         )
 
         save_log_to_file(
