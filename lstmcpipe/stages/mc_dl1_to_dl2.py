@@ -208,7 +208,7 @@ def dl1_to_dl2(
     for file in file_list:
 
         cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {file} -p {path_models}" \
-            f" -o {output_dir}"
+              f" -o {output_dir}"
 
         if config_file is not None:
             cmd += f" -c {config_file}"
@@ -229,7 +229,7 @@ def dl1_to_dl2(
         batch_cmd = "sbatch --parsable -p short --mem=16G"
         if slurm_account is not "":
             batch_cmd += f" -A {slurm_account}"
-        batch_cmd = (
+        batch_cmd += (
             f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}"
             f' -o {jobo} --wrap="{cmd}"'
         )
