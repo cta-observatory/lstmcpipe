@@ -550,8 +550,8 @@ def submit_dl1_jobs(
         files = [f.as_posix() for f in Path(dir_lists).glob("*")]
 
         slurm_options = {
-            "output": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o"),
-            "error": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o"),
+            "output": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
+            "error": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
             "array": f"0-{len(files)-1}%{n_jobs_parallel}",
             "job-name": f"{job_name}"
         }
