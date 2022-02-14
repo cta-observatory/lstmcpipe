@@ -208,8 +208,8 @@ def parse_config_and_handle_global_vars(loaded_config):
         f"conda activate {loaded_config['source_environment']['conda_env']}; "
     )
     # 2.1 - Parse slurm user config account
-    if config["slurm_config"]:
-        slurm_account = config["slurm_config"]["user_account"]
+    if loaded_config["slurm_config"]:
+        slurm_account = loaded_config["slurm_config"]["user_account"]
     else:
         slurm_account = ""
 
