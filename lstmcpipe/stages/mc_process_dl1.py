@@ -50,7 +50,7 @@ def batch_process_dl1(
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
     new_production: bool
-        Whether to analysis simtels or reprocess existing dl1 files.
+        Whether to analysis simtel or reprocess existing dl1 files.
 
     Returns
     -------
@@ -177,7 +177,7 @@ def r0_to_dl1(
         If the number of r0 files found in `input_dir` is less than 100, it is consider to be a test on a small
         production. Therefore, the number of r0 files treated per batched stage (r0_to_dl1 or dl1ab) will be set to 10.
 
-        Usual productions have =>1000 r0 files, in this case, the number of files per job (r0_to_dl1 or dl1ab) will be
+        Usual productions have >=1000 r0 files, in this case, the number of files per job (r0_to_dl1 or dl1ab) will be
         fixed to 50 (in case of gamma and electrons), and 100 for protons. Because of this protons end up in the
         long queue and other particles are submitted to the short queue.
     particle : str
@@ -239,7 +239,7 @@ def r0_to_dl1(
     else:
         base_cmd = ''
         jobtype_id = ''
-        log.critical("Please, selected an allowed workflow kind.")
+        log.critical("Please, select an allowed workflow kind.")
         exit(-1)
 
     job_name = {
