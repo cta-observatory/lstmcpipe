@@ -265,7 +265,7 @@ def main():
 
         # Plot the RF feature's importance
         log_plot_rf_features = batch_plot_rf_features(
-            model_dir, args.config_file_lst, env_config, job_from_train_pipe
+            model_dir, args.config_file_lst, batch_config, job_from_train_pipe
         )
         save_log_to_file(
             log_plot_rf_features,
@@ -289,7 +289,7 @@ def main():
             jobs_all_dl1_finished,  # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             all_particles,
-            env_config=env_config,
+            batch_config=batch_config,
             gamma_offsets=gamma_offs,
         )
 
