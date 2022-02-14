@@ -12,8 +12,8 @@
 # 5. move running_dir
 
 import os
-import logging
 import time
+import logging
 from lstmcpipe.io.data_management import check_job_logs
 
 
@@ -24,7 +24,7 @@ def batch_merge_and_copy_dl1(
     running_analysis_dir,
     log_jobs_from_r0_to_dl1,
     particles_loop,
-    source_env,
+    batch_config,
     smart_merge=False,
     no_image_flag=True,
     prod_id=None,
@@ -56,8 +56,11 @@ def batch_merge_and_copy_dl1(
         list containing the offset of the gammas
     prod_id : str
         prod_id defined in config_MC_prod.yml
-    source_env : str
-        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed
+        to `merge_dl1` and `compose_batch_command_of_script` functions.
+    workflow_kind : str
+        Defines workflow kind (lstchain, ctapipe, hiperta)
 
     Returns
     -------
@@ -99,7 +102,7 @@ def batch_merge_and_copy_dl1(
                     flag_no_image=no_image_flag,
                     prod_id=prod_id,
                     gamma_offset=off,
-                    source_environment=source_env,
+                    batch_configuration=batch_config,
                     workflow_kind=workflow_kind,
                 )
 
@@ -128,7 +131,7 @@ def batch_merge_and_copy_dl1(
                 flag_merge=merge_flag,
                 flag_no_image=no_image_flag,
                 prod_id=prod_id,
-                source_environment=source_env,
+                batch_configuration=batch_config,
                 workflow_kind=workflow_kind,
             )
 
@@ -155,7 +158,7 @@ def batch_merge_and_copy_dl1(
 
 
 def compose_batch_command_of_script(
-    source, destination, script, particle, wait_jobs, suffix
+    source, destination, script, particle, wait_jobs, suffix, slurm_account
 ):
     """
     Creates the slurm command of the 'cmd' script
@@ -174,6 +177,8 @@ def compose_batch_command_of_script(
         Suffix to indicate the kind of job
     wait_jobs: str
         Job-id to be used as dependency in the batched slurm command
+    slurm_account: str
+        Slurm account argument (-A; --account)
 
     Returns
     -------
@@ -186,9 +191,12 @@ def compose_batch_command_of_script(
     jobe = f"slurm-{particle}_{suffix}.e"
     jobo = f"slurm-{particle}_{suffix}.o"
 
-    batch_cmd = (
-        f"sbatch --parsable -p short -J {particle}_{suffix} -e {jobe} -o {jobo} "
-        f'--dependency=afterok:{wait_jobs} --wrap="{cmd}"'
+    batch_cmd = "sbatch --parsable -p short"
+    if slurm_account is not "":
+        batch_cmd += f" -A {slurm_account}"
+    batch_cmd += (
+        f" -J {particle}_{suffix} -e {jobe} -o {jobo}"
+        f' --dependency=afterok:{wait_jobs} --wrap="{cmd}"'
     )
 
     return batch_cmd
@@ -202,7 +210,7 @@ def merge_dl1(
     flag_no_image=True,
     prod_id=None,
     gamma_offset=None,
-    source_environment=None,
+    batch_configuration=None,
     workflow_kind="lstchain",
 ):
     """
@@ -236,10 +244,8 @@ def merge_dl1(
         prod_id for output filename.
     gamma_offset : str
         if gamma files have various off0.Xdeg observations, include the offset within the filename for completeness.
-    source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script)
-         to activate a certain conda environment.
-         DEFAULT: `source /fefs/aswg/software/virtual_env/.bashrc; conda activate cta`.
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
@@ -261,6 +267,9 @@ def merge_dl1(
         jobids to store in log_reduced.txt - Mainly debug purposes.
 
     """
+
+    source_environment = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
 
     log_merge = {particle: {"training": {}, "testing": {}}}
 
@@ -327,6 +336,8 @@ def merge_dl1(
             )
 
         cmd = "sbatch --parsable -p short"
+        if slurm_account is not "":
+            cmd += f" -A {slurm_account}"
         if wait_r0_dl1_jobs != "":
             cmd += " --dependency=afterok:" + wait_r0_dl1_jobs
 
@@ -375,6 +386,7 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="mv_dl1_files",
         wait_jobs=wait_both_merges,
+        slurm_account=slurm_account
     )
 
     jobid_move_dl1 = os.popen(cmd_mv_dl1).read().strip("\n")
@@ -392,6 +404,7 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="cp_config",
         wait_jobs=jobid_move_dl1,
+        slurm_account=slurm_account
     )
 
     jobid_copy_conf = os.popen(cmd_cp_conf).read().strip("\n")
@@ -409,6 +422,7 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="mv_dl1_dir",
         wait_jobs=jobid_copy_conf,
+        slurm_account=slurm_account
     )
 
     jobid_move_log = os.popen(cmd_mv_dir).read().strip("\n")
