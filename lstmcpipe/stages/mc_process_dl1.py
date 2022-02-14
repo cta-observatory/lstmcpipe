@@ -560,7 +560,7 @@ def submit_dl1_jobs(
         else:
             slurm_options.update({"partition": "short"})
         # `sbatch -A` is the --account slurm argument
-        if slurm_account is not '':
+        if slurm_account != '':
             slurm_options.update({"account": slurm_account})
 
         # start 1 jobarray with all files included. The job selects its file based on its task id

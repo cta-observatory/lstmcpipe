@@ -192,7 +192,7 @@ def compose_batch_command_of_script(
     jobo = f"slurm-{particle}_{suffix}.o"
 
     batch_cmd = "sbatch --parsable -p short"
-    if slurm_account is not "":
+    if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
         f" -J {particle}_{suffix} -e {jobe} -o {jobo}"
@@ -336,7 +336,7 @@ def merge_dl1(
             )
 
         cmd = "sbatch --parsable -p short"
-        if slurm_account is not "":
+        if slurm_account != "":
             cmd += f" -A {slurm_account}"
         if wait_r0_dl1_jobs != "":
             cmd += " --dependency=afterok:" + wait_r0_dl1_jobs

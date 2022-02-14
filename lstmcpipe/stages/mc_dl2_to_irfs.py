@@ -294,7 +294,7 @@ def dl2_to_irfs(
     jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.o")
 
     batch_cmd = "sbatch --parsable -p short"
-    if slurm_account is not "":
+    if slurm_account != "":
         batch_cmd += f" -A {batch_cmd}"
     batch_cmd += (
         f" --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"

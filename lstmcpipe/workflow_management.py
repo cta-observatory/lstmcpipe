@@ -187,7 +187,7 @@ def batch_mc_production_check(
     )
 
     batch_cmd = "sbatch -p short --parsable"
-    if slurm_account is not "":
+    if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
         f" --dependency=afterok:{which_last_stage} -J prod_check"

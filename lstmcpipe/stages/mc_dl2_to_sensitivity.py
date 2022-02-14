@@ -233,7 +233,7 @@ def dl2_to_sensitivity(
     jobe_sens = os.path.join(out_dir, f"job_dl2_to_sensitivity_gamma_{gamma_offset}.e")
 
     cmd_sens = "sbatch --parsable -p short --mem 32G"
-    if slurm_account is not "":
+    if slurm_account != "":
         cmd_sens += f" -A {slurm_account}"
     cmd_sens += (
         f" --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens}"
@@ -252,7 +252,7 @@ def dl2_to_sensitivity(
     jobo_plot = os.path.join(out_dir, f"job_plot_sensitivity_gamma_{gamma_offset}.o")
 
     cmd_plot = "sbatch --parsable -p short"
-    if slurm_account is not "":
+    if slurm_account != "":
         cmd_plot += f" -A {slurm_account}"
     cmd_plot += (
         f" --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}"

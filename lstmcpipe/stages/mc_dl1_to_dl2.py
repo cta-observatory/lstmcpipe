@@ -227,7 +227,7 @@ def dl1_to_dl2(
 
         # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
         batch_cmd = "sbatch --parsable -p short --mem=16G"
-        if slurm_account is not "":
+        if slurm_account != "":
             batch_cmd += f" -A {slurm_account}"
         batch_cmd += (
             f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}"
