@@ -83,6 +83,12 @@ def load_config(config_path):
 
     log.info("Stages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
     log.info("Merging options:" f"\n - No-image argument: {config['merging_no_image']}")
+    log.info("Slurm configuration:" +
+             "\n - Source environment:" +
+             f"\n   * {config['batch_config']['source_environment']}" +
+             "\n - Slurm account:" +
+             f"\n   * {config['batch_config']['slurm_account']}"
+             )
 
     return config
 
