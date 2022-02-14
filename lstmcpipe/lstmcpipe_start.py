@@ -378,6 +378,7 @@ def main():
         scancel_file,
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],
+        batch_config=batch_config
     )
 
     save_log_to_file(

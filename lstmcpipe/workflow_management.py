@@ -112,6 +112,7 @@ def batch_mc_production_check(
     scancel_file,
     prod_config_file,
     last_stage,
+    batch_config
 ):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
@@ -134,6 +135,7 @@ def batch_mc_production_check(
     scancel_file: str
     prod_config_file: str
     last_stage: str
+    batch_config: dict
 
     Returns
     -------
@@ -143,6 +145,9 @@ def batch_mc_production_check(
     """
     debug_log = {}
     all_pipeline_jobs = []
+
+    source_env = batch_config["source_environment"]
+    slurm_account = batch_config["slurm_account"]
 
     jobids_stages = {
         "r0_to_dl1": jobids_from_r0_to_dl1,
@@ -181,9 +186,12 @@ def batch_mc_production_check(
         f"mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};"
     )
 
-    batch_cmd = (
-        f"sbatch -p short --parsable --dependency=afterok:{which_last_stage} -J prod_check "
-        f'--wrap="{cmd_wrap}"'
+    batch_cmd = "sbatch -p short --parsable"
+    if slurm_account is not "":
+        batch_cmd += f" -A {slurm_account}"
+    batch_cmd += (
+        f" --dependency=afterok:{which_last_stage} -J prod_check"
+        f' --wrap="{source_env} {cmd_wrap}"'
     )
 
     jobid = os.popen(batch_cmd).read().strip("\n")
