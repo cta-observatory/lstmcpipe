@@ -48,6 +48,7 @@ def batch_dl1_to_dl2(
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
+        dl1_dl2 function
 
     gamma_offsets : list
         list off gamma offsets

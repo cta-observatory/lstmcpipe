@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import os
-import logging
 import time
+import logging
 
 
 log = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ def batch_dl2_to_sensitivity(
     offset_gammas,
     job_ids_from_dl1_dl2,
     log_from_dl1_dl2,
-    source_env,
+    batch_config,
     prod_id,
 ):
     """
@@ -31,8 +31,9 @@ def batch_dl2_to_sensitivity(
         to schedule the current stage
     log_from_dl1_dl2: dict
         Dictionary from dl1_to_dl2 stage with particle path information
-    source_env: str
-        source environment to select the desired conda environment (source .bashrc + conda activate $ENV)
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
+        dl2_to_sensitivity function
     prod_id: str
         String with prod_id prefix to complete 'file-naming'
 
@@ -58,7 +59,7 @@ def batch_dl2_to_sensitivity(
             log_from_dl1_dl2,
             gamma_offset=off,
             prod_id=prod_id,
-            source_env=source_env,
+            batch_configuration=batch_config,
             wait_jobs_dl1_dl2=job_ids_from_dl1_dl2,
         )
         jobid_for_check.append(jobid)
@@ -182,7 +183,7 @@ def dl2_to_sensitivity(
     log_from_dl1_dl2,
     gamma_offset="off0.0deg",
     prod_id=None,
-    source_env="",
+    batch_configuration="",
     wait_jobs_dl1_dl2="",
 ):
     """
@@ -200,8 +201,9 @@ def dl2_to_sensitivity(
         String to indicate the gamma offset if gamma_point_like == True. Either 'off0.0deg' or 'off0.4deg'
     prod_id: str
         String with prod_id prefix to complete 'filenaming'
-    source_env: str
-        Source environment (source .bashrc + conda activate env) to be used in the slurm cmd
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
+        sbatch commands
     wait_jobs_dl1_dl2: str
         Comma-separated string with the jobs (dependency) to wait for before launching the cmd
 
@@ -221,13 +223,20 @@ def dl2_to_sensitivity(
         dl2_dir, log_from_dl1_dl2, gamma_offset, prod_id
     )
 
+    source_env = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
+
     # TODO Move the base commands into scripts so that we can use subprocess properly(makes splitting the string easier)
     # create sensitivity files
     base_cmd_sens = f"lstmcpipe_dl2_to_sensitivity -g {g_file} -p {p_file} -e {e_file} -o {out_file}"
     jobo_sens = os.path.join(out_dir, f"job_dl2_to_sensitivity_gamma_{gamma_offset}.o")
     jobe_sens = os.path.join(out_dir, f"job_dl2_to_sensitivity_gamma_{gamma_offset}.e")
-    cmd_sens = (
-        f"sbatch --parsable -p short --mem 32G --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens} "
+
+    cmd_sens = "sbatch --parsable -p short --mem 32G"
+    if slurm_account is not "":
+        cmd_sens += f" -A {slurm_account}"
+    cmd_sens += (
+        f" --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens}"
         f' -J {job_name}_sensitivity --wrap="{source_env} {base_cmd_sens}"'
     )
 
@@ -241,8 +250,12 @@ def dl2_to_sensitivity(
     )
     jobe_plot = os.path.join(out_dir, f"job_plot_sensitivity_gamma_{gamma_offset}.e")
     jobo_plot = os.path.join(out_dir, f"job_plot_sensitivity_gamma_{gamma_offset}.o")
-    cmd_plot = (
-        f"sbatch --parsable -p short --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}"
+
+    cmd_plot = "sbatch --parsable -p short"
+    if slurm_account is not "":
+        cmd_plot += f" -A {slurm_account}"
+    cmd_plot += (
+        f" --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}"
         f' -J {job_name}_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd_plot}"'
     )
 

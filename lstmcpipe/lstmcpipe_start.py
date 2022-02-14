@@ -314,7 +314,7 @@ def main():
             Path(args.config_file_lst),
             jobs_from_dl1_dl2,  # Final dl2 names
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
-            env_config=env_config,
+            batch_config=batch_config,
             prod_id=prod_id,
         )
 
@@ -343,7 +343,7 @@ def main():
             gamma_offs,
             jobs_from_dl1_dl2,
             log_batch_dl1_to_dl2,  # Final dl2 names
-            env_config=env_config,
+            batch_config=batch_config,
             prod_id=prod_id,
         )
 
