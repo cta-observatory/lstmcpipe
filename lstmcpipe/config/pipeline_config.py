@@ -210,7 +210,6 @@ def parse_config_and_handle_global_vars(loaded_config):
     config["source_environment"] = src_env
 
     # 3 - particles loop
-    config["source_environment"] = src_env
     config["all_particles"] = particles
 
     # 3.1 - Gammas' offsets
