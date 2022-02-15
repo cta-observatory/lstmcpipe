@@ -133,7 +133,7 @@ def main():
     # Load variables
     prod_id = config["prod_id"]
     workflow_kind = config["workflow_kind"]
-    source_env = config["source_environment"]
+    batch_config = config["batch_config"]
     stages_to_run = config["stages_to_run"]
     all_particles = config["all_particles"]
     input_dir = config["input_dir"]
@@ -180,7 +180,7 @@ def main():
             conf_file=dl1_config,
             prod_id=prod_id,
             particles_loop=all_particles,
-            source_env=source_env,
+            batch_config=batch_config,
             gamma_offsets=gamma_offs,
             workflow_kind=workflow_kind,
             new_production=r0_to_dl1,
@@ -214,7 +214,7 @@ def main():
             no_image_flag=no_image_merging,
             gamma_offsets=gamma_offs,
             prod_id=prod_id,
-            source_env=source_env,
+            batch_config=batch_config,
             workflow_kind=workflow_kind,
         )
 
@@ -249,7 +249,10 @@ def main():
             model_dir,
             debug_train,
         ) = batch_train_pipe(
-            log_batch_merge_and_copy, train_config, jobs_to_train, source_env=source_env
+            log_batch_merge_and_copy,
+            train_config,
+            jobs_to_train,
+            batch_config=batch_config
         )
 
         save_log_to_file(
@@ -262,7 +265,7 @@ def main():
 
         # Plot the RF feature's importance
         log_plot_rf_features = batch_plot_rf_features(
-            model_dir, args.config_file_lst, source_env, job_from_train_pipe
+            model_dir, args.config_file_lst, batch_config, job_from_train_pipe
         )
         save_log_to_file(
             log_plot_rf_features,
@@ -286,7 +289,7 @@ def main():
             jobs_all_dl1_finished,  # jobids from merge
             log_batch_merge_and_copy,  # final dl1 names
             all_particles,
-            source_env=source_env,
+            batch_config=batch_config,
             gamma_offsets=gamma_offs,
         )
 
@@ -311,7 +314,7 @@ def main():
             Path(args.config_file_lst),
             jobs_from_dl1_dl2,  # Final dl2 names
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
-            source_env=source_env,
+            batch_config=batch_config,
             prod_id=prod_id,
         )
 
@@ -340,7 +343,7 @@ def main():
             gamma_offs,
             jobs_from_dl1_dl2,
             log_batch_dl1_to_dl2,  # Final dl2 names
-            source_env=source_env,
+            batch_config=batch_config,
             prod_id=prod_id,
         )
 
@@ -375,6 +378,7 @@ def main():
         scancel_file,
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],
+        batch_config=batch_config
     )
 
     save_log_to_file(

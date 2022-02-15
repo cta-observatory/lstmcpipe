@@ -9,10 +9,10 @@
 #
 
 import os
+import time
 import glob
 import shutil
 import logging
-import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
@@ -26,7 +26,7 @@ def batch_dl2_to_irfs(
     config_file,
     job_ids_from_dl1_dl2,
     log_from_dl1_dl2,
-    source_env,
+    batch_config,
     prod_id,
 ):
     """
@@ -45,8 +45,9 @@ def batch_dl2_to_irfs(
     job_ids_from_dl1_dl2: str
         Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
         to schedule the current stage
-    source_env: str
-        source environment to select the desired conda environment (source .bnashrc + conda activate $ENV)
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
+        dl2_to_irfs function
     log_from_dl1_dl2: dict
         Dictionary from dl1_to_dl2 stage with particle path information
     prod_id: str
@@ -73,7 +74,7 @@ def batch_dl2_to_irfs(
             log_from_dl1_dl2=log_from_dl1_dl2,
             irf_point_like=True,
             irf_gamma_offset=off,
-            source_env=source_env,
+            batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id,
         )
@@ -91,7 +92,7 @@ def batch_dl2_to_irfs(
             dl2_directory,
             irf_point_like=False,
             config_file=config_file,
-            source_env=source_env,
+            batch_configuration=batch_config,
             log_from_dl1_dl2=log_from_dl1_dl2,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             prod_id=prod_id,
@@ -166,7 +167,7 @@ def dl2_to_irfs(
     log_from_dl1_dl2,
     irf_point_like=True,
     irf_gamma_offset="off0.0deg",
-    source_env=None,
+    batch_configuration="",
     wait_jobs_dl1dl2=None,
     prod_id=None,
 ):
@@ -183,9 +184,9 @@ def dl2_to_irfs(
         MC prod configuration argument to create IRFs: {True: gamma, False: gamma-diffuse}.
     irf_gamma_offset: str
         MC prod configuration argument to create IRFs: off0.0deg (for ON/OFF obs) or off0.4deg (for wobble obs).
-    source_env: str
-        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script) to activate
-        a certain conda environment.
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
+        sbatch commands
     log_from_dl1_dl2: dict
         Dictionary with dl2 output path. Files are not yet here, but path and full name are needed to batch the job.
     wait_jobs_dl1dl2: str
@@ -201,6 +202,9 @@ def dl2_to_irfs(
     list_job_id_dl2_irfs: str
         Job-ids of the batched job to be passed to the last (MC prod check) stage of the workflow.
     """
+    source_env = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
+
     allowed_gamma_off = ["off0.0deg", "off0.4deg"]
     if irf_gamma_offset not in allowed_gamma_off:
         log.info(
@@ -289,8 +293,11 @@ def dl2_to_irfs(
     jobe = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.e")
     jobo = os.path.join(output_irfs_dir, f"job_dl2_to_irfs_gamma_{irf_kind}.o")
 
-    batch_cmd = (
-        f"sbatch --parsable -p short --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
+    batch_cmd = "sbatch --parsable -p short"
+    if slurm_account != "":
+        batch_cmd += f" -A {batch_cmd}"
+    batch_cmd += (
+        f" --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
         f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
     )
 

@@ -107,7 +107,13 @@ def test_parse_config_and_handle_global_vars():
         + "_v0.7.3_prod5_trans_80_None"
     )
     assert (
-        parsed_config["source_environment"] == "source src_file; conda activate env; "
+        parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
     )
+    assert parsed_config["batch_config"]["slurm_account"] == ""
     assert parsed_config["stages_to_run"] == ["r0_to_dl1"]
     assert parsed_config["workflow_kind"] == "lstchain"
+
+    new_dummy = config.copy()
+    new_dummy["slurm_config"] = {"user_account": "aswg"}
+    new_parsed_config = parse_config_and_handle_global_vars(new_dummy)
+    assert new_parsed_config["batch_config"]["slurm_account"] == "aswg"

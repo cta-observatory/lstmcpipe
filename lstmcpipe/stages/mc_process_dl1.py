@@ -26,7 +26,7 @@ def batch_process_dl1(
     conf_file,
     prod_id,
     particles_loop,
-    source_env,
+    batch_config,
     gamma_offsets=None,
     workflow_kind="lstchain",
     new_production=True,
@@ -44,8 +44,9 @@ def batch_process_dl1(
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
-    source_env : str
-        source environment to select the desired conda environment to run the r0/1_to_dl1 stage.
+    batch_config : dict
+        Dict with source environment (to select the desired conda environment to run the r0/1_to_dl1 stage),
+        and the slurm user account.
     gamma_offsets : list
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
@@ -80,7 +81,7 @@ def batch_process_dl1(
                         config_file=conf_file,
                         particle=_particle,
                         prod_id=prod_id,
-                        source_environment=source_env,
+                        batch_config=batch_config,
                         offset=off,
                         workflow_kind=workflow_kind,
                     )
@@ -90,7 +91,7 @@ def batch_process_dl1(
                         config_file=conf_file,
                         particle=_particle,
                         prod_id=prod_id,
-                        source_environment=source_env,
+                        batch_config=batch_config,
                         offset=off,
                         workflow_kind=workflow_kind,
                     )
@@ -111,7 +112,7 @@ def batch_process_dl1(
                     config_file=conf_file,
                     particle=_particle,
                     prod_id=prod_id,
-                    source_environment=source_env,
+                    batch_config=batch_config,
                     workflow_kind=workflow_kind,
                 )
             else:
@@ -120,7 +121,7 @@ def batch_process_dl1(
                     config_file=conf_file,
                     particle=_particle,
                     prod_id=prod_id,
-                    source_environment=source_env,
+                    batch_config=batch_config,
                     workflow_kind=workflow_kind,
                 )
             full_log["log_all_job_ids"].update(job_logs)
@@ -149,7 +150,7 @@ def r0_to_dl1(
     dl1_files_per_job=None,
     particle=None,
     prod_id=None,
-    source_environment=None,
+    batch_config=None,
     offset=None,
     workflow_kind="lstchain",
     keep_rta_file=False,
@@ -187,11 +188,8 @@ def r0_to_dl1(
         gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @lstmcpipe_start script)
-        and command to activate a certain conda environment.
-        Passed to the core script of the selected pipeline and activated there.
-        Has no effect for hiperta currently
+    batch_config : dict
+        Dictionary containing the full (source + env) source_environment and the slurm_account strings.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
@@ -223,6 +221,9 @@ def r0_to_dl1(
     log.info("Starting R0 to DL1 processing for particle {}".format(particle))
 
     train_test_ratio = float(train_test_ratio)
+
+    source_environment = batch_config["source_environment"]
+    slurm_account = batch_config["slurm_account"]
 
     if workflow_kind == "lstchain":
         base_cmd = f"{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} "
@@ -318,14 +319,15 @@ def r0_to_dl1(
     # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
 
     jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
-        base_cmd,
-        {"testing": testing_list, "training": training_list},
-        particle,
-        job_name[particle],
-        dl1_files_per_job,
-        running_dir,
-        job_logs_dir,
-        n_jobs_parallel
+        base_cmd=base_cmd,
+        file_lists={"testing": testing_list, "training": training_list},
+        particle=particle,
+        job_name=job_name[particle],
+        dl1_files_per_batched_job=dl1_files_per_job,
+        running_dir=running_dir,
+        job_logs_dir=job_logs_dir,
+        n_jobs_parallel=n_jobs_parallel,
+        slurm_account=slurm_account
     )
 
     # copy config into working dir
@@ -348,7 +350,7 @@ def reprocess_dl1(
     dl1_files_per_job=50,
     particle=None,
     prod_id=None,
-    source_environment=None,
+    batch_config=None,
     offset=None,
     workflow_kind="lstchain",
     n_jobs_parallel=20,
@@ -372,11 +374,8 @@ def reprocess_dl1(
         gamma offset
     prod_id :str
         Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @lstmcpipe_start script)
-        and command to activate a certain conda environment.
-        Passed to the core script of the selected pipeline and activated there.
-        Has no effect for hiperta currently
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings.
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
@@ -407,6 +406,9 @@ def reprocess_dl1(
     log.info("Starting DL1 to DL1 processing for particle {}".format(particle))
 
     input_dir = Path(input_dir)
+
+    source_environment = batch_config["source_environment"]
+    slurm_account = batch_config["slurm_account"]
 
     if workflow_kind == "lstchain":
         base_cmd = f"{source_environment} lstmcpipe_lst_core_dl1_dl1 -c {config_file} "
@@ -485,14 +487,15 @@ def reprocess_dl1(
     shutil.move("training.list", running_dir.joinpath("training.list"))
 
     jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(
-        base_cmd,
-        {"testing": testing_list, "training": training_list},
-        particle,
-        job_name[particle],
-        dl1_files_per_job,
-        running_dir,
-        job_logs_dir,
-        n_jobs_parallel
+        base_cmd=base_cmd,
+        file_lists={"testing": testing_list, "training": training_list},
+        particle=particle,
+        job_name=job_name[particle],
+        dl1_files_per_batched_job=dl1_files_per_job,
+        running_dir=running_dir,
+        job_logs_dir=job_logs_dir,
+        n_jobs_parallel=n_jobs_parallel,
+        slurm_account=slurm_account
     )
 
     # return it log dictionary
@@ -507,7 +510,8 @@ def submit_dl1_jobs(
     dl1_files_per_batched_job,
     running_dir,
     job_logs_dir,
-    n_jobs_parallel
+    n_jobs_parallel,
+    slurm_account
 ):
     jobid2log = {}
     jobids_dl1 = []
@@ -538,17 +542,19 @@ def submit_dl1_jobs(
 
         files = [f.as_posix() for f in Path(dir_lists).glob("*")]
 
-        slurm_options = {}
-        slurm_options["output"] = \
-            job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o")
-        slurm_options["error"] = \
-            job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.e")
+        slurm_options = {
+            "output": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
+            "error": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
+            "array": f"0-{len(files)-1}%{n_jobs_parallel}",
+            "job-name": f"{job_name}"
+        }
         if particle == "proton":
-            slurm_options["partition"] = "short"
+            slurm_options.update({"partition": "long"})
         else:
-            slurm_options["partition"] = "short"
-        slurm_options["array"] = f"0-{len(files)-1}%{n_jobs_parallel}"
-        slurm_options["job-name"] = f"{job_name}"
+            slurm_options.update({"partition": "short"})
+        # `sbatch -A` is the --account slurm argument
+        if slurm_account != '':
+            slurm_options.update({"account": slurm_account})
 
         # start 1 jobarray with all files included. The job selects its file based on its task id
         cmd = f'{base_cmd} -f {" ".join(files)} --output_dir {output_dir}'

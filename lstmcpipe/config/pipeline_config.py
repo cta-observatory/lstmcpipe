@@ -83,6 +83,10 @@ def load_config(config_path):
 
     log.info("Stages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
     log.info("Merging options:" f"\n - No-image argument: {config['merging_no_image']}")
+    log.info("Slurm configuration:" +
+             f"\n - Source environment: {config['batch_config']['source_environment']}" +
+             f"\n - Slurm account: {config['batch_config']['slurm_account']}"
+             )
 
     return config
 
@@ -207,12 +211,17 @@ def parse_config_and_handle_global_vars(loaded_config):
         f"source {loaded_config['source_environment']['source_file']}; "
         f"conda activate {loaded_config['source_environment']['conda_env']}; "
     )
-    config["source_environment"] = src_env
+    # 2.1 - Parse slurm user config account
+    slurm_account = loaded_config.get("slurm_config", {}).get("user_account", "")
+
+    # 2.2 - Create a dict for all env configuration and slurm configuration (batch arguments)
+    config["batch_config"] = {
+        "source_environment": src_env,
+        "slurm_account": slurm_account
+    }
 
     # 3 - particles loop
     config["all_particles"] = particles
-
-    # 3.1 - Gammas' offsets
 
     # 4 - Stages to be run
     config["stages_to_run"] = stages_to_be_run

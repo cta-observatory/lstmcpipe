@@ -5,9 +5,9 @@
 # lstMCpipe DL1 to DL2 onsite stage (at La Palma cluster)
 
 import os
+import time
 import shutil
 import logging
-import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
@@ -22,7 +22,7 @@ def batch_dl1_to_dl2(
     jobids_from_merge,
     dict_with_dl1_paths,
     particles_loop,
-    source_env,
+    batch_config,
     gamma_offsets=None,
 ):
     """
@@ -46,8 +46,10 @@ def batch_dl1_to_dl2(
         Indeed the log of the merge_and_copy stage, where the final names of the dl1 files were stored
     particles_loop : list
         list with the particles to be processed. Takes the global variable ALL_PARTICLES
-    source_env : str
-        source environment to select the desired conda environment to run train_pipe and dl1_to_dl2 stages
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
+        dl1_dl2 function
+
     gamma_offsets : list
         list off gamma offsets
 
@@ -83,7 +85,7 @@ def batch_dl1_to_dl2(
                     wait_jobid_train_pipe=jobid_from_training,
                     wait_jobids_merge=jobids_from_merge,
                     dictionary_with_dl1_paths=dict_with_dl1_paths,
-                    source_environment=source_env,
+                    batch_configuration=batch_config,
                 )
 
                 log_dl1_to_dl2.update(job_logs)
@@ -103,7 +105,7 @@ def batch_dl1_to_dl2(
                 wait_jobid_train_pipe=jobid_from_training,
                 wait_jobids_merge=jobids_from_merge,
                 dictionary_with_dl1_paths=dict_with_dl1_paths,
-                source_environment=source_env,
+                batch_configuration=batch_config,
             )
 
             log_dl1_to_dl2.update(job_logs)
@@ -129,7 +131,7 @@ def dl1_to_dl2(
     wait_jobid_train_pipe=None,
     wait_jobids_merge=None,
     dictionary_with_dl1_paths=None,
-    source_environment=None,
+    batch_configuration='',
 ):
     """
     Convert onsite files from dl1 to dl2
@@ -151,9 +153,9 @@ def dl1_to_dl2(
         string with merge_and_copy jobids
     dictionary_with_dl1_paths : dict
         Dictionary with 'particles' as keys containing final output filenames of dl1 files.
-    source_environment : str
-        path to a .bashrc file to source (can be configurable for custom runs @ mc_r0_to_dl3 script) to activate
-        a certain conda environment.
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
+        sbatch commands
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
 
     Returns
@@ -167,6 +169,8 @@ def dl1_to_dl2(
         workflow (dl2_to_irfs)
 
     """
+    source_environment = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
 
     output_dir = input_dir.replace("DL1", "DL2")
     log.info("Working on DL1 files in {}".format(input_dir))
@@ -203,10 +207,8 @@ def dl1_to_dl2(
 
     for file in file_list:
 
-        cmd = ""
-        if source_environment is not None:
-            cmd += source_environment
-        cmd += f"lstchain_dl1_to_dl2 -f {file} -p {path_models} -o {output_dir}"
+        cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {file} -p {path_models}" \
+              f" -o {output_dir}"
 
         if config_file is not None:
             cmd += f" -c {config_file}"
@@ -224,9 +226,12 @@ def dl1_to_dl2(
         jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.o")
 
         # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
-        batch_cmd = (
-            f"sbatch --parsable -p short --mem=16G --dependency=afterok:{wait_jobs}"
-            f' -J {job_name[particle]} -e {jobe} -o {jobo} --wrap="{cmd}"'
+        batch_cmd = "sbatch --parsable -p short --mem=16G"
+        if slurm_account != "":
+            batch_cmd += f" -A {slurm_account}"
+        batch_cmd += (
+            f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}"
+            f' -o {jobo} --wrap="{cmd}"'
         )
 
         # Batch the job at La Palma
