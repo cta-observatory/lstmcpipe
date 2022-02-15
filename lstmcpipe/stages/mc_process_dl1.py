@@ -259,19 +259,15 @@ def r0_to_dl1(
 
     if len(raw_files_list) < 100:
         dl1_files_per_job = 10
-
-    if not dl1_files_per_job:
-        if len(raw_files_list) < 100:
-            dl1_files_per_job = 10
+    else:
+        if "gamma" in input_dir:
+            dl1_files_per_job = 25
+        elif "gamma-diffuse" in input_dir or "electron" in input_dir:
+            dl1_files_per_job = 50
+        elif "proton" in input_dir:
+            dl1_files_per_job = 100
         else:
-            if "gamma" in input_dir:
-                dl1_files_per_job = 25
-            elif "gamma-diffuse" in input_dir or "electron" in input_dir:
-                dl1_files_per_job = 50
-            elif "proton" in input_dir:
-                dl1_files_per_job = 100
-            else:
-                dl1_files_per_job = 50
+            dl1_files_per_job = 50
 
     if rng is None:
         rng = default_rng()
