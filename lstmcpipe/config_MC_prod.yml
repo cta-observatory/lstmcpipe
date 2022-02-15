@@ -51,6 +51,8 @@ stages_to_be_run:
   - dl2_to_irfs
   - dl2_to_sensitivity
 
-
 merging_options:
   no_image: True
+
+slurm_config:
+  user_account: aswg
