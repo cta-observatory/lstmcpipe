@@ -348,7 +348,7 @@ def merge_dl1(
 
         # Close " of wrap
         if workflow_kind == "lstchain":
-            cmd += f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image}"'
+            cmd += f'lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image"'
         elif workflow_kind == "hiperta":
             cmd += (
                 f"lstchain_merge_hdf5_files -d {tdir} -o {output_filename} --no-image {flag_no_image} "
