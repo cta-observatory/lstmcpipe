@@ -207,7 +207,7 @@ def train_pipe(
     #     print(cmd)
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long --mem=32G --cpus-per-task=8"
+    batch_cmd = "sbatch --parsable -p long --mem=32G"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     if wait_ids_proton_and_gammas != "":

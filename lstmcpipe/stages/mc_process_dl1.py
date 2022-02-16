@@ -154,7 +154,7 @@ def r0_to_dl1(
     offset=None,
     workflow_kind="lstchain",
     keep_rta_file=False,
-    n_jobs_parallel=20,
+    n_jobs_parallel=50,
 ):
     """
     R0 to DL1 MC onsite conversion.
@@ -265,7 +265,7 @@ def r0_to_dl1(
         elif "gamma-diffuse" in input_dir or "electron" in input_dir:
             dl1_files_per_job = 50
         elif "proton" in input_dir:
-            dl1_files_per_job = 100
+            dl1_files_per_job = 50
         else:
             dl1_files_per_job = 50
 
