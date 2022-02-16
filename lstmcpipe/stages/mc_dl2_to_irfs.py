@@ -295,7 +295,7 @@ def dl2_to_irfs(
 
     batch_cmd = "sbatch --parsable -p short"
     if slurm_account != "":
-        batch_cmd += f" -A {batch_cmd}"
+        batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
         f" --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
         f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
