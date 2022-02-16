@@ -190,13 +190,11 @@ def main():
         save_log_to_file(
             log_batch_dl1,
             logs_files["log_file"],
-            log_format="yml",
             workflow_step="r0_to_dl1"
         )
         save_log_to_file(
             debug_r0dl1,
             logs_files["debug_file"],
-            log_format="yml",
             workflow_step="r0_to_dl1"
         )
         update_scancel_file(scancel_file, jobs_all_dl1)
@@ -229,13 +227,11 @@ def main():
         save_log_to_file(
             log_batch_merge_and_copy,
             logs_files["log_file"],
-            log_format="yml",
             workflow_step="merge_and_copy_dl1",
         )
         save_log_to_file(
             debug_merge,
             logs_files["debug_file"],
-            log_format="yml",
             workflow_step="merge_and_copy_dl1",
         )
         update_scancel_file(scancel_file, jobs_all_dl1_finished)
@@ -293,13 +289,11 @@ def main():
         save_log_to_file(
             log_batch_dl1_to_dl2,
             logs_files["log_file"],
-            log_format="yml",
             workflow_step="dl1_to_dl2"
         )
         save_log_to_file(
             debug_dl1dl2,
             logs_files["debug_file"],
-            log_format="yml",
             workflow_step="dl1_to_dl2"
         )
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
