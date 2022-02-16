@@ -4,7 +4,6 @@
 
 import os
 import yaml
-import pprint
 import logging
 from pathlib import Path
 
@@ -12,7 +11,7 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 
-def save_log_to_file(dictionary, output_file, log_format="yml", workflow_step=None):
+def save_log_to_file(dictionary, output_file, workflow_step=None):
     """
     Dumps a dictionary (log) into a dicts of dicts with keys each of the pipeline stages.
 
@@ -22,8 +21,6 @@ def save_log_to_file(dictionary, output_file, log_format="yml", workflow_step=No
         The dictionary to be dumped to a file
     output_file : str or Path
         Output file to store the log
-    log_format : str
-        The way the data will be dumped to the output file. Either using yaml or just writing a dictionary as plain text
     workflow_step : str
         Step of the workflow, to be recorded in the log
 
@@ -36,16 +33,8 @@ def save_log_to_file(dictionary, output_file, log_format="yml", workflow_step=No
 
     dict2log = {workflow_step: dictionary}
 
-    if log_format == "yml":
-        with open(output_file, "a+") as fileout:
-            yaml.dump(dict2log, fileout)
-    else:
-        # json
-        with open(output_file, "a+") as fout:
-            fout.write("\n\n  *******************************************\n")
-            fout.write(f"   *** Log from the {workflow_step} stage \n")
-            fout.write("  *******************************************\n")
-            fout.write(pprint.pformat(dict2log))
+    with open(output_file, "a+") as fileout:
+        yaml.dump(dict2log, fileout)
 
 
 def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=None):
