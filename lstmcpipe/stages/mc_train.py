@@ -9,12 +9,13 @@ import time
 import shutil
 import logging
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
 
 
-def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_config):
+def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_config, logs):
     """
     Function to batch the lstchain train_pipe once the proton and gamma-diffuse merge_and_copy_dl1 batched jobs have
     finished.
@@ -32,18 +33,16 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_confi
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         the `train_pipe` function.
+    logs: dict
+        Dictionary con logs files
 
     Returns
     -------
-    log_train : dict
-        Dictionary containing the log of the batched train_pipe jobs
     jobid_4_dl1_to_dl2 : str
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
     model_path : str
         Path with the model's directory
-    debug_log : dict
-        Debug and summary purposes
     """
     debug_log = {}
 
@@ -70,12 +69,15 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_confi
         f"_and_copy jobids"
     )
 
+    save_log_to_file(log_train, logs["log_file"], workflow_step="train_pipe")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="train_pipe")
+
     log.info("==== END {} ====".format("batch mc_train_workflow"))
 
-    return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
+    return jobid_4_dl1_to_dl2, model_path
 
 
-def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_jobid):
+def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_jobid, logs):
     """
     Batches the plot_model_importance.py script that creates a .png with the RF feature's importance models
     after the RF are trained.
@@ -91,13 +93,11 @@ def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_j
         Dictionary containing the (full) source_environment and the slurm_account strings.
     train_jobid: str
         Single jobid from training stage.
-
-    Returns
-    -------
-    log: dict
-        Dictionary with lstmcpipe_plot_models_importance single job id to be passed to debug log.
+    logs: dict
+        Dictionary with logs files
     """
-    logs = {}
+    log_rf_feat = {}
+    log_debug = {}
 
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
@@ -118,12 +118,16 @@ def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_j
     )
     jobid = os.popen(slurm_cmd).read().strip("\n")
 
-    logs[jobid] = "Single job_id to plot RF feature s importance"
+    log_rf_feat[jobid] = slurm_cmd
+    log_debug[jobid] = "Single job_id to plot RF feature s importance"
+
+    save_log_to_file(log_rf_feat, logs["log_file"],
+                     workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_debug, logs["debug_file"],
+                     workflow_step="plot_RF_features_importance")
 
     log.info(" Random Forest importance's plot will be saved at: {}".format(dir_models))
     log.info("==== END {} ====".format("batch plot RF features importance"))
-
-    return logs
 
 
 def train_pipe(

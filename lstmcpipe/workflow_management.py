@@ -12,7 +12,7 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 
-def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
+def save_log_to_file(dictionary, output_file, log_format="yml", workflow_step=None):
     """
     Dumps a dictionary (log) into a dicts of dicts with keys each of the pipeline stages.
 
@@ -20,7 +20,7 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
     ----------
     dictionary : dict
         The dictionary to be dumped to a file
-    output_file : str
+    output_file : str or Path
         Output file to store the log
     log_format : str
         The way the data will be dumped to the output file. Either using yaml or just writing a dictionary as plain text
@@ -40,6 +40,7 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
         with open(output_file, "a+") as fileout:
             yaml.dump(dict2log, fileout)
     else:
+        # json
         with open(output_file, "a+") as fout:
             fout.write("\n\n  *******************************************\n")
             fout.write(f"   *** Log from the {workflow_step} stage \n")
@@ -107,12 +108,11 @@ def batch_mc_production_check(
     jobids_from_dl2_to_irf,
     jobids_from_dl2_to_sensitivity,
     prod_id,
-    log_file,
-    log_debug_file,
     scancel_file,
     prod_config_file,
     last_stage,
-    batch_config
+    batch_config,
+    logs_files,
 ):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
@@ -130,17 +130,16 @@ def batch_mc_production_check(
     jobids_from_dl1_to_dl2: str
     jobids_from_dl2_to_irf: str
     jobids_from_dl2_to_sensitivity: str
-    log_file: str
-    log_debug_file: str
-    scancel_file: str
+    scancel_file: str  or Path
     prod_config_file: str
     last_stage: str
     batch_config: dict
+    logs_files: dict
+        Dictionary with logs files
 
     Returns
     -------
-    debug_log : dict
-        Dict with the jobid of the batched job to be stored in the `debug file`
+    jobid : str
 
     """
     debug_log = {}
@@ -183,7 +182,8 @@ def batch_mc_production_check(
         f"check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; "
         f"rm {scancel_file}; "
         f"cp {Path(prod_config_file).resolve()} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
-        f"mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};"
+        f"mv slurm-* check_MC_{prod_id}.txt {logs_files['log_file']} {logs_files['log_debug_file']}"
+        f" IRFFITSWriter.provenance.log logs_{prod_id};"
     )
 
     batch_cmd = "sbatch -p short --parsable"
@@ -209,7 +209,10 @@ def batch_mc_production_check(
     debug_log["SUMMARY_dl2_irfs"] = jobids_from_dl2_to_irf
     debug_log["SUMMARY_dl2_sensitivity"] = jobids_from_dl2_to_sensitivity
 
-    return jobid, debug_log
+    save_log_to_file(debug_log, logs_files["debug_file"],
+                     workflow_step="check_full_workflow")
+
+    return jobid
 
 
 def create_log_files(production_id):
@@ -223,11 +226,11 @@ def create_log_files(production_id):
 
     Returns
     -------
-    log_file: str
-         path and filename of full log file
-    debug_file: str
-        path and filename of reduced (debug) log file
-    scancel_file: str
+    logs_files: dict
+        Dictionary containing
+            log_file: Path - path and filename of full log file
+            debug_file: Path - path and filename of reduced (debug) log file
+    scancel_file: Path
         path and filename of bash file to cancel all the scheduled jobs
     """
     log_file = Path(f"./log_onsite_mc_r0_to_dl3_{production_id}.yml")
@@ -235,6 +238,8 @@ def create_log_files(production_id):
     scancel_file = Path(f"./scancel_{production_id}.sh")
 
     # scancel prod file needs chmod +x rights !
+    if scancel_file.exists():
+        scancel_file.unlink()
     scancel_file.touch()
     scancel_file.chmod(0o755)  # -rwxr-xr-x
 
@@ -244,7 +249,12 @@ def create_log_files(production_id):
     if debug_file.exists():
         debug_file.unlink()
 
-    return log_file, debug_file, scancel_file
+    logs_files = {
+        "log_file": log_file,
+        "debug_file": debug_file
+    }
+
+    return logs_files, scancel_file
 
 
 def update_scancel_file(scancel_file, jobids_to_update):

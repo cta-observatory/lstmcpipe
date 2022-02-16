@@ -144,7 +144,7 @@ def main():
     no_image_merging = config.get("merging_no_image")
 
     # Create log files
-    log_file, debug_file, scancel_file = create_log_files(prod_id)
+    logs_files, scancel_file = create_log_files(prod_id)
 
     # Make sure the lstchain config is defined if needed
     # It is not exactly required if you process only up to dl1
@@ -173,8 +173,10 @@ def main():
         else:  # if this wasnt ctapipe, the config parsing would have failed
             dl1_config = Path(args.config_file_ctapipe)
         stage_input_dir = Path(input_dir)
+
         if dl1ab:
             stage_input_dir /= config["dl1_reference_id"]
+
         log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
             input_dir=stage_input_dir.as_posix(),
             conf_file=dl1_config,
@@ -186,10 +188,16 @@ def main():
             new_production=r0_to_dl1,
         )
         save_log_to_file(
-            log_batch_dl1, log_file, log_format="yml", workflow_step="r0_to_dl1"
+            log_batch_dl1,
+            logs_files["log_file"],
+            log_format="yml",
+            workflow_step="r0_to_dl1"
         )
         save_log_to_file(
-            debug_r0dl1, debug_file, log_format="yml", workflow_step="r0_to_dl1"
+            debug_r0dl1,
+            logs_files["debug_file"],
+            log_format="yml",
+            workflow_step="r0_to_dl1"
         )
         update_scancel_file(scancel_file, jobs_all_dl1)
 
@@ -220,13 +228,13 @@ def main():
 
         save_log_to_file(
             log_batch_merge_and_copy,
-            log_file,
+            logs_files["log_file"],
             log_format="yml",
             workflow_step="merge_and_copy_dl1",
         )
         save_log_to_file(
             debug_merge,
-            debug_file,
+            logs_files["debug_file"],
             log_format="yml",
             workflow_step="merge_and_copy_dl1",
         )
@@ -243,35 +251,24 @@ def main():
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
         train_config = Path(args.config_file_lst)
-        (
-            log_batch_train_pipe,
-            job_from_train_pipe,
-            model_dir,
-            debug_train,
-        ) = batch_train_pipe(
+
+        job_from_train_pipe, model_dir = batch_train_pipe(
             log_batch_merge_and_copy,
             train_config,
             jobs_to_train,
-            batch_config=batch_config
+            batch_config=batch_config,
+            logs=logs_files
         )
 
-        save_log_to_file(
-            log_batch_train_pipe, log_file, log_format="yml", workflow_step="train_pipe"
-        )
-        save_log_to_file(
-            debug_train, debug_file, log_format="yml", workflow_step="train_pipe"
-        )
         update_scancel_file(scancel_file, job_from_train_pipe)
 
         # Plot the RF feature's importance
-        log_plot_rf_features = batch_plot_rf_features(
-            model_dir, args.config_file_lst, batch_config, job_from_train_pipe
-        )
-        save_log_to_file(
-            log_plot_rf_features,
-            debug_file,
-            log_format="yml",
-            workflow_step="plot_RF_features_importance",
+        batch_plot_rf_features(
+            model_dir,
+            args.config_file_lst,
+            batch_config,
+            job_from_train_pipe,
+            logs=logs_files
         )
 
     else:
@@ -294,10 +291,16 @@ def main():
         )
 
         save_log_to_file(
-            log_batch_dl1_to_dl2, log_file, log_format="yml", workflow_step="dl1_to_dl2"
+            log_batch_dl1_to_dl2,
+            logs_files["log_file"],
+            log_format="yml",
+            workflow_step="dl1_to_dl2"
         )
         save_log_to_file(
-            debug_dl1dl2, debug_file, log_format="yml", workflow_step="dl1_to_dl2"
+            debug_dl1dl2,
+            logs_files["debug_file"],
+            log_format="yml",
+            workflow_step="dl1_to_dl2"
         )
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
 
@@ -307,7 +310,7 @@ def main():
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
-        log_batch_dl2_to_irfs, jobs_from_dl2_irf, debug_dl2_to_irfs = batch_dl2_to_irfs(
+        jobs_from_dl2_irf = batch_dl2_to_irfs(
             dl2_output_dir,
             all_particles,
             gamma_offs,
@@ -316,17 +319,9 @@ def main():
             log_from_dl1_dl2=log_batch_dl1_to_dl2,
             batch_config=batch_config,
             prod_id=prod_id,
+            logs=logs_files
         )
 
-        save_log_to_file(
-            log_batch_dl2_to_irfs,
-            log_file,
-            log_format="yml",
-            workflow_step="dl2_to_irfs",
-        )
-        save_log_to_file(
-            debug_dl2_to_irfs, debug_file, log_format="yml", workflow_step="dl2_to_irfs"
-        )
         update_scancel_file(scancel_file, jobs_from_dl2_irf)
 
     else:
@@ -334,38 +329,23 @@ def main():
 
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
-        (
-            log_batch_dl2_sensitivity,
-            jobs_from_dl2_sensitivity,
-            debug_dl2_to_sensitivity,
-        ) = batch_dl2_to_sensitivity(
+        jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
             dl2_output_dir,
             gamma_offs,
             jobs_from_dl1_dl2,
             log_batch_dl1_to_dl2,  # Final dl2 names
             batch_config=batch_config,
             prod_id=prod_id,
+            logs=logs_files
         )
 
-        save_log_to_file(
-            log_batch_dl2_sensitivity,
-            log_file,
-            log_format="yml",
-            workflow_step="dl2_to_sensitivity",
-        )
-        save_log_to_file(
-            debug_dl2_to_sensitivity,
-            debug_file,
-            log_format="yml",
-            workflow_step="dl2_to_sensitivity",
-        )
         update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
 
     else:
         jobs_from_dl2_sensitivity = ""
 
     # Check DL2 jobs and the full workflow if it has finished correctly
-    jobid_check, debug_mc_check = batch_mc_production_check(
+    jobid_check = batch_mc_production_check(
         jobs_all_dl1,
         jobs_all_dl1_finished,
         job_from_train_pipe,
@@ -373,20 +353,13 @@ def main():
         jobs_from_dl2_irf,
         jobs_from_dl2_sensitivity,
         prod_id,
-        log_file,
-        debug_file,
         scancel_file,
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],
-        batch_config=batch_config
+        batch_config=batch_config,
+        logs_files=logs_files
     )
 
-    save_log_to_file(
-        debug_mc_check,
-        debug_file,
-        log_format="yml",
-        workflow_step="check_full_workflow",
-    )
     update_scancel_file(scancel_file, jobid_check)
     log.info("Finished lstmcpipe processing script. All jobs have been submitted")
 
