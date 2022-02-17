@@ -64,27 +64,29 @@ def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None)
     for particle in particles_loop:
         if gamma_offsets is not None and particle == "gamma":
             for off in gamma_offsets:
-                _particle = particle + off
+                _particle = particle + "_" + off
                 dl1_filename_directory[_particle] = {"training": {}, "testing": {}}
 
                 dl1_filename_directory[_particle]["training"][
                     "train_path_and_outname_dl1"
                 ] = next(
-                    Path(off) / dl1_directory.format(particle).glob("*training*.h5")
-                )
+                    Path(dl1_directory.format(particle), off).glob("*training*.h5")
+                ).resolve().as_posix()
                 dl1_filename_directory[_particle]["testing"][
                     "test_path_and_outname_dl1"
                 ] = next(
-                    Path(off) / dl1_directory.format(particle).glob("*testing*.h5")
-                )
+                    Path(dl1_directory.format(particle), off).glob("*testing*.h5")
+                ).resolve().as_posix()
         else:
             dl1_filename_directory[particle] = {"training": {}, "testing": {}}
             dl1_filename_directory[particle]["training"][
                 "train_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5"))
+            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5")
+                     ).resolve().as_posix()
             dl1_filename_directory[particle]["testing"][
                 "test_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5"))
+            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5")
+                     ).resolve().as_posix()
 
     return dl1_filename_directory
 
