@@ -173,7 +173,7 @@ def batch_mc_production_check(
         f"check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; "
         f"rm {scancel_file}; "
         f"cp {Path(prod_config_file).resolve()} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
-        f"mv slurm-* check_MC_{prod_id}.txt {logs_files['log_file']} {logs_files['log_debug_file']}"
+        f"mv slurm-* check_MC_{prod_id}.txt {logs_files['log_file']} {logs_files['debug_file']}"
         f" IRFFITSWriter.provenance.log logs_{prod_id};"
     )
 
