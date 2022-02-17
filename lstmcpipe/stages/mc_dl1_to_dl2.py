@@ -226,7 +226,7 @@ def dl1_to_dl2(
         jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.o")
 
         # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
-        batch_cmd = "sbatch --parsable -p short --mem=16G"
+        batch_cmd = "sbatch --parsable -p short --mem=32G"
         if slurm_account != "":
             batch_cmd += f" -A {slurm_account}"
         batch_cmd += (
