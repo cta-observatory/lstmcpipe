@@ -167,11 +167,11 @@ def main():
 
     if r0_to_dl1 or dl1ab:
         if workflow_kind == "lstchain":
-            dl1_config = Path(args.config_file_lst)
+            dl1_config = Path(args.config_file_lst).resolve()
         elif workflow_kind == "hiperta":
-            dl1_config = Path(args.config_file_rta)
+            dl1_config = Path(args.config_file_rta).resolve()
         else:  # if this wasnt ctapipe, the config parsing would have failed
-            dl1_config = Path(args.config_file_ctapipe)
+            dl1_config = Path(args.config_file_ctapipe).resolve()
         stage_input_dir = Path(input_dir)
 
         if dl1ab:
