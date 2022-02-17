@@ -28,8 +28,7 @@ from lstmcpipe.stages import (
     batch_plot_rf_features,
 )
 from lstmcpipe.workflow_management import (
-    save_log_to_file,
-    create_dict_with_dl1_filenames,
+    create_dl1_filenames_dict,
     batch_mc_production_check,
     create_log_files,
     update_scancel_file,
@@ -165,6 +164,7 @@ def main():
     # 1 STAGE --> R0/1 to DL1 or reprocessing of existing dl1a files
     r0_to_dl1 = "r0_to_dl1" in stages_to_run
     dl1ab = "dl1ab" in stages_to_run
+
     if r0_to_dl1 or dl1ab:
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst)
@@ -177,7 +177,7 @@ def main():
         if dl1ab:
             stage_input_dir /= config["dl1_reference_id"]
 
-        log_batch_dl1, debug_r0dl1, jobs_all_dl1 = batch_process_dl1(
+        particle2jobid_process_dl1_dict, jobs_all_dl1 = batch_process_dl1(
             input_dir=stage_input_dir.as_posix(),
             conf_file=dl1_config,
             prod_id=prod_id,
@@ -186,35 +186,26 @@ def main():
             gamma_offsets=gamma_offs,
             workflow_kind=workflow_kind,
             new_production=r0_to_dl1,
+            logs=logs_files,
         )
-        save_log_to_file(
-            log_batch_dl1,
-            logs_files["log_file"],
-            workflow_step="r0_to_dl1"
-        )
-        save_log_to_file(
-            debug_r0dl1,
-            logs_files["debug_file"],
-            workflow_step="r0_to_dl1"
-        )
+
         update_scancel_file(scancel_file, jobs_all_dl1)
 
     else:
         jobs_all_dl1 = ""
-        log_batch_dl1 = {}
+        particle2jobid_process_dl1_dict = {}
         for particle in all_particles:
-            log_batch_dl1[particle] = ""
+            particle2jobid_process_dl1_dict[particle] = ""
 
     # 2 STAGE --> Merge,copy and move DL1 files
     if "merge_and_copy_dl1" in stages_to_run:
         (
-            log_batch_merge_and_copy,
+            merged_dl1_paths_dict,
             jobs_to_train,
             jobs_all_dl1_finished,
-            debug_merge,
         ) = batch_merge_and_copy_dl1(
             running_analysis_dir,
-            log_batch_dl1,
+            particle2jobid_process_dl1_dict,
             all_particles,
             smart_merge=False,  # smart_merge=WORKFLOW_KIND
             no_image_flag=no_image_merging,
@@ -222,23 +213,14 @@ def main():
             prod_id=prod_id,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
+            logs=logs_files,
         )
 
-        save_log_to_file(
-            log_batch_merge_and_copy,
-            logs_files["log_file"],
-            workflow_step="merge_and_copy_dl1",
-        )
-        save_log_to_file(
-            debug_merge,
-            logs_files["debug_file"],
-            workflow_step="merge_and_copy_dl1",
-        )
         update_scancel_file(scancel_file, jobs_all_dl1_finished)
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        log_batch_merge_and_copy = create_dict_with_dl1_filenames(
+        merged_dl1_paths_dict = create_dl1_filenames_dict(
             dl1_output_dir, all_particles, gamma_offs
         )
         jobs_to_train = ""
@@ -249,7 +231,7 @@ def main():
         train_config = Path(args.config_file_lst)
 
         job_from_train_pipe, model_dir = batch_train_pipe(
-            log_batch_merge_and_copy,
+            merged_dl1_paths_dict,
             train_config,
             jobs_to_train,
             batch_config=batch_config,
@@ -274,33 +256,25 @@ def main():
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
         dl1_to_dl2_config = Path(args.config_file_lst)
-        log_batch_dl1_to_dl2, jobs_from_dl1_dl2, debug_dl1dl2 = batch_dl1_to_dl2(
+
+        dl2_files_path_dict, jobs_from_dl1_dl2 = batch_dl1_to_dl2(
             dl1_output_dir,
             model_dir,
             dl1_to_dl2_config,
             job_from_train_pipe,  # Single jobid from train
             jobs_all_dl1_finished,  # jobids from merge
-            log_batch_merge_and_copy,  # final dl1 names
+            merged_dl1_paths_dict,  # final dl1 names
             all_particles,
             batch_config=batch_config,
             gamma_offsets=gamma_offs,
+            logs=logs_files
         )
 
-        save_log_to_file(
-            log_batch_dl1_to_dl2,
-            logs_files["log_file"],
-            workflow_step="dl1_to_dl2"
-        )
-        save_log_to_file(
-            debug_dl1dl2,
-            logs_files["debug_file"],
-            workflow_step="dl1_to_dl2"
-        )
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
 
     else:
         jobs_from_dl1_dl2 = ""
-        log_batch_dl1_to_dl2 = {}  # Empty log will be manage inside onsite_dl2_irfs
+        dl2_files_path_dict = {}  # Empty log will be manage inside onsite_dl2_irfs
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
@@ -310,7 +284,7 @@ def main():
             gamma_offs,
             Path(args.config_file_lst),
             jobs_from_dl1_dl2,  # Final dl2 names
-            log_from_dl1_dl2=log_batch_dl1_to_dl2,
+            log_from_dl1_dl2=dl2_files_path_dict,
             batch_config=batch_config,
             prod_id=prod_id,
             logs=logs_files
@@ -327,7 +301,7 @@ def main():
             dl2_output_dir,
             gamma_offs,
             jobs_from_dl1_dl2,
-            log_batch_dl1_to_dl2,  # Final dl2 names
+            dl2_files_path_dict,  # Final dl2 names
             batch_config=batch_config,
             prod_id=prod_id,
             logs=logs_files

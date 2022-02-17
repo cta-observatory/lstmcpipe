@@ -37,7 +37,7 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
         yaml.dump(dict2log, fileout)
 
 
-def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=None):
+def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None):
     """
     Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
     in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow
@@ -189,7 +189,7 @@ def batch_mc_production_check(
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[
         jobid
-    ] = "single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly."
+    ] = "single jobid batched to check the check command worked correctly."
     debug_log["sbatch_cmd"] = batch_cmd
     debug_log["SUMMARY_r0_dl1"] = jobids_from_r0_to_dl1
     debug_log["SUMMARY_merge"] = jobids_from_merge

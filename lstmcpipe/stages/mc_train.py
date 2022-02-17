@@ -34,7 +34,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_confi
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         the `train_pipe` function.
     logs: dict
-        Dictionary con logs files
+        Dictionary with logs files
 
     Returns
     -------

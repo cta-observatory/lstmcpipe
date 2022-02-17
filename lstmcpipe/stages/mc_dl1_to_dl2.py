@@ -9,6 +9,7 @@ import time
 import shutil
 import logging
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ def batch_dl1_to_dl2(
     dict_with_dl1_paths,
     particles_loop,
     batch_config,
+    logs,
     gamma_offsets=None,
 ):
     """
@@ -49,9 +51,10 @@ def batch_dl1_to_dl2(
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         dl1_dl2 function
-
     gamma_offsets : list
         list off gamma offsets
+    logs: dict
+        Dictionary with logs files
 
     Returns
     -------
@@ -59,8 +62,6 @@ def batch_dl1_to_dl2(
         Dictionary containing the log of the batched dl1_to_dl2 jobs
     jobid_4_dl2_to_dl3 : str
         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
-    debug_log : dict
-        Debug and summary purposes
 
     """
 
@@ -118,9 +119,12 @@ def batch_dl1_to_dl2(
 
     jobid_4_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
 
+    save_log_to_file(log_dl1_to_dl2, logs["log_file"], workflow_step="dl1_to_dl2")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl1_to_dl2")
+
     log.info("==== END {} ====".format("batch dl1_to_dl2_workflow"))
 
-    return log_dl1_to_dl2, jobid_4_dl2_to_dl3, debug_log
+    return log_dl1_to_dl2, jobid_4_dl2_to_dl3
 
 
 def dl1_to_dl2(
