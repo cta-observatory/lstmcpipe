@@ -10,6 +10,7 @@ import numpy as np
 import astropy.units as u
 from pyirf.utils import cone_solid_angle
 import ctaplot
+from astropy.visualization import quantity_support
 
 
 def plot_summary_from_file(filename, axes=None, **kwargs):
@@ -397,13 +398,6 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
     ax.legend()
 
     return ax
-
-
-
-from pathlib import Path
-from lstmcpipe.plots.plot_irfs import read_sensitivity_table
-import astropy.units as u
-from astropy.visualization import quantity_support
 
 
 def plot_sensitivity_ratio(sensitivity_tables, baseline_index=0, ax=None, labels=None, **kwargs):
