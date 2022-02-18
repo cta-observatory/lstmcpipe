@@ -224,7 +224,8 @@ def create_log_files(production_id):
     scancel_file: Path
         path and filename of bash file to cancel all the scheduled jobs
     """
-    log_file = Path(f"./log_lstmcpipe_{production_id}.yml")
+    import lstmcpipe
+    log_file = Path(f"./log_lstmcpipe{lstmcpipe.__version__}_{production_id}.yml")
     debug_file = Path(f"./log_reduced_{production_id}.yml")
     scancel_file = Path(f"./scancel_{production_id}.sh")
 
