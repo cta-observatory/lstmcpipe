@@ -49,69 +49,6 @@ from lstchain.io.io import read_mc_dl2_to_QTable
 import argparse
 
 
-log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
-
-
-parser = argparse.ArgumentParser(description="MC DL2 to IRF")
-
-# Required arguments
-parser.add_argument(
-    "--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file"
-)
-
-parser.add_argument(
-    "--proton-dl2",
-    "-p",
-    type=str,
-    dest="proton_file",
-    help="Path to the dl2 proton file",
-)
-
-parser.add_argument(
-    "--electron-dl2",
-    "-e",
-    type=str,
-    dest="electron_file",
-    help="Path to the dl2 electron file",
-)
-
-parser.add_argument(
-    "--outfile",
-    "-o",
-    action="store",
-    type=str,
-    dest="outfile",
-    help="Path where to save IRF FITS file",
-    default="sensitivity.fits.gz",
-)
-
-parser.add_argument(
-    "--source_alt",
-    action="store",
-    type=float,
-    dest="source_alt",
-    help="Source altitude (optional). If not provided, it will be guessed from the gammas true altitude",
-    default=None
-)
-
-parser.add_argument(
-    "--source_az",
-    action="store",
-    type=float,
-    dest="source_az",
-    help="Source azimuth (optional). If not provided, it will be guessed from the gammas true altitude",
-    default=None
-)
-
-# Optional arguments
-# parser.add_argument('--config', '-c', action='store', type=Path,
-#                     dest='config_file',
-#                     help='Path to a configuration file. If none is given, a standard configuration is applied',
-#                     default=None
-#                     )
-
-
-args = parser.parse_args()
 
 T_OBS = 50 * u.hour
 
@@ -171,7 +108,72 @@ def determine_source_position(gamma_events, args):
     return source_alt, source_az
 
 
-def main():
+
+if __name__ == "__main__":
+    log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
+
+
+    parser = argparse.ArgumentParser(description="MC DL2 to IRF")
+
+    # Required arguments
+    parser.add_argument(
+        "--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file"
+    )
+
+    parser.add_argument(
+        "--proton-dl2",
+        "-p",
+        type=str,
+        dest="proton_file",
+        help="Path to the dl2 proton file",
+    )
+
+    parser.add_argument(
+        "--electron-dl2",
+        "-e",
+        type=str,
+        dest="electron_file",
+        help="Path to the dl2 electron file",
+    )
+
+    parser.add_argument(
+        "--outfile",
+        "-o",
+        action="store",
+        type=str,
+        dest="outfile",
+        help="Path where to save IRF FITS file",
+        default="sensitivity.fits.gz",
+    )
+
+    parser.add_argument(
+        "--source_alt",
+        action="store",
+        type=float,
+        dest="source_alt",
+        help="Source altitude (optional). If not provided, it will be guessed from the gammas true altitude",
+        default=None
+    )
+
+    parser.add_argument(
+        "--source_az",
+        action="store",
+        type=float,
+        dest="source_az",
+        help="Source azimuth (optional). If not provided, it will be guessed from the gammas true altitude",
+        default=None
+    )
+
+    # Optional arguments
+    # parser.add_argument('--config', '-c', action='store', type=Path,
+    #                     dest='config_file',
+    #                     help='Path to a configuration file. If none is given, a standard configuration is applied',
+    #                     default=None
+    #                     )
+
+
+    args = parser.parse_args()
+    
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pyirf").setLevel(logging.DEBUG)
 
@@ -391,7 +393,3 @@ def main():
     log.info("Writing output file")
     Path(args.outfile).parent.mkdir(exist_ok=True)
     fits.HDUList(hdus).writeto(args.outfile, overwrite=True)
-
-
-if __name__ == "__main__":
-    main()
