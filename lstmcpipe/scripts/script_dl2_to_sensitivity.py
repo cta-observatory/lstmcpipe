@@ -94,8 +94,7 @@ def determine_source_position(gamma_events):
     return source_alt, source_az
 
 
-
-if __name__ == "__main__":
+def main():
     log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
 
     parser = argparse.ArgumentParser(description="MC DL2 to IRF")
@@ -391,3 +390,7 @@ if __name__ == "__main__":
     log.info("Writing output file")
     Path(args.outfile).parent.mkdir(exist_ok=True)
     fits.HDUList(hdus).writeto(args.outfile, overwrite=True)
+
+
+if __name__ == "__main__":
+    main()
