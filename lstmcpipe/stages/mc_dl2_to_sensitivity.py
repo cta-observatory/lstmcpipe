@@ -3,6 +3,7 @@
 import os
 import time
 import logging
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ def batch_dl2_to_sensitivity(
     log_from_dl1_dl2,
     batch_config,
     prod_id,
+    logs,
 ):
     """
     Batches the dl2_to_sensitivity stage (`stages.script_dl2_to_sensitivity` based in the pyIRF iib) once the
@@ -36,15 +38,13 @@ def batch_dl2_to_sensitivity(
         dl2_to_sensitivity function
     prod_id: str
         String with prod_id prefix to complete 'file-naming'
+    logs: dict
+        Dictionary with logs files
 
     Returns
     -------
-    log_dl2_to_sensitivity: dict
-        Dictionary with job_id-slurm command key-value pair used for logging
     jobid_for_check: str
         Comma-separated jobids batched in the current stage
-    debug_log: dict
-        Dictionary with the job-id and stage explanation to be stored in the debug file
     """
     log.info("==== START {} ====".format("batch mc_dl2_to_sensitivity"))
     time.sleep(1)
@@ -76,9 +76,12 @@ def batch_dl2_to_sensitivity(
 
     jobid_for_check = ",".join(jobid_for_check)
 
+    save_log_to_file(log_dl2_to_sensitivity, logs["log_file"], "dl2_to_sensitivity")
+    save_log_to_file(debug_log, logs["debug_file"], "dl2_to_sensitivity")
+
     log.info("==== END {} ====".format("batch mc_dl2_to_sensitivity"))
 
-    return log_dl2_to_sensitivity, jobid_for_check, debug_log
+    return jobid_for_check
 
 
 def compose_sensitivity_outdir(dl2_dir, gamma_offset):

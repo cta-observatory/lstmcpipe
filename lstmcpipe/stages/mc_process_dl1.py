@@ -11,6 +11,7 @@ import shutil
 import logging
 from pathlib import Path
 from numpy.random import default_rng
+from lstmcpipe.workflow_management import save_log_to_file
 from lstmcpipe.io.data_management import (
     check_data_path,
     get_input_filelist,
@@ -27,6 +28,7 @@ def batch_process_dl1(
     prod_id,
     particles_loop,
     batch_config,
+    logs,
     gamma_offsets=None,
     workflow_kind="lstchain",
     new_production=True,
@@ -52,18 +54,18 @@ def batch_process_dl1(
         One of the supported pipelines. Defines the command to be run on r0 files
     new_production: bool
         Whether to analysis simtel or reprocess existing dl1 files.
+    logs: dict
+        Dictionary con logs files
 
     Returns
     -------
-    full_log : dict
+    particle2jobid_dict : dict
         Dictionary of dictionaries containing the full log of the batched jobs (jobids as keys) as well as the
         4 more keys (one by particle) with all the jobs associated with each particle.
-    debug_log : dict
-            dictionary containing minimum information - jobids -  for log_reduced.txt
     all_jobids_from_r0_dl1_stage : str
         string, separated by commas, containing all the jobids of this stage
     """
-    full_log = {"log_all_job_ids": {}}
+    particle2jobid_dict = {"full_logs_all_jobs": {}}
     debug_log = {}
     all_jobids_from_dl1_processing_stage = []
 
@@ -95,10 +97,10 @@ def batch_process_dl1(
                         offset=off,
                         workflow_kind=workflow_kind,
                     )
-                full_log["log_all_job_ids"].update(job_logs)
-                full_log[_particle] = ",".join(jobids_by_particle)
+                particle2jobid_dict["full_logs_all_jobs"].update(job_logs)
+                particle2jobid_dict[_particle] = ",".join(jobids_by_particle)
                 all_jobids_from_dl1_processing_stage.append(
-                    full_log[_particle]
+                    particle2jobid_dict[_particle]
                 )  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
@@ -124,10 +126,10 @@ def batch_process_dl1(
                     batch_config=batch_config,
                     workflow_kind=workflow_kind,
                 )
-            full_log["log_all_job_ids"].update(job_logs)
-            full_log[_particle] = ",".join(jobids_by_particle)
+            particle2jobid_dict["full_logs_all_jobs"].update(job_logs)
+            particle2jobid_dict[_particle] = ",".join(jobids_by_particle)
             all_jobids_from_dl1_processing_stage.append(
-                full_log[_particle]
+                particle2jobid_dict[_particle]
             )  # Create a list with particles elements
 
             for jid in jobids_by_particle:
@@ -137,9 +139,12 @@ def batch_process_dl1(
         all_jobids_from_dl1_processing_stage
     )  # Create a string to be directly passed
 
+    save_log_to_file(particle2jobid_dict, logs["log_file"], "r0_to_dl1")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="r0_to_dl1")
+
     log.info("==== END {} dl1 processing ====".format(workflow_kind))
 
-    return full_log, debug_log, all_jobids_from_dl1_processing_stage
+    return particle2jobid_dict, all_jobids_from_dl1_processing_stage
 
 
 def r0_to_dl1(
@@ -154,7 +159,7 @@ def r0_to_dl1(
     offset=None,
     workflow_kind="lstchain",
     keep_rta_file=False,
-    n_jobs_parallel=20,
+    n_jobs_parallel=50,
 ):
     """
     R0 to DL1 MC onsite conversion.
@@ -265,7 +270,7 @@ def r0_to_dl1(
         elif "gamma-diffuse" in input_dir or "electron" in input_dir:
             dl1_files_per_job = 50
         elif "proton" in input_dir:
-            dl1_files_per_job = 100
+            dl1_files_per_job = 50
         else:
             dl1_files_per_job = 50
 

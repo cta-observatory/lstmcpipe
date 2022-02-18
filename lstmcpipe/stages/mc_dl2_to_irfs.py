@@ -14,6 +14,7 @@ import glob
 import shutil
 import logging
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ def batch_dl2_to_irfs(
     log_from_dl1_dl2,
     batch_config,
     prod_id,
+    logs,
 ):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
@@ -52,12 +54,12 @@ def batch_dl2_to_irfs(
         Dictionary from dl1_to_dl2 stage with particle path information
     prod_id: str
         String with prod_id prefix to complete 'file-naming'
+    logs: dict
+        Dictionary with logs files
 
     Returns
     -------
-    log_batch_dl2_to_irfs: dict
     jobs_from_dl2_irf: str
-    debug_dl2_to_irfs: dict
     """
     log.info("==== START {} ====".format("batch mc_dl2_to_irfs"))
     time.sleep(1)
@@ -107,9 +109,12 @@ def batch_dl2_to_irfs(
 
     jobid_for_check = ",".join(jobid_for_check)
 
+    save_log_to_file(log_dl2_to_irfs, logs["log_file"], workflow_step="dl2_to_irfs")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl2_to_irfs")
+
     log.info("==== END {} ====".format("batch mc_dl2_to_irfs"))
 
-    return log_dl2_to_irfs, jobid_for_check, debug_log
+    return jobid_for_check
 
 
 def check_dl2_files(dl2_dir, pointlike, gamma_off):
@@ -295,7 +300,7 @@ def dl2_to_irfs(
 
     batch_cmd = "sbatch --parsable -p short"
     if slurm_account != "":
-        batch_cmd += f" -A {batch_cmd}"
+        batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
         f" --dependency=afterok:{wait_jobs_dl1dl2} -J IRF_{irf_kind}"
         f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'

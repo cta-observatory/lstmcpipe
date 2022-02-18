@@ -15,6 +15,7 @@ import os
 import time
 import logging
 from lstmcpipe.io.data_management import check_job_logs
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ def batch_merge_and_copy_dl1(
     log_jobs_from_r0_to_dl1,
     particles_loop,
     batch_config,
+    logs,
     smart_merge=False,
     no_image_flag=True,
     prod_id=None,
@@ -61,6 +63,8 @@ def batch_merge_and_copy_dl1(
         to `merge_dl1` and `compose_batch_command_of_script` functions.
     workflow_kind : str
         Defines workflow kind (lstchain, ctapipe, hiperta)
+    logs: dict
+        Dictionary with logs files
 
     Returns
     -------
@@ -70,8 +74,6 @@ def batch_merge_and_copy_dl1(
          string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
     all_merge : str
         string containing all the jobs to indicate that all the dl1 are correctly finished (for dl1_to_dl2)
-    debug_log : dict
-        Debug purposes
 
     """
     log_merge_and_copy = {}
@@ -152,9 +154,12 @@ def batch_merge_and_copy_dl1(
     jobid_4_train = ",".join(jobid_4_train)
     all_jobs_from_merge_stage = ",".join(all_jobs_from_merge_stage)
 
+    save_log_to_file(log_merge_and_copy, logs["log_file"], "merge_and_copy_dl1")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="merge_and_copy_dl1")
+
     log.info("==== END {} ====".format("batch merge_and_copy_dl1_workflow"))
 
-    return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage, debug_log
+    return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage
 
 
 def compose_batch_command_of_script(

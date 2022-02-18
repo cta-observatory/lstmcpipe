@@ -4,7 +4,6 @@
 
 import os
 import yaml
-import pprint
 import logging
 from pathlib import Path
 
@@ -12,7 +11,7 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 
-def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
+def save_log_to_file(dictionary, output_file, workflow_step=None):
     """
     Dumps a dictionary (log) into a dicts of dicts with keys each of the pipeline stages.
 
@@ -20,10 +19,8 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
     ----------
     dictionary : dict
         The dictionary to be dumped to a file
-    output_file : str
+    output_file : str or Path
         Output file to store the log
-    log_format : str
-        The way the data will be dumped to the output file. Either using yaml or just writing a dictionary as plain text
     workflow_step : str
         Step of the workflow, to be recorded in the log
 
@@ -36,18 +33,11 @@ def save_log_to_file(dictionary, output_file, log_format, workflow_step=None):
 
     dict2log = {workflow_step: dictionary}
 
-    if log_format == "yml":
-        with open(output_file, "a+") as fileout:
-            yaml.dump(dict2log, fileout)
-    else:
-        with open(output_file, "a+") as fout:
-            fout.write("\n\n  *******************************************\n")
-            fout.write(f"   *** Log from the {workflow_step} stage \n")
-            fout.write("  *******************************************\n")
-            fout.write(pprint.pformat(dict2log))
+    with open(output_file, "a+") as fileout:
+        yaml.dump(dict2log, fileout)
 
 
-def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=None):
+def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None):
     """
     Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
     in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow
@@ -74,27 +64,29 @@ def create_dict_with_dl1_filenames(dl1_directory, particles_loop, gamma_offsets=
     for particle in particles_loop:
         if gamma_offsets is not None and particle == "gamma":
             for off in gamma_offsets:
-                _particle = particle + off
+                _particle = particle + "_" + off
                 dl1_filename_directory[_particle] = {"training": {}, "testing": {}}
 
                 dl1_filename_directory[_particle]["training"][
                     "train_path_and_outname_dl1"
                 ] = next(
-                    Path(off) / dl1_directory.format(particle).glob("*training*.h5")
-                )
+                    Path(dl1_directory.format(particle), off).glob("*training*.h5")
+                ).resolve().as_posix()
                 dl1_filename_directory[_particle]["testing"][
                     "test_path_and_outname_dl1"
                 ] = next(
-                    Path(off) / dl1_directory.format(particle).glob("*testing*.h5")
-                )
+                    Path(dl1_directory.format(particle), off).glob("*testing*.h5")
+                ).resolve().as_posix()
         else:
             dl1_filename_directory[particle] = {"training": {}, "testing": {}}
             dl1_filename_directory[particle]["training"][
                 "train_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5"))
+            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5")
+                     ).resolve().as_posix()
             dl1_filename_directory[particle]["testing"][
                 "test_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5"))
+            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5")
+                     ).resolve().as_posix()
 
     return dl1_filename_directory
 
@@ -107,12 +99,11 @@ def batch_mc_production_check(
     jobids_from_dl2_to_irf,
     jobids_from_dl2_to_sensitivity,
     prod_id,
-    log_file,
-    log_debug_file,
     scancel_file,
     prod_config_file,
     last_stage,
-    batch_config
+    batch_config,
+    logs_files,
 ):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
@@ -130,17 +121,16 @@ def batch_mc_production_check(
     jobids_from_dl1_to_dl2: str
     jobids_from_dl2_to_irf: str
     jobids_from_dl2_to_sensitivity: str
-    log_file: str
-    log_debug_file: str
-    scancel_file: str
+    scancel_file: str  or Path
     prod_config_file: str
     last_stage: str
     batch_config: dict
+    logs_files: dict
+        Dictionary with logs files
 
     Returns
     -------
-    debug_log : dict
-        Dict with the jobid of the batched job to be stored in the `debug file`
+    jobid : str
 
     """
     debug_log = {}
@@ -183,7 +173,8 @@ def batch_mc_production_check(
         f"check_MC_{prod_id}.txt; mkdir -p logs_{prod_id}; "
         f"rm {scancel_file}; "
         f"cp {Path(prod_config_file).resolve()} logs_{prod_id}/config_MC_prod_{prod_id}.yml; "
-        f"mv slurm-* check_MC_{prod_id}.txt {log_file} {log_debug_file} IRFFITSWriter.provenance.log logs_{prod_id};"
+        f"mv slurm-* check_MC_{prod_id}.txt {logs_files['log_file']} {logs_files['debug_file']}"
+        f" IRFFITSWriter.provenance.log logs_{prod_id};"
     )
 
     batch_cmd = "sbatch -p short --parsable"
@@ -200,7 +191,7 @@ def batch_mc_production_check(
     # and in case the code brakes, here there is a summary of all the jobs by stages
     debug_log[
         jobid
-    ] = "single jobid batched to check that all the dl1_to_dl2 stage jobs finish correctly."
+    ] = "single jobid batched to check the check command worked correctly."
     debug_log["sbatch_cmd"] = batch_cmd
     debug_log["SUMMARY_r0_dl1"] = jobids_from_r0_to_dl1
     debug_log["SUMMARY_merge"] = jobids_from_merge
@@ -209,7 +200,10 @@ def batch_mc_production_check(
     debug_log["SUMMARY_dl2_irfs"] = jobids_from_dl2_to_irf
     debug_log["SUMMARY_dl2_sensitivity"] = jobids_from_dl2_to_sensitivity
 
-    return jobid, debug_log
+    save_log_to_file(debug_log, logs_files["debug_file"],
+                     workflow_step="check_full_workflow")
+
+    return jobid
 
 
 def create_log_files(production_id):
@@ -223,18 +217,21 @@ def create_log_files(production_id):
 
     Returns
     -------
-    log_file: str
-         path and filename of full log file
-    debug_file: str
-        path and filename of reduced (debug) log file
-    scancel_file: str
+    logs_files: dict
+        Dictionary containing
+            log_file: Path - path and filename of full log file
+            debug_file: Path - path and filename of reduced (debug) log file
+    scancel_file: Path
         path and filename of bash file to cancel all the scheduled jobs
     """
-    log_file = Path(f"./log_onsite_mc_r0_to_dl3_{production_id}.yml")
+    import lstmcpipe
+    log_file = Path(f"./log_lstmcpipe{lstmcpipe.__version__}_{production_id}.yml")
     debug_file = Path(f"./log_reduced_{production_id}.yml")
     scancel_file = Path(f"./scancel_{production_id}.sh")
 
     # scancel prod file needs chmod +x rights !
+    if scancel_file.exists():
+        scancel_file.unlink()
     scancel_file.touch()
     scancel_file.chmod(0o755)  # -rwxr-xr-x
 
@@ -244,7 +241,12 @@ def create_log_files(production_id):
     if debug_file.exists():
         debug_file.unlink()
 
-    return log_file, debug_file, scancel_file
+    logs_files = {
+        "log_file": log_file,
+        "debug_file": debug_file
+    }
+
+    return logs_files, scancel_file
 
 
 def update_scancel_file(scancel_file, jobids_to_update):
