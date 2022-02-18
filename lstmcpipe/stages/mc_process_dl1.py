@@ -416,7 +416,7 @@ def reprocess_dl1(
     slurm_account = batch_config["slurm_account"]
 
     if workflow_kind == "lstchain":
-        base_cmd = f"{source_environment} lstmcpipe_lst_core_dl1_dl1 -c {config_file} "
+        base_cmd = f"{source_environment} lstmcpipe_lst_core_dl1ab -c {config_file} "
         jobtype_id = "LST"
     elif workflow_kind == "ctapipe":
         base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
