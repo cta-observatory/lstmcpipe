@@ -399,6 +399,83 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
     return ax
 
 
+
+from pathlib import Path
+from lstmcpipe.plots.plot_irfs import read_sensitivity_table
+import astropy.units as u
+from astropy.visualization import quantity_support
+
+
+def plot_sensitivity_ratio(sensitivity_tables, baseline_index=0, ax=None, labels=None, **kwargs):
+    """
+    Plot the ratio of sensitivities as a function of the energy
+
+    Parameters
+    ----------
+    sensitivity_tables: list
+        list of sensitivity tables
+    baseline_index: int
+        index of the baseline to use in the list
+    ax: pyplot.axis
+    labels: list 
+        list of labels to use
+    kwargs: kwargs for the plot
+
+    Returns
+    -------
+    ax: pyplot.axis
+    """
+
+    ax = plt.gca() if ax is None else ax 
+    
+    sens_table_baseline = sensitivity_tables[baseline_index]
+    e = sens_table_baseline["reco_energy_center"]
+    w = sens_table_baseline["reco_energy_high"] - sens_table_baseline["reco_energy_low"]
+    s_baseline = e ** 2 * sens_table_baseline["flux_sensitivity"]
+    
+    for ii, sens_table in enumerate(sensitivity_tables):
+        s = e ** 2 * sens_table["flux_sensitivity"]
+        if labels is not None:
+            kwargs['label'] = labels[ii]
+        with quantity_support():
+            ax.errorbar(
+                e,
+                s/s_baseline,
+                xerr=w / 2,
+                **kwargs,
+            )
+    ax.set_title('Sensitivity ratio (lower is better)')
+    ax.set_xscale('log')
+    ax.grid(True, which='both')
+    ax.set_xlabel(f'Energy / {e.unit}')
+        
+    return ax
+
+
+def plot_sensitivity_ratio_from_files(filelist, baseline_index=0, ax=None, **kwargs):
+    """
+    Plot the ratio of sensitivities as a function of the energy
+
+    Parameters
+    ----------
+    sensitivity_tables: list
+        list of sensitivity tables
+    baseline_index: int
+        index of the baseline to use in the list
+    ax: pyplot.axis
+    kwargs: kwargs for the plot
+
+    Returns
+    -------
+    ax: pyplot.axis
+    """
+
+    sens_tables = [read_sensitivity_table(file) for file in filelist]
+    labels = [Path(file).name for file in filelist]
+    ax = plot_sensitivity_ratio(sens_tables, baseline_index=baseline_index, ax=ax, labels=labels, **kwargs)
+    return ax
+
+
 def main():
 
     parser = argparse.ArgumentParser(
