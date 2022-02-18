@@ -79,31 +79,17 @@ filters = {
 }
 
 
-particles = {
-    "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
-    "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
-    "electron": {
-        "file": args.electron_file,
-        "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
-    },
-}
 
-
-
-def determine_source_position(gamma_events, args):
-    if args.source_alt is None and len(set(gamma_events['true_alt'].value)) == 1:
+def determine_source_position(gamma_events):
+    if len(set(gamma_events['true_alt'].value)) == 1:
         source_alt = gamma_events['true_alt'][0]
-    elif args.source_alt is None:
-        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
     else:
-        source_alt = args.source_alt
+        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
 
-    if args.source_az is None and len(set(gamma_events['true_az'].value)) == 1:
+    if len(set(gamma_events['true_az'].value)) == 1:
         source_az = gamma_events['true_az'][0]
-    elif args.source_az is None:
-        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
     else:
-        source_az = args.source_az
+        raise ValueError("The gamma source position is not unique, one should be provided with --source-alt")
 
     return source_alt, source_az
 
@@ -111,7 +97,6 @@ def determine_source_position(gamma_events, args):
 
 if __name__ == "__main__":
     log = logging.getLogger("lstchain MC DL2 to IRF - sensitivity curves")
-
 
     parser = argparse.ArgumentParser(description="MC DL2 to IRF")
 
@@ -177,6 +162,15 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pyirf").setLevel(logging.DEBUG)
 
+    particles = {
+    "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
+    "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
+    "electron": {
+        "file": args.electron_file,
+        "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
+    },
+}
+
     for particle_type, p in particles.items():
         log.info("Simulated Events: {}".format(particle_type.title()))
         p["events"], p["simulation_info"] = read_mc_dl2_to_QTable(p["file"])
@@ -199,7 +193,11 @@ if __name__ == "__main__":
         [particles["proton"]["events"], particles["electron"]["events"]]
     )
 
-    source_alt, source_az = determine_source_position(gammas, args)
+    if args.source_alt is None or args.source_az is None:
+        source_alt, source_az = determine_source_position(gammas, args)
+    else:
+        source_alt, source_az = args.source_alt, args.source_az
+
     for particle_type, p in particles.items():
         # calculate theta / distance between reco and assumed source position
         # we handle only ON observations here, so the assumed source pos is the pointing position
