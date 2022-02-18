@@ -194,7 +194,7 @@ if __name__ == "__main__":
     )
 
     if args.source_alt is None or args.source_az is None:
-        source_alt, source_az = determine_source_position(gammas, args)
+        source_alt, source_az = determine_source_position(gammas)
     else:
         source_alt, source_az = args.source_alt, args.source_az
 
