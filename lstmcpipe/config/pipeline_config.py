@@ -82,6 +82,8 @@ def load_config(config_path):
     log.info(f'PROD_ID to be used: {config["prod_id"]}')
 
     log.info("Stages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
+    if "dl1ab" in config["stages_to_run"]:
+        log.info(f'Applying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
     log.info("Merging options:" f"\n - No-image argument: {config['merging_no_image']}")
     log.info("Slurm configuration:" +
              f"\n - Source environment: {config['batch_config']['source_environment']}" +
