@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# #!/usr/bin/env python
 
 # E. Garcia, Jan '20
 #
@@ -33,7 +33,7 @@ from lstmcpipe.workflow_management import (
     create_log_files,
     update_scancel_file,
 )
-from lstmcpipe.config import load_config
+from lstmcpipe.config import load_config, create_dl1ab_tuned_config
 from lstmcpipe.logging import setup_logging
 
 
@@ -166,14 +166,22 @@ def main():
     dl1ab = "dl1ab" in stages_to_run
 
     if r0_to_dl1 or dl1ab:
+        stage_input_dir = Path(input_dir)
         if workflow_kind == "lstchain":
-            dl1_config = Path(args.config_file_lst).resolve()
+            dl1_config = Path(args.config_file_lst).resolve().as_posix()
+            if config.get("dl1_noise_tune_data_run"):
+                # lstchain uses json, but just in case
+                assert ".json" in dl1_config
+                dl1_config = create_dl1ab_tuned_config(
+                    dl1_config,
+                    dl1_config.replace(".json", "_tuning.json"),
+                    config.get("dl1_noise_tune_data_run"),
+                    config.get("dl1_noise_tune_mc_run"),
+                )
         elif workflow_kind == "hiperta":
             dl1_config = Path(args.config_file_rta).resolve()
         else:  # if this wasnt ctapipe, the config parsing would have failed
             dl1_config = Path(args.config_file_ctapipe).resolve()
-        stage_input_dir = Path(input_dir)
-
         if dl1ab:
             stage_input_dir /= config["dl1_reference_id"]
 
@@ -235,7 +243,7 @@ def main():
             train_config,
             jobs_to_train,
             batch_config=batch_config,
-            logs=logs_files
+            logs=logs_files,
         )
 
         update_scancel_file(scancel_file, job_from_train_pipe)
@@ -246,7 +254,7 @@ def main():
             args.config_file_lst,
             batch_config,
             job_from_train_pipe,
-            logs=logs_files
+            logs=logs_files,
         )
 
     else:
@@ -267,7 +275,7 @@ def main():
             all_particles,
             batch_config=batch_config,
             gamma_offsets=gamma_offs,
-            logs=logs_files
+            logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
@@ -287,7 +295,7 @@ def main():
             log_from_dl1_dl2=dl2_files_path_dict,
             batch_config=batch_config,
             prod_id=prod_id,
-            logs=logs_files
+            logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl2_irf)
@@ -304,7 +312,7 @@ def main():
             dl2_files_path_dict,  # Final dl2 names
             batch_config=batch_config,
             prod_id=prod_id,
-            logs=logs_files
+            logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
@@ -325,7 +333,7 @@ def main():
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],
         batch_config=batch_config,
-        logs_files=logs_files
+        logs_files=logs_files,
     )
 
     update_scancel_file(scancel_file, jobid_check)
