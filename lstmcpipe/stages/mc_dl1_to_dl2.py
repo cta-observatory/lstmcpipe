@@ -221,6 +221,7 @@ def dl1_to_dl2(
         # if dry_run:
         #     print(cmd)
 
+        # Only applying dl1_to_dl2 stage to test files
         if "testing" in file:
             ftype = "test"
         else:
@@ -242,12 +243,10 @@ def dl1_to_dl2(
         jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
 
         log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
-        if (
-            "testing" in file
-        ):  # TODO to be done to 'training' files too ? Should not be necessary
+        if "testing" in file:
             log_dl1_to_dl2[particle]["dl2_test_path"] = file.replace(
                 "/DL1/", "/DL2/"
-            ).replace("dl1_", "dl2_")
+            ).replace("dl1_", "dl2_", 1)
         return_jobids.append(jobid_dl1_to_dl2)
 
     if config_file is not None:
