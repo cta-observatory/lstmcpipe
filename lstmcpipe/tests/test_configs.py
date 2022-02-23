@@ -1,4 +1,3 @@
-import pytest
 from pathlib import Path
 from  lstmcpipe.config import load_config
 from lstchain.io.config import read_configuration_file
