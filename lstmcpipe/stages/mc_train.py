@@ -5,16 +5,17 @@
 # Code train models from DL1 files onsite (La Palma cluster)
 
 import os
+import time
 import shutil
 import logging
-import time
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from lstmcpipe.workflow_management import save_log_to_file
 
 
 log = logging.getLogger(__name__)
 
 
-def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env):
+def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_config, logs):
     """
     Function to batch the lstchain train_pipe once the proton and gamma-diffuse merge_and_copy_dl1 batched jobs have
     finished.
@@ -29,20 +30,19 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
     jobids_from_merge : str
         string containing the jobids (***ONLY from proton and gamma-diffuse***) from the jobs batched in the
          merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency)
-    source_env : str
-        source environment to select the desired conda environment to run train_pipe and dl1_to_dl2 stages
+    batch_config : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
+        the `train_pipe` function.
+    logs: dict
+        Dictionary with logs files
 
     Returns
     -------
-    log_train : dict
-        Dictionary containing the log of the batched train_pipe jobs
     jobid_4_dl1_to_dl2 : str
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
     model_path : str
         Path with the model's directory
-    debug_log : dict
-        Debug and summary purposes
     """
     debug_log = {}
 
@@ -60,7 +60,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
         gamma_dl1_train_file,
         proton_dl1_train_file,
         config_file=config_file,
-        source_environment=source_env,
+        batch_configuration=batch_config,
         wait_ids_proton_and_gammas=jobids_from_merge,
     )
 
@@ -69,12 +69,15 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, source_env)
         f"_and_copy jobids"
     )
 
+    save_log_to_file(log_train, logs["log_file"], workflow_step="train_pipe")
+    save_log_to_file(debug_log, logs["debug_file"], workflow_step="train_pipe")
+
     log.info("==== END {} ====".format("batch mc_train_workflow"))
 
-    return log_train, jobid_4_dl1_to_dl2, model_path, debug_log
+    return jobid_4_dl1_to_dl2, model_path
 
 
-def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
+def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_jobid, logs):
     """
     Batches the plot_model_importance.py script that creates a .png with the RF feature's importance models
     after the RF are trained.
@@ -86,42 +89,52 @@ def batch_plot_rf_features(dir_models, config_file, source_env, train_jobid):
         Path to model's directory
     config_file: str
         Path to lstchain config file
-    source_env: str
-        String containing the .bashrc file to source and the conda env to call
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings.
     train_jobid: str
         Single jobid from training stage.
-
-    Returns
-    -------
-    log: dict
-        Dictionary with lstmcpipe_plot_models_importance single job id to be passed to debug log.
+    logs: dict
+        Dictionary with logs files
     """
-    logs = {}
+    log_rf_feat = {}
+    log_debug = {}
+
+    source_env = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
+
     log.info("==== START {} ====".format("batch plot RF features importance"))
     time.sleep(1)
     jobe = os.path.join(dir_models, "job_plot_rf_feat_importance.e")
     jobo = os.path.join(dir_models, "job_plot_rf_feat_importance.o")
 
-    base_cmd = f"lstmcpipe_plot_models_importance {dir_models} -cf {config_file}"
-    cmd = (
-        f"sbatch --parsable --mem=16G --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} "
-        f' -J RF_importance --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd}"'
-    )
-    jobid = os.popen(cmd).read().strip("\n")
+    batch_cmd = f"lstmcpipe_plot_models_importance {dir_models} -cf {config_file}"
 
-    logs[jobid] = "Single job_id to plot RF feature s importance"
+    slurm_cmd = "sbatch --parsable --mem=16G "
+    if slurm_account != "":
+        slurm_cmd += f" -A {slurm_account}"
+    slurm_cmd += (
+        f" --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} "
+        f' -J RF_importance --wrap="export MPLBACKEND=Agg; {source_env} {batch_cmd}"'
+    )
+    jobid = os.popen(slurm_cmd).read().strip("\n")
+
+    log_rf_feat[jobid] = slurm_cmd
+    log_debug[jobid] = "Single job_id to plot RF feature s importance"
+
+    save_log_to_file(log_rf_feat, logs["log_file"],
+                     workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_debug, logs["debug_file"],
+                     workflow_step="plot_RF_features_importance")
 
     log.info(" Random Forest importance's plot will be saved at: {}".format(dir_models))
     log.info("==== END {} ====".format("batch plot RF features importance"))
-
-    return logs
 
 
 def train_pipe(
     gamma_dl1_train_file,
     proton_dl1_train_file,
     config_file=None,
-    source_environment=None,
+    batch_configuration='',
     wait_ids_proton_and_gammas=None,
 ):
     """
@@ -135,9 +148,9 @@ def train_pipe(
         path to the proton file
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
-    source_environment : str
-        path to a .bashrc file (lstanalyzer user by default - can be configurable for custom runs) to activate a
-        certain conda environment. By default : `conda activate cta`.
+    batch_configuration : dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
+        sbatch commands
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
     wait_ids_proton_and_gammas : str
         a string (of chained jobids separated by ',' and without spaces between each element), to indicate the
@@ -158,6 +171,9 @@ def train_pipe(
 
     """
     log_train = {}
+
+    source_environment = batch_configuration["source_environment"]
+    slurm_account = batch_configuration["slurm_account"]
 
     dl1_proton_dir = os.path.dirname(os.path.abspath(proton_dl1_train_file))
 
@@ -191,7 +207,9 @@ def train_pipe(
     #     print(cmd)
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long --mem=16G"
+    batch_cmd = "sbatch --parsable -p long --mem=32G"
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
     if wait_ids_proton_and_gammas != "":
         batch_cmd += " --dependency=afterok:" + wait_ids_proton_and_gammas
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
