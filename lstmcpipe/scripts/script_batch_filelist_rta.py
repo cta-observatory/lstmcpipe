@@ -2,7 +2,6 @@
 
 import argparse
 import subprocess
-from distutils.util import strtobool
 import os
 
 
@@ -39,18 +38,16 @@ def main():
     parser.add_argument(
         "--keep_file",
         "-k",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="keep_file",
         help="Keep output of hiperta. Set by default to False",
-        default=False,
     )
     parser.add_argument(
         "--debug_mode",
         "-d",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="debug_mode",
         help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
-        default=False,
     )
     args = parser.parse_args()
 
@@ -66,11 +63,13 @@ def main():
                 "lstmcpipe_hiperta_r0_to_dl1lstchain",
                 f"--infile={file}",
                 f"--outdir={args.output_dir}",
-                f"--keep_file={args.keep_file}",
-                f"--debug_mode={args.debug_mode}",
+                f"--config={args.config_file}",
             ]
-            if args.config_file:
-                cmd.append(f"--config={args.config_file}")
+
+            if args.keep_file:
+                cmd.append("--keep_file")
+            if args.debug_mode:
+                cmd.append("--debug_mode")
 
             subprocess.run(cmd)
 
