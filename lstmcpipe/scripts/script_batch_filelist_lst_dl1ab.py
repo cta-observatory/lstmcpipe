@@ -49,7 +49,8 @@ def main():
             # TODO: We need ways to set the pedestal cleaning!
             # or do we? is that not only for observed data?
             output = join(args.output_dir, basename(file))
-            cmd = ["lstchain_dl1ab", f"--input-file={file}", f"--output-file={output}"]
+            # TODO --no-image should be passed by default. To be configurable from lstmcpipe config ?
+            cmd = ["lstchain_dl1ab", "--no-image", f"--input-file={file}", f"--output-file={output}"]
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
