@@ -85,10 +85,11 @@ def load_config(config_path):
     if "dl1ab" in config["stages_to_run"]:
         log.info(f'Applying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
     log.info("Merging options:" f"\n - No-image argument: {config['merging_no_image']}")
-    log.info("Slurm configuration:" +
-             f"\n - Source environment: {config['batch_config']['source_environment']}" +
-             f"\n - Slurm account: {config['batch_config']['slurm_account']}"
-             )
+    log.info(
+        "Slurm configuration:"
+        + f"\n - Source environment: {config['batch_config']['source_environment']}"
+        + f"\n - Slurm account: {config['batch_config']['slurm_account']}"
+    )
 
     return config
 
@@ -143,6 +144,16 @@ def config_valid(loaded_config):
                 "The key dl1_reference_id has to be set in order to locate "
                 "the input files for the dl1ab stage"
             )
+
+    dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
+    dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
+    if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
+        raise KeyError(
+            "Please specify a simtel monte carlo file to "
+            "compare observed noise against."
+        )
+    elif not dl1_noise_tune_data_run and dl1_noise_tune_mc_run:
+        raise KeyError("Please specify an observed dl1 file to " "tune the images.")
     log.debug("Configuration deemed valid")
     return True
 
@@ -174,6 +185,9 @@ def parse_config_and_handle_global_vars(loaded_config):
     base_path = loaded_config.get("base_path")
     # to locate the source dl1 files
     dl1_reference_id = loaded_config.get("dl1_reference_id")
+    # Full path to an observed dl1 file
+    dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
+    dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
 
     pointing = loaded_config["pointing"]
     zenith = loaded_config["zenith"]
@@ -219,7 +233,7 @@ def parse_config_and_handle_global_vars(loaded_config):
     # 2.2 - Create a dict for all env configuration and slurm configuration (batch arguments)
     config["batch_config"] = {
         "source_environment": src_env,
-        "slurm_account": slurm_account
+        "slurm_account": slurm_account,
     }
 
     # 3 - particles loop
@@ -259,6 +273,8 @@ def parse_config_and_handle_global_vars(loaded_config):
     else:  # RTA
         config["input_dir"] = create_path(base_path, "R0", obs_date, pointing_zenith)
     config["dl1_reference_id"] = dl1_reference_id
+    config["dl1_noise_tune_data_run"] = dl1_noise_tune_data_run
+    config["dl1_noise_tune_mc_run"] = dl1_noise_tune_mc_run
 
     directories = {
         "running_analysis_dir": "running_analysis",
