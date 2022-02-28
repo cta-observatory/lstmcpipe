@@ -21,6 +21,25 @@ Enrique Garcia, garcia [at] lapp.in2p3.fr
 Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 
+Requesting a MC analysis
+------------------------
+As a LST member, you may require a MC analysis with a specific configuation, for exemple to later analyse a specific source with tuned MC parameters.      
+
+To do so, please:
+
+#. open a pull request in lstMCpipe, adding the desired configuration in a new directory in `production_configs`
+#. you may have a look at the `production_configs/20220222_template/` as an example
+#. Add the date and a descriptive production ID name to you directory and config
+#. the requested config must contain:
+
+* a lstchain config file
+* a lstmcpipe config file
+* a readme with a short description of why you require this analysis to be run
+
+The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
+
+
+
 Install
 -------
 
