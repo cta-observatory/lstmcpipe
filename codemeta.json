@@ -5,7 +5,7 @@
     "codeRepository": "git+https://github.com/cta-observatory/lstmcpipe.git",
     "dateCreated": "2019-09-09",
     "datePublished": "2021-02-18",
-    "downloadUrl": "https://github.com/cta-observatory/lstmcpipe/archive/refs/tags/v0.5.1.tar.gz",
+    "downloadUrl": "https://github.com/cta-observatory/lstmcpipe/archive/master.tar.gz",
     "issueTracker": "https://github.com/cta-observatory/lstmcpipe/issues",
     "name": "lstmcpipe",
     "version": "0.6.0",
