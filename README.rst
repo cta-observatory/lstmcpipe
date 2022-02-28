@@ -38,6 +38,8 @@ To do so, please:
 
 The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
 
+Depending on the number of requests, we may give priorities.
+
 
 
 Install
