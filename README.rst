@@ -27,7 +27,7 @@ As a LST member, you may require a MC analysis with a specific configuation, for
 
 To do so, please:
 
-#. open a pull request in lstMCpipe, adding the desired configuration in a new directory in `production_configs`
+#. open a pull request in lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`
 #. you may have a look at the `production_configs/20220222_template/` as an example
 #. Add the date and a descriptive production ID name to you directory and config
 #. the requested config must contain:
