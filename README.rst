@@ -23,7 +23,7 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Requesting a MC analysis
 ------------------------
-As a LST member, you may require a MC analysis with a specific configuation, for exemple to later analyse a specific source with tuned MC parameters.      
+As a LST member, you may require a MC analysis with a specific configuation, for example to later analyse a specific source with tuned MC parameters.      
 
 To do so, please:
 
