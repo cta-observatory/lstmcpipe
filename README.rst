@@ -32,7 +32,7 @@ To do so, please:
 #. Add the date and a descriptive production ID name to you directory and config
 #. the requested config must contain:
 
-* a lstchain config file
+* a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file
 * a readme with a short description of why you require this analysis to be run
 
