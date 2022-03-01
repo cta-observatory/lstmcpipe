@@ -25,7 +25,7 @@ prod_type: prod5
 obs_date: 20200629_prod5_trans_80
   # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
   # pro3 : `20190415`
-zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
+zenith: zenith_40deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
 pointing: south_pointing
 particles:
   - electron

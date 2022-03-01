@@ -1,10 +1,10 @@
 # New Prod Config 
 
-## 20220301_psf_tuned_zen20
+## 20220301_psf_tuned_zen40
 
 ## Short description of the config
 
-Modified standard config to tune the PSF and to run the process for zenith 20 deg, south pointing MC
+Modified standard config to tune the PSF and to run the process for zenith 40 deg, south pointing MC
 
 ## Why this config is needed 
 
