@@ -27,7 +27,6 @@ As a LST member, you may require a MC analysis with a specific configuration, fo
 
 To do so, please:
 
-#. Check that you are in the `lst-dev` GitHub group (otherwise, please contact us).
 #. Open a pull request in lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
 #. You may have a look at the `production_configs/20220222_template/` as an example.
 #. Add the date and a descriptive production ID name to you directory and configuration.
