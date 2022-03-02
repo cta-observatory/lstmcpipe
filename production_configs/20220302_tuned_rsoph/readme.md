@@ -1,6 +1,6 @@
 # RS Ophiuchi Config
 
-## 20220301_rsoph
+## 20220301_tuned_rsoph
 
 ## Short description of the config
 
