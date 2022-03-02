@@ -13,7 +13,7 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-#prod_id:                 # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: tuned_rsoph                 # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path: /fefs/aswg/workspace/MC_data_simlink  # Default user path
   # lstanalyzer user : /fefs/aswg/data/mc
