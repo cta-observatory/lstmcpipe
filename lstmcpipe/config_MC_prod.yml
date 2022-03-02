@@ -34,7 +34,7 @@ offset_gammas:
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.9.2
+  conda_env: lstchain-v0.9.3
   #   source_file: /fefs/home/enrique.garcia/.bashrc
   #   conda_env: lst-dev
 
