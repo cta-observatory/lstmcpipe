@@ -43,5 +43,3 @@ stages_to_be_run:
 merging_options:
   no_image: True
 
-slurm_config:
-  user_account: dpps
