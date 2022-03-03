@@ -1,6 +1,6 @@
 # New Prod Config 
 
-## 20220301_psf_tuned_zen20
+## psf_tuned_zen20
 
 ## Short description of the config
 
