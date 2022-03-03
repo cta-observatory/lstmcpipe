@@ -44,4 +44,4 @@ merging_options:
   no_image: True
 
 slurm_config:
-  user_account: aswg
+  user_account: dpps
