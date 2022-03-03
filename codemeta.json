@@ -11,7 +11,7 @@
     "version": "0.6.1",
     "description": "Scripts to ease the reduction of MC data on the LST cluster at La Palma. With this package, the analysis/creation of R1/DL0/DL1/DL2/IRFs can be orchestrated.",
     "applicationCategory": "CTA, LST",
-    "releaseNotes": "Adds user MC prod template and BugFix v0.6.0",
+    "releaseNotes": "Introduces template for MC productions user requests. Small bugfixes. **Full Changelog**: https://github.com/cta-observatory/lstmcpipe/compare/v0.6.0...v0.6.1",
     "funding": "824064",
     "developmentStatus": "active",
     "isPartOf": "https://www.cta-observatory.org/",
