@@ -4,7 +4,7 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-prod_id: tuned_lhaaso        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: tuned_ze40_south        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path: /fefs/aswg/data/mc  # Path for centralised LST MC prods
 

@@ -1,11 +1,11 @@
-# LHAASO J2108 Config
+# Ze40 south pointing Config
 
-## 20220303_tuned_lhaaso
+## 20220303_tuned_ze40_south
 
 ## Short description of the config
 
-Config for 40zd and 180deg with tuning of PSF and NSB of the LHAASO field
+Config for ze40 and south pointing with PSF and NSB tuned on data
 
 ## Why this config is needed
 
-Processing of LHAASO data from June to September 2021
+Processing of data for which tuned MC is missing
