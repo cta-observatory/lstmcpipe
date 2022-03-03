@@ -1,6 +1,6 @@
 # New Prod Config 
 
-## psf_tuned_zen20
+## zen20az180_dl1ab_tuned_psf
 
 ## Short description of the config
 
