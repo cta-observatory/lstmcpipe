@@ -2,6 +2,7 @@
 # Licensed under a MIT license - see LICENSE.rst
 
 import os
+import json
 from pathlib import Path
 from setuptools import setup, find_packages
 
@@ -16,9 +17,7 @@ def readfile(filename):
         return f.read()
 
 
-### Read package info from codemeta.json ###
-import json
-
+# Read package info from codemeta.json
 with open(os.path.join(os.path.dirname(__file__), "codemeta.json")) as file:
     metadata = json.load(file)
 
