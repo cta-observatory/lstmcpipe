@@ -1,6 +1,6 @@
 # New Prod Config 
 
-## 20220222_template_prod
+## template_prod
 
 ## Short description of the config
 

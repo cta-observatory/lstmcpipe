@@ -23,14 +23,14 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Requesting a MC analysis
 ------------------------
-As a LST member, you may require a MC analysis with a specific configuation, for example to later analyse a specific source with tuned MC parameters.      
+As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
 
 To do so, please:
 
-#. open a pull request in lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`
-#. you may have a look at the `production_configs/20220222_template/` as an example
-#. Add the date and a descriptive production ID name to you directory and config
-#. the requested config must contain:
+#. `Open a pull request from your fork <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork>`_ into lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
+#. You may have a look at the ``production_configs/template_prod`` as an example.
+#. Add a descriptive production ID (e.g. ``mrk421_psf_tuned``) to you directory and configuration.
+#. The requested config must contain:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file
