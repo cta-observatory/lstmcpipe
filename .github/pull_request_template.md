@@ -6,8 +6,8 @@ You may leave this message, it will be commented out in your PR.
 
 <!---  
 New Prod Config template
-Add date and prodid and fill the template
-Your Pull Request must include the following files placed in directory `production_configs/yyyymmdd_prod_id`:
+Add Prod_ID and fill the template
+Your Pull Request must include the following files placed in directory `production_configs/prod_id`:
 - lstmcpipe config file
 - lstchain config
 - readme.md
@@ -17,7 +17,7 @@ Add label `new_prod_config`
 
 # New Prod config
 
-## YYYYMMDD_prodid
+## Prod_ID
 
 ## Short description of the config
 
