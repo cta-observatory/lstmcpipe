@@ -567,7 +567,9 @@ def submit_dl1_jobs(
         if particle == "proton":
             slurm_options.update({"partition": "long"})
         else:
-            slurm_options.update({"partition": "short"})
+            # Computing time sometimes depends on the machine.
+            # e and g_0.X should be working on short, but sometimes runs on timeout.
+            slurm_options.update({"partition": "long"})
         # `sbatch -A` is the --account slurm argument
         if slurm_account != '':
             slurm_options.update({"account": slurm_account})
