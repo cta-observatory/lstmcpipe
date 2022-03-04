@@ -1,6 +1,6 @@
 # Ze40 south pointing Config
 
-## 20220303_tuned_ze40_south
+## 20220304_zen40az180_dl1ab_tuned_nsb_psf
 
 ## Short description of the config
 

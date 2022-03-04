@@ -4,7 +4,7 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-prod_id: tuned_ze40_south        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: zen40az180_dl1ab_tuned_nsb_psf         # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path: /fefs/aswg/data/mc  # Path for centralised LST MC prods
 
@@ -33,7 +33,7 @@ source_environment:
   conda_env: lstchain-v0.9.3
 
 stages_to_be_run:
-  - r0_to_dl1
+  - dl1ab
   - merge_and_copy_dl1
   - train_pipe
   - dl1_to_dl2
@@ -42,6 +42,3 @@ stages_to_be_run:
 
 merging_options:
   no_image: True
-
-slurm_config:
-  user_account: aswg
