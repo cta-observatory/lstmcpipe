@@ -262,13 +262,13 @@
     "nsb_tuning_ratio": 0.52,
     "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
   },
-  "image_modifier": {
-	  "increase_nsb": true,
-	  "extra_noise_in_dim_pixels": 0.705,
-	  "extra_bias_in_dim_pixels": 0.269,
-	  "transition_charge": 8,
-	  "extra_noise_in_bright_pixels": 0.673,
-	  "increase_psf": true,
-  	"smeared_light_fraction": 0.125
-			}
+  "image_modifier":{
+    "increase_nsb": true,
+    "extra_noise_in_dim_pixels": 0.705,
+    "extra_bias_in_dim_pixels": 0.269,
+    "transition_charge": 8,
+    "extra_noise_in_bright_pixels": 0.673,
+    "increase_psf": true,
+    "smeared_light_fraction": 0.125
+  }
 }
