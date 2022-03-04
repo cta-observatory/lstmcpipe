@@ -4,13 +4,13 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-prod_id: template        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: zen20az180_dl1ab_tuned_psf        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path: /fefs/aswg/data/mc  # Path for centralised LST MC prods
 
 # Only for dl1 reprocessing - you will also need to change:
 # `r0_to_dl1` for `dl1ab` in "stages_to_be_run"
-#dl1_reference_id: # ex: 20220215_v0.9.1_prod5_trans_80_local_tailcut_8_4
+dl1_reference_id: 20220215_v0.9.1_prod5_trans_80_local_tailcut_8_4
 
 prod_type: prod5
   # Choose between {prod5, prod3}
@@ -33,7 +33,7 @@ source_environment:
   conda_env: lstchain-v0.9.3
 
 stages_to_be_run:
-  - r0_to_dl1
+  - dl1ab
   - merge_and_copy_dl1
   - train_pipe
   - dl1_to_dl2
@@ -42,4 +42,3 @@ stages_to_be_run:
 
 merging_options:
   no_image: True
-
