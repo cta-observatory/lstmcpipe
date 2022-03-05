@@ -4,7 +4,7 @@
 
 
 workflow_kind: lstchain  # Not expected to be changed by the user
-prod_id: zen20az180_src_dep        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: zen40az180_src_dep        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
 base_path: /fefs/aswg/data/mc  # Path for centralised LST MC prods
 
@@ -17,7 +17,7 @@ prod_type: prod5
 obs_date: 20200629_prod5_trans_80
   # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
   # pro3 : `20190415`
-zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
+zenith: zenith_40deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
 pointing: south_pointing
 particles:
   - electron
