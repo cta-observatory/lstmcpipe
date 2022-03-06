@@ -22,7 +22,7 @@ pointing: south_pointing
 particles:
   - electron
   - gamma
-  - gamma-diffuse
+#  - gamma-diffuse
   - proton
 offset_gammas:  # Taken into account only when `prod_type: prod5` [ thus `obs_date`: 20200629_prod5(_trans_80) ]
   - off0.0deg
@@ -38,7 +38,7 @@ stages_to_be_run:
   - train_pipe
   - dl1_to_dl2
   - dl2_to_irfs
-  - dl2_to_sensitivity
+ # - dl2_to_sensitivity
 
 merging_options:
   no_image: True
