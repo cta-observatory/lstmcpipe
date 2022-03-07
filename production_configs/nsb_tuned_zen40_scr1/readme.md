@@ -1,6 +1,6 @@
 # NSB tuned Config
 
-## tunednsb_z40_180deg
+## zen40az180_dl1ab_tuned_nsb_src1
 
 ## Short description of the config
 
