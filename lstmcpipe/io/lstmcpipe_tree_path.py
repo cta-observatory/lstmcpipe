@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import shutil
 from pathlib import Path
 from lstmcpipe import lstmcpipe_root_dir, __version__
 
@@ -22,7 +23,7 @@ def backup_log(file):
             counter += 1
             save_file = Path(file.parent, f"BACKUP_{counter:02d}_{file.name}")
 
-        save_file.mkdir(exist_ok=True)
+        shutil.copyfile(file, save_file)
 
 
 def create_log_dir(prod_id):

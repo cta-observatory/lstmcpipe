@@ -4,7 +4,7 @@ from lstmcpipe import lstmcpipe_root_dir
 
 def test_create_log_files():
     from ..lstmcpipe_tree_path import create_log_files
-    logs, scancel_file = create_log_files('dummy_prodID')
+    logs, scancel_file, log_dir = create_log_files('dummy_prodID')
 
     assert "log_file" in logs.keys()
     assert "debug_file" in logs.keys()
@@ -15,10 +15,13 @@ def test_create_log_files():
 
     assert scancel_file.exists()
 
+    scancel_file.unlink()
+    log_dir.rmdir()
+
 
 def test_update_scancel_file():
     from ..lstmcpipe_tree_path import create_log_files, update_scancel_file
-    _, scancel_file = create_log_files("dummy_prodID")
+    _, scancel_file, log_dir = create_log_files("dummy_prodID")
 
     update_scancel_file(scancel_file, "1234")
     with open(scancel_file) as f:
@@ -29,6 +32,9 @@ def test_update_scancel_file():
     with open(scancel_file) as f:
         lines = f.readlines()
     assert lines == ["scancel 1234,5678"]
+
+    scancel_file.unlink()
+    log_dir.rmdir()
 
 
 def test_backup_log():
@@ -51,7 +57,7 @@ def test_backup_log():
 
 def test_create_log_dir():
     from ..lstmcpipe_tree_path import create_log_dir
-    dirname = create_log_dir('test_prodID')
-    assert dirname.is_dir()
-    assert dirname.name == lstmcpipe_root_dir.joinpath('prod_logs', 'logs_test_prodID').name
-    dirname.rmdir()
+    log_dirname = create_log_dir("test_prodID")
+    assert log_dirname.is_dir()
+    assert log_dirname.name == lstmcpipe_root_dir.joinpath("prod_logs", "logs_test_prodID").name
+    log_dirname.rmdir()
