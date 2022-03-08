@@ -12,3 +12,4 @@ lstmcpipe/__pycache__/
 .coverage
 # vim swap files
 *.swp
+prod_logs/
