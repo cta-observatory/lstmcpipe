@@ -17,7 +17,17 @@
 
 import argparse
 from pathlib import Path
+from lstmcpipe.logging import setup_logging
 from lstmcpipe.io.data_management import query_continue
+from lstmcpipe.config import load_config, create_dl1ab_tuned_config
+from lstmcpipe.io.lstmcpipe_tree_path import (
+    create_log_files,
+    update_scancel_file,
+)
+from lstmcpipe.workflow_management import (
+    create_dl1_filenames_dict,
+    batch_mc_production_check,
+)
 from lstmcpipe.stages import (
     batch_process_dl1,
     batch_merge_and_copy_dl1,
@@ -27,14 +37,6 @@ from lstmcpipe.stages import (
     batch_dl2_to_sensitivity,
     batch_plot_rf_features,
 )
-from lstmcpipe.workflow_management import (
-    create_dl1_filenames_dict,
-    batch_mc_production_check,
-    create_log_files,
-    update_scancel_file,
-)
-from lstmcpipe.config import load_config, create_dl1ab_tuned_config
-from lstmcpipe.logging import setup_logging
 
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
@@ -142,8 +144,8 @@ def main():
     gamma_offs = config.get("gamma_offs")
     no_image_merging = config.get("merging_no_image")
 
-    # Create log files
-    logs_files, scancel_file = create_log_files(prod_id)
+    # Create log files and log directory
+    logs_files, scancel_file, logs_dir = create_log_files(prod_id)
 
     # Make sure the lstchain config is defined if needed
     # It is not exactly required if you process only up to dl1
@@ -329,7 +331,7 @@ def main():
         jobs_from_dl2_irf,
         jobs_from_dl2_sensitivity,
         prod_id,
-        scancel_file,
+        log_directory=logs_dir,
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],
         batch_config=batch_config,

@@ -24,35 +24,6 @@ def test_save_log_to_file():
     assert dummy_log["dummy_jobid"] == log["NoKEY"]["dummy_jobid"]
 
 
-def test_create_log_files():
-    from ..workflow_management import create_log_files
-    logs, scancel_file = create_log_files('dummy_prodID')
-
-    assert "log_file" in logs.keys()
-    assert "debug_file" in logs.keys()
-
-    assert isinstance(logs["log_file"], Path)
-    assert isinstance(logs["debug_file"], Path)
-    assert isinstance(scancel_file, Path)
-
-    assert scancel_file.exists()
-
-
-def test_update_scancel_file():
-    from ..workflow_management import create_log_files, update_scancel_file
-    _, scancel_file = create_log_files("dummy_prodID")
-
-    update_scancel_file(scancel_file, "1234")
-    with open(scancel_file) as f:
-        lines = f.readlines()
-    assert lines == ["scancel 1234"]
-
-    update_scancel_file(scancel_file, "5678")
-    with open(scancel_file) as f:
-        lines = f.readlines()
-    assert lines == ["scancel 1234,5678"]
-
-
 @pytest.fixture()
 def create_fake_dl1_structure(tmp_path):
     fake_dl1_dir = tmp_path.joinpath("DL1", "{}")
