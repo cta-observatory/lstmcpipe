@@ -20,4 +20,5 @@ help:
 	pip install ..
 	pip install -U -r requirements.txt
 	sphinx-apidoc -o api ../lstmcpipe
+	python produce_config_page.py
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
