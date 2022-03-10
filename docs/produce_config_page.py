@@ -23,6 +23,7 @@ def add_prod_table(production_dir, prod_file='productions.rst'):
 
     prod_txt = '\n'
 
+    commit_times = []
     prod_list = []
     for prod_dir in Path(production_dir).iterdir():
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir, max_count=1))[0]
@@ -42,6 +43,10 @@ def add_prod_table(production_dir, prod_file='productions.rst'):
                           f"`{prod_dir.name} <{lstmcpipe_repo_prod_config_url+prod_dir.name}>`_",
                           prod_id]
                          )
+        commit_times.append(commit.committed_date)
+
+    sorted_lists = sorted(zip(commit_times, prod_list))
+    prod_list = [prod for _,prod in sorted_lists]
 
     prod_txt += tabulate(prod_list, ['Request date', 'Directory name', 'Prod ID'], tablefmt='rst')
 
