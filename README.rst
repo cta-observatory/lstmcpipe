@@ -34,7 +34,9 @@ To do so, please:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file
-* a readme with a short description of why you require this analysis to be run
+* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_.
+
+
 
 The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
 
