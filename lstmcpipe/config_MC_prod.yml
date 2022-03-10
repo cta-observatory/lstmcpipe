@@ -15,28 +15,26 @@
 workflow_kind: lstchain  # Not expected to be changed by the user
 #prod_id:                 # ex: local_no_n_islands. Default; v00 (if key left empty or None)
 
-base_path_dl0: /fefs/aswg/workspace/MC_data_simlink  # Default user path
+base_path: /fefs/aswg/workspace/MC_data_simlink  # Default user path
   # lstanalyzer user : /fefs/aswg/data/mc
+  #
 prod_type: prod5
-  # Choose between {prod5, prod3}
 obs_date: 20200629_prod5_trans_80
-  # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
-  # pro3 : `20190415`
-zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
+zenith: zenith_20deg
 pointing: south_pointing
+
 particles:
   - electron
   - gamma
   - gamma-diffuse
   - proton
-offset_gammas:  # Taken into account only when `prod_type: prod5` [ thus `obs_date`: 20200629_prod5(_trans_80) ]
+offset_gammas:
   - off0.0deg
   - off0.4deg
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.8.3
-  # user example: "source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev" should be writen:
+  conda_env: lstchain-v0.9.3
   #   source_file: /fefs/home/enrique.garcia/.bashrc
   #   conda_env: lst-dev
 
@@ -48,6 +46,8 @@ stages_to_be_run:
   - dl2_to_irfs
   - dl2_to_sensitivity
 
-
 merging_options:
   no_image: True
+
+slurm_config:
+  user_account: aswg

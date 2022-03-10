@@ -11,7 +11,7 @@ from datetime import datetime
 yaml_keys = [
     "prod_id",
     "stages_to_be_run",
-    "base_path_dl0",
+    "base_path",
     "pointing",
     "zenith",
     "particles",
@@ -46,6 +46,8 @@ def test_config_valid():
     valid["prod_type"] = "prod5"
     valid["workflow_kind"] = "lstchain"
     valid["obs_date"] = "20200629_prod5_trans_80"
+    valid["stages_to_be_run"] = []
+    valid["base_path"] = "/path/to/dl0"
     assert config_valid(valid)
 
     invalid_workflow = valid.copy()
@@ -69,6 +71,11 @@ def test_config_valid():
     with pytest.raises(Exception):
         config_valid(invalid_date_prod)
 
+    missing_reference = valid.copy()
+    missing_reference["stages_to_be_run"] = ["dl1ab"]
+    with pytest.raises(KeyError):
+        config_valid(missing_reference)
+
 
 def test_parse_config_and_handle_global_vars():
     """
@@ -82,24 +89,31 @@ def test_parse_config_and_handle_global_vars():
     config["obs_date"] = "20200629_prod5_trans_80"
     config["pointing"] = "90"
     config["zenith"] = "45"
-    config["base_path_dl0"] = "/dummy/path/to/files"
+    config["base_path"] = "/dummy/path/to/files"
+    config["stages_to_be_run"] = ["r0_to_dl1"]
 
     parsed_config = parse_config_and_handle_global_vars(config)
     date = datetime.today().strftime("%Y%m%d")
     assert (
-        parsed_config["DL1_data_dir"]
+        parsed_config["DL1_output_dir"]
         == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"
         + date
-        + "_v0.7.3_prod5_trans_80_None"
+        + "_v0.9.1_prod5_trans_80_None"
     )
     assert (
-        parsed_config["model_dir"]
+        parsed_config["model_output_dir"]
         == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"
         + date
-        + "_v0.7.3_prod5_trans_80_None"
+        + "_v0.9.1_prod5_trans_80_None"
     )
     assert (
-        parsed_config["source_environment"] == "source src_file; conda activate env; "
+        parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
     )
-    assert parsed_config["stages_to_run"] is None
+    assert parsed_config["batch_config"]["slurm_account"] == ""
+    assert parsed_config["stages_to_run"] == ["r0_to_dl1"]
     assert parsed_config["workflow_kind"] == "lstchain"
+
+    new_dummy = config.copy()
+    new_dummy["slurm_config"] = {"user_account": "aswg"}
+    new_parsed_config = parse_config_and_handle_global_vars(new_dummy)
+    assert new_parsed_config["batch_config"]["slurm_account"] == "aswg"

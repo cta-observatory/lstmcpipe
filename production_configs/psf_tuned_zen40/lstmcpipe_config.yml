@@ -1,0 +1,44 @@
+## MC PRODUCTION FULL PIPELINE CONFIGURATION ##
+#
+# Template example to request a MC prod.
+
+
+workflow_kind: lstchain  # Not expected to be changed by the user
+prod_id: zen40az180_dl1ab_tuned_psf        # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+
+base_path: /fefs/aswg/data/mc  # Path for centralised LST MC prods
+
+# Only for dl1 reprocessing - you will also need to change:
+# `r0_to_dl1` for `dl1ab` in "stages_to_be_run"
+dl1_reference_id: 20220304_v0.9.3_prod5_trans_80_zen40az180_local_tailcut_8_4
+
+prod_type: prod5
+  # Choose between {prod5, prod3}
+obs_date: 20200629_prod5_trans_80
+  # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
+  # pro3 : `20190415`
+zenith: zenith_40deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
+pointing: south_pointing
+particles:
+  - electron
+  - gamma
+  - gamma-diffuse
+  - proton
+offset_gammas:  # Taken into account only when `prod_type: prod5` [ thus `obs_date`: 20200629_prod5(_trans_80) ]
+  - off0.0deg
+  - off0.4deg
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.3
+
+stages_to_be_run:
+  - dl1ab
+  - merge_and_copy_dl1
+  - train_pipe
+  - dl1_to_dl2
+  - dl2_to_irfs
+  - dl2_to_sensitivity
+
+merging_options:
+  no_image: True

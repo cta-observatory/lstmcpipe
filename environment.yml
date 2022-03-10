@@ -1,4 +1,4 @@
-name: lstMCpipe
+name: lstmcpipe
 channels:
   - default
   - cta-observatory
@@ -8,9 +8,9 @@ dependencies:
   - astropy~=4.2
   - pip
   - pre-commit
-  - ctapipe~=0.10.5
+  - ctapipe~=0.12
   - pip:
-      - ctaplot>=0.5
-      - ctapipe_io_lst~=0.9.2
-      - lstchain==0.7.3
-      - pyirf~=0.4.0
+      - ctaplot~=0.5.5
+      - ctapipe_io_lst~=0.15.1
+      - lstchain==0.9.1
+      - pyirf~=0.6.0

@@ -5,7 +5,6 @@
 
 import os
 import argparse
-from distutils.util import strtobool
 from lstmcpipe.hiperta.reorganize_dl1hiperta300_to_dl1lstchain060 import (
     main as reorganize_dl1,
 )
@@ -48,19 +47,17 @@ def main():
     parser.add_argument(
         "--keep_file",
         "-k",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="keep_file",
         help="Keep output of hiperta. Set by default to False",
-        default=False,
     )
 
     parser.add_argument(
         "--debug_mode",
         "-d",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="debug_mode",
         help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
-        default=False,
     )
     args = parser.parse_args()
 

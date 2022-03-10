@@ -21,6 +21,27 @@ Enrique Garcia, garcia [at] lapp.in2p3.fr
 Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 
+Requesting a MC analysis
+------------------------
+As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
+
+To do so, please:
+
+#. `Open a pull request from your fork <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork>`_ into lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
+#. You may have a look at the ``production_configs/template_prod`` as an example.
+#. Add a descriptive production ID (e.g. ``mrk421_psf_tuned``) to you directory and configuration.
+#. The requested config must contain:
+
+* a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
+* a lstmcpipe config file
+* a readme with a short description of why you require this analysis to be run
+
+The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
+
+Depending on the number of requests, we may give priorities.
+
+
+
 Install
 -------
 
@@ -107,6 +128,18 @@ processing tool. These are:
 - rta: lstmcpipe_hiperta_r0_to_dl1lstchain (``lstmcpipe/hiperta/hiperta_r0_to_dl1lstchain.py``)
 
 Results can be found in ``running_analysis``
+
+**dl1ab**
+
+As an alternative to the processing of simtel r0 files, existing dl1 files can be reprocessed.
+This can be useful to apply different cleanings or alter the images by adding noise etc.
+For this to work the old files have to contain images, i.e. they need to have been processed
+using the ``no_image: False`` flag in the config.
+The config key ``dl1_reference_id`` is used to determine the input files.
+Its value needs to be the full prod_id including software versions (i.e. the name of the
+directories directly above the dl1 files).
+For lstchain the dl1ab script is used, ctapipe can use the same script as for simtel
+processing. There is no support for hiperta!
 
 
 **merge_and_copy_dl1**
