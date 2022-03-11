@@ -10,7 +10,7 @@ def load_config(filename):
         return yaml.safe_load(f)
 
 
-def add_prod_table(production_dir, prod_file='productions.rst'):
+def add_prod_table(production_dir, prod_file='productions.rst', lstmcpipe_repo_prod_config_url='https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/'):
     """
 
     Parameters
@@ -58,7 +58,5 @@ def add_prod_table(production_dir, prod_file='productions.rst'):
 if __name__ == '__main__':
     root_dir = Path(__file__).parent.joinpath('..').resolve()
     prod_dir = root_dir.joinpath('production_configs')
-
-    lstmcpipe_repo_prod_config_url = 'https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/'
 
     add_prod_table(prod_dir)
