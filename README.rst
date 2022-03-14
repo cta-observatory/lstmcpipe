@@ -23,6 +23,9 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Requesting a MC analysis
 ------------------------
+You may find the list of already run productions in the documentation.
+Please check in this list that the request you are about to make does not exist already!
+
 As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
 
 To do so, please:
