@@ -16,7 +16,7 @@ jobs:
       - name: Run steps on added configs.
         if: steps.verify-changed-files.outputs.added_files == 'true'
         run: |
-          echo "Added files: ${{ steps.verify-changed-files.outputs.added_files }}"
+          echo "Added yaml files: ${{ steps.verify-changed-files.outputs.added_files }}"
           for file in ${{ steps.verify-changed-files.outputs.added_files }}; do
             lstmcpipe_validate_config file;
           done
