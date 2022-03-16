@@ -14,10 +14,11 @@ jobs:
           files: |
             production_configs/*/*.yml
       - name: Validate added configs.
-        if: steps.verify-changed-files.outputs.added_files == 'true'
+        if: steps.verify-changed-files.outputs.any_added == 'true'
         run: |
           echo "Added yaml files: ${{ steps.verify-changed-files.outputs.added_files }}"
           for file in ${{ steps.verify-changed-files.outputs.added_files }}; do
-            lstmcpipe_validate_config file;
+            lstmcpipe_validate_config $file;
+            checked $file;
           done
 
