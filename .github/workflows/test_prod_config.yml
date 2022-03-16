@@ -1,0 +1,23 @@
+name: check_prod_config
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate Add Config
+        uses: tj-actions/verify-changed-files@v9
+        id: verify-changed-files
+        with:
+          files: |
+             production_configs/**.yml
+      - name: Run steps on added configs.
+        if: steps.verify-changed-files.outputs.added_files == 'true'
+        run: |
+          echo "Added files: ${{ steps.verify-changed-files.outputs.added_files }}"
+          for file in ${{ steps.verify-changed-files.outputs.added_files }}; do
+            lstmcpipe_validate_config file;
+          done
+
