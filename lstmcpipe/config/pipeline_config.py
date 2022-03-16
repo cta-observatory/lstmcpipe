@@ -181,8 +181,11 @@ def parse_config_and_handle_global_vars(loaded_config):
 
     prod_id = loaded_config.get("prod_id", "v00")
     stages_to_be_run = loaded_config["stages_to_be_run"]
-    merging_options = loaded_config["merging_options"]["no_image"]
-    base_path = loaded_config.get("base_path")
+    merging_options = loaded_config.get("merging_options", {}).get("no_image", True)
+    try:
+        base_path = loaded_config.get("base_path")
+    except TypeError:
+        base_path = loaded_config.get("base_path_dl0")
     # to locate the source dl1 files
     dl1_reference_id = loaded_config.get("dl1_reference_id")
     # Full path to an observed dl1 file
