@@ -12,7 +12,7 @@ jobs:
         id: verify-changed-files
         with:
           files: |
-             production_configs/*/*.yml
+            production_configs/*/*.yml
       - name: Validate added configs.
         if: steps.verify-changed-files.outputs.added_files == 'true'
         run: |
