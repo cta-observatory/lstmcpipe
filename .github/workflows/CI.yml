@@ -67,6 +67,8 @@ jobs:
       - name: Validate added configs.
         if: steps.verify-changed-files.outputs.any_changed == 'true'
         run: |
+          source $CONDA/etc/profile.d/conda.sh
+          conda activate ci
           echo "Added yaml files: ${{ steps.verify-changed-files.outputs.added_files }}"
           for file in ${{ steps.verify-changed-files.outputs.added_files }}; do
             lstmcpipe_validate_config $file;
