@@ -1,0 +1,53 @@
+## MC PRODUCTION FULL PIPELINE CONFIGURATION ##
+#
+# The entries are needed to correctly select the MC production type
+#  and to create the common path tree;
+#
+#
+#   $BASE_PATH_DL0/$STAGE/$OBS_DATE/$PARTICLE/$ZENITH/$POINTING/$PROD_ID
+#
+#
+#  This way every MC production will follow the same path logic;
+#    ex;  $BASE_PATH_DL0/{DL0, DL1, DL2, running_analysis}/20200629_prod5/{electron, gamma, gamma-diffuse, proton}/
+#          /zenith_20deg/south_pointing/$PROD_ID
+
+
+workflow_kind: lstchain  # Not expected to be changed by the user
+prod_id:  zen40az180_local_tailcut_8_4      # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+
+base_path: /fefs/aswg/data/mc  #/fefs/aswg/workspace/MC_data_simlink  # Default user path
+  # lstanalyzer user : /fefs/aswg/data/mc
+  #
+prod_type: prod5
+obs_date: 20200629_prod5_trans_80
+zenith: zenith_40deg
+pointing: south_pointing
+
+particles:
+  - electron
+  - gamma
+  - gamma-diffuse
+  - proton
+offset_gammas:
+  - off0.0deg
+  - off0.4deg
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.3
+  #   source_file: /fefs/home/enrique.garcia/.bashrc
+  #   conda_env: lst-dev
+
+stages_to_be_run:
+  - r0_to_dl1
+  - merge_and_copy_dl1
+  - train_pipe
+  - dl1_to_dl2
+  - dl2_to_irfs
+  - dl2_to_sensitivity
+
+merging_options:
+  no_image: True
+
+slurm_config:
+  user_account: dpps

@@ -1,0 +1,52 @@
+## MC PRODUCTION FULL PIPELINE CONFIGURATION ##
+#
+# The entries are needed to correctly select the MC production type
+#  and to create the common path tree;
+#
+#
+#   $BASE_PATH_DL0/$STAGE/$OBS_DATE/$PARTICLE/$ZENITH/$POINTING/$PROD_ID
+#
+#
+#  This way every MC production will follow the same path logic;
+#    ex;  $BASE_PATH_DL0/{DL0, DL1, DL2, running_analysis}/20200629_prod5/{electron, gamma, gamma-diffuse, proton}/
+#          /zenith_20deg/south_pointing/$PROD_ID
+
+
+workflow_kind: lstchain  # Not expected to be changed by the user
+prod_id: local_taicut_8_4                # ex: local_no_n_islands. Default; v00 (if key left empty or None)
+
+base_path_dl0: /fefs/aswg/data/mc  # Default user path
+  # lstanalyzer user : /fefs/aswg/data/mc
+prod_type: prod5
+  # Choose between {prod5, prod3}
+obs_date: 20200629_prod5_trans_80
+  # prod5 : `20200629_prod5` or `20200629_prod5_trans_80`
+  # pro3 : `20190415`
+zenith: zenith_20deg  # Taken into account only when `prod_type: prod5` [ thus `obs_date` : 20200629_prod5(_trans_80) ]
+pointing: south_pointing
+particles:
+  - electron
+  - gamma
+  - gamma-diffuse
+  - proton
+offset_gammas:  # Taken into account only when `prod_type: prod5` [ thus `obs_date`: 20200629_prod5(_trans_80) ]
+  - off0.0deg
+  - off0.4deg
+
+source_environment:
+  source_file: /fefs/aswg/software/virtual_env/.bashrc
+  conda_env: cta
+  # user example: "source /fefs/home/enrique.garcia/.bashrc; conda activate lst-dev" should be writen:
+  #   source_file: /fefs/home/enrique.garcia/.bashrc
+  #   conda_env: lst-dev
+
+irf_config:
+  point_like: true      # If false, no `--point-like` argument will be passed to `lstchain_create_irf_files`
+  gamma_offset: 0.0deg  # Select between 0.0deg (ON/OFF obs) and 0.4deg (wobble obs).
+
+stages_to_be_run:
+  - r0_to_dl1
+  - merge_and_copy_dl1
+  - train_pipe
+  - dl1_to_dl2
+  - dl2_to_irfs
