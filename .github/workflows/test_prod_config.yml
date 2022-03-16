@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Validate Add Config
-        uses: tj-actions/verify-changed-files@v18.2
+        uses: tj-actions/changed-files@v18.2
         id: verify-changed-files
         with:
           files: |
