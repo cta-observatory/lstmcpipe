@@ -57,3 +57,18 @@ jobs:
             pytest --cov=lstmcpipe --cov-report=xml lstmcpipe
 
       - uses: codecov/codecov-action@v1
+
+      - name: Detect added configs
+        uses: tj-actions/changed-files@v18.2
+        id: verify-changed-files
+        with:
+          files: |
+            production_configs/*/*.yml
+      - name: Validate added configs.
+        if: steps.verify-changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Added yaml files: ${{ steps.verify-changed-files.outputs.added_files }}"
+          for file in ${{ steps.verify-changed-files.outputs.added_files }}; do
+            lstmcpipe_validate_config $file;
+            checked $file;
+          done
