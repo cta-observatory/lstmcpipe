@@ -23,6 +23,9 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Requesting a MC analysis
 ------------------------
+You may find the list of already run productions in the documentation.
+Please check in this list that the request you are about to make does not exist already!
+
 As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
 
 To do so, please:
@@ -34,7 +37,9 @@ To do so, please:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file
-* a readme with a short description of why you require this analysis to be run
+* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_.
+
+
 
 The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
 
