@@ -3,7 +3,7 @@ import argparse
 import yaml
 from pathlib import Path
 
-from lstmcpipe.config import load_config
+# from lstmcpipe.config import load_config
 from lstmcpipe.config.pipeline_config import config_valid
 from lstchain.io.config import read_configuration_file
 
