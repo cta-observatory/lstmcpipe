@@ -32,7 +32,7 @@ To do so, please:
 
 #. `Open a pull request from your fork <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork>`_ into lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
 #. You may have a look at the ``production_configs/template_prod`` as an example.
-#. Add a descriptive production ID (e.g. ``mrk421_psf_tuned``) to you directory and configuration.
+#. Add a descriptive production ID (e.g. ``src***_psf_tuned``) to you directory and configuration.
 #. The requested config must contain:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
