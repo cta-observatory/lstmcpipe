@@ -42,8 +42,8 @@ class PathConfigProd5Trans80(PathConfig):
         self.prod_id = prod_id
         self.zenith = zenith
         self.base_dir = '/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'
-        self.training_particles = ['gamma-diffuse', 'protons']
-        self.testing_particles = ['gamma', 'electron', 'protons']
+        self.training_particles = ['gamma-diffuse', 'proton']
+        self.testing_particles = ['gamma', 'electron', 'proton']
         self.point_src_offsets = ['off0.0deg', 'off0.4deg']
         self.particles = self.training_particles + self.testing_particles
         self.paths = {}
