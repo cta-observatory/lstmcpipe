@@ -225,8 +225,8 @@ def main():
     if "train_pipe" in stages_to_run:
         train_config = Path(args.config_file_lst)
 
-        job_from_train_pipe, model_dir = batch_train_pipe(
-            merged_dl1_paths_dict,
+        job_from_train_pipe = batch_train_pipe(
+            path_dict,
             train_config,
             jobs_to_train,
             batch_config=batch_config,
@@ -237,31 +237,26 @@ def main():
 
         # Plot the RF feature's importance
         batch_plot_rf_features(
-            model_dir,
+            path_dict,
             args.config_file_lst,
             batch_config,
             job_from_train_pipe,
             logs=logs_files,
         )
+        # TODO check if we want to update jobid from `batch_plot_rf_features`
 
     else:
         job_from_train_pipe = ""
-        model_dir = config["model_output_dir"]
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
         dl1_to_dl2_config = Path(args.config_file_lst)
 
-        dl2_files_path_dict, jobs_from_dl1_dl2 = batch_dl1_to_dl2(
-            dl1_output_dir,
-            model_dir,
+        jobs_from_dl1_dl2 = batch_dl1_to_dl2(
+            path_dict,
             dl1_to_dl2_config,
             job_from_train_pipe,  # Single jobid from train
-            jobs_all_dl1_finished,  # jobids from merge
-            merged_dl1_paths_dict,  # final dl1 names
-            all_particles,
             batch_config=batch_config,
-            gamma_offsets=gamma_offs,
             logs=logs_files,
         )
 
@@ -269,7 +264,6 @@ def main():
 
     else:
         jobs_from_dl1_dl2 = ""
-        dl2_files_path_dict = {}  # Empty log will be manage inside onsite_dl2_irfs
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:

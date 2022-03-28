@@ -38,9 +38,7 @@ def batch_dl1_to_dl2(
 
     Returns
     -------
-    log_batch_dl1_to_dl2 : dict
-        Dictionary containing the log of the batched dl1_to_dl2 jobs
-    jobid_4_dl2_to_dl3 : str
+    jobid_for_dl2_to_dl3 : str
         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
 
     """
@@ -70,14 +68,14 @@ def batch_dl1_to_dl2(
             f"dl1_to_dl2 jobid that depends on : {jobid_from_training} training job"
         )
 
-    jobid_4_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
+    jobid_for_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
 
     save_log_to_file(log_dl1_to_dl2, logs["log_file"], workflow_step="dl1_to_dl2")
     save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl1_to_dl2")
 
     log.info("==== END {} ====".format("batch dl1_to_dl2_workflow"))
 
-    return log_dl1_to_dl2, jobid_4_dl2_to_dl3
+    return jobid_for_dl2_to_dl3
 
 
 def dl1_to_dl2(

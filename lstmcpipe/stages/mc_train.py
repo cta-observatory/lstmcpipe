@@ -51,7 +51,7 @@ def batch_train_pipe(
     proton_dl1_train_file = dict_paths["input"]["proton"]
     models_dir = dict_paths["output"]
 
-    log_train, jobid_4_dl1_to_dl2 = train_pipe(
+    log_train, jobid_for_dl1_to_dl2 = train_pipe(
         gamma_dl1_train_file,
         proton_dl1_train_file,
         models_dir,
@@ -60,7 +60,7 @@ def batch_train_pipe(
         wait_jobs_dl1=jobids_from_merge,
     )
 
-    debug_log[jobid_4_dl1_to_dl2] = (
+    debug_log[jobid_for_dl1_to_dl2] = (
         f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
         f"_and_copy jobids"
     )
@@ -70,7 +70,7 @@ def batch_train_pipe(
 
     log.info("==== END {} ====".format("batch mc_train_workflow"))
 
-    return jobid_4_dl1_to_dl2
+    return jobid_for_dl1_to_dl2
 
 
 def batch_plot_rf_features(
