@@ -25,12 +25,11 @@ from lstmcpipe.io.lstmcpipe_tree_path import (
     update_scancel_file,
 )
 from lstmcpipe.workflow_management import (
-    create_dl1_filenames_dict,
     batch_mc_production_check,
 )
 from lstmcpipe.stages import (
     batch_process_dl1,
-    batch_merge_and_copy_dl1,
+    batch_merge_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
@@ -209,32 +208,18 @@ def main():
 
     # 2 STAGE --> Merge,copy and move DL1 files
     if "merge_and_copy_dl1" in stages_to_run:
-        (
-            merged_dl1_paths_dict,
-            jobs_to_train,
-            jobs_all_dl1_finished,
-        ) = batch_merge_and_copy_dl1(
-            running_analysis_dir,
-            particle2jobid_process_dl1_dict,
-            all_particles,
-            smart_merge=False,  # smart_merge=WORKFLOW_KIND
-            no_image_flag=no_image_merging,
-            gamma_offsets=gamma_offs,
-            prod_id=prod_id,
+        jobs_to_train = batch_merge_dl1(
+            path_dict,
+            jobid_from_splitting=particle2jobid_process_dl1_dict,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
             logs=logs_files,
         )
 
-        update_scancel_file(scancel_file, jobs_all_dl1_finished)
+        update_scancel_file(scancel_file, jobs_to_train)
 
     else:
-        # Create just the needed dictionary inputs (dl1 files must exist !)
-        merged_dl1_paths_dict = create_dl1_filenames_dict(
-            dl1_output_dir, all_particles, gamma_offs
-        )
         jobs_to_train = ""
-        jobs_all_dl1_finished = ""
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:

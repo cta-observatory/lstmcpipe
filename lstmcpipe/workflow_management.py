@@ -38,60 +38,6 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
         yaml.dump(dict2log, fileout)
 
 
-def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None):
-    """
-    Function that creates a dictionary with the filenames of all the final dl1 files (the same is done
-    in the merge_and_copy_dl1 function) so that it can be passed to the rest of the stages, in case the full workflow
-    it is not run from the start.
-
-    Parameters
-    ----------
-    dl1_directory: str
-        path to the dl1 directory files
-    particles_loop : list
-        list with the particles to be processed. Takes the global variable ALL_PARTICLES
-    gamma_offsets : list
-
-    Returns
-    -------
-    dl1_filename_directory : dict
-        dictionary with the name (and absolute path) of the dl1 files with the name of the particles set as key of the
-        dictionary
-
-             dl1_filename_directory[particle].keys() = ['train_path_and_outname_dl1', 'test_path_and_outname_dl1']
-    """
-    dl1_filename_directory = {}
-
-    for particle in particles_loop:
-        if gamma_offsets is not None and particle == "gamma":
-            for off in gamma_offsets:
-                _particle = particle + "_" + off
-                dl1_filename_directory[_particle] = {"training": {}, "testing": {}}
-
-                dl1_filename_directory[_particle]["training"][
-                    "train_path_and_outname_dl1"
-                ] = next(
-                    Path(dl1_directory.format(particle), off).glob("*training*.h5")
-                ).resolve().as_posix()
-                dl1_filename_directory[_particle]["testing"][
-                    "test_path_and_outname_dl1"
-                ] = next(
-                    Path(dl1_directory.format(particle), off).glob("*testing*.h5")
-                ).resolve().as_posix()
-        else:
-            dl1_filename_directory[particle] = {"training": {}, "testing": {}}
-            dl1_filename_directory[particle]["training"][
-                "train_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5")
-                     ).resolve().as_posix()
-            dl1_filename_directory[particle]["testing"][
-                "test_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5")
-                     ).resolve().as_posix()
-
-    return dl1_filename_directory
-
-
 def batch_mc_production_check(
     jobids_from_r0_to_dl1,
     jobids_from_merge,
