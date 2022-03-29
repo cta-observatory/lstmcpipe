@@ -206,20 +206,33 @@ def main():
         for particle in all_particles:
             particle2jobid_process_dl1_dict[particle] = ""
 
-    # 2 STAGE --> Merge,copy and move DL1 files
-    if "merge_and_copy_dl1" in stages_to_run:
-        jobs_to_train = batch_merge_dl1(
+    # 2.1 STAGE --> Train, test splitting
+    if "train_test_split" in stages_to_run:
+        jobs_from_splitting = batch_train_test_split(
             path_dict,
-            jobid_from_splitting=particle2jobid_process_dl1_dict,
+            jobid_from_r0dl1=jobs_to_split,
+            batch_config=batch_config,
+            logs=logs_files,
+        )
+
+        update_scancel_file(scancel_file, jobs_from_splitting)
+    else:
+        jobs_from_splitting = ""
+
+    # 2.2 STAGE --> Merge,copy and move DL1 files
+    if "merge_and_copy_dl1" in stages_to_run:
+        jobs_from_merge = batch_merge_dl1(
+            path_dict,
+            jobid_from_splitting=jobs_from_splitting,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
             logs=logs_files,
         )
 
-        update_scancel_file(scancel_file, jobs_to_train)
+        update_scancel_file(scancel_file, jobs_from_merge)
 
     else:
-        jobs_to_train = ""
+        jobs_from_merge = ""
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
@@ -228,7 +241,7 @@ def main():
         job_from_train_pipe = batch_train_pipe(
             path_dict,
             train_config,
-            jobs_to_train,
+            jobs_from_merge,
             batch_config=batch_config,
             logs=logs_files,
         )

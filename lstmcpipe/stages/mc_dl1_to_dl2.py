@@ -4,8 +4,8 @@ import os
 import shutil
 import logging
 from pathlib import Path
-from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 from lstmcpipe.workflow_management import save_log_to_file
+from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
 log = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def batch_dl1_to_dl2(
 
     log.info("==== START {} ==== \n".format("batch dl1_to_dl2_workflow"))
 
-    for particle, paths in dict_paths["dl1_to_dl2"].items():
+    for paths in dict_paths["dl1_to_dl2"]:
 
         job_logs, jobid = dl1_to_dl2(
             paths["input"],
