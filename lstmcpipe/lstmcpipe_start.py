@@ -219,7 +219,7 @@ def main():
     else:
         jobs_from_splitting = ""
 
-    # 2.2 STAGE --> Merge,copy and move DL1 files
+    # 2.2 STAGE --> Merge DL1 files
     if "merge_and_copy_dl1" in stages_to_run:
         jobs_from_merge = batch_merge_dl1(
             path_dict,
@@ -256,7 +256,7 @@ def main():
             job_from_train_pipe,
             logs=logs_files,
         )
-        # TODO check if we want to update jobid from `batch_plot_rf_features`
+        # TODO check if we want to update jobid from `batch_plot_rf_features` into scancel
 
     else:
         job_from_train_pipe = ""
