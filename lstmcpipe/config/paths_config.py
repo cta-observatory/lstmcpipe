@@ -1,6 +1,6 @@
 import os
 import yaml
-
+from copy import deepcopy
 
 class PathConfig:
     def __init__(self):
@@ -13,20 +13,30 @@ class PathConfig:
             self.paths[stage] = getattr(self, stage)
         return self.paths
 
-    def save_yml(self, filename, overwrite=False):
+    def save_yml(self, filename, append=False, overwrite=False):
         if self.paths == {}:
             raise ValueError("Empty paths, generate first")
-        if os.path.exists(filename) and not overwrite:
-            raise FileExistsError(f"{filename} exists. Set overwrite=True")
+        else:
+            config_to_save = deepcopy(self.paths)
+        if os.path.exists(filename) and not (overwrite or append):
+            raise FileExistsError(f"{filename} exists. Set overwrite=True or append=True")
+        if append and overwrite:
+            raise ValueError("Append or overwrite, not both ;-)")
+        if append:
+            with open(filename) as f:
+                existing_config = yaml.safe_load(f)
+            config_to_save.update(existing_config)
         with open(filename, 'w') as f:
-            yaml.safe_dump(self.paths, f)
+            yaml.safe_dump(config_to_save, f)
 
     def load_yml(self, filename):
         with open(filename) as f:
             paths = yaml.safe_load(f)
-        for keys in paths:
-            if not hasattr(self, keys):
+        for key, path in paths.items():
+            if not hasattr(self, key):
                 raise NotImplementedError(f"This class does not have an implemented stage called {keys}")
+            else:
+                self.paths[key] = path
 
 
 
