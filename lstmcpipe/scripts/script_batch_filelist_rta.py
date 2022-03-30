@@ -2,7 +2,7 @@
 
 import argparse
 import subprocess
-import os
+from os import environ
 
 
 def main():
