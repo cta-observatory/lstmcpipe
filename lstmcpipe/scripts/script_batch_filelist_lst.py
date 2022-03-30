@@ -36,9 +36,13 @@ def main():
     )
     args = parser.parse_args()
 
-    task_id = int(environ["SLURM_ARRAY_TASK_ID"])
-    file_for_this_job = args.file_list[task_id]
-    print("Using file: ", file_for_this_job)
+    task_id = int(environ.get("SLURM_ARRAY_TASK_ID"))
+    # Running script manually:
+    if len(args.file_list) == 1 and task_id == None:
+        file_for_this_job = args.file_list[0]
+    else:
+        file_for_this_job = args.file_list[task_id]
+    print("Processing files in: ", file_for_this_job)
 
     # lstchain takes the output dir and constructs filenanmes itself
     with open(file_for_this_job, "r") as filelist:
