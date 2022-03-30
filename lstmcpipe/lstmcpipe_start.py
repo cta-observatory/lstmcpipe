@@ -29,6 +29,7 @@ from lstmcpipe.workflow_management import (
 )
 from lstmcpipe.stages import (
     batch_process_dl1,
+    batch_train_test_splitting,
     batch_merge_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
@@ -167,7 +168,7 @@ def main():
     dl1ab = "dl1ab" in stages_to_run
 
     if r0_to_dl1 or dl1ab:
-        stage_input_dir = Path(input_dir)
+        stage_input_dir = Path(input_dir)  # TODO take out
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst).resolve().as_posix()
             if config.get("dl1_noise_tune_data_run"):
@@ -183,16 +184,13 @@ def main():
             dl1_config = Path(args.config_file_rta).resolve()
         else:  # if this wasnt ctapipe, the config parsing would have failed
             dl1_config = Path(args.config_file_ctapipe).resolve()
-        if dl1ab:
+        if dl1ab:  #TODO take out
             stage_input_dir /= config["dl1_reference_id"]
 
-        particle2jobid_process_dl1_dict, jobs_all_dl1 = batch_process_dl1(
-            input_dir=stage_input_dir.as_posix(),
+        jobs_all_dl1 = batch_process_dl1(
+            path_dict,
             conf_file=dl1_config,
-            prod_id=prod_id,
-            particles_loop=all_particles,
             batch_config=batch_config,
-            gamma_offsets=gamma_offs,
             workflow_kind=workflow_kind,
             new_production=r0_to_dl1,
             logs=logs_files,
@@ -208,9 +206,9 @@ def main():
 
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
-        jobs_from_splitting = batch_train_test_split(
+        jobs_from_splitting = batch_train_test_splitting(
             path_dict,
-            jobid_from_r0dl1=jobs_to_split,
+            jobids_from_r0dl1=jobs_to_split,
             batch_config=batch_config,
             logs=logs_files,
         )
@@ -236,12 +234,11 @@ def main():
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
-        train_config = Path(args.config_file_lst)
 
         job_from_train_pipe = batch_train_pipe(
             path_dict,
-            train_config,
             jobs_from_merge,
+            config_file=Path(args.config_file_lst).resolve().as_posix(),
             batch_config=batch_config,
             logs=logs_files,
         )
@@ -251,7 +248,7 @@ def main():
         # Plot the RF feature's importance
         batch_plot_rf_features(
             path_dict,
-            args.config_file_lst,
+            Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
             logs=logs_files,
@@ -263,11 +260,10 @@ def main():
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
-        dl1_to_dl2_config = Path(args.config_file_lst)
 
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
             path_dict,
-            dl1_to_dl2_config,
+            Path(args.config_file_lst).resolve().as_posix(),
             job_from_train_pipe,  # Single jobid from train
             batch_config=batch_config,
             logs=logs_files,

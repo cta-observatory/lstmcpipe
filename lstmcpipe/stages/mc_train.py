@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 
 def batch_train_pipe(
         dict_paths,
-        config_file,
         jobids_from_merge,
+        config_file,
         batch_config,
         logs
 ):
