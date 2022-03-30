@@ -37,14 +37,9 @@ def batch_process_dl1(
         Core dictionary with {stage: PATHS} information
     conf_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-    prod_id : str
-        Production ID. If None, _v00 will be used, indicating an official base production. Default = None.
-    particles_loop : list
-        list with the particles to be processed. Takes the global variable ALL_PARTICLES
     batch_config : dict
         Dict with source environment (to select the desired conda environment to run the r0/1_to_dl1 stage),
         and the slurm user account.
-    gamma_offsets : list
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
     new_production: bool
@@ -88,7 +83,6 @@ def batch_process_dl1(
             jobids_dl1_processing_stage.append(jobid)
             for jid in jobids_dl1_processing_stage:
                 debug_log[jid] = f'dl1ab job from input dir: {paths["input"]}'
-
 
     # Create a string to be directly passed
     jobids_dl1_processing_stage = ",".join(jobids_dl1_processing_stage)
@@ -141,23 +135,12 @@ def r0_to_dl1(
     Returns
     -------
     jobid2log : dict
-        A dictionary of dictionaries containing the full log information of the script. The first `layer` contains
-        only the each jobid that the scripts has batched.
-
-            dict[jobid] = information
-
-        The second layer contains, organized by jobid,
-             - the kind of particle that corresponded to the jobid
-             - the command that was run to batch the job into the server
-             - the path to both the output and error files (job_`jobid`.o and job_`jobid`.e) that were generated
-                 when the job was send to the cluster
-
-             dict[jobid].keys() = ['particle', 'sbatch_command', 'jobe_path', 'jobo_path']
+        dictionary log containing {jobid: batch_cmd} information
     jobids_r0_dl1
-        A list of all the jobs sent by particle (including test and train set types).
+        A list of all the jobs sent for input dir
     """
 
-    log.info("Starting R0 to DL1 processing for particle {}".format(particle))
+    log.info("Starting R0 to DL1 processing for files in dir : {}".format(input_dir))
 
     source_environment = batch_config["source_environment"]
     slurm_account = batch_config["slurm_account"]
@@ -207,13 +190,14 @@ def r0_to_dl1(
     log.info("DL1 DATA DIR: {}".format(input_dir))
 
     jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
+        input_dir,
         output_dir,
         base_cmd=base_cmd,
         file_list=raw_files_list,
+        job_type_id=jobtype_id,
         dl1_files_per_batched_job=dl1_files_per_job,
         job_logs_dir=job_logs_dir,
         slurm_account=slurm_account,
-        job_type_id=jobtype_id,
         filelist_name="r0_to_dl1",
     )
 
