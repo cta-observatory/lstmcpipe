@@ -277,14 +277,10 @@ def main():
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         jobs_from_dl2_irf = batch_dl2_to_irfs(
-            dl2_output_dir,
-            all_particles,
-            gamma_offs,
-            Path(args.config_file_lst),
-            jobs_from_dl1_dl2,  # Final dl2 names
-            log_from_dl1_dl2=dl2_files_path_dict,
+            path_dict,
+            Path(args.config_file_lst).resolve().as_posix(),
+            jobs_from_dl1_dl2,
             batch_config=batch_config,
-            prod_id=prod_id,
             logs=logs_files,
         )
 
