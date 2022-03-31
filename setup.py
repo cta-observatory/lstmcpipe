@@ -55,8 +55,8 @@ setup(
     version=version,
     description=description,
     install_requires=[
-        "yaml",
         "lstchain",
+        "pyyaml",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
