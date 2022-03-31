@@ -1,13 +1,12 @@
 import os
-
 from ruamel.yaml import YAML
-
 from datetime import date
 
 from . import base_config
 
 class PathConfig:
-    def __init__(self):
+    def __init__(self, prod_id):
+        self.prod_id = prod_id
         self.paths = {}
         self.stages = []
 
@@ -35,6 +34,7 @@ class PathConfig:
         if self.paths == {}:
             raise ValueError("Empty paths, generate first")
 
+        config_to_save['prod_id'] = self.prod_id
         config_to_save['stages_to_run'] = self.stages
         config_to_save['stages'] = self.paths
 
@@ -66,7 +66,7 @@ class PathConfigProd5Trans80(PathConfig):
     """
 
     def __init__(self, prod_id, zenith='zenith_20deg'):
-        super().__init__()
+        super().__init__(prod_id)
         self.prod_id = prod_id
         self.zenith = zenith
         self.base_dir = '/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'

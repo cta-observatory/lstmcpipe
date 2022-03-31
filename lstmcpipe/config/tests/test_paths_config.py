@@ -6,8 +6,8 @@ from lstmcpipe.config import paths_config
 
 @pytest.mark.xfail(raises=NotImplementedError)
 def test_path_config_generate_fail():
-    pcfg = paths_config.PathConfig()
-    pcfg.generate([])
+    pcfg = paths_config.PathConfig('v00')
+    pcfg.generate()
 
 
 def test_path_config_generate():
@@ -18,7 +18,7 @@ def test_path_config_generate():
         @property
         def stage1(self):
             return {'input': 'input_path', 'output': None}
-    pcfg = NewPathConfig()
+    pcfg = NewPathConfig('v00')
     pcfg.generate(stages=['stage1']) == {'stage1': {'input': 'input_path', 'output': None}}
 
 
@@ -27,6 +27,7 @@ def test_path_config_save():
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
+
 
 def test_PathConfigProd5Trans80():
     # testing with an existing prod
