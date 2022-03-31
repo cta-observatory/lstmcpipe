@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-# E. Garcia, Avr '21
-#
 # DL2 to IRFs stage for the R0 to IRFs full MC production workflow.
-#
-#
 # As all the previous stages, this script make use of the lstchain entry points to batch each workflow stage.
-#
 
 import os
 import time

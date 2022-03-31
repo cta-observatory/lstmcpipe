@@ -161,42 +161,42 @@ def check_and_make_dir_without_verification(directory):
     os.makedirs(directory, exist_ok=True)
 
 
-def check_job_logs(job_logs_dir):
-    job_logs = [
-        os.path.join(job_logs_dir, f)
-        for f in os.listdir(job_logs_dir)
-        if f.endswith(".e")
-    ]
-    logs_with_error = []
-    for log_filename in job_logs:
-        with open(log_filename) as log_file:
-            for line in log_file.readlines():
-
-                if (
-                    "Remote data cache could not be accessed due to FileNotFoundError"
-                    in line
-                    or "URLError(" in line
-                    or "<urlopen error Unable to open any source!" in line
-                    or "ftp error: timeout(" in line
-                ):
-
-                    continue  # Known astropy errors, they do not break the workflow
-
-                elif (
-                    line.startswith("Error")
-                    or line.startswith("ERROR")
-                    or "ERROR" in line
-                    or "Error" in line
-                ):
-                    logs_with_error.append(os.path.basename(log_filename))
-                    break
-
-    if not logs_with_error == []:
-        query_continue(
-            "There are errors in the following log files:\n {}\n "
-            "Are you sure you want to continue?".format(logs_with_error),
-            default="no",
-        )
+# def check_job_logs(job_logs_dir):
+#     job_logs = [
+#         os.path.join(job_logs_dir, f)
+#         for f in os.listdir(job_logs_dir)
+#         if f.endswith(".e")
+#     ]
+#     logs_with_error = []
+#     for log_filename in job_logs:
+#         with open(log_filename) as log_file:
+#             for line in log_file.readlines():
+#
+#                 if (
+#                     "Remote data cache could not be accessed due to FileNotFoundError"
+#                     in line
+#                     or "URLError(" in line
+#                     or "<urlopen error Unable to open any source!" in line
+#                     or "ftp error: timeout(" in line
+#                 ):
+#
+#                     continue  # Known astropy errors, they do not break the workflow
+#
+#                 elif (
+#                     line.startswith("Error")
+#                     or line.startswith("ERROR")
+#                     or "ERROR" in line
+#                     or "Error" in line
+#                 ):
+#                     logs_with_error.append(os.path.basename(log_filename))
+#                     break
+#
+#     if not logs_with_error == []:
+#         query_continue(
+#             "There are errors in the following log files:\n {}\n "
+#             "Are you sure you want to continue?".format(logs_with_error),
+#             default="no",
+#         )
 
 
 def check_files_in_dir_from_file(directory, file):

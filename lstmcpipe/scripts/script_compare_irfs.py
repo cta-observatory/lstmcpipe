@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from lstmcpipe.plots.plot_irfs import plot_summary_from_file
 
 
-
 def plot_comparison(filelist, outfile=None, cta_north=False):
     """
     Create a 2x2 plot comparing different sensitivity curves
