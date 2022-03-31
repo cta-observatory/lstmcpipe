@@ -187,7 +187,7 @@ def main():
         if dl1ab:  #TODO take out
             stage_input_dir /= config["dl1_reference_id"]
 
-        jobs_all_dl1 = batch_process_dl1(
+        jobs_from_dl1_processing = batch_process_dl1(
             path_dict,
             conf_file=dl1_config,
             batch_config=batch_config,
@@ -196,19 +196,16 @@ def main():
             logs=logs_files,
         )
 
-        update_scancel_file(scancel_file, jobs_all_dl1)
+        update_scancel_file(scancel_file, jobs_from_dl1_processing)
 
     else:
-        jobs_all_dl1 = ""
-        particle2jobid_process_dl1_dict = {}
-        for particle in all_particles:
-            particle2jobid_process_dl1_dict[particle] = ""
+        jobs_from_dl1_processing = ""
 
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
         jobs_from_splitting = batch_train_test_splitting(
             path_dict,
-            jobids_from_r0dl1=jobs_to_split,
+            jobids_from_r0dl1=jobs_from_dl1_processing,
             batch_config=batch_config,
             logs=logs_files,
         )
@@ -292,12 +289,9 @@ def main():
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
         jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
-            dl2_output_dir,
-            gamma_offs,
+            path_dict,
             jobs_from_dl1_dl2,
-            dl2_files_path_dict,  # Final dl2 names
             batch_config=batch_config,
-            prod_id=prod_id,
             logs=logs_files,
         )
 
@@ -308,13 +302,11 @@ def main():
 
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check = batch_mc_production_check(
-        jobs_all_dl1,
-        jobs_all_dl1_finished,
+        jobs_from_dl1_processing,
         job_from_train_pipe,
         jobs_from_dl1_dl2,
         jobs_from_dl2_irf,
         jobs_from_dl2_sensitivity,
-        prod_id,
         log_directory=logs_dir,
         prod_config_file=args.config_mc_prod,
         last_stage=stages_to_run[-1],

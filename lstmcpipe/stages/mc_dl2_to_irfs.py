@@ -42,6 +42,7 @@ def batch_dl2_to_irfs(
     Returns
     -------
     jobs_from_dl2_irf: str
+        Comma-separated jobids batched in the current stage
     """
     log.info("==== START {} ====".format("batch mc_dl2_to_irfs"))
 
