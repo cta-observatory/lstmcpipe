@@ -288,7 +288,33 @@ class PathConfigProd5Trans80(PathConfig):
                     paths.append(path_dict(offset))
         return paths
 
-    # def generate(self):
-    #     return super().generate(stages)
 
+class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
+    
+    def __init__(self, starting_prod_id, new_prod_id, zenith='zenith_20deg'):
+        super(PathConfigProd5Trans80DL1ab, self).__init__(prod_id=new_prod_id, zenith=zenith)
+        self.starting_prod_id = starting_prod_id
+        self.stages.remove('r0_to_dl1')
+        self.stages.remove('train_test_split')
+        self.stages.remove('merge_dl1')
+        self.stages.insert(0, 'dl1ab')
 
+    def starting_dl1(self, particle, step, gamma_src_offset='off0.4deg'):
+        former_merged_dl1 = self.merge_output_file(particle=particle, step=step, gamma_src_offset=gamma_src_offset)
+        return former_merged_dl1.replace(self.prod_id, self.starting_prod_id)
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for step in ['train', 'test']:
+            for particle in self.particles:
+                if particle == 'gamma':
+                    for offset in self.point_src_offsets:
+                        dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
+                        dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset=offset)
+                        paths.append({'input': dl1_input, 'output': dl1_output})
+                else:
+                    dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
+                    dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset='')
+                    paths.append({'input': dl1_input, 'output': dl1_output})
+        return paths
