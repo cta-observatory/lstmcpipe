@@ -12,18 +12,18 @@ def test_path_config_generate_fail():
 
 def test_path_config_generate():
     class NewPathConfig(paths_config.PathConfig):
-        def __init__(self):
-            super().__init__()
-
+        def __init__(self, prod_id):
+            super().__init__(prod_id)
+            self.stages = ['stage1']
         @property
         def stage1(self):
             return {'input': 'input_path', 'output': None}
     pcfg = NewPathConfig('v00')
-    pcfg.generate(stages=['stage1']) == {'stage1': {'input': 'input_path', 'output': None}}
+    pcfg.generate() == {'stage1': {'input': 'input_path', 'output': None}}
 
 
 def test_path_config_save():
-    pcfg = paths_config.PathConfig()
+    pcfg = paths_config.PathConfig('v00')
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
