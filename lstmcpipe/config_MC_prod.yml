@@ -38,7 +38,7 @@ source_environment:
   #   source_file: /fefs/home/enrique.garcia/.bashrc
   #   conda_env: lst-dev
 
-stages_to_be_run:
+stages_to_run:
   - r0_to_dl1
   - merge_and_copy_dl1
   - train_pipe

@@ -10,7 +10,7 @@ from datetime import datetime
 
 yaml_keys = [
     "prod_id",
-    "stages_to_be_run",
+    "stages_to_run",
     "base_path",
     "pointing",
     "zenith",
@@ -46,7 +46,7 @@ def test_config_valid():
     valid["prod_type"] = "prod5"
     valid["workflow_kind"] = "lstchain"
     valid["obs_date"] = "20200629_prod5_trans_80"
-    valid["stages_to_be_run"] = []
+    valid["stages_to_run"] = []
     valid["base_path"] = "/path/to/dl0"
     assert config_valid(valid)
 
@@ -72,7 +72,7 @@ def test_config_valid():
         config_valid(invalid_date_prod)
 
     missing_reference = valid.copy()
-    missing_reference["stages_to_be_run"] = ["dl1ab"]
+    missing_reference["stages_to_run"] = ["dl1ab"]
     with pytest.raises(KeyError):
         config_valid(missing_reference)
 
@@ -90,7 +90,7 @@ def test_parse_config_and_handle_global_vars():
     config["pointing"] = "90"
     config["zenith"] = "45"
     config["base_path"] = "/dummy/path/to/files"
-    config["stages_to_be_run"] = ["r0_to_dl1"]
+    config["stages_to_run"] = ["r0_to_dl1"]
 
     parsed_config = parse_config_and_handle_global_vars(config)
     date = datetime.today().strftime("%Y%m%d")
