@@ -78,5 +78,5 @@ setup(
     ],
     scripts=scripts_list,
     entry_points=entry_points,
-    data_files=[('lstmcpipe', ['base_config_lstmcpipe.yaml'])],
+    data_files=[('lstmcpipe', ['lstmcpipe/base_config_lstmcpipe.yaml'])],
 )
