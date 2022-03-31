@@ -1,0 +1,16 @@
+# lstmcpipe base config #
+
+
+# workflow_kind is not expected to be changed by LST users
+workflow_kind: lstchain
+
+# prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id:
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.3
+
+slurm_config:
+  user_account: aswg
+
