@@ -36,9 +36,9 @@ def main():
     )
     args = parser.parse_args()
 
-    task_id = int(environ.get("SLURM_ARRAY_TASK_ID"))
+    task_id = int(environ.get("SLURM_ARRAY_TASK_ID", -1))
     # Running script manually:
-    if len(args.file_list) == 1 and task_id == None:
+    if len(args.file_list) == 1 and task_id == -1:
         file_for_this_job = args.file_list[0]
     else:
         file_for_this_job = args.file_list[task_id]
