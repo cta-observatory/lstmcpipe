@@ -1,14 +1,15 @@
 import os
-from ruamel.yaml import YAML
+import yaml
 import calendar
 import logging
 from pathlib import Path
+
 
 log = logging.getLogger(__name__)
 
 
 def create_path(
-        parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
+    parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
 ):
     p = Path(parent_path) / stage / obs_date
     if particles:
@@ -37,7 +38,7 @@ def load_config(config_path):
 
     # This could easily be adapted to support different formats
     with open(config_path) as f:
-        loaded_config = YAML().load(f)
+        loaded_config = yaml.safe_load(f)
 
     config_valid(loaded_config)
 
@@ -132,7 +133,7 @@ def config_valid(loaded_config):
 
     # and incompatible possibilities
     if (prod_type == "prod3" and obs_date != "20190415") or (
-            prod_type == "prod5" and obs_date == "20190415"
+        prod_type == "prod5" and obs_date == "20190415"
     ):
         raise Exception("This prod_type and obs_date combination is not possible.")
 
@@ -299,4 +300,3 @@ def parse_config_and_handle_global_vars(loaded_config):
         particles=False,
     )
     return config
-

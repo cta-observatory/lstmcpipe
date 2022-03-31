@@ -3,7 +3,7 @@
 # Enrique Garcia Nov 2019
 
 import os
-from ruamel.yaml import YAML
+import yaml
 import shutil
 import logging
 from pathlib import Path
@@ -35,7 +35,7 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
     dict2log = {workflow_step: dictionary}
 
     with open(output_file, "a+") as fileout:
-        YAML().dump(dict2log, fileout)
+        yaml.dump(dict2log, fileout)
 
 
 def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None):

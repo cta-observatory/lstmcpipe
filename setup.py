@@ -55,14 +55,14 @@ setup(
     version=version,
     description=description,
     install_requires=[
+        "yaml",
         "lstchain",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
         "pyirf>=0.4",
         "matplotlib",
-        "pytest",
-        "ruamel.yaml>=0.17"
+        "pytest"
     ],
     packages=find_packages(),
     tests_require=["pytest"],
@@ -78,5 +78,4 @@ setup(
     ],
     scripts=scripts_list,
     entry_points=entry_points,
-    data_files=[('lstmcpipe', ['base_config_lstmcpipe.yaml'])],
 )
