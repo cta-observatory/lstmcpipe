@@ -39,16 +39,10 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
 
 
 def batch_mc_production_check(
-    jobids_from_r0_to_dl1,
-    jobids_from_merge,
-    jobids_from_train_pipe,
-    jobids_from_dl1_to_dl2,
-    jobids_from_dl2_to_irf,
-    jobids_from_dl2_to_sensitivity,
-    prod_id,
+    dict_jobids_all_stages,
     log_directory,
+    prod_id,
     prod_config_file,
-    last_stage,
     batch_config,
     logs_files,
 ):
@@ -59,18 +53,11 @@ def batch_mc_production_check(
 
     Parameters
     ----------
-    jobids_from_r0_to_dl1 : str
-        jobs from the dl1_to_dl2 stage
-    prod_id : str
-        MC Production ID.
-    jobids_from_merge :  str
-    jobids_from_train_pipe : str
-    jobids_from_dl1_to_dl2: str
-    jobids_from_dl2_to_irf: str
-    jobids_from_dl2_to_sensitivity: str
+    dict_jobids_all_stages : dict
+        dict containing the {stage: all_job_ids related} information
     log_directory: Path
+    prod_id: str
     prod_config_file: str
-    last_stage: str
     batch_config: dict
     logs_files: dict
         Dictionary with logs files
@@ -86,38 +73,20 @@ def batch_mc_production_check(
     source_env = batch_config["source_environment"]
     slurm_account = batch_config["slurm_account"]
 
-    jobids_stages = {
-        "r0_to_dl1": jobids_from_r0_to_dl1,
-        "merge_and_copy_dl1": jobids_from_merge,
-        "train_pipe": jobids_from_train_pipe,
-        "dl1_to_dl2": jobids_from_dl1_to_dl2,
-        "dl2_to_irfs": jobids_from_dl2_to_irf,
-        "dl2_to_sensitivity": jobids_from_dl2_to_sensitivity,
-    }
-
-    if jobids_from_r0_to_dl1 != "":
-        all_pipeline_jobs.append(jobids_from_r0_to_dl1)
-    if jobids_from_merge != "":
-        all_pipeline_jobs.append(jobids_from_merge)
-    if jobids_from_train_pipe != "":
-        all_pipeline_jobs.append(jobids_from_train_pipe)
-    if jobids_from_dl1_to_dl2 != "":
-        all_pipeline_jobs.append(jobids_from_dl1_to_dl2)
-    if jobids_from_dl2_to_irf != "":
-        all_pipeline_jobs.append(jobids_from_dl2_to_irf)
-    if jobids_from_dl2_to_sensitivity != "":
-        all_pipeline_jobs.append(jobids_from_dl2_to_sensitivity)
+    for stage, jobids in dict_jobids_all_stages.items():
+        all_pipeline_jobs.append(jobids)
+        debug_log.update({f"SUMMARY_{stage}": jobids})
 
     all_pipeline_jobs = ",".join(all_pipeline_jobs)
 
-    which_last_stage = jobids_stages[last_stage]
+    # Copy lstmcpipe config used to log directory
+    shutil.copyfile(
+        Path(prod_config_file).resolve(),
+        log_directory.joinpath(f"config_MC_prod_{prod_id}.yml")
+    )
 
     # Save machine info into the check file
     check_prod_file = log_directory.joinpath(f"check_MC_{prod_id}.txt").name
-    save_lstmcpipe_config = log_directory.joinpath(f"config_MC_prod_{prod_id}.yml")
-
-    # Copy lstmcpipe config used
-    shutil.copyfile(Path(prod_config_file).resolve(), save_lstmcpipe_config)
 
     cmd_wrap = f"touch {check_prod_file}; "
     cmd_wrap += (
@@ -130,24 +99,13 @@ def batch_mc_production_check(
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
-        f" --dependency=afterok:{which_last_stage} -J prod_check"
+        f" --dependency=afterok:{all_pipeline_jobs} -J prod_check"
         f' --wrap="{source_env} {cmd_wrap}"'
     )
 
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
-
-    # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[
-        jobid
-    ] = "single jobid batched to check the check command worked correctly."
-    debug_log["sbatch_cmd"] = batch_cmd
-    debug_log["SUMMARY_r0_dl1"] = jobids_from_r0_to_dl1
-    debug_log["SUMMARY_merge"] = jobids_from_merge
-    debug_log["SUMMARY_train_pipe"] = jobids_from_train_pipe
-    debug_log["SUMMARY_dl1_dl2"] = jobids_from_dl1_to_dl2
-    debug_log["SUMMARY_dl2_irfs"] = jobids_from_dl2_to_irf
-    debug_log["SUMMARY_dl2_sensitivity"] = jobids_from_dl2_to_sensitivity
+    debug_log.update({f"prod_check_{jobid}": batch_cmd})
 
     save_log_to_file(debug_log, logs_files["debug_file"],
                      workflow_step="check_full_workflow")
