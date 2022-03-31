@@ -1,5 +1,5 @@
 import os
-import yaml
+from ruamel.yaml import YAML
 import calendar
 import logging
 from pathlib import Path
@@ -37,7 +37,7 @@ def load_config(config_path):
 
     # This could easily be adapted to support different formats
     with open(config_path) as f:
-        loaded_config = yaml.safe_load(f)
+        loaded_config = YAML().load(f)
 
     config_valid(loaded_config)
 

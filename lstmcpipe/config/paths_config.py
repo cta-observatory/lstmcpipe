@@ -1,37 +1,57 @@
 import os
-import yaml
-from copy import deepcopy
+
+from ruamel.yaml import YAML
+
+from datetime import date
+
+from . import base_config
 
 class PathConfig:
     def __init__(self):
         self.paths = {}
+        self.stages = []
 
-    def generate(self, stages):
-        for stage in stages:
+    def generate(self):
+        for stage in self.stages:
             if not hasattr(self, stage):
                 raise NotImplementedError(f"The stage {stage} is not implemented for this class")
             self.paths[stage] = getattr(self, stage)
         return self.paths
 
-    def save_yml(self, filename, append=False, overwrite=False):
+    def save_yml(self, filename, overwrite=False, append=False):
+        """
+        Dump the path config to a file
+
+        Parameters
+        ----------
+        filename: str or Path
+        overwrite: bool
+        append: bool
+        """
+        config_to_save = base_config()
+        config_to_save.yaml_set_start_comment(f"lstmcpipe generated config from {self.__class__.__name__} "
+                                              f"- {date.today()}\n\n")
+
         if self.paths == {}:
             raise ValueError("Empty paths, generate first")
-        else:
-            config_to_save = deepcopy(self.paths)
+
+        config_to_save['stages_to_run'] = self.stages
+        config_to_save['stages'] = self.paths
+
         if os.path.exists(filename) and not (overwrite or append):
             raise FileExistsError(f"{filename} exists. Set overwrite=True or append=True")
         if append and overwrite:
             raise ValueError("Append or overwrite, not both ;-)")
         if append:
-            with open(filename) as f:
-                existing_config = yaml.safe_load(f)
-            config_to_save.update(existing_config)
+            config_to_save.update(YAML().load((open(filename).read())))
+
         with open(filename, 'w') as f:
-            yaml.safe_dump(config_to_save, f)
+            yaml = YAML()
+            yaml.indent(mapping=2, offset=2)
+            yaml.dump(config_to_save, f)
 
     def load_yml(self, filename):
-        with open(filename) as f:
-            paths = yaml.safe_load(f)
+        paths = YAML().load(open(filename).read())
         for key, path in paths.items():
             if not hasattr(self, key):
                 raise NotImplementedError(f"This class does not have an implemented stage called {keys}")
@@ -45,8 +65,6 @@ class PathConfigProd5Trans80(PathConfig):
     Standard paths configuration for a prod5_trans_80 MC production
     """
 
-    ## TODO: generate for each gamma pointing offset in stages
-
     def __init__(self, prod_id, zenith='zenith_20deg'):
         super().__init__()
         self.prod_id = prod_id
@@ -57,6 +75,8 @@ class PathConfigProd5Trans80(PathConfig):
         self.point_src_offsets = ['off0.0deg', 'off0.4deg']
         self.particles = self.training_particles + self.testing_particles
         self.paths = {}
+        self.stages = ['r0_to_dl1', 'train_test_split', 'merge_dl1', 'train_pipe', 'dl1_to_dl2',
+                  'dl2_to_sensitivity', 'dl2_to_irfs']
 
     def _data_level_dir(self, prod_id, data_level, particle, gamma_src_offset='off0.4deg'):
         """
@@ -89,6 +109,10 @@ class PathConfigProd5Trans80(PathConfig):
     def dl2_dir(self, particle, gamma_src_offset='off0.4deg'):
         return self._data_level_dir(data_level='DL2', particle=particle, gamma_src_offset=gamma_src_offset,
                                     prod_id=self.prod_id)
+
+    def irf_dir(self, gamma_src_offset='diffuse'):
+        return os.path.join(os.path.realpath(self._data_level_dir(data_level='IRF', particle='', gamma_src_offset=gamma_src_offset,
+                                    prod_id=self.prod_id)), gamma_src_offset)
 
     @property
     def r0_to_dl1(self):
@@ -126,6 +150,8 @@ class PathConfigProd5Trans80(PathConfig):
         return paths
 
     def merge_output_file(self, particle, step, gamma_src_offset='off0.4deg'):
+        if not step in ['train', 'test']:
+            raise ValueError("Only steps accepted: train or test")
         dl1 = self.dl1_dir(particle=particle, gamma_src_offset=gamma_src_offset)
         return os.path.join(dl1, f'dl1_{particle}_{self.prod_id}_{step}.h5')
 
@@ -163,7 +189,7 @@ class PathConfigProd5Trans80(PathConfig):
         return os.path.realpath(p)
 
     @property
-    def train(self):
+    def train_pipe(self):
         paths = [{
             'input': {
                 'gamma': self.merge_output_file('gamma-diffuse', 'train'),
@@ -188,8 +214,81 @@ class PathConfigProd5Trans80(PathConfig):
                 paths.append({'input': dl1, 'output': dl2})
         return paths
 
-    def generate(self):
-        stages = ['r0_to_dl1', 'train_test_split', 'merge_dl1', 'train', 'dl1_to_dl2']
-        return super().generate(stages)
+    def dl2_output_file(self, particle, gamma_src_offset='off0.4deg'):
+        dl2_filename = os.path.basename(self.merge_output_file(particle=particle, step='test', gamma_src_offset=gamma_src_offset)).replace('dl1', 'dl2')
+        return os.path.join(self.dl2_dir(particle=particle, gamma_src_offset=gamma_src_offset),
+                            dl2_filename
+                            )
+
+    def sensitivity_file(self, offset):
+        return os.path.join(self.irf_dir(gamma_src_offset=offset), f'sensitivity_{self.prod_id}_{offset}.fits.gz')
+
+    @property
+    def dl2_to_sensitivity(self):
+        paths = []
+
+        def path_dict(gamma_part, offset):
+            d = {'input': {
+                'gamma_file': self.dl2_output_file(gamma_part),
+                'proton_file': self.dl2_output_file('proton'),
+                'electron_file': self.dl2_output_file('electron')
+            },
+                'output': self.sensitivity_file(offset)
+            }
+            return d
+
+        for gamma_part in ['gamma-diffuse', 'gamma']:
+            if gamma_part == 'gamma-diffuse':
+                paths.append(path_dict(gamma_part, 'diffuse'))
+            else:
+                for offset in self.point_src_offsets:
+                    paths.append(path_dict(gamma_part, offset))
+
+        return paths
+
+    @property
+    def dl2_to_irfs(self):
+        paths = []
+
+        def path_dict(gamma_part, offset):
+            d = {'input': {
+                'gamma_file': self.dl2_output_file(gamma_part),
+                'proton_file': self.dl2_output_file('proton'),
+                'electron_file': self.dl2_output_file('electron')
+            },
+                'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
+                'options': '--point-like' if gamma_part == 'gamma' else ''
+            }
+            return d
+
+        for gamma_part in ['gamma-diffuse', 'gamma']:
+            if gamma_part == 'gamma-diffuse':
+                paths.append(path_dict(gamma_part, 'diffuse'))
+            else:
+                for offset in self.point_src_offsets:
+                    paths.append(path_dict(gamma_part, offset))
+
+        return paths
+
+    @property
+    def plot_irfs(self):
+        paths = []
+
+        def path_dict(offset):
+            d = {'input': self.sensitivity_file(offset),
+                 'output': self.sensitivity_file(offset).replace('fits.gz', 'png')
+            }
+            return d
+
+        for gamma_part in ['gamma-diffuse', 'gamma']:
+            if gamma_part == 'gamma-diffuse':
+                paths.append(path_dict('diffuse'))
+            else:
+                for offset in self.point_src_offsets:
+                    paths.append(path_dict(offset))
+        return paths
+
+    # def generate(self):
+    #     return super().generate(stages)
 
 
