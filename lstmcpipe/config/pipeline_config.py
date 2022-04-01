@@ -1,16 +1,14 @@
-import os
-import yaml
 import calendar
 import logging
+import os
 from pathlib import Path
 
+import yaml
 
 log = logging.getLogger(__name__)
 
 
-def create_path(
-    parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
-):
+def create_path(parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True):
     p = Path(parent_path) / stage / obs_date
     if particles:
         p /= "{}"
@@ -66,19 +64,12 @@ def load_config(config_path):
     ]
     log.info(
         "The following directories and all the information within them will be either created or overwritten:\n - "
-        + "\n - ".join(
-            [
-                config[pd].format("{" + ",".join(config["all_particles"]) + "}")
-                for pd in particle_dirs
-            ]
-        )
+        + "\n - ".join([config[pd].format("{" + ",".join(config["all_particles"]) + "}") for pd in particle_dirs])
         + f'\n - {config["IRF_output_dir"]}'
         + f'\n - {config["model_output_dir"]}'
     )
 
-    log.warning(
-        "! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !"
-    )
+    log.warning("! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !")
     log.info(f'PROD_ID to be used: {config["prod_id"]}')
 
     log.info("Stages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
@@ -118,9 +109,7 @@ def config_valid(loaded_config):
     # Check allowed cases
     workflow_kind = loaded_config["workflow_kind"]
     if workflow_kind not in allowed_workflows:
-        raise Exception(
-            f"Please select an allowed `workflow_kind`: {allowed_workflows}"
-        )
+        raise Exception(f"Please select an allowed `workflow_kind`: {allowed_workflows}")
 
     prod_type = loaded_config["prod_type"]
     if prod_type not in allowed_prods:
@@ -132,26 +121,20 @@ def config_valid(loaded_config):
         raise Exception(f"Please select an allowed obs_date: {allowed_workflows}")
 
     # and incompatible possibilities
-    if (prod_type == "prod3" and obs_date != "20190415") or (
-        prod_type == "prod5" and obs_date == "20190415"
-    ):
+    if (prod_type == "prod3" and obs_date != "20190415") or (prod_type == "prod5" and obs_date == "20190415"):
         raise Exception("This prod_type and obs_date combination is not possible.")
 
     stages_to_be_run = loaded_config["stages_to_be_run"]
     if "dl1ab" in stages_to_be_run:
         if not "dl1_reference_id" in loaded_config:
             raise KeyError(
-                "The key dl1_reference_id has to be set in order to locate "
-                "the input files for the dl1ab stage"
+                "The key dl1_reference_id has to be set in order to locate " "the input files for the dl1ab stage"
             )
 
     dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
     dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
     if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
-        raise KeyError(
-            "Please specify a simtel monte carlo file to "
-            "compare observed noise against."
-        )
+        raise KeyError("Please specify a simtel monte carlo file to " "compare observed noise against.")
     elif not dl1_noise_tune_data_run and dl1_noise_tune_mc_run:
         raise KeyError("Please specify an observed dl1 file to " "tune the images.")
     log.debug("Configuration deemed valid")
@@ -263,13 +246,9 @@ def parse_config_and_handle_global_vars(loaded_config):
     elif "dl1ab" in stages_to_be_run:
         source_datalevel = "DL1"
     else:
-        raise NotImplementedError(
-            "Starting the processing from higher stages is not supported"
-        )
+        raise NotImplementedError("Starting the processing from higher stages is not supported")
     if workflow_kind == "lstchain" or workflow_kind == "ctapipe":
-        config["input_dir"] = create_path(
-            base_path, source_datalevel, obs_date, pointing_zenith
-        )
+        config["input_dir"] = create_path(base_path, source_datalevel, obs_date, pointing_zenith)
     else:  # RTA
         config["input_dir"] = create_path(base_path, "R0", obs_date, pointing_zenith)
     config["dl1_reference_id"] = dl1_reference_id
@@ -283,9 +262,7 @@ def parse_config_and_handle_global_vars(loaded_config):
         "DL2_output_dir": "DL2",
     }
     for key, value in directories.items():
-        config[key] = create_path(
-            base_path, value, obs_date, pointing_zenith, config["prod_id"]
-        )
+        config[key] = create_path(base_path, value, obs_date, pointing_zenith, config["prod_id"])
 
     config["IRF_output_dir"] = create_path(
         base_path, "IRF", obs_date, pointing_zenith, config["prod_id"], particles=False

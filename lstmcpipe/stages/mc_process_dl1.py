@@ -5,19 +5,16 @@
 # Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
 
-import os
-import time
-import shutil
 import logging
+import os
+import shutil
+import time
 from pathlib import Path
-from numpy.random import default_rng
-from lstmcpipe.workflow_management import save_log_to_file
-from lstmcpipe.io.data_management import (
-    check_data_path,
-    get_input_filelist,
-    check_and_make_dir_without_verification,
-)
 
+from numpy.random import default_rng
+
+from lstmcpipe.io.data_management import check_and_make_dir_without_verification, check_data_path, get_input_filelist
+from lstmcpipe.workflow_management import save_log_to_file
 
 log = logging.getLogger(__name__)
 
@@ -244,9 +241,7 @@ def r0_to_dl1(
         base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
-        base_cmd = (
-            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
-        )
+        base_cmd = f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
         if keep_rta_file:
             base_cmd += " --keep_rta_file"
         if debug_mode:
@@ -312,15 +307,9 @@ def r0_to_dl1(
 
     if "off" in particle:
         # Take out /off0.Xdeg
-        running_dir = (
-            Path(str(input_dir).replace("DL0", "running_analysis")).parent
-            / prod_id
-            / offset
-        )
+        running_dir = Path(str(input_dir).replace("DL0", "running_analysis")).parent / prod_id / offset
     else:
-        running_dir = (
-            Path(str(input_dir).replace("DL0", "running_analysis")) / prod_id
-        )
+        running_dir = Path(str(input_dir).replace("DL0", "running_analysis")) / prod_id
 
     job_logs_dir = running_dir.joinpath("job_logs")
     dl1_output_dir = running_dir.joinpath("DL1")
@@ -343,14 +332,12 @@ def r0_to_dl1(
         running_dir=running_dir,
         job_logs_dir=job_logs_dir,
         n_jobs_parallel=n_jobs_parallel,
-        slurm_account=slurm_account
+        slurm_account=slurm_account,
     )
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file, running_dir.joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, running_dir.joinpath(Path(config_file).name))
 
     # save file lists into logs
     shutil.move("testing.list", running_dir.joinpath("testing.list"))
@@ -470,16 +457,9 @@ def reprocess_dl1(
 
     if "off" in particle:
         # Take out /off0.Xdeg
-        running_dir = (
-            Path(input_dir.as_posix().replace("DL1", "running_analysis")).parent.parent
-            / prod_id
-            / offset
-        )
+        running_dir = Path(input_dir.as_posix().replace("DL1", "running_analysis")).parent.parent / prod_id / offset
     else:
-        running_dir = (
-            Path(input_dir.as_posix().replace("DL1", "running_analysis")).parent
-            / prod_id
-        )
+        running_dir = Path(input_dir.as_posix().replace("DL1", "running_analysis")).parent / prod_id
 
     job_logs_dir = running_dir / "job_logs"
     dl1_output_dir = running_dir / "DL1"
@@ -494,9 +474,7 @@ def reprocess_dl1(
     # dumping the training and testing lists and splitting them in sub-lists for parallel jobs
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file, running_dir.joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, running_dir.joinpath(Path(config_file).name))
 
     # save file lists into logs
     shutil.move("testing.list", running_dir.joinpath("testing.list"))
@@ -511,7 +489,7 @@ def reprocess_dl1(
         running_dir=running_dir,
         job_logs_dir=job_logs_dir,
         n_jobs_parallel=n_jobs_parallel,
-        slurm_account=slurm_account
+        slurm_account=slurm_account,
     )
 
     # return it log dictionary
@@ -527,7 +505,7 @@ def submit_dl1_jobs(
     running_dir,
     job_logs_dir,
     n_jobs_parallel,
-    slurm_account
+    slurm_account,
 ):
     jobid2log = {}
     jobids_dl1 = []
@@ -549,9 +527,7 @@ def submit_dl1_jobs(
         for i in range(number_of_sublists):
             output_file = dir_lists.joinpath("{}_{}.list".format(set_type, i)).as_posix()
             with open(output_file, "w+") as out:
-                for line in list_type[
-                    i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)
-                ]:
+                for line in list_type[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:
                     out.write(line)
                     out.write("\n")
         log.info(f"{number_of_sublists} files generated for {set_type} list")
@@ -562,7 +538,7 @@ def submit_dl1_jobs(
             "output": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
             "error": job_logs_dir.joinpath(f"job_%A_%a_{'train' if set_type=='training' else 'test'}.o").as_posix(),
             "array": f"0-{len(files)-1}%{n_jobs_parallel}",
-            "job-name": f"{job_name}"
+            "job-name": f"{job_name}",
         }
         if particle == "proton":
             slurm_options.update({"partition": "long"})
@@ -591,7 +567,7 @@ def submit_dl1_jobs(
             "set_type": set_type,
             "jobe_path": slurm_options["error"],
             "jobo_path": slurm_options["output"],
-            "sbatch_command": slurm_cmd
+            "sbatch_command": slurm_cmd,
         }
 
     return jobid2log, jobids_dl1

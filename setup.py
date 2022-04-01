@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # Licensed under a MIT license - see LICENSE.rst
 
-import os
 import json
+import os
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 
 def find_scripts(script_dir, prefix):
-    script_list = [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
-    return script_list
+    return [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
 
 
 def readfile(filename):

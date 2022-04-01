@@ -1,14 +1,11 @@
 import json
-import subprocess
 import logging
-
+import subprocess
 
 log = logging.getLogger(__name__)
 
 
-def create_dl1ab_tuned_config(
-    base_config_path, config_output_path, observed_data_path, mc_path
-):
+def create_dl1ab_tuned_config(base_config_path, config_output_path, observed_data_path, mc_path):
     """
     Create a new lstchain config with noise parameters added.
     If there are noise parameters in the input config,
@@ -56,8 +53,7 @@ def create_dl1ab_tuned_config(
     for key, value in parameters.items():
         if key in modifier_settings:
             log.warning(
-                f"Overwriting image modifier parameter {key} from the base config with "
-                f"the new value {value}."
+                f"Overwriting image modifier parameter {key} from the base config with " f"the new value {value}."
             )
         modifier_settings[key] = value
     base["image_modifier"] = modifier_settings

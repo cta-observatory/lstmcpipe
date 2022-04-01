@@ -1,54 +1,28 @@
 """
 Procedure adapted from pyirf v0.4 example one (used with eventdisplay)
 """
+import argparse
 import logging
 import operator
-
 from pathlib import Path
+
+import astropy.units as u
 import numpy as np
 from astropy import table
-import astropy.units as u
 from astropy.io import fits
-
-from pyirf.binning import (
-    create_bins_per_decade,
-    add_overflow_bins,
-    create_histogram_table,
-)
-from pyirf.cuts import calculate_percentile_cut, evaluate_binned_cut
-from pyirf.sensitivity import calculate_sensitivity, estimate_background
-from pyirf.utils import calculate_theta, calculate_source_fov_offset
-from pyirf.benchmarks import energy_bias_resolution, angular_resolution
-from pyirf.benchmarks.energy_bias_resolution import energy_resolution_absolute_68
-
-from pyirf.spectral import (
-    calculate_event_weights,
-    PowerLaw,
-    CRAB_HEGRA,
-    IRFDOC_PROTON_SPECTRUM,
-    IRFDOC_ELECTRON_SPECTRUM,
-)
-from pyirf.cut_optimization import optimize_gh_cut
-
-from pyirf.irf import (
-    effective_area_per_energy,
-    energy_dispersion,
-    psf_table,
-    background_2d,
-)
-
-from pyirf.io import (
-    create_aeff2d_hdu,
-    create_psf_table_hdu,
-    create_energy_dispersion_hdu,
-    create_rad_max_hdu,
-    create_background_2d_hdu,
-)
-
 from lstchain.io.io import read_mc_dl2_to_QTable
-import argparse
-
-
+from pyirf.benchmarks import angular_resolution, energy_bias_resolution
+from pyirf.benchmarks.energy_bias_resolution import energy_resolution_absolute_68
+from pyirf.binning import add_overflow_bins, create_bins_per_decade, create_histogram_table
+from pyirf.cut_optimization import optimize_gh_cut
+from pyirf.cuts import calculate_percentile_cut, evaluate_binned_cut
+from pyirf.io import (create_aeff2d_hdu, create_background_2d_hdu, create_energy_dispersion_hdu, create_psf_table_hdu,
+                      create_rad_max_hdu)
+from pyirf.irf import background_2d, effective_area_per_energy, energy_dispersion, psf_table
+from pyirf.sensitivity import calculate_sensitivity, estimate_background
+from pyirf.spectral import (CRAB_HEGRA, IRFDOC_ELECTRON_SPECTRUM, IRFDOC_PROTON_SPECTRUM, PowerLaw,
+                            calculate_event_weights)
+from pyirf.utils import calculate_source_fov_offset, calculate_theta
 
 T_OBS = 50 * u.hour
 
@@ -79,7 +53,6 @@ filters = {
 }
 
 
-
 def determine_source_position(gamma_events):
     if len(set(gamma_events['true_alt'].value)) == 1:
         source_alt = gamma_events['true_alt'][0]
@@ -100,9 +73,7 @@ def main():
     parser = argparse.ArgumentParser(description="MC DL2 to IRF")
 
     # Required arguments
-    parser.add_argument(
-        "--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file"
-    )
+    parser.add_argument("--gamma-dl2", "-g", type=str, dest="gamma_file", help="Path to the dl2 gamma file")
 
     parser.add_argument(
         "--proton-dl2",
@@ -136,7 +107,7 @@ def main():
         type=float,
         dest="source_alt",
         help="Source altitude (optional). If not provided, it will be guessed from the gammas true altitude",
-        default=None
+        default=None,
     )
 
     parser.add_argument(
@@ -145,7 +116,7 @@ def main():
         type=float,
         dest="source_az",
         help="Source azimuth (optional). If not provided, it will be guessed from the gammas true altitude",
-        default=None
+        default=None,
     )
 
     # Optional arguments
@@ -155,20 +126,19 @@ def main():
     #                     default=None
     #                     )
 
-
     args = parser.parse_args()
-    
+
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("pyirf").setLevel(logging.DEBUG)
 
     particles = {
-    "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
-    "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
-    "electron": {
-        "file": args.electron_file,
-        "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
-    },
-}
+        "gamma": {"file": args.gamma_file, "target_spectrum": CRAB_HEGRA},
+        "proton": {"file": args.proton_file, "target_spectrum": IRFDOC_PROTON_SPECTRUM},
+        "electron": {
+            "file": args.electron_file,
+            "target_spectrum": IRFDOC_ELECTRON_SPECTRUM,
+        },
+    }
 
     for particle_type, p in particles.items():
         log.info("Simulated Events: {}".format(particle_type.title()))
@@ -188,9 +158,7 @@ def main():
 
     gammas = particles["gamma"]["events"]
     # background table composed of both electrons and protons
-    background = table.vstack(
-        [particles["proton"]["events"], particles["electron"]["events"]]
-    )
+    background = table.vstack([particles["proton"]["events"], particles["electron"]["events"]])
 
     if args.source_alt is None or args.source_az is None:
         source_alt, source_az = determine_source_position(gammas)
@@ -204,15 +172,12 @@ def main():
         log.info(p["simulation_info"])
         log.info("")
 
-
     INITIAL_GH_CUT = np.quantile(gammas["gh_score"], (1 - INITIAL_GH_CUT_EFFICENCY))
     log.info("Using fixed G/H cut of {} to calculate theta cuts".format(INITIAL_GH_CUT))
 
     # event display uses much finer bins for the theta cut than
     # for the sensitivity
-    theta_bins = add_overflow_bins(
-        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
-    )
+    theta_bins = add_overflow_bins(create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE))
 
     # theta cut is 68 percent containment of the gammas
     # for now with a fixed global, unoptimized score cut
@@ -253,9 +218,7 @@ def main():
     # cut as 68 percent containment on the events surviving these cuts.
     log.info("Recalculating theta cut for optimized GH Cuts")
     for tab in (gammas, background):
-        tab["selected_gh"] = evaluate_binned_cut(
-            tab["gh_score"], tab["reco_energy"], gh_cuts, operator.ge
-        )
+        tab["selected_gh"] = evaluate_binned_cut(tab["gh_score"], tab["reco_energy"], gh_cuts, operator.ge)
 
     theta_cuts_opt = calculate_percentile_cut(
         gammas[gammas["selected_gh"]]["theta"],
@@ -267,15 +230,11 @@ def main():
         min_value=MIN_THETA_CUT,
     )
 
-    gammas["selected_theta"] = evaluate_binned_cut(
-        gammas["theta"], gammas["reco_energy"], theta_cuts_opt, operator.le
-    )
+    gammas["selected_theta"] = evaluate_binned_cut(gammas["theta"], gammas["reco_energy"], theta_cuts_opt, operator.le)
     gammas["selected"] = gammas["selected_theta"] & gammas["selected_gh"]
 
     # calculate sensitivity
-    signal_hist = create_histogram_table(
-        gammas[gammas["selected"]], bins=sensitivity_bins
-    )
+    signal_hist = create_histogram_table(gammas[gammas["selected"]], bins=sensitivity_bins)
     background_hist = estimate_background(
         background[background["selected_gh"]],
         reco_energy_bins=sensitivity_bins,
@@ -288,9 +247,7 @@ def main():
     # scale relative sensitivity by Crab flux to get the flux sensitivity
     spectrum = particles["gamma"]["target_spectrum"]
     for s in (sensitivity_step_2, sensitivity):
-        s["flux_sensitivity"] = s["relative_sensitivity"] * spectrum(
-            s["reco_energy_center"]
-        )
+        s["flux_sensitivity"] = s["relative_sensitivity"] * spectrum(s["reco_energy_center"])
 
     log.info("Calculating IRFs")
     hdus = [
@@ -310,12 +267,8 @@ def main():
     }
 
     # binnings for the irfs
-    true_energy_bins = add_overflow_bins(
-        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
-    )
-    reco_energy_bins = add_overflow_bins(
-        create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE)
-    )
+    true_energy_bins = add_overflow_bins(create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE))
+    reco_energy_bins = add_overflow_bins(create_bins_per_decade(MIN_ENERGY, MAX_ENERGY, N_BIN_PER_DECADE))
 
     fov_offset_bins = [0, 0.6] * u.deg
     source_offset_bins = np.arange(0, 1 + 1e-4, 1e-3) * u.deg
@@ -371,19 +324,9 @@ def main():
         t_obs=T_OBS,
     )
 
-    hdus.append(
-        create_background_2d_hdu(
-            background_rate, reco_energy_bins, fov_offset_bins=np.arange(0, 11) * u.deg
-        )
-    )
-    hdus.append(
-        create_psf_table_hdu(psf, true_energy_bins, source_offset_bins, fov_offset_bins)
-    )
-    hdus.append(
-        create_rad_max_hdu(
-            theta_cuts_opt["cut"][:, np.newaxis], theta_bins, fov_offset_bins
-        )
-    )
+    hdus.append(create_background_2d_hdu(background_rate, reco_energy_bins, fov_offset_bins=np.arange(0, 11) * u.deg))
+    hdus.append(create_psf_table_hdu(psf, true_energy_bins, source_offset_bins, fov_offset_bins))
+    hdus.append(create_rad_max_hdu(theta_cuts_opt["cut"][:, np.newaxis], theta_bins, fov_offset_bins))
     hdus.append(fits.BinTableHDU(ang_res, name="ANGULAR_RESOLUTION"))
     hdus.append(fits.BinTableHDU(bias_resolution, name="ENERGY_BIAS_RESOLUTION"))
 

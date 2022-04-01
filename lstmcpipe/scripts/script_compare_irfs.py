@@ -1,13 +1,13 @@
 # #!/usr/bin/env python
-import os
-import logging
 import argparse
+import logging
+import os
 from pathlib import Path
 
 import ctaplot
 import matplotlib.pyplot as plt
-from lstmcpipe.plots.plot_irfs import plot_summary_from_file
 
+from lstmcpipe.plots.plot_irfs import plot_summary_from_file
 
 
 def plot_comparison(filelist, outfile=None, cta_north=False):
@@ -56,29 +56,27 @@ def main():
     parser = argparse.ArgumentParser(description="Produce IRFs comparative plots")
 
     # Required arguments
-    parser.add_argument('--filelist', '-f',
-                        type=str,
-                        nargs='*',
-                        dest='filelist',
-                        help='List of IRF files',
-                        required=True
-                        )
+    parser.add_argument(
+        '--filelist', '-f', type=str, nargs='*', dest='filelist', help='List of IRF files', required=True
+    )
 
     # optional
-    parser.add_argument('--outfile', '-o', action='store', type=Path,
-                        dest='outfile',
-                        help='Path of the outfile',
-                        default='compare_irfs.png',
-                        )
+    parser.add_argument(
+        '--outfile',
+        '-o',
+        action='store',
+        type=Path,
+        dest='outfile',
+        help='Path of the outfile',
+        default='compare_irfs.png',
+    )
 
-    parser.add_argument('--add-cta-north',
-                        action='store_true',
-                        dest='cta_north',
-                        help='add CTA north performances curves'
-                        )
+    parser.add_argument(
+        '--add-cta-north', action='store_true', dest='cta_north', help='add CTA north performances curves'
+    )
 
     args = parser.parse_args()
-    plot_comparison(args.filelist, args.outfile,  args.cta_north)
+    plot_comparison(args.filelist, args.outfile, args.cta_north)
 
 
 if __name__ == '__main__':

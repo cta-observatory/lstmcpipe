@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-from lstmcpipe.io.data_management import (
-    move_dir_content,
-    check_and_make_dir_without_verification,
-)
+
+from lstmcpipe.io.data_management import check_and_make_dir_without_verification, move_dir_content
 
 parser = argparse.ArgumentParser(
-    description="Script to move a directory and its content after creating the destination"
-    " directory."
+    description="Script to move a directory and its content after creating the destination" " directory."
 )
 
 parser.add_argument(

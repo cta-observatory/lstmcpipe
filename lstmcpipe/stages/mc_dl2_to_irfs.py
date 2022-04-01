@@ -8,14 +8,14 @@
 # As all the previous stages, this script make use of the lstchain entry points to batch each workflow stage.
 #
 
-import os
-import time
 import glob
-import shutil
 import logging
+import os
+import shutil
+import time
+
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 from lstmcpipe.workflow_management import save_log_to_file
-
 
 log = logging.getLogger(__name__)
 
@@ -154,13 +154,9 @@ def check_dl2_files(dl2_dir, pointlike, gamma_off):
             particle_dir_dl2 = dl2_dir.format(particle)
 
         if os.path.isdir(particle_dir_dl2):
-            dl2_particle_paths[particle] = glob.glob(
-                os.path.join(particle_dir_dl2, "*testing.h5")
-            )[0]
+            dl2_particle_paths[particle] = glob.glob(os.path.join(particle_dir_dl2, "*testing.h5"))[0]
         else:
-            log.info(
-                f"DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}"
-            )
+            log.info(f"DL2 {particle} directory cannot be found or does not exists:\n {particle_dir_dl2}")
             exit(-1)
 
     return dl2_particle_paths
@@ -212,9 +208,7 @@ def dl2_to_irfs(
 
     allowed_gamma_off = ["off0.0deg", "off0.4deg"]
     if irf_gamma_offset not in allowed_gamma_off:
-        log.info(
-            f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}'
-        )
+        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
     if irf_point_like:
@@ -223,17 +217,13 @@ def dl2_to_irfs(
             irf_gamma_offset,
         )
     else:
-        output_irfs_dir = os.path.join(
-            dl2_directory.replace("/DL2/", "/IRF/").replace("/{}/", "/"), "diffuse"
-        )
+        output_irfs_dir = os.path.join(dl2_directory.replace("/DL2/", "/IRF/").replace("/{}/", "/"), "diffuse")
 
     log_dl2_to_irfs = {}
     list_job_id_dl2_irfs = []
 
     if not log_from_dl1_dl2:  # Empty dict and thus no dl2 path files
-        dl2_particle_paths = check_dl2_files(
-            dl2_directory, irf_point_like, irf_gamma_offset
-        )
+        dl2_particle_paths = check_dl2_files(dl2_directory, irf_point_like, irf_gamma_offset)
 
         # Comprehension list to find gamma or gamma-diffuse
         gamma_kind = [g for g in dl2_particle_paths.keys() if g.startswith("gamma")][0]
@@ -270,9 +260,7 @@ def dl2_to_irfs(
         if irf_point_like:
             output_filename_irf = os.path.join(
                 output_irfs_dir,
-                "irf_"
-                + prod_id.replace(".", "")
-                + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz',
+                "irf_" + prod_id.replace(".", "") + f'_gamma_point-like_{irf_gamma_offset.replace(".", "")}.fits.gz',
             )
         else:
             output_filename_irf = os.path.join(
@@ -313,9 +301,7 @@ def dl2_to_irfs(
 
     # Copy config into working dir
     if config_file:
-        shutil.copyfile(
-            config_file, os.path.join(output_irfs_dir, os.path.basename(config_file))
-        )
+        shutil.copyfile(config_file, os.path.join(output_irfs_dir, os.path.basename(config_file)))
 
     list_job_id_dl2_irfs = ",".join(list_job_id_dl2_irfs)
 

@@ -1,9 +1,11 @@
 from pathlib import Path
+
 from lstmcpipe import lstmcpipe_root_dir
 
 
 def test_create_log_files():
     from ..lstmcpipe_tree_path import create_log_files
+
     logs, scancel_file, log_dir = create_log_files('dummy_prodID')
 
     assert "log_file" in logs.keys()
@@ -21,6 +23,7 @@ def test_create_log_files():
 
 def test_update_scancel_file():
     from ..lstmcpipe_tree_path import create_log_files, update_scancel_file
+
     _, scancel_file, log_dir = create_log_files("dummy_prodID")
 
     update_scancel_file(scancel_file, "1234")
@@ -39,6 +42,7 @@ def test_update_scancel_file():
 
 def test_backup_log():
     from ..lstmcpipe_tree_path import backup_log
+
     dummy_file = Path('./test_file.txt')
     dummy_file.touch()
 
@@ -57,6 +61,7 @@ def test_backup_log():
 
 def test_create_log_dir():
     from ..lstmcpipe_tree_path import create_log_dir
+
     log_dirname = create_log_dir("test_prodID")
     assert log_dirname.is_dir()
     assert log_dirname.name == lstmcpipe_root_dir.joinpath("prod_logs", "logs_test_prodID").name

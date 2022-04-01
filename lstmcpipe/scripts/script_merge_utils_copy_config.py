@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
+import argparse
 import os
 import shutil
-import argparse
 
 parser = argparse.ArgumentParser(
-    description="Script to copy all the config files of the source directory into the "
-    "destination directory."
+    description="Script to copy all the config files of the source directory into the " "destination directory."
 )
 
 parser.add_argument(

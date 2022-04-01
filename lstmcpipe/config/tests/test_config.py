@@ -1,12 +1,11 @@
-from lstmcpipe.config import export_env
-from lstmcpipe.config.pipeline_config import (
-    config_valid,
-    parse_config_and_handle_global_vars,
-)
-import tempfile
 import os
-import pytest
+import tempfile
 from datetime import datetime
+
+import pytest
+
+from lstmcpipe.config import export_env
+from lstmcpipe.config.pipeline_config import config_valid, parse_config_and_handle_global_vars
 
 yaml_keys = [
     "prod_id",
@@ -96,19 +95,13 @@ def test_parse_config_and_handle_global_vars():
     date = datetime.today().strftime("%Y%m%d")
     assert (
         parsed_config["DL1_output_dir"]
-        == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"
-        + date
-        + "_v0.9.1_prod5_trans_80_None"
+        == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/" + date + "_v0.9.1_prod5_trans_80_None"
     )
     assert (
         parsed_config["model_output_dir"]
-        == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"
-        + date
-        + "_v0.9.1_prod5_trans_80_None"
+        == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/" + date + "_v0.9.1_prod5_trans_80_None"
     )
-    assert (
-        parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
-    )
+    assert parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
     assert parsed_config["batch_config"]["slurm_account"] == ""
     assert parsed_config["stages_to_run"] == ["r0_to_dl1"]
     assert parsed_config["workflow_kind"] == "lstchain"

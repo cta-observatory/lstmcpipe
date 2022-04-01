@@ -2,7 +2,8 @@
 
 import shutil
 from pathlib import Path
-from lstmcpipe import lstmcpipe_root_dir, __version__
+
+from lstmcpipe import __version__, lstmcpipe_root_dir
 
 
 def backup_log(file):
@@ -84,10 +85,7 @@ def create_log_files(production_id):
         backup_log(debug_file)
         debug_file.unlink()
 
-    logs_files = {
-        "log_file": log_file,
-        "debug_file": debug_file
-    }
+    logs_files = {"log_file": log_file, "debug_file": debug_file}
 
     return logs_files, scancel_file, lstmcpipe_log_dir
 

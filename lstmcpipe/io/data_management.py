@@ -4,8 +4,8 @@
 # Enrique Garcia 09/04/2020
 
 import os
-import sys
 import shutil
+import sys
 from distutils.util import strtobool
 
 
@@ -44,9 +44,7 @@ def query_yes_no(question, default="yes"):
             try:
                 return bool(strtobool(choice))
             except:
-                sys.stdout.write(
-                    "Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n"
-                )
+                sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
 def query_continue(question, default="no"):
@@ -145,9 +143,7 @@ def check_and_make_dir(directory):
     """
     if os.path.exists(directory) and os.listdir(directory) != []:
         clean = query_continue(
-            "The directory {} is not empty. Do you want to remove its content?".format(
-                directory
-            ),
+            "The directory {} is not empty. Do you want to remove its content?".format(directory),
             default="no",
         )
         if clean:
@@ -162,19 +158,14 @@ def check_and_make_dir_without_verification(directory):
 
 
 def check_job_logs(job_logs_dir):
-    job_logs = [
-        os.path.join(job_logs_dir, f)
-        for f in os.listdir(job_logs_dir)
-        if f.endswith(".e")
-    ]
+    job_logs = [os.path.join(job_logs_dir, f) for f in os.listdir(job_logs_dir) if f.endswith(".e")]
     logs_with_error = []
     for log_filename in job_logs:
         with open(log_filename) as log_file:
             for line in log_file.readlines():
 
                 if (
-                    "Remote data cache could not be accessed due to FileNotFoundError"
-                    in line
+                    "Remote data cache could not be accessed due to FileNotFoundError" in line
                     or "URLError(" in line
                     or "<urlopen error Unable to open any source!" in line
                     or "ftp error: timeout(" in line
@@ -182,12 +173,7 @@ def check_job_logs(job_logs_dir):
 
                     continue  # Known astropy errors, they do not break the workflow
 
-                elif (
-                    line.startswith("Error")
-                    or line.startswith("ERROR")
-                    or "ERROR" in line
-                    or "Error" in line
-                ):
+                elif line.startswith("Error") or line.startswith("ERROR") or "ERROR" in line or "Error" in line:
                     logs_with_error.append(os.path.basename(log_filename))
                     break
 

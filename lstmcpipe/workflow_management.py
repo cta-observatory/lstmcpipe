@@ -2,12 +2,12 @@
 
 # Enrique Garcia Nov 2019
 
-import os
-import yaml
-import shutil
 import logging
+import os
+import shutil
 from pathlib import Path
 
+import yaml
 
 log = logging.getLogger(__name__)
 
@@ -68,26 +68,20 @@ def create_dl1_filenames_dict(dl1_directory, particles_loop, gamma_offsets=None)
                 _particle = particle + "_" + off
                 dl1_filename_directory[_particle] = {"training": {}, "testing": {}}
 
-                dl1_filename_directory[_particle]["training"][
-                    "train_path_and_outname_dl1"
-                ] = next(
-                    Path(dl1_directory.format(particle), off).glob("*training*.h5")
-                ).resolve().as_posix()
-                dl1_filename_directory[_particle]["testing"][
-                    "test_path_and_outname_dl1"
-                ] = next(
-                    Path(dl1_directory.format(particle), off).glob("*testing*.h5")
-                ).resolve().as_posix()
+                dl1_filename_directory[_particle]["training"]["train_path_and_outname_dl1"] = (
+                    next(Path(dl1_directory.format(particle), off).glob("*training*.h5")).resolve().as_posix()
+                )
+                dl1_filename_directory[_particle]["testing"]["test_path_and_outname_dl1"] = (
+                    next(Path(dl1_directory.format(particle), off).glob("*testing*.h5")).resolve().as_posix()
+                )
         else:
             dl1_filename_directory[particle] = {"training": {}, "testing": {}}
-            dl1_filename_directory[particle]["training"][
-                "train_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*training*.h5")
-                     ).resolve().as_posix()
-            dl1_filename_directory[particle]["testing"][
-                "test_path_and_outname_dl1"
-            ] = next(Path(dl1_directory.format(particle)).glob("*testing*.h5")
-                     ).resolve().as_posix()
+            dl1_filename_directory[particle]["training"]["train_path_and_outname_dl1"] = (
+                next(Path(dl1_directory.format(particle)).glob("*training*.h5")).resolve().as_posix()
+            )
+            dl1_filename_directory[particle]["testing"]["test_path_and_outname_dl1"] = (
+                next(Path(dl1_directory.format(particle)).glob("*testing*.h5")).resolve().as_posix()
+            )
 
     return dl1_filename_directory
 
@@ -183,18 +177,13 @@ def batch_mc_production_check(
     batch_cmd = "sbatch -p short --parsable"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
-    batch_cmd += (
-        f" --dependency=afterok:{which_last_stage} -J prod_check"
-        f' --wrap="{source_env} {cmd_wrap}"'
-    )
+    batch_cmd += f" --dependency=afterok:{which_last_stage} -J prod_check" f' --wrap="{source_env} {cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
 
     # and in case the code brakes, here there is a summary of all the jobs by stages
-    debug_log[
-        jobid
-    ] = "single jobid batched to check the check command worked correctly."
+    debug_log[jobid] = "single jobid batched to check the check command worked correctly."
     debug_log["sbatch_cmd"] = batch_cmd
     debug_log["SUMMARY_r0_dl1"] = jobids_from_r0_to_dl1
     debug_log["SUMMARY_merge"] = jobids_from_merge
@@ -203,7 +192,6 @@ def batch_mc_production_check(
     debug_log["SUMMARY_dl2_irfs"] = jobids_from_dl2_to_irf
     debug_log["SUMMARY_dl2_sensitivity"] = jobids_from_dl2_to_sensitivity
 
-    save_log_to_file(debug_log, logs_files["debug_file"],
-                     workflow_step="check_full_workflow")
+    save_log_to_file(debug_log, logs_files["debug_file"], workflow_step="check_full_workflow")
 
     return jobid

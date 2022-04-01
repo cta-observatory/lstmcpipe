@@ -3,15 +3,15 @@
 # Everything is hardcoded to LST telescopes - because this is just a temporal work that will no longer be used
 # in the moment lstchain upgrades to V0.8
 
-import os
-import tables
 import argparse
+import os
+
 import numpy as np
-from astropy.table import Table, vstack, join
+import tables
 from astropy.io.misc.hdf5 import write_table_hdf5
-from lstmcpipe.hiperta.reorganize_dl1hiperta_to_dl1lstchain import (
-    add_disp_and_mc_type_to_parameters_table,
-)
+from astropy.table import Table, join, vstack
+
+from lstmcpipe.hiperta.reorganize_dl1hiperta_to_dl1lstchain import add_disp_and_mc_type_to_parameters_table
 
 parser = argparse.ArgumentParser(
     description="Re-organize the dl1 `standard` output file from either the "
@@ -66,9 +66,7 @@ def stack_and_write_images_table(input_filename, hfile_out, node_dl1_event):
     )
 
 
-def stack_and_write_parameters_table(
-    input_filename, hfile_out, node_dl1_event, output_mc_table_pointer
-):
+def stack_and_write_parameters_table(input_filename, hfile_out, node_dl1_event, output_mc_table_pointer):
     """
     Stack all the `tel_00X` parameters tables (of v0.8), change names of the columns and write the table in the
     V0.6 (lstchain like) format
@@ -80,9 +78,7 @@ def stack_and_write_parameters_table(
     """
     telescope_node = node_dl1_event.telescope
 
-    param_per_tels = [
-        Table(table_param.read()) for table_param in telescope_node.parameters
-    ]
+    param_per_tels = [Table(table_param.read()) for table_param in telescope_node.parameters]
     parameter_table = vstack(param_per_tels)
 
     for tab in telescope_node.parameters:
@@ -102,20 +98,14 @@ def stack_and_write_parameters_table(
     parameter_table.rename_column("timing_intercept", "intercept")
     parameter_table.rename_column("morphology_num_pixels", "n_pixels")
     parameter_table.rename_column("morphology_num_islands", "n_islands")
-    parameter_table.add_column(
-        np.log10(parameter_table["intensity"]), name="log_intensity"
-    )
-    parameter_table.add_column(
-        parameter_table["width"] / parameter_table["length"], name="wl"
-    )
+    parameter_table.add_column(np.log10(parameter_table["intensity"]), name="log_intensity")
+    parameter_table.add_column(parameter_table["width"] / parameter_table["length"], name="wl")
 
     # Param table is indeed huge - it contains all the mc_events parameters (from v0.6 !!) too
     mc_event_table = Table(output_mc_table_pointer.mc_shower.read())
     mc_event_table.remove_column("obs_id")
     parameter_table = join(parameter_table, mc_event_table, keys="event_id")
-    parameter_table.add_column(
-        np.log10(parameter_table["mc_energy"]), name="log_mc_energy"
-    )
+    parameter_table.add_column(np.log10(parameter_table["mc_energy"]), name="log_mc_energy")
 
     dump_plus_copy_node_to_create_new_table(
         input_filename,
@@ -169,9 +159,7 @@ def dump_plus_copy_node_to_create_new_table(
     os.remove(temp_table_name)
 
 
-def rename_mc_shower_colnames(
-    input_filename, hfile_out, event_node, output_mc_table_pointer
-):
+def rename_mc_shower_colnames(input_filename, hfile_out, event_node, output_mc_table_pointer):
     """
     Rename column names of the `mc_shower` table and dump the table to the v0.6 output hfile.
 
@@ -258,9 +246,7 @@ def create_hfile_out(
         recursive=True,
         filters=filter_pointer,
     )
-    hfile_out.rename_node(
-        instrument_node.telescope.camera.geometry_LSTCam, newname="LSTCam"
-    )
+    hfile_out.rename_node(instrument_node.telescope.camera.geometry_LSTCam, newname="LSTCam")
 
     # dl1 node V0.6
     #    +--dl1 (Group)
@@ -289,12 +275,8 @@ def create_hfile_out(
         filters=filter_pointer,
     )
 
-    rename_mc_shower_colnames(
-        input_filename, hfile_out, dl1_event_node06, subarray_pointer
-    )
-    stack_and_write_parameters_table(
-        input_filename, hfile_out, dl1_event_node06, subarray_pointer
-    )
+    rename_mc_shower_colnames(input_filename, hfile_out, dl1_event_node06, subarray_pointer)
+    stack_and_write_parameters_table(input_filename, hfile_out, dl1_event_node06, subarray_pointer)
     if "image" in dl1_event_node06.telescope:
         stack_and_write_images_table(input_filename, hfile_out, dl1_event_node06)
 
@@ -327,9 +309,7 @@ def main(input_filename, output_filename):
     )
 
     # Add disp_* and mc_type to the parameters table.
-    add_disp_and_mc_type_to_parameters_table(
-        output_filename, "dl1/event/telescope/parameters/LST_LSTCam"
-    )
+    add_disp_and_mc_type_to_parameters_table(output_filename, "dl1/event/telescope/parameters/LST_LSTCam")
 
     hfile.close()
 

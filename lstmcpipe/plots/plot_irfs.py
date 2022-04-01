@@ -2,15 +2,16 @@
 
 # T. Vuillaume & E. Garcia - 2021
 
-from pathlib import Path
 import argparse
-from astropy.table import QTable
+from pathlib import Path
+
+import astropy.units as u
+import ctaplot
 import matplotlib.pyplot as plt
 import numpy as np
-import astropy.units as u
-from pyirf.utils import cone_solid_angle
-import ctaplot
+from astropy.table import QTable
 from astropy.visualization import quantity_support
+from pyirf.utils import cone_solid_angle
 
 
 def plot_summary_from_file(filename, axes=None, **kwargs):
@@ -68,7 +69,7 @@ def plot_sensitivity_from_table(sens_table, ax=None, **kwargs):
     sens_unit = u.Unit("erg cm-2 s-1")
 
     e = sens_table["reco_energy_center"]
-    s = e ** 2 * sens_table["flux_sensitivity"]
+    s = e**2 * sens_table["flux_sensitivity"]
     w = sens_table["reco_energy_high"] - sens_table["reco_energy_low"]
 
     ax.errorbar(
@@ -86,9 +87,7 @@ def plot_sensitivity_from_table(sens_table, ax=None, **kwargs):
     ax.set_title("Minimal Flux Needed for 5σ Detection in 50 hours")
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_ylabel(
-        rf"$(E^2 \cdot \mathrm{{Flux Sensitivity}}) /$ ({sens_unit.to_string('latex')})"
-    )
+    ax.set_ylabel(rf"$(E^2 \cdot \mathrm{{Flux Sensitivity}}) /$ ({sens_unit.to_string('latex')})")
 
     return ax
 
@@ -102,7 +101,9 @@ def plot_sensitivity_from_file(irf_file, ax=None, **kwargs):
 
 def plot_magic_2014(ax=None, **kwargs):
     ax = plt.gca() if ax is None else ax
-    file = "/fefs/home/thomas.vuillaume/software/cta-observatory/cta-lstchain/lstchain/spectra/data/magic_sensitivity.txt"
+    file = (
+        "/fefs/home/thomas.vuillaume/software/cta-observatory/cta-lstchain/lstchain/spectra/data/magic_sensitivity.txt"
+    )
     magic_2014 = np.loadtxt(file, skiprows=1)
 
     kwargs.setdefault("label", "MAGIC (Aleksic et al. 2014)")
@@ -137,7 +138,7 @@ def plot_effective_area_from_file(file, all_cuts=False, ax=None, **kwargs):
 
         ax.errorbar(
             0.5 * (area["ENERG_LO"] + area["ENERG_HI"]).to_value(u.TeV)[1:-1],
-            area["EFFAREA"].to_value(u.m ** 2).T[1:-1, 0],
+            area["EFFAREA"].to_value(u.m**2).T[1:-1, 0],
             xerr=0.5 * (area["ENERG_LO"] - area["ENERG_HI"]).to_value(u.TeV)[1:-1],
             **kwargs,
         )
@@ -216,11 +217,9 @@ def plot_angular_resolution_from_file(filename, ax=None, **kwargs):
 
     kwargs.setdefault("ls", "")
     ax.errorbar(
-        0.5
-        * (ang_res["true_energy_low"] + ang_res["true_energy_high"]).to_value(u.TeV),
+        0.5 * (ang_res["true_energy_low"] + ang_res["true_energy_high"]).to_value(u.TeV),
         ang_res["angular_resolution"].to_value(u.deg),
-        xerr=0.5
-        * (ang_res["true_energy_high"] - ang_res["true_energy_low"]).to_value(u.TeV),
+        xerr=0.5 * (ang_res["true_energy_high"] - ang_res["true_energy_low"]).to_value(u.TeV),
         **kwargs,
     )
 
@@ -271,15 +270,9 @@ def plot_energy_resolution_from_file(filename, ax=None, **kwargs):
 
     # Plot function
     ax.errorbar(
-        0.5
-        * (
-            bias_resolution["true_energy_low"] + bias_resolution["true_energy_high"]
-        ).to_value(u.TeV),
+        0.5 * (bias_resolution["true_energy_low"] + bias_resolution["true_energy_high"]).to_value(u.TeV),
         bias_resolution["resolution"],
-        xerr=0.5
-        * (
-            bias_resolution["true_energy_high"] - bias_resolution["true_energy_low"]
-        ).to_value(u.TeV),
+        xerr=0.5 * (bias_resolution["true_energy_high"] - bias_resolution["true_energy_low"]).to_value(u.TeV),
         **kwargs,
     )
     ax.set_xscale("log")
@@ -378,15 +371,9 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
 
     # Plot function
     ax.errorbar(
-        0.5
-        * (
-            bias_resolution["true_energy_low"] + bias_resolution["true_energy_high"]
-        ).to_value(u.TeV),
+        0.5 * (bias_resolution["true_energy_low"] + bias_resolution["true_energy_high"]).to_value(u.TeV),
         bias_resolution["bias"],
-        xerr=0.5
-        * (
-            bias_resolution["true_energy_high"] - bias_resolution["true_energy_low"]
-        ).to_value(u.TeV),
+        xerr=0.5 * (bias_resolution["true_energy_high"] - bias_resolution["true_energy_low"]).to_value(u.TeV),
         **kwargs,
     )
     ax.set_xscale("log")
@@ -411,7 +398,7 @@ def plot_sensitivity_ratio(sensitivity_tables, baseline_index=0, ax=None, labels
     baseline_index: int
         index of the baseline to use in the list
     ax: pyplot.axis
-    labels: list 
+    labels: list
         list of labels to use
     kwargs: kwargs for the plot
 
@@ -420,21 +407,21 @@ def plot_sensitivity_ratio(sensitivity_tables, baseline_index=0, ax=None, labels
     ax: pyplot.axis
     """
 
-    ax = plt.gca() if ax is None else ax 
-    
+    ax = plt.gca() if ax is None else ax
+
     sens_table_baseline = sensitivity_tables[baseline_index]
     e = sens_table_baseline["reco_energy_center"]
     w = sens_table_baseline["reco_energy_high"] - sens_table_baseline["reco_energy_low"]
-    s_baseline = e ** 2 * sens_table_baseline["flux_sensitivity"]
-    
+    s_baseline = e**2 * sens_table_baseline["flux_sensitivity"]
+
     for ii, sens_table in enumerate(sensitivity_tables):
-        s = e ** 2 * sens_table["flux_sensitivity"]
+        s = e**2 * sens_table["flux_sensitivity"]
         if labels is not None:
             kwargs['label'] = labels[ii]
         with quantity_support():
             ax.errorbar(
                 e,
-                s/s_baseline,
+                s / s_baseline,
                 xerr=w / 2,
                 **kwargs,
             )
@@ -442,7 +429,7 @@ def plot_sensitivity_ratio(sensitivity_tables, baseline_index=0, ax=None, labels
     ax.set_xscale('log')
     ax.grid(True, which='both')
     ax.set_xlabel(f'Energy / {e.unit}')
-        
+
     return ax
 
 
@@ -472,17 +459,11 @@ def plot_sensitivity_ratio_from_files(filelist, baseline_index=0, ax=None, **kwa
 
 def main():
 
-    parser = argparse.ArgumentParser(
-        description="Produce lstMCpipe IRFs plot from a sensitivity.fits.gz file"
-    )
+    parser = argparse.ArgumentParser(description="Produce lstMCpipe IRFs plot from a sensitivity.fits.gz file")
 
     # Required arguments
-    parser.add_argument(
-        "--filename", "-f", type=str, dest="filename", help="Input filename"
-    )
-    parser.add_argument(
-        "--outfile", "-o", type=Path, dest="outfile", help="Output filename"
-    )
+    parser.add_argument("--filename", "-f", type=str, dest="filename", help="Input filename")
+    parser.add_argument("--outfile", "-o", type=Path, dest="outfile", help="Output filename")
 
     args = parser.parse_args()
 

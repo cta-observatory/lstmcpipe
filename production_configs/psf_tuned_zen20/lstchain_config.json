@@ -26,7 +26,7 @@
         }
       }
     },
-  
+
     "events_filters": {
       "intensity": [0, Infinity],
       "width": [0, Infinity],
@@ -35,7 +35,7 @@
       "r": [0, Infinity],
       "leakage_intensity_width_2": [0, Infinity]
     },
-  
+
     "tailcut": {
       "picture_thresh":8,
       "boundary_thresh":4,
@@ -58,7 +58,7 @@
       "threshold": 267,
       "fraction_cleaning_intensity": 0.03
     },
-  
+
     "random_forest_energy_regressor_args": {
       "max_depth": 50,
       "min_samples_leaf": 2,
@@ -76,7 +76,7 @@
       "verbose": 0,
       "warm_start": false
     },
-  
+
     "random_forest_disp_regressor_args": {
       "max_depth": 50,
       "min_samples_leaf": 2,
@@ -94,7 +94,7 @@
       "verbose": 0,
       "warm_start": false
     },
-  
+
     "random_forest_disp_classifier_args": {
       "max_depth": 100,
       "min_samples_leaf": 2,
@@ -113,7 +113,7 @@
       "warm_start": false,
       "class_weight": null
     },
-  
+
     "random_forest_particle_classifier_args": {
       "max_depth": 100,
       "min_samples_leaf": 2,
@@ -132,8 +132,8 @@
       "warm_start": false,
       "class_weight": null
     },
-  
-  
+
+
     "energy_regression_features": [
       "log_intensity",
       "width",
@@ -146,9 +146,9 @@
       "time_gradient",
       "leakage_intensity_width_2"
     ],
-  
+
     "disp_method": "disp_norm_sign",
-  
+
     "disp_regression_features": [
       "log_intensity",
       "width",
@@ -159,7 +159,7 @@
       "time_gradient",
       "leakage_intensity_width_2"
     ],
-  
+
     "disp_classification_features": [
       "log_intensity",
       "width",
@@ -170,7 +170,7 @@
       "time_gradient",
       "leakage_intensity_width_2"
     ],
-  
+
     "particle_classification_features": [
       "log_intensity",
       "width",
@@ -186,7 +186,7 @@
       "reco_disp_norm",
       "reco_disp_sign"
     ],
-  
+
     "allowed_tels": [1],
     "write_pe_image": false,
     "mc_image_scaling_factor": 1,
@@ -207,20 +207,20 @@
       "apply_integration_correction": false
     },
     "timestamps_pointing":"ucts",
-  
+
     "train_gamma_src_r_deg": [0, Infinity],
-  
+
     "source_dependent": false,
     "mc_nominal_source_x_deg": 0.4,
     "mc_nominal_source_y_deg": 0.0,
-  
+
     "volume_reducer":{
       "algorithm": null,
       "parameters": {
       }
     },
     "calibration_product": "LSTCalibrationCalculator",
-  
+
     "LSTCalibrationCalculator":{
       "systematic_correction_path": null,
       "squared_excess_noise_factor": 1.222,

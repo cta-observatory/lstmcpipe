@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+import logging
 import os
 import time
-import logging
-from lstmcpipe.workflow_management import save_log_to_file
 
+from lstmcpipe.workflow_management import save_log_to_file
 
 log = logging.getLogger(__name__)
 
@@ -104,23 +104,17 @@ def compose_sensitivity_outdir(dl2_dir, gamma_offset):
 
     allowed_gamma_off = ["off0.0deg", "off0.4deg"]
     if gamma_offset not in allowed_gamma_off:
-        log.info(
-            f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}'
-        )
+        log.info(f'Please select a valid gamma_offset to compute the IRFS: {" or ".join(allowed_gamma_off)}')
         exit(-1)
 
-    output_sensitivity_dir = os.path.join(
-        dl2_dir.replace("/DL2/", "/IRF/").replace("/{}/", "/"), gamma_offset
-    )
+    output_sensitivity_dir = os.path.join(dl2_dir.replace("/DL2/", "/IRF/").replace("/{}/", "/"), gamma_offset)
 
     os.makedirs(output_sensitivity_dir, exist_ok=True)
 
     return output_sensitivity_dir
 
 
-def sensitivity_io(
-    dl2_directory, log_from_dl1_dl2, gamma_offset="off0.0deg", prod_id=None
-):
+def sensitivity_io(dl2_directory, log_from_dl1_dl2, gamma_offset="off0.0deg", prod_id=None):
     """
     Manages the i/o arguments and parameters to be passed to the batch_dl2_to_sensitivity function.
 
@@ -163,9 +157,7 @@ def sensitivity_io(
 
     # Create output filenames
     if prod_id is None:
-        output_sensitivity_filename = os.path.join(
-            output_directory, "sensitivity.fits.gz"
-        )
+        output_sensitivity_filename = os.path.join(output_directory, "sensitivity.fits.gz")
     else:
         output_sensitivity_filename = os.path.join(
             output_directory,
@@ -222,9 +214,7 @@ def dl2_to_sensitivity(
     jobids_dl2_to_sensitivity = []
     job_name = gamma_offset.replace(".", "").replace("off", "").replace("deg", "")
 
-    g_file, p_file, e_file, out_dir, out_file = sensitivity_io(
-        dl2_dir, log_from_dl1_dl2, gamma_offset, prod_id
-    )
+    g_file, p_file, e_file, out_dir, out_file = sensitivity_io(dl2_dir, log_from_dl1_dl2, gamma_offset, prod_id)
 
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
@@ -248,9 +238,7 @@ def dl2_to_sensitivity(
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
 
     # Create plot from sensitivity files
-    base_cmd_plot = (
-        f'lstmcpipe_plot_irfs -f {out_file} -o {out_file.replace(".fits.gz", ".png")}'
-    )
+    base_cmd_plot = f'lstmcpipe_plot_irfs -f {out_file} -o {out_file.replace(".fits.gz", ".png")}'
     jobe_plot = os.path.join(out_dir, f"job_plot_sensitivity_gamma_{gamma_offset}.e")
     jobo_plot = os.path.join(out_dir, f"job_plot_sensitivity_gamma_{gamma_offset}.o")
 

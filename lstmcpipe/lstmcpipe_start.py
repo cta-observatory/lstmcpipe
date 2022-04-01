@@ -17,27 +17,14 @@
 
 import argparse
 from pathlib import Path
-from lstmcpipe.logging import setup_logging
-from lstmcpipe.io.data_management import query_continue
-from lstmcpipe.config import load_config, create_dl1ab_tuned_config
-from lstmcpipe.io.lstmcpipe_tree_path import (
-    create_log_files,
-    update_scancel_file,
-)
-from lstmcpipe.workflow_management import (
-    create_dl1_filenames_dict,
-    batch_mc_production_check,
-)
-from lstmcpipe.stages import (
-    batch_process_dl1,
-    batch_merge_and_copy_dl1,
-    batch_train_pipe,
-    batch_dl1_to_dl2,
-    batch_dl2_to_irfs,
-    batch_dl2_to_sensitivity,
-    batch_plot_rf_features,
-)
 
+from lstmcpipe.config import create_dl1ab_tuned_config, load_config
+from lstmcpipe.io.data_management import query_continue
+from lstmcpipe.io.lstmcpipe_tree_path import create_log_files, update_scancel_file
+from lstmcpipe.logging import setup_logging
+from lstmcpipe.stages import (batch_dl1_to_dl2, batch_dl2_to_irfs, batch_dl2_to_sensitivity, batch_merge_and_copy_dl1,
+                              batch_plot_rf_features, batch_process_dl1, batch_train_pipe)
+from lstmcpipe.workflow_management import batch_mc_production_check, create_dl1_filenames_dict
 
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
 
@@ -58,8 +45,7 @@ parser.add_argument(
     action="store",
     type=str,
     dest="config_file_lst",
-    help="Path to a lstchain-like configuration file. "
-    "RF classifier and regressor arguments must be declared here !",
+    help="Path to a lstchain-like configuration file. " "RF classifier and regressor arguments must be declared here !",
     default=None,
 )
 
@@ -85,9 +71,7 @@ parser.add_argument(
     default=None,
 )
 
-parser.add_argument(
-    "--debug", action="store_true", help="print debug messages to stderr"
-)
+parser.add_argument("--debug", action="store_true", help="print debug messages to stderr")
 parser.add_argument(
     "--log-file",
     action="store",
@@ -107,7 +91,7 @@ def main():
     Main lstmcpipe script. This will launch the selected stages and start the processing.
     The jobs are submitted, but not awaited meaning that the analysis will be going on after
     the script has exited. To look at the submitted jobs, you can use e.g. `squeue -u $USER`.
-    
+
     Arguments, that can be passed via the command line:
     ---------------------------------------------------
     --config_mc_prod / -c
@@ -149,16 +133,9 @@ def main():
 
     # Make sure the lstchain config is defined if needed
     # It is not exactly required if you process only up to dl1
-    if any(
-        [
-            step not in ("r0_to_dl1", "dl1ab", "merge_and_copy_dl1")
-            for step in stages_to_run
-        ]
-    ):
+    if any([step not in ("r0_to_dl1", "dl1ab", "merge_and_copy_dl1") for step in stages_to_run]):
         if args.config_file_lst is None:
-            raise Exception(
-                "The lstchain config needs to be defined for all steps following dl1 processing"
-            )
+            raise Exception("The lstchain config needs to be defined for all steps following dl1 processing")
 
     if "r0_to_dl1" in stages_to_run and "reprocess_dl1" in stages_to_run:
         raise Exception("There can only be one stage producing dl1 files")
@@ -209,11 +186,7 @@ def main():
 
     # 2 STAGE --> Merge,copy and move DL1 files
     if "merge_and_copy_dl1" in stages_to_run:
-        (
-            merged_dl1_paths_dict,
-            jobs_to_train,
-            jobs_all_dl1_finished,
-        ) = batch_merge_and_copy_dl1(
+        (merged_dl1_paths_dict, jobs_to_train, jobs_all_dl1_finished,) = batch_merge_and_copy_dl1(
             running_analysis_dir,
             particle2jobid_process_dl1_dict,
             all_particles,
@@ -230,9 +203,7 @@ def main():
 
     else:
         # Create just the needed dictionary inputs (dl1 files must exist !)
-        merged_dl1_paths_dict = create_dl1_filenames_dict(
-            dl1_output_dir, all_particles, gamma_offs
-        )
+        merged_dl1_paths_dict = create_dl1_filenames_dict(dl1_output_dir, all_particles, gamma_offs)
         jobs_to_train = ""
         jobs_all_dl1_finished = ""
 

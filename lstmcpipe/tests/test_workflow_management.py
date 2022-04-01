@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-import yaml
-import pytest
 from pathlib import Path
+
+import pytest
+import yaml
 
 
 def test_save_log_to_file():
     from ..workflow_management import save_log_to_file
+
     outfile_yml = Path('dummy_log.yml')
 
-    dummy_log = {
-        'dummy_jobid': 'sbatch --parsable --wrap="sleep 10"'
-    }
+    dummy_log = {'dummy_jobid': 'sbatch --parsable --wrap="sleep 10"'}
     save_log_to_file(dummy_log, outfile_yml)
 
     assert outfile_yml.exists()
@@ -68,8 +68,7 @@ def test_create_dl1_filenames_dict(create_fake_dl1_structure):
                 assert dl1_dirs_gammas[key][ik]["test_path_and_outname_dl1"].endswith("testing.h5")
 
     # Rest of particles
-    dl1_dirs_rest = create_dl1_filenames_dict(create_fake_dl1_structure,
-                                              ["electron", "gamma-diffuse", "proton"])
+    dl1_dirs_rest = create_dl1_filenames_dict(create_fake_dl1_structure, ["electron", "gamma-diffuse", "proton"])
     assert isinstance(dl1_dirs_rest, dict)
     assert all(particle in dl1_dirs_rest for particle in ["gamma-diffuse", "proton", "electron"])
     for key, value in dl1_dirs_rest.items():

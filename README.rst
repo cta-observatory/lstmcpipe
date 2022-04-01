@@ -12,7 +12,7 @@ lstMCpipe
 .. |documentation| image:: https://img.shields.io/badge/lstmcpipe-documentation-orange
   :target: https://cta-observatory.github.io/lstmcpipe/
 
-Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
+Scripts to ease the reduction of MC data on the LST cluster at La Palma.
 With this package, the analysis/creation of R1/DL0/DL1/DL2/IRFs can be orchestrated.
 
 Contact:
@@ -125,7 +125,7 @@ and for testing.
 For efficiency reasons files are processed in batches: N files (depending on paricle type
 as that influences the averages duration of the processing) are submitted as one job in a jobarray.
 To group the files together, the paths are saved in files that are passed to
-python scripts in ``lstmcpipe/scripts`` which then call the selected pipelines 
+python scripts in ``lstmcpipe/scripts`` which then call the selected pipelines
 processing tool. These are:
 
 - lstchain: lstchain_mc_r0_to_dl1
@@ -173,7 +173,7 @@ DL2 data can be found in ``DL2`` directory.
 **dl2_to_irfs**
 
 Point-like IRFs are produced for each set of offset gammas.
-The processing is performed by calling ``lstchain_create_irf_files``. 
+The processing is performed by calling ``lstchain_create_irf_files``.
 
 
 **dl2_to_sensitivity**

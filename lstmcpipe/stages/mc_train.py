@@ -4,13 +4,13 @@
 # Modifications by E. Garcia
 # Code train models from DL1 files onsite (La Palma cluster)
 
-import os
-import time
-import shutil
 import logging
+import os
+import shutil
+import time
+
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 from lstmcpipe.workflow_management import save_log_to_file
-
 
 log = logging.getLogger(__name__)
 
@@ -49,12 +49,8 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_confi
     log.info("==== START {} ====".format("batch mc_train_workflow"))
     time.sleep(1)
 
-    gamma_dl1_train_file = log_from_merge["gamma-diffuse"]["training"][
-        "train_path_and_outname_dl1"
-    ]
-    proton_dl1_train_file = log_from_merge["proton"]["training"][
-        "train_path_and_outname_dl1"
-    ]
+    gamma_dl1_train_file = log_from_merge["gamma-diffuse"]["training"]["train_path_and_outname_dl1"]
+    proton_dl1_train_file = log_from_merge["proton"]["training"]["train_path_and_outname_dl1"]
 
     log_train, jobid_4_dl1_to_dl2, model_path = train_pipe(
         gamma_dl1_train_file,
@@ -65,8 +61,7 @@ def batch_train_pipe(log_from_merge, config_file, jobids_from_merge, batch_confi
     )
 
     debug_log[jobid_4_dl1_to_dl2] = (
-        f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
-        f"_and_copy jobids"
+        f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge" f"_and_copy jobids"
     )
 
     save_log_to_file(log_train, logs["log_file"], workflow_step="train_pipe")
@@ -121,10 +116,8 @@ def batch_plot_rf_features(dir_models, config_file, batch_configuration, train_j
     log_rf_feat[jobid] = slurm_cmd
     log_debug[jobid] = "Single job_id to plot RF feature s importance"
 
-    save_log_to_file(log_rf_feat, logs["log_file"],
-                     workflow_step="plot_RF_features_importance")
-    save_log_to_file(log_debug, logs["debug_file"],
-                     workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_rf_feat, logs["log_file"], workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_debug, logs["debug_file"], workflow_step="plot_RF_features_importance")
 
     log.info(" Random Forest importance's plot will be saved at: {}".format(dir_models))
     log.info("==== END {} ====".format("batch plot RF features importance"))
@@ -219,8 +212,6 @@ def train_pipe(
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file, os.path.join(models_dir, os.path.basename(config_file))
-        )
+        shutil.copyfile(config_file, os.path.join(models_dir, os.path.basename(config_file)))
 
     return log_train, jobid_train, models_dir

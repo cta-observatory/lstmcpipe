@@ -1,22 +1,17 @@
 # to run this script you need a DL1 debug files of hipeRTA and a DL1 file from lstchain from the same run
 
 
-import numpy as np
+import astropy.units as u
 import matplotlib.pyplot as plt
-from ctapipe.visualization import CameraDisplay
-from ctapipe.image import tailcuts_clean
-from lstchain.io.io import (
-    dl1_images_lstcam_key,
-    dl1_params_lstcam_key,
-    read_camera_geometries,
-)
+import numpy as np
+from astropy.coordinates import Angle
 from astropy.table import Table, join
 from ctapipe.containers import HillasParametersContainer
+from ctapipe.image import tailcuts_clean
+from ctapipe.visualization import CameraDisplay
+from lstchain.io.config import get_standard_config, read_configuration_file
+from lstchain.io.io import dl1_images_lstcam_key, dl1_params_lstcam_key, read_camera_geometries
 from matplotlib.backends.backend_pdf import PdfPages
-import astropy.units as u
-from astropy.coordinates import Angle
-from lstchain.io.config import get_standard_config
-from lstchain.io.config import read_configuration_file
 
 
 def get_hillas_container(row):
@@ -53,9 +48,7 @@ def main(filename, config_file=None):
     dl1_parameters_table = Table.read(filename, path=dl1_params_lstcam_key)
     images_table = Table.read(filename, path=dl1_images_lstcam_key)
 
-    dl1_table = join(
-        dl1_parameters_table, images_table, keys=["event_id", "tel_id", "obs_id"]
-    )
+    dl1_table = join(dl1_parameters_table, images_table, keys=["event_id", "tel_id", "obs_id"])
 
     params_cleaning = get_cleaning_config(config_file)
 

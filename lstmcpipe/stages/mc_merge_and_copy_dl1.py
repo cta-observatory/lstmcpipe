@@ -11,12 +11,12 @@
 # 4. merge DL1 files
 # 5. move running_dir
 
+import logging
 import os
 import time
-import logging
+
 from lstmcpipe.io.data_management import check_job_logs
 from lstmcpipe.workflow_management import save_log_to_file
-
 
 log = logging.getLogger(__name__)
 
@@ -119,9 +119,7 @@ def batch_merge_and_copy_dl1(
                     f"depend on the following {log_jobs_from_r0_to_dl1[_particle]} "
                     f"r0_t0_dl1 jobs."
                 )
-                debug_log[
-                    jobid_debug
-                ] = f"Are all the {_particle} jobs that have been launched in merge_and_copy_dl1."
+                debug_log[jobid_debug] = f"Are all the {_particle} jobs that have been launched in merge_and_copy_dl1."
 
         else:
             _particle = particle
@@ -147,9 +145,7 @@ def batch_merge_and_copy_dl1(
                 f"move_dl1 jobid - that will be send to the train pipe stage. They depend "
                 f"on the following {log_jobs_from_r0_to_dl1[_particle]} r0_t0_dl1 jobs."
             )
-            debug_log[
-                jobid_debug
-            ] = f"Are all the {_particle} jobs that have been launched in merge_and_copy_dl1."
+            debug_log[jobid_debug] = f"Are all the {_particle} jobs that have been launched in merge_and_copy_dl1."
 
     jobid_4_train = ",".join(jobid_4_train)
     all_jobs_from_merge_stage = ",".join(all_jobs_from_merge_stage)
@@ -162,9 +158,7 @@ def batch_merge_and_copy_dl1(
     return log_merge_and_copy, jobid_4_train, all_jobs_from_merge_stage
 
 
-def compose_batch_command_of_script(
-    source, destination, script, particle, wait_jobs, suffix, slurm_account
-):
+def compose_batch_command_of_script(source, destination, script, particle, wait_jobs, suffix, slurm_account):
     """
     Creates the slurm command of the 'cmd' script
 
@@ -199,10 +193,7 @@ def compose_batch_command_of_script(
     batch_cmd = "sbatch --parsable -p short"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
-    batch_cmd += (
-        f" -J {particle}_{suffix} -e {jobe} -o {jobo}"
-        f' --dependency=afterok:{wait_jobs} --wrap="{cmd}"'
-    )
+    batch_cmd += f" -J {particle}_{suffix} -e {jobe} -o {jobo}" f' --dependency=afterok:{wait_jobs} --wrap="{cmd}"'
 
     return batch_cmd
 
@@ -391,15 +382,13 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="mv_dl1_files",
         wait_jobs=wait_both_merges,
-        slurm_account=slurm_account
+        slurm_account=slurm_account,
     )
 
     jobid_move_dl1 = os.popen(cmd_mv_dl1).read().strip("\n")
     log_merge[particle][set_type][jobid_move_dl1] = cmd_mv_dl1
 
-    log.info(
-        f"Submitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish."
-    )
+    log.info(f"Submitted batch job {jobid_move_dl1}. It will move dl1 files when {wait_both_merges} finish.")
 
     # 5 --> copy lstchain config file in final_dir too
     cmd_cp_conf = compose_batch_command_of_script(
@@ -409,15 +398,13 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="cp_config",
         wait_jobs=jobid_move_dl1,
-        slurm_account=slurm_account
+        slurm_account=slurm_account,
     )
 
     jobid_copy_conf = os.popen(cmd_cp_conf).read().strip("\n")
     log_merge[particle][set_type][jobid_copy_conf] = cmd_cp_conf
 
-    log.info(
-        f"Submitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish."
-    )
+    log.info(f"Submitted batch job {jobid_copy_conf}. It will copy the used config when {jobid_move_dl1} finish.")
 
     # 6 --> move running_dir to final analysis_logs
     cmd_mv_dir = compose_batch_command_of_script(
@@ -427,15 +414,13 @@ def merge_dl1(
         particle=job_name[particle].split("_")[0],
         suffix="mv_dl1_dir",
         wait_jobs=jobid_copy_conf,
-        slurm_account=slurm_account
+        slurm_account=slurm_account,
     )
 
     jobid_move_log = os.popen(cmd_mv_dir).read().strip("\n")
     log_merge[particle][set_type][jobid_move_log] = cmd_mv_dir
 
-    log.info(
-        f"Submitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish."
-    )
+    log.info(f"Submitted batch job {jobid_move_log}. It will move running_dir when {jobid_copy_conf} finish.")
 
     return_jobids4train.append(jobid_move_dl1)
 

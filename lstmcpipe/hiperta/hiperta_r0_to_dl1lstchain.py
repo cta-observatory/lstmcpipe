@@ -3,11 +3,10 @@
 # usage:
 # python hiperta_r0_to_dl1lstchain.py -i INFILE [-o OUTDIR] [-c CONFIG_FILE] [-k KEEP_FILE]
 
-import os
 import argparse
-from lstmcpipe.hiperta.reorganize_dl1hiperta300_to_dl1lstchain060 import (
-    main as reorganize_dl1,
-)
+import os
+
+from lstmcpipe.hiperta.reorganize_dl1hiperta300_to_dl1lstchain060 import main as reorganize_dl1
 
 
 def main():
@@ -17,12 +16,7 @@ def main():
     )
 
     parser.add_argument(
-        "--infile",
-        "-i",
-        type=str,
-        dest="infile",
-        help="mc r0 file to be run with hiperta_r0_dl1",
-        required=True
+        "--infile", "-i", type=str, dest="infile", help="mc r0 file to be run with hiperta_r0_dl1", required=True
     )
 
     parser.add_argument(
@@ -71,9 +65,7 @@ def main():
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
-    output_reorganized_filename = os.path.join(
-        args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile)
-    )
+    output_reorganized_filename = os.path.join(args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?

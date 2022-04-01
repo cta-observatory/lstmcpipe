@@ -4,13 +4,13 @@
 # Modifications by E. Garcia
 # lstMCpipe DL1 to DL2 onsite stage (at La Palma cluster)
 
-import os
-import time
-import shutil
 import logging
+import os
+import shutil
+import time
+
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 from lstmcpipe.workflow_management import save_log_to_file
-
 
 log = logging.getLogger(__name__)
 
@@ -185,9 +185,7 @@ def dl1_to_dl2(
     log_dl1_to_dl2 = {particle: {}}
 
     # path to dl1 files by particle type
-    file_list = [
-        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"]
-    ]
+    file_list = [dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"]]
 
     return_jobids = []
 
@@ -211,8 +209,7 @@ def dl1_to_dl2(
 
     for file in file_list:
 
-        cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {file} -p {path_models}" \
-              f" -o {output_dir}"
+        cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {file} -p {path_models}" f" -o {output_dir}"
 
         if config_file is not None:
             cmd += f" -c {config_file}"
@@ -234,25 +231,18 @@ def dl1_to_dl2(
         batch_cmd = "sbatch --parsable -p short --mem=32G"
         if slurm_account != "":
             batch_cmd += f" -A {slurm_account}"
-        batch_cmd += (
-            f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}"
-            f' -o {jobo} --wrap="{cmd}"'
-        )
+        batch_cmd += f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}" f' -o {jobo} --wrap="{cmd}"'
 
         # Batch the job at La Palma
         jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
 
         log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
         if "testing" in file:
-            log_dl1_to_dl2[particle]["dl2_test_path"] = file.replace(
-                "/DL1/", "/DL2/"
-            ).replace("dl1_", "dl2_", 1)
+            log_dl1_to_dl2[particle]["dl2_test_path"] = file.replace("/DL1/", "/DL2/").replace("dl1_", "dl2_", 1)
         return_jobids.append(jobid_dl1_to_dl2)
 
     if config_file is not None:
-        shutil.copyfile(
-            config_file, os.path.join(output_dir, os.path.basename(config_file))
-        )
+        shutil.copyfile(config_file, os.path.join(output_dir, os.path.basename(config_file)))
 
     return_jobids = ",".join(return_jobids)
 
