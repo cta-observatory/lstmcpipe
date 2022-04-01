@@ -70,12 +70,7 @@ class PathConfig:
         ----------
         filename
         """
-        paths = YAML().load(open(filename).read())
-        for key, path in paths.items():
-            if not hasattr(self, key):
-                raise NotImplementedError(f"This class does not have an implemented stage called {key}")
-            else:
-                self.paths[key] = path
+        cls.paths = YAML().load(open(filename).read())
 
 
 class PathConfigProd5Trans80(PathConfig):
