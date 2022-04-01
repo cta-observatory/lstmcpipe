@@ -47,6 +47,7 @@ entry_points = {
         "lstmcpipe_rta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_rta:main",
         "lstmcpipe_compare_irfs = lstmcpipe.scripts.script_compare_irfs:main",
         "lstmcpipe_validate_config = lstmcpipe.scripts.script_lstmcpipe_validate_config:main",
+        "lstmcpipe_generate_config = lstmcpipe.scripts.lstmcpipe_generate_config:main",
     ]
 }
 
