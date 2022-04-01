@@ -60,17 +60,6 @@ class PathConfig:
             yaml.indent(mapping=2, offset=2)
             yaml.dump(config_to_save, f)
 
-    @classmethod
-    def load_yml(cls, filename):
-        """
-        Load a path config.
-        The config must include the stages implemented by this class.
-
-        Parameters
-        ----------
-        filename
-        """
-        cls.paths = YAML().load(open(filename).read())
 
 
 class PathConfigProd5Trans80(PathConfig):
