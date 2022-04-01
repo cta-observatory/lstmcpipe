@@ -451,7 +451,7 @@ class PathConfigAllSky(PathConfig):
         for particle in self.training_particles:
             dl1 = self.dl1_dir(particle, '')
             merged_dl1 = self.training_merged_dl1(particle)
-            options = "-p /*/*.h5"
+            options = "-p */*.h5"
             paths.append({
                 'input': dl1,
                 'output': merged_dl1,
@@ -468,7 +468,7 @@ class PathConfigAllSky(PathConfig):
                     'output': merged_dl1
                 })
 
-        return  paths
+        return paths
 
     def models_path(self):
         p = self.base_dir.format(data_level='models', particle='', pointing='', prod_id=self.prod_id).replace(
@@ -498,7 +498,7 @@ class PathConfigAllSky(PathConfig):
         return paths
 
     def dl2_output_file(self, particle, pointing):
-        os.path.join(self.dl2_dir(particle, pointing), f'dl2_{particle}_{pointing}.h5')
+        return os.path.join(self.dl2_dir(particle, pointing), f'dl2_{particle}_{pointing}.h5')
 
     # @property
     # def dl2_to_irfs(self):
