@@ -5,12 +5,22 @@ from datetime import date
 from . import base_config
 
 class PathConfig:
+    """
+    Base class to generate a Path configuration for a production
+    """
     def __init__(self, prod_id):
         self.prod_id = prod_id
         self.paths = {}
         self.stages = []
 
     def generate(self):
+        """
+        Generate the stages paths. They are copied into self.paths and returned.
+
+        Returns
+        -------
+        dict: paths config
+        """
         for stage in self.stages:
             if not hasattr(self, stage):
                 raise NotImplementedError(f"The stage {stage} is not implemented for this class")
@@ -50,7 +60,16 @@ class PathConfig:
             yaml.indent(mapping=2, offset=2)
             yaml.dump(config_to_save, f)
 
-    def load_yml(self, filename):
+    @classmethod
+    def load_yml(cls, filename):
+        """
+        Load a path config.
+        The config must include the stages implemented by this class.
+
+        Parameters
+        ----------
+        filename
+        """
         paths = YAML().load(open(filename).read())
         for key, path in paths.items():
             if not hasattr(self, key):
