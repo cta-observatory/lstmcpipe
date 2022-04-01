@@ -15,13 +15,26 @@ class ParseKwargs(argparse.Action):
             getattr(namespace, self.dest)[key] = value
 
 
+def list_config_classes():
+    all_attrs = []
+    for att in list(paths_config.__dict__):
+        try:
+            cls_base = getattr(paths_config, att).__mro__
+            if paths_config.PathConfig in cls_base:
+                all_attrs.append(att)
+        except:
+            pass
+    return all_attrs
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Generate a lstmcpipe config")
+    parser = argparse.ArgumentParser(description="Generate a lstmcpipe config.")
 
     # Required arguments
     parser.add_argument(dest='config_class',
                         type=str,
-                        help='Config class name to use'
+                        help=f'Config class name to use.'
+                             f'List of implemented classes: {list_config_classes()}'
                         )
 
     parser.add_argument('--prod_id',
