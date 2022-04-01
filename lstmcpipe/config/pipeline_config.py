@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import yaml
 import calendar
@@ -45,50 +47,34 @@ def load_config(config_path):
     config = parse_config_and_handle_global_vars(loaded_config)
 
     log.info(
-        f'************ - Configuration for processing of {config["prod_type"]} using the {config["workflow_kind"]} pipeline:- ************'
+        f'************ - lstMCpipe will be launch using the {config["workflow_kind"]} pipeline:- ************'
     )
-    if config.get("DL0_input_dir"):
+    log.info(f'\nPROD_ID to be used: {config["prod_id"]}')
+    log.info("\nStages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
+
+    if "merge_dl1" in config["stages_to_run"]:
+        log.info("Merging options:" f"\n - No-image argument: {config['merge_dl1']['merging_no_image']}")
+
+    if "r0_to_dl1" in config["stages_to_run"]:
         log.info(
-            "Simtel DL0 files are going to be searched at: "
-            f'{config["DL0_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+            f"Simtel DL0 files will be get from:" + "\n - ".join([i["input"] for i in config["r0_to_dl1"]])
         )
-    elif config.get("DL1_input_dir"):
+    elif "dl1ab" in config["stages_to_run"]:
+        log.info(f'\nApplying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
         log.info(
-            "DL1 base files are going to be searched at: "
-            f'{config["DL1_input_dir"].format("{" + ",".join(config["all_particles"]) + "}")}'
+            f"\nDL1 .h5 files will be get from:" + "\n - ".join([i["input"] for i in config["dl1ab"]])
         )
+    else:
+        pass
 
-    particle_dirs = [
-        "running_analysis_dir",
-        "DL1_output_dir",
-        "DL2_output_dir",
-        "analysis_log_dir",
-    ]
-    log.info(
-        "The following directories and all the information within them will be either created or overwritten:\n - "
-        + "\n - ".join(
-            [
-                config[pd].format("{" + ",".join(config["all_particles"]) + "}")
-                for pd in particle_dirs
-            ]
-        )
-        + f'\n - {config["IRF_output_dir"]}'
-        + f'\n - {config["model_output_dir"]}'
-    )
-
-    log.warning(
-        "! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !"
-    )
-    log.info(f'PROD_ID to be used: {config["prod_id"]}')
-
-    log.info("Stages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
-    if "dl1ab" in config["stages_to_run"]:
-        log.info(f'Applying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
-    log.info("Merging options:" f"\n - No-image argument: {config['merging_no_image']}")
     log.info(
         "Slurm configuration:"
         + f"\n - Source environment: {config['batch_config']['source_environment']}"
         + f"\n - Slurm account: {config['batch_config']['slurm_account']}"
+    )
+
+    log.warning(
+        "\n! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !"
     )
 
     return config

@@ -130,18 +130,17 @@ def main():
     log = setup_logging(verbose=args.debug, logfile=args.log_file)
     log.info("Starting lstmcpipe processing script")
     # Read MC production configuration file
-    config = load_config(args.config_mc_prod)
+    lstmcpipe_config = load_config(args.config_mc_prod)
     query_continue("Are you sure ?")
 
     # Load variables
-    prod_id = config["prod_id"]
-    workflow_kind = config["workflow_kind"]
-    batch_config = config["batch_config"]
-    stages_to_run = config["stages_to_run"]
+    prod_id = lstmcpipe_config["prod_id"]
+    workflow_kind = lstmcpipe_config["workflow_kind"]
+    batch_config = lstmcpipe_config["batch_config"]
+    stages_to_run = lstmcpipe_config["stages_to_run"]
 
     # Create log files and log directory
     logs_files, scancel_file, logs_dir = create_log_files(prod_id)
-
     all_job_ids = {}
 
     if "r0_to_dl1" in stages_to_run and "reprocess_dl1" in stages_to_run:
@@ -155,12 +154,12 @@ def main():
 
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst).resolve().as_posix()
-            if config.get("dl1_noise_tune_data_run"):
+            if lstmcpipe_config.get("dl1_noise_tune_data_run"):
                 dl1_config = create_dl1ab_tuned_config(
                     dl1_config,
                     dl1_config.replace(".json", "_tuning.json"),
-                    config.get("dl1_noise_tune_data_run"),
-                    config.get("dl1_noise_tune_mc_run"),
+                    lstmcpipe_config.get("dl1_noise_tune_data_run"),
+                    lstmcpipe_config.get("dl1_noise_tune_mc_run"),
                 )
         elif workflow_kind == "hiperta":
             dl1_config = Path(args.config_file_rta).resolve().as_posix()
@@ -168,7 +167,7 @@ def main():
             dl1_config = Path(args.config_file_ctapipe).resolve().as_posix()
 
         jobs_from_dl1_processing = batch_process_dl1(
-            path_dict,
+            lstmcpipe_config,
             conf_file=dl1_config,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -187,7 +186,7 @@ def main():
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
         jobs_from_splitting = batch_train_test_splitting(
-            path_dict,
+            lstmcpipe_config,
             jobids_from_r0dl1=jobs_from_dl1_processing,
             batch_config=batch_config,
             logs=logs_files,
@@ -206,7 +205,7 @@ def main():
 
     if "merge_and_copy_dl1" in stages_to_run:
         jobs_from_merge = batch_merge_dl1(
-            path_dict,
+            lstmcpipe_config,
             jobid_from_splitting=merge_wait_jobs,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -222,7 +221,7 @@ def main():
     if "train_pipe" in stages_to_run:
 
         job_from_train_pipe = batch_train_pipe(
-            path_dict,
+            lstmcpipe_config,
             jobs_from_merge,
             config_file=Path(args.config_file_lst).resolve().as_posix(),
             batch_config=batch_config,
@@ -234,7 +233,7 @@ def main():
 
         # Plot the RF feature's importance
         batch_plot_rf_features(
-            path_dict,
+            lstmcpipe_config,
             Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
@@ -250,7 +249,7 @@ def main():
     if "dl1_to_dl2" in stages_to_run:
 
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
-            path_dict,
+            lstmcpipe_config,
             Path(args.config_file_lst).resolve().as_posix(),
             job_from_train_pipe,  # Single jobid from train
             batch_config=batch_config,
@@ -265,7 +264,7 @@ def main():
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         jobs_from_dl2_irf = batch_dl2_to_irfs(
-            path_dict,
+            lstmcpipe_config,
             Path(args.config_file_lst).resolve().as_posix(),
             jobs_from_dl1_dl2,
             batch_config=batch_config,
@@ -278,7 +277,7 @@ def main():
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
         jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
-            path_dict,
+            lstmcpipe_config,
             jobs_from_dl1_dl2,
             batch_config=batch_config,
             logs=logs_files,
