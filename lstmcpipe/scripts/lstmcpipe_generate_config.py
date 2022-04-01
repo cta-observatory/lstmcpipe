@@ -33,7 +33,7 @@ def main():
     # Required arguments
     parser.add_argument(dest='config_class',
                         type=str,
-                        help=f'Config class name to use.'
+                        help=f'Config class name to use. '
                              f'List of implemented classes: {list_config_classes()}'
                         )
 
@@ -44,7 +44,8 @@ def main():
 
     parser.add_argument('--output', '-o',
                         type=Path,
-                        help='Path to the output file to dump the generated config',
+                        help='Path to the output file to dump the generated config. '
+                             'Optional, if not provided, the file is dumped locally',
                         default=None
                         )
 
