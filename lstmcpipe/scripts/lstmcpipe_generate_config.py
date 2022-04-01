@@ -8,6 +8,9 @@ from lstmcpipe.config import paths_config
 
 
 class ParseKwargs(argparse.Action):
+    """
+    Parse a string formatted as `option1=foo` into a dict `{option1: foo}`
+    """
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, dict())
         for value in values:
@@ -16,6 +19,13 @@ class ParseKwargs(argparse.Action):
 
 
 def list_config_classes():
+    """
+    List the classes in `lstmcpipe.config.paths_config` that inherit from `lstmcpipe.config.paths_config.PathConfig`
+
+    Returns
+    -------
+    [object]: list of classes
+    """
     all_attrs = []
     for att in list(paths_config.__dict__):
         try:
@@ -64,7 +74,8 @@ def main():
     output = f'lstmcpipe_config_{date.today()}_{args.config_class}.yaml' if args.output is None else args.output
     prod_id = 'prod_00' if args.prod_id is None else args.prod_id
 
-    cfg=getattr(paths_config, args.config_class)(prod_id, **args.kwargs)
+    # we get the class from its name and instantiate it with the required args
+    cfg = getattr(paths_config, args.config_class)(prod_id, **args.kwargs)
     cfg.generate()
     cfg.save_yml(output)
 

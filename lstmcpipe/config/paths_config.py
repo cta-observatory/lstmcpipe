@@ -506,14 +506,7 @@ class PathConfigAllSky(PathConfig):
     # @property
     # def dl2_to_irfs(self):
     #     # TODO?
-    #     paths = []
-    #     for particle in self.testing_particles:
-    #         for pointing in self.testing_pointings:
-    #             paths.append({
-    #                 'input': self.dl2_output_file(particle, pointing),
-    #                 'output': self.
-    #             })
-    #     return paths
+
 
 
 
