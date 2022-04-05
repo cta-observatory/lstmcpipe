@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import yaml
+from ruamel.yaml import YAML
 import pytest
 from pathlib import Path
 
@@ -16,7 +16,7 @@ def test_save_log_to_file():
 
     assert outfile_yml.exists()
     with open(outfile_yml) as f:
-        log = yaml.safe_load(f)
+        log = YAML().load(f)
 
     assert "NoKEY" in log.keys()
     assert isinstance(log["NoKEY"], dict)

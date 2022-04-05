@@ -1,15 +1,14 @@
 import os
-import yaml
+from ruamel.yaml import YAML
 import calendar
 import logging
 from pathlib import Path
-
 
 log = logging.getLogger(__name__)
 
 
 def create_path(
-    parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
+        parent_path, stage, obs_date, pointing_zenith, prod_id=None, particles=True
 ):
     p = Path(parent_path) / stage / obs_date
     if particles:
@@ -38,7 +37,7 @@ def load_config(config_path):
 
     # This could easily be adapted to support different formats
     with open(config_path) as f:
-        loaded_config = yaml.safe_load(f)
+        loaded_config = YAML().load(f)
 
     config_valid(loaded_config)
 
@@ -133,12 +132,12 @@ def config_valid(loaded_config):
 
     # and incompatible possibilities
     if (prod_type == "prod3" and obs_date != "20190415") or (
-        prod_type == "prod5" and obs_date == "20190415"
+            prod_type == "prod5" and obs_date == "20190415"
     ):
         raise Exception("This prod_type and obs_date combination is not possible.")
 
-    stages_to_be_run = loaded_config["stages_to_be_run"]
-    if "dl1ab" in stages_to_be_run:
+    stages_to_run = loaded_config["stages_to_run"]
+    if "dl1ab" in stages_to_run:
         if not "dl1_reference_id" in loaded_config:
             raise KeyError(
                 "The key dl1_reference_id has to be set in order to locate "
@@ -180,7 +179,7 @@ def parse_config_and_handle_global_vars(loaded_config):
     config = {}
 
     prod_id = loaded_config.get("prod_id", "v00")
-    stages_to_be_run = loaded_config["stages_to_be_run"]
+    stages_to_run = loaded_config["stages_to_run"]
     merging_options = loaded_config["merging_options"]["no_image"]
     base_path = loaded_config.get("base_path")
     # to locate the source dl1 files
@@ -240,7 +239,7 @@ def parse_config_and_handle_global_vars(loaded_config):
     config["all_particles"] = particles
 
     # 4 - Stages to be run
-    config["stages_to_run"] = stages_to_be_run
+    config["stages_to_run"] = stages_to_run
     config["merging_no_image"] = merging_options
 
     # 5 - production workflow and type
@@ -258,9 +257,9 @@ def parse_config_and_handle_global_vars(loaded_config):
         pointing_zenith = os.path.join(zenith, pointing)
         config["gamma_offs"] = offset_gammas
 
-    if "r0_to_dl1" in stages_to_be_run:
+    if "r0_to_dl1" in stages_to_run:
         source_datalevel = "DL0"
-    elif "dl1ab" in stages_to_be_run:
+    elif "dl1ab" in stages_to_run:
         source_datalevel = "DL1"
     else:
         raise NotImplementedError(
@@ -300,3 +299,4 @@ def parse_config_and_handle_global_vars(loaded_config):
         particles=False,
     )
     return config
+
