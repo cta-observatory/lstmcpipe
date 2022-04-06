@@ -369,8 +369,8 @@ def submit_dl1_jobs(
     sublist_names = [f.as_posix() for f in Path(job_logs_dir).glob("*.sublist")]  # Number of sublists ??
 
     slurm_options = {
-        "output": job_logs_dir.joinpath(f"job_%A_%a.o").as_posix(),
-        "error": job_logs_dir.joinpath(f"job_%A_%a.e").as_posix(),
+        "output": job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
+        "error": job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
         "array": f"0-{len(sublist_names)-1}%{n_jobs_parallel}",
         "job-name": f"{job_type_id}-{dl1_processing}"
     }

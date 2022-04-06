@@ -132,8 +132,8 @@ def dl1_to_dl2(
     if config_file is not None:
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
 
-    jobe = Path(output_dir).joinpath(f"dl1_dl2_%j.e").resolve().as_posix()
-    jobo = Path(output_dir).joinpath(f"dl1_dl2_%j.o").resolve().as_posix()
+    jobe = Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix()
+    jobo = Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix()
 
     # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
     batch_cmd = "sbatch --parsable -p short --mem=32G"

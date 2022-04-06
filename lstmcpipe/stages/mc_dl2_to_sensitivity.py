@@ -109,8 +109,8 @@ def dl2_to_sensitivity(
     # TODO Move the base commands into scripts so that we can use subprocess properly(makes splitting the string easier)
     base_cmd_sens = f"lstmcpipe_dl2_to_sensitivity -g {g_file} -p {p_file} -e {e_file} -o {output}"
 
-    jobo_sens = Path(output).parent.joinpath(f"job_dl2_to_sensitivity.o")
-    jobe_sens = Path(output).parent.joinpath(f"job_dl2_to_sensitivity.e")
+    jobo_sens = Path(output).parent.joinpath("job_dl2_to_sensitivity.o")
+    jobe_sens = Path(output).parent.joinpath("job_dl2_to_sensitivity.e")
 
     cmd_sens = "sbatch --parsable -p short --mem 32G"
     if slurm_account != "":
@@ -128,8 +128,8 @@ def dl2_to_sensitivity(
     base_cmd_plot = (
         f'lstmcpipe_plot_irfs -f {Path(output).parent} -o {output.replace(".fits.gz", ".png")}'
     )
-    jobe_plot = Path(output).parent.joinpath(f"job_plot_sensitivity.e")
-    jobo_plot = Path(output).parent.joinpath(f"job_plot_sensitivity.o")
+    jobe_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.e")
+    jobo_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.o")
 
     cmd_plot = "sbatch --parsable -p short"
     if slurm_account != "":

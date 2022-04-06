@@ -42,12 +42,12 @@ def load_config(config_path):
 
     if "r0_to_dl1" in config["stages_to_run"]:
         log.info(
-            f"Simtel DL0 files will be get from:" + "\n - ".join([i["input"] for i in config["r0_to_dl1"]])
+            "Simtel DL0 files will be get from:" + "\n - ".join([i["input"] for i in config["r0_to_dl1"]])
         )
     elif "dl1ab" in config["stages_to_run"]:
         log.info(f'\nApplying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
         log.info(
-            f"\nDL1 .h5 files will be get from:" + "\n - ".join([i["input"] for i in config["dl1ab"]])
+            "\nDL1 .h5 files will be get from:" + "\n - ".join([i["input"] for i in config["dl1ab"]])
         )
     else:
         pass

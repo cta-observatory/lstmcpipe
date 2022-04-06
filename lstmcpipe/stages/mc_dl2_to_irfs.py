@@ -133,8 +133,8 @@ def dl2_to_irfs(
 
     log.info(f"Output dir IRF of {gamma_file}: {output_dir}")
 
-    jobe = Path(output_dir).joinpath(f"job_dl2_to_irfs.e").resolve().as_posix()
-    jobo = Path(output_dir).joinpath(f"job_dl2_to_irfs.o").resolve().as_posix()
+    jobe = Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix()
+    jobo = Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix()
 
     batch_cmd = "sbatch --parsable -p short"
     if slurm_account != "":
