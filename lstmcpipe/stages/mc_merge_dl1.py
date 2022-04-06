@@ -3,7 +3,6 @@
 import os
 import logging
 from pathlib import Path
-from lstmcpipe.io.data_management import check_job_logs
 from lstmcpipe.workflow_management import save_log_to_file
 
 
@@ -60,9 +59,9 @@ def batch_merge_dl1(
         job_logs, jobid_debug = merge_dl1(
             particle["input"],
             particle["output"],
-            merging_options={  # TODO this should be passed within `dict_paths`
-                "no_image": True,
-                "smart": False,
+            merging_options={
+                "no_image": dict_paths["merge_dl1"].get("no_image", True),
+                "smart": dict_paths["merge_dl1"].get("smart", False),
             },
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,

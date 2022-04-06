@@ -203,7 +203,7 @@ def main():
     else:
         merge_wait_jobs = jobs_from_dl1_processing
 
-    if "merge_and_copy_dl1" in stages_to_run:
+    if "merge_dl1" in stages_to_run:
         jobs_from_merge = batch_merge_dl1(
             lstmcpipe_config,
             jobid_from_splitting=merge_wait_jobs,
