@@ -1,14 +1,16 @@
 # #!/usr/bin/env python
 
-# E. Garcia, Jan '20
+# E. Garcia, T. VUILLAUME, LAPP, CNRS
 #
 # Full workflow from r0 to dl3.
 #  wraps together the individual scripts of
-#   - onsite_mc_r0_to_dl1
-#   - onsite_mc_merge_and_copy_dl1
-#   - onsite_mc_train
-#   - onsite_mc_dl1_to_dl2
-#   - onsite_mc_dl2_to_irfs
+#   - mc_process_dl1
+#   - mc_train_test_split
+#   - mc_merge_dl1
+#   - mc_train
+#   - mc_dl1_to_dl2
+#   - mc_dl2_to_irfs
+#   - mc_dl2_to_sensitivity
 #
 # usage:
 # > lstmcpipe -c config_MC_prod.yml -conf_lst LSTCHAIN_CONFIG_FILE [-conf_rta RTA_CONFIG_FILE]
@@ -25,12 +27,12 @@ from lstmcpipe.io.lstmcpipe_tree_path import (
     update_scancel_file,
 )
 from lstmcpipe.workflow_management import (
-    create_dl1_filenames_dict,
     batch_mc_production_check,
 )
 from lstmcpipe.stages import (
     batch_process_dl1,
-    batch_merge_and_copy_dl1,
+    batch_train_test_splitting,
+    batch_merge_dl1,
     batch_train_pipe,
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
@@ -60,7 +62,7 @@ parser.add_argument(
     dest="config_file_lst",
     help="Path to a lstchain-like configuration file. "
     "RF classifier and regressor arguments must be declared here !",
-    default=None,
+    required=True
 )
 
 parser.add_argument(
@@ -128,37 +130,18 @@ def main():
     log = setup_logging(verbose=args.debug, logfile=args.log_file)
     log.info("Starting lstmcpipe processing script")
     # Read MC production configuration file
-    config = load_config(args.config_mc_prod)
+    lstmcpipe_config = load_config(args.config_mc_prod)
     query_continue("Are you sure ?")
 
     # Load variables
-    prod_id = config["prod_id"]
-    workflow_kind = config["workflow_kind"]
-    batch_config = config["batch_config"]
-    stages_to_run = config["stages_to_run"]
-    all_particles = config["all_particles"]
-    input_dir = config["input_dir"]
-    dl1_output_dir = config["DL1_output_dir"]
-    dl2_output_dir = config["DL2_output_dir"]
-    running_analysis_dir = config["running_analysis_dir"]
-    gamma_offs = config.get("gamma_offs")
-    no_image_merging = config.get("merging_no_image")
+    prod_id = lstmcpipe_config["prod_id"]
+    workflow_kind = lstmcpipe_config["workflow_kind"]
+    batch_config = lstmcpipe_config["batch_config"]
+    stages_to_run = lstmcpipe_config["stages_to_run"]
 
     # Create log files and log directory
     logs_files, scancel_file, logs_dir = create_log_files(prod_id)
-
-    # Make sure the lstchain config is defined if needed
-    # It is not exactly required if you process only up to dl1
-    if any(
-        [
-            step not in ("r0_to_dl1", "dl1ab", "merge_and_copy_dl1")
-            for step in stages_to_run
-        ]
-    ):
-        if args.config_file_lst is None:
-            raise Exception(
-                "The lstchain config needs to be defined for all steps following dl1 processing"
-            )
+    all_job_ids = {}
 
     if "r0_to_dl1" in stages_to_run and "reprocess_dl1" in stages_to_run:
         raise Exception("There can only be one stage producing dl1 files")
@@ -168,172 +151,147 @@ def main():
     dl1ab = "dl1ab" in stages_to_run
 
     if r0_to_dl1 or dl1ab:
-        stage_input_dir = Path(input_dir)
+
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst).resolve().as_posix()
-            if config.get("dl1_noise_tune_data_run"):
-                # lstchain uses json, but just in case
-                assert ".json" in dl1_config
+            if lstmcpipe_config.get("dl1_noise_tune_data_run"):
                 dl1_config = create_dl1ab_tuned_config(
                     dl1_config,
                     dl1_config.replace(".json", "_tuning.json"),
-                    config.get("dl1_noise_tune_data_run"),
-                    config.get("dl1_noise_tune_mc_run"),
+                    lstmcpipe_config.get("dl1_noise_tune_data_run"),
+                    lstmcpipe_config.get("dl1_noise_tune_mc_run"),
                 )
         elif workflow_kind == "hiperta":
-            dl1_config = Path(args.config_file_rta).resolve()
-        else:  # if this wasnt ctapipe, the config parsing would have failed
-            dl1_config = Path(args.config_file_ctapipe).resolve()
-        if dl1ab:
-            stage_input_dir /= config["dl1_reference_id"]
+            dl1_config = Path(args.config_file_rta).resolve().as_posix()
+        else:  # if this was not ctapipe, the config parsing would have failed
+            dl1_config = Path(args.config_file_ctapipe).resolve().as_posix()
 
-        particle2jobid_process_dl1_dict, jobs_all_dl1 = batch_process_dl1(
-            input_dir=stage_input_dir.as_posix(),
+        jobs_from_dl1_processing = batch_process_dl1(
+            lstmcpipe_config,
             conf_file=dl1_config,
-            prod_id=prod_id,
-            particles_loop=all_particles,
             batch_config=batch_config,
-            gamma_offsets=gamma_offs,
             workflow_kind=workflow_kind,
             new_production=r0_to_dl1,
             logs=logs_files,
         )
 
-        update_scancel_file(scancel_file, jobs_all_dl1)
-
+        update_scancel_file(scancel_file, jobs_from_dl1_processing)
+        if r0_to_dl1:
+            all_job_ids.update({"r0_dl1": all_job_ids})
+        else:
+            all_job_ids.update({"dl1ab": all_job_ids})
     else:
-        jobs_all_dl1 = ""
-        particle2jobid_process_dl1_dict = {}
-        for particle in all_particles:
-            particle2jobid_process_dl1_dict[particle] = ""
+        jobs_from_dl1_processing = ""
 
-    # 2 STAGE --> Merge,copy and move DL1 files
-    if "merge_and_copy_dl1" in stages_to_run:
-        (
-            merged_dl1_paths_dict,
-            jobs_to_train,
-            jobs_all_dl1_finished,
-        ) = batch_merge_and_copy_dl1(
-            running_analysis_dir,
-            particle2jobid_process_dl1_dict,
-            all_particles,
-            smart_merge=False,  # smart_merge=WORKFLOW_KIND
-            no_image_flag=no_image_merging,
-            gamma_offsets=gamma_offs,
-            prod_id=prod_id,
+    # 2.1 STAGE --> Train, test splitting
+    if "train_test_split" in stages_to_run:
+        jobs_from_splitting = batch_train_test_splitting(
+            lstmcpipe_config,
+            jobids_from_r0dl1=jobs_from_dl1_processing,
+            batch_config=batch_config,
+            logs=logs_files,
+        )
+
+        update_scancel_file(scancel_file, jobs_from_splitting)
+        all_job_ids.update({"train_test_split": jobs_from_splitting})
+    else:
+        jobs_from_splitting = ""
+
+    # 2.2 STAGE --> Merge DL1 files
+    if jobs_from_splitting != "":
+        merge_wait_jobs = ','.join([jobs_from_dl1_processing, jobs_from_splitting])
+    else:
+        merge_wait_jobs = jobs_from_dl1_processing
+
+    if "merge_dl1" in stages_to_run:
+        jobs_from_merge = batch_merge_dl1(
+            lstmcpipe_config,
+            jobid_from_splitting=merge_wait_jobs,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
             logs=logs_files,
         )
 
-        update_scancel_file(scancel_file, jobs_all_dl1_finished)
-
+        update_scancel_file(scancel_file, jobs_from_merge)
+        all_job_ids.update({"merge_and_copy_dl1": jobs_from_merge})
     else:
-        # Create just the needed dictionary inputs (dl1 files must exist !)
-        merged_dl1_paths_dict = create_dl1_filenames_dict(
-            dl1_output_dir, all_particles, gamma_offs
-        )
-        jobs_to_train = ""
-        jobs_all_dl1_finished = ""
+        jobs_from_merge = ""
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
-        train_config = Path(args.config_file_lst)
 
-        job_from_train_pipe, model_dir = batch_train_pipe(
-            merged_dl1_paths_dict,
-            train_config,
-            jobs_to_train,
+        job_from_train_pipe = batch_train_pipe(
+            lstmcpipe_config,
+            jobs_from_merge,
+            config_file=Path(args.config_file_lst).resolve().as_posix(),
             batch_config=batch_config,
             logs=logs_files,
         )
 
         update_scancel_file(scancel_file, job_from_train_pipe)
+        all_job_ids.update({"train_pipe": job_from_train_pipe})
 
         # Plot the RF feature's importance
         batch_plot_rf_features(
-            model_dir,
-            args.config_file_lst,
+            lstmcpipe_config,
+            Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
             logs=logs_files,
         )
+        all_job_ids.update({"plot_rf_feat": batch_plot_rf_features})
+        # TODO check if we want to update jobid from `batch_plot_rf_features` into scancel
 
     else:
         job_from_train_pipe = ""
-        model_dir = config["model_output_dir"]
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
-        dl1_to_dl2_config = Path(args.config_file_lst)
 
-        dl2_files_path_dict, jobs_from_dl1_dl2 = batch_dl1_to_dl2(
-            dl1_output_dir,
-            model_dir,
-            dl1_to_dl2_config,
+        jobs_from_dl1_dl2 = batch_dl1_to_dl2(
+            lstmcpipe_config,
+            Path(args.config_file_lst).resolve().as_posix(),
             job_from_train_pipe,  # Single jobid from train
-            jobs_all_dl1_finished,  # jobids from merge
-            merged_dl1_paths_dict,  # final dl1 names
-            all_particles,
             batch_config=batch_config,
-            gamma_offsets=gamma_offs,
             logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
-
+        all_job_ids.update({"dl1_to_dl2": jobs_from_dl1_dl2})
     else:
         jobs_from_dl1_dl2 = ""
-        dl2_files_path_dict = {}  # Empty log will be manage inside onsite_dl2_irfs
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         jobs_from_dl2_irf = batch_dl2_to_irfs(
-            dl2_output_dir,
-            all_particles,
-            gamma_offs,
-            Path(args.config_file_lst),
-            jobs_from_dl1_dl2,  # Final dl2 names
-            log_from_dl1_dl2=dl2_files_path_dict,
+            lstmcpipe_config,
+            Path(args.config_file_lst).resolve().as_posix(),
+            jobs_from_dl1_dl2,
             batch_config=batch_config,
-            prod_id=prod_id,
             logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl2_irf)
-
-    else:
-        jobs_from_dl2_irf = ""
+        all_job_ids.update({"dl2_to_irfs": jobs_from_dl2_irf})
 
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
         jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
-            dl2_output_dir,
-            gamma_offs,
+            lstmcpipe_config,
             jobs_from_dl1_dl2,
-            dl2_files_path_dict,  # Final dl2 names
             batch_config=batch_config,
-            prod_id=prod_id,
             logs=logs_files,
         )
 
         update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
-
-    else:
-        jobs_from_dl2_sensitivity = ""
+        all_job_ids.update({"dl2_to_sensitivity": jobs_from_dl2_sensitivity})
 
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check = batch_mc_production_check(
-        jobs_all_dl1,
-        jobs_all_dl1_finished,
-        job_from_train_pipe,
-        jobs_from_dl1_dl2,
-        jobs_from_dl2_irf,
-        jobs_from_dl2_sensitivity,
-        prod_id,
+        all_job_ids,
         log_directory=logs_dir,
+        prod_id=prod_id,
         prod_config_file=args.config_mc_prod,
-        last_stage=stages_to_run[-1],
         batch_config=batch_config,
         logs_files=logs_files,
     )

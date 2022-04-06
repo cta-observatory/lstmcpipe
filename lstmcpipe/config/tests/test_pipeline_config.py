@@ -1,24 +1,19 @@
 from lstmcpipe.config import export_env
 from lstmcpipe.config.pipeline_config import (
     config_valid,
-    parse_config_and_handle_global_vars,
+    complete_lstmcpipe_config,
 )
 import tempfile
 import os
 import pytest
-from datetime import datetime
+# from datetime import datetime
 
 yaml_keys = [
     "prod_id",
     "stages_to_run",
-    "base_path",
-    "pointing",
-    "zenith",
-    "particles",
-    "offset_gammas",
-    "obs_date",
     "prod_type",
     "workflow_kind",
+    "stages"
 ]
 dummy_config = {k: None for k in yaml_keys}
 dummy_config["merging_options"] = {"no_image": False}
@@ -43,11 +38,9 @@ def test_config_valid():
         config_valid(dummy_config)
 
     valid = dummy_config.copy()
-    valid["prod_type"] = "prod5"
+    valid["prod_type"] = "PathConfigProd5Trans80"
     valid["workflow_kind"] = "lstchain"
-    valid["obs_date"] = "20200629_prod5_trans_80"
     valid["stages_to_run"] = []
-    valid["base_path"] = "/path/to/dl0"
     assert config_valid(valid)
 
     invalid_workflow = valid.copy()
@@ -55,21 +48,10 @@ def test_config_valid():
     with pytest.raises(Exception):
         config_valid(invalid_workflow)
 
-    invalid_date = valid.copy()
-    invalid_date["obs_date"] = "1970-01-01"
-    with pytest.raises(Exception):
-        config_valid(invalid_date)
-
     invalid_prod = valid.copy()
     invalid_prod["prod_type"] = "prod42"
     with pytest.raises(Exception):
         config_valid(invalid_prod)
-
-    invalid_date_prod = valid.copy()
-    # this should only be allowed with prod3, which is not chosen here
-    invalid_date_prod["obs_date"] = "20190415"
-    with pytest.raises(Exception):
-        config_valid(invalid_date_prod)
 
     missing_reference = valid.copy()
     missing_reference["stages_to_run"] = ["dl1ab"]
@@ -77,7 +59,7 @@ def test_config_valid():
         config_valid(missing_reference)
 
 
-def test_parse_config_and_handle_global_vars():
+def test_complete_lstmcpipe_config():
     """
     Test that the file paths are properly set.
     This only tests a subset of the variables, that are set in
@@ -85,27 +67,13 @@ def test_parse_config_and_handle_global_vars():
     """
     config = dummy_config.copy()
     config["workflow_kind"] = "lstchain"
-    config["prod_type"] = "prod5"
-    config["obs_date"] = "20200629_prod5_trans_80"
-    config["pointing"] = "90"
-    config["zenith"] = "45"
-    config["base_path"] = "/dummy/path/to/files"
+    config["prod_type"] = "PathConfigProd5Trans80"
     config["stages_to_run"] = ["r0_to_dl1"]
 
-    parsed_config = parse_config_and_handle_global_vars(config)
-    date = datetime.today().strftime("%Y%m%d")
-    assert (
-        parsed_config["DL1_output_dir"]
-        == "/dummy/path/to/files/DL1/20200629_prod5_trans_80/{}/45/90/"
-        + date
-        + "_v0.9.1_prod5_trans_80_None"
-    )
-    assert (
-        parsed_config["model_output_dir"]
-        == "/dummy/path/to/files/models/20200629_prod5_trans_80/45/90/"
-        + date
-        + "_v0.9.1_prod5_trans_80_None"
-    )
+    parsed_config = complete_lstmcpipe_config(config)
+    # date = datetime.today().strftime("%Y%m%d")
+    # TODO test check some paths
+    # TODO test check model path
     assert (
         parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
     )
@@ -115,5 +83,5 @@ def test_parse_config_and_handle_global_vars():
 
     new_dummy = config.copy()
     new_dummy["slurm_config"] = {"user_account": "aswg"}
-    new_parsed_config = parse_config_and_handle_global_vars(new_dummy)
+    new_parsed_config = complete_lstmcpipe_config(new_dummy)
     assert new_parsed_config["batch_config"]["slurm_account"] == "aswg"

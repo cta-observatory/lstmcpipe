@@ -49,7 +49,6 @@ from lstchain.io.io import read_mc_dl2_to_QTable
 import argparse
 
 
-
 T_OBS = 50 * u.hour
 
 # scaling between on and off region.

@@ -1,66 +1,44 @@
 #!/usr/bin/env python
 
-# T. Vuillaume,
-# Modifications by E. Garcia
-# lstMCpipe DL1 to DL2 onsite stage (at La Palma cluster)
-
 import os
-import time
 import shutil
 import logging
-from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from pathlib import Path
 from lstmcpipe.workflow_management import save_log_to_file
+from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
 
 log = logging.getLogger(__name__)
 
 
 def batch_dl1_to_dl2(
-    dl1_directory,
-    path_to_models,
+    dict_paths,
     config_file,
     jobid_from_training,
-    jobids_from_merge,
-    dict_with_dl1_paths,
-    particles_loop,
     batch_config,
     logs,
-    gamma_offsets=None,
 ):
     """
     Function to batch the dl1_to_dl2 stage once the lstchain train_pipe batched jobs have finished.
 
     Parameters
     ----------
-    dl1_directory : str
-        Path to the dl1 directory
-    path_to_models : str
-        Path to the model directory - should be taken from train_pipe
+    dict_paths : dict
+        Core dictionary with {stage: PATHS} information
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
     jobid_from_training : str
         string containing the jobid from the jobs batched in the train_pipe stage, to be passed to the
         dl1_to_dl2 function (as a slurm dependency)
-    jobids_from_merge : str
-        string containing the jobid from the jobs batched in the merge_and_copy_dl1 stage,
-        to be passed to the dl1_to_dl2 function (as a slurm dependency)
-    dict_with_dl1_paths : dict
-        Indeed the log of the merge_and_copy stage, where the final names of the dl1 files were stored
-    particles_loop : list
-        list with the particles to be processed. Takes the global variable ALL_PARTICLES
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         dl1_dl2 function
-    gamma_offsets : list
-        list off gamma offsets
     logs: dict
         Dictionary with logs files
 
     Returns
     -------
-    log_batch_dl1_to_dl2 : dict
-        Dictionary containing the log of the batched dl1_to_dl2 jobs
-    jobid_4_dl2_to_dl3 : str
+    jobid_for_dl2_to_dl3 : str
         string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
 
     """
@@ -70,71 +48,42 @@ def batch_dl1_to_dl2(
     debug_log = {}
 
     log.info("==== START {} ==== \n".format("batch dl1_to_dl2_workflow"))
-    time.sleep(1)
 
-    for particle in particles_loop:
-        if particle == "gamma" and gamma_offsets is not None:
-            for off in gamma_offsets:
-                gamma_dl1_directory = os.path.join(dl1_directory, off)
-                _particle = particle + "_" + off
+    for paths in dict_paths["dl1_to_dl2"]:
 
-                job_logs, jobid = dl1_to_dl2(
-                    gamma_dl1_directory.format(particle),
-                    path_models=path_to_models,
-                    config_file=config_file,
-                    particle=_particle,
-                    wait_jobid_train_pipe=jobid_from_training,
-                    wait_jobids_merge=jobids_from_merge,
-                    dictionary_with_dl1_paths=dict_with_dl1_paths,
-                    batch_configuration=batch_config,
-                )
+        job_logs, jobid = dl1_to_dl2(
+            paths["input"],
+            paths["output"],
+            path_models=dict_paths["train"]["output"],
+            config_file=config_file,
+            wait_jobid_train_pipe=jobid_from_training,
+            batch_configuration=batch_config,
+        )
 
-                log_dl1_to_dl2.update(job_logs)
-                jobid_for_dl2_to_dl3.append(jobid)
+        log_dl1_to_dl2.update(job_logs)
 
-                debug_log[jobid] = (
-                    f"{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} "
-                    f"training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs"
-                )
-        else:
-            _particle = particle
-            job_logs, jobid = dl1_to_dl2(
-                dl1_directory.format(particle),
-                path_models=path_to_models,
-                config_file=config_file,
-                particle=_particle,
-                wait_jobid_train_pipe=jobid_from_training,
-                wait_jobids_merge=jobids_from_merge,
-                dictionary_with_dl1_paths=dict_with_dl1_paths,
-                batch_configuration=batch_config,
-            )
+        # Single particle dl1_dl2 jobid to be appended
+        jobid_for_dl2_to_dl3.append(jobid)
+        debug_log[jobid] = (
+            f"dl1_to_dl2 jobid that depends on : {jobid_from_training} training job"
+        )
 
-            log_dl1_to_dl2.update(job_logs)
-            jobid_for_dl2_to_dl3.append(jobid)
-
-            debug_log[jobid] = (
-                f"{_particle} job from dl1_to_dl2 that depends both on : {jobid_from_training} "
-                f"training jobs AND from {jobids_from_merge} merge_and_copy_dl1 jobs"
-            )
-
-    jobid_4_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
+    jobid_for_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
 
     save_log_to_file(log_dl1_to_dl2, logs["log_file"], workflow_step="dl1_to_dl2")
     save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl1_to_dl2")
 
     log.info("==== END {} ====".format("batch dl1_to_dl2_workflow"))
 
-    return log_dl1_to_dl2, jobid_4_dl2_to_dl3
+    return jobid_for_dl2_to_dl3
 
 
 def dl1_to_dl2(
-    input_dir,
+    input_file,
+    output_dir,
     path_models,
     config_file,
-    particle,
     wait_jobid_train_pipe=None,
-    wait_jobids_merge=None,
-    dictionary_with_dl1_paths=None,
     batch_configuration='',
 ):
     """
@@ -142,118 +91,66 @@ def dl1_to_dl2(
 
     Parameters
     ----------
-    input_dir : str
-        DL1 base path
+    input_file : str
+        FILE DL1 path
+    output_dir : str
+        DIR Dl2 path
     path_models : str
-        Path to the trained models
+        DIR trained models path
     config_file : str
         Path to a configuration file. If none is given, a standard configuration is applied
-    particle : str
-        Particle to which apply the dl1_to_dl2 stage
     wait_jobid_train_pipe : str
         Comma-separated string with the batched jobid from the train stage to indicate the
         dependencies of the current job to be batched
-    wait_jobids_merge : str
-        string with merge_and_copy jobids
-    dictionary_with_dl1_paths : dict
-        Dictionary with 'particles' as keys containing final output filenames of dl1 files.
     batch_configuration : dict
-        Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
-        sbatch commands
+        Dictionary containing the (full) source_environment and the slurm_account strings
+        to be passed to the sbatch commands
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
 
     Returns
     -------
     log_dl1_to_dl2 : dict
-        dictionary of dictionaries containing the jobid of the batched job as key and the run command (the
-        lstchain_mc_dl1_to_dl2 command with all its corresponding arguments) as value.
+        log dictionary containing {jobid: batch_cmd} information
 
     jobid_dl1_to_dl2 : str
-        jobid of the batched job to be send (for dependencies purposes) to the next stage of the
-        workflow (dl2_to_irfs)
+        batched job_id to be passed to later stages
 
     """
     source_environment = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
-    output_dir = input_dir.replace("DL1", "DL2")
-    log.info("Working on DL1 files in {}".format(input_dir))
+    log.info("Working on DL1 files in {}".format(Path(input_file).parent.as_posix()))
 
     check_and_make_dir_without_verification(output_dir)
-    log.info("Output dir {}: {}".format(particle, output_dir))
+    log.info("Output dir: {}".format(output_dir))
 
-    log_dl1_to_dl2 = {particle: {}}
+    log_dl1_to_dl2 = {}
 
-    # path to dl1 files by particle type
-    file_list = [
-        dictionary_with_dl1_paths[particle]["testing"]["test_path_and_outname_dl1"]
-    ]
+    cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" \
+          f" -o {output_dir}"
 
-    return_jobids = []
+    if config_file is not None:
+        cmd += f" -c {Path(config_file).resolve().as_posix()}"
 
-    if wait_jobid_train_pipe == "":
-        wait_jobs = wait_jobids_merge
-    elif wait_jobids_merge == "":
-        wait_jobs = wait_jobid_train_pipe
-    elif wait_jobids_merge == "" and wait_jobid_train_pipe == "":
-        wait_jobs = ""
-    else:
-        wait_jobs = ",".join([wait_jobid_train_pipe, wait_jobids_merge])
+    jobe = Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix()
+    jobo = Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix()
 
-    job_name = {
-        "electron": "dl1-2_e",
-        "gamma": "dl1-2_g",
-        "gamma-diffuse": "dl1-2_gd",
-        "proton": "dl1-2_p",
-        "gamma_off0.0deg": "dl1-2_g.0",
-        "gamma_off0.4deg": "dl1-2_g.4",
-    }
+    # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
+    batch_cmd = "sbatch --parsable -p short --mem=32G"
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
+    if wait_jobid_train_pipe is not None:
+        batch_cmd += f" --dependency=afterok:{wait_jobid_train_pipe}"
+    batch_cmd += f' -J dl1_2 -e {jobe} -o {jobo} --wrap="{cmd}"'
 
-    for file in file_list:
-
-        cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {file} -p {path_models}" \
-              f" -o {output_dir}"
-
-        if config_file is not None:
-            cmd += f" -c {config_file}"
-
-        # TODO dry-run option ?
-        # if dry_run:
-        #     print(cmd)
-
-        # Only applying dl1_to_dl2 stage to test files
-        if "testing" in file:
-            ftype = "test"
-        else:
-            ftype = "-"
-
-        jobe = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.e")
-        jobo = os.path.join(output_dir, f"dl1_dl2_{particle}_{ftype}job.o")
-
-        # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
-        batch_cmd = "sbatch --parsable -p short --mem=32G"
-        if slurm_account != "":
-            batch_cmd += f" -A {slurm_account}"
-        batch_cmd += (
-            f" --dependency=afterok:{wait_jobs} -J {job_name[particle]} -e {jobe}"
-            f' -o {jobo} --wrap="{cmd}"'
-        )
-
-        # Batch the job at La Palma
-        jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
-
-        log_dl1_to_dl2[particle][jobid_dl1_to_dl2] = batch_cmd
-        if "testing" in file:
-            log_dl1_to_dl2[particle]["dl2_test_path"] = file.replace(
-                "/DL1/", "/DL2/"
-            ).replace("dl1_", "dl2_", 1)
-        return_jobids.append(jobid_dl1_to_dl2)
+    # Batch the job at La Palma
+    jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
+    log_dl1_to_dl2.update({jobid_dl1_to_dl2: batch_cmd})
 
     if config_file is not None:
         shutil.copyfile(
-            config_file, os.path.join(output_dir, os.path.basename(config_file))
+            config_file,
+            Path(output_dir).joinpath(Path(config_file).name)
         )
 
-    return_jobids = ",".join(return_jobids)
-
-    return log_dl1_to_dl2, return_jobids
+    return log_dl1_to_dl2, jobid_dl1_to_dl2
