@@ -71,7 +71,7 @@ def test_complete_lstmcpipe_config():
     config["stages_to_be_run"] = ["r0_to_dl1"]
 
     parsed_config = complete_lstmcpipe_config(config)
-    date = datetime.today().strftime("%Y%m%d")
+    # date = datetime.today().strftime("%Y%m%d")
     # TODO test check some paths
     # TODO test check model path
     assert (
