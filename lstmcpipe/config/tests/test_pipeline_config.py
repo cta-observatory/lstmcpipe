@@ -40,7 +40,7 @@ def test_config_valid():
     valid = dummy_config.copy()
     valid["prod_type"] = "PathConfigProd5Trans80"
     valid["workflow_kind"] = "lstchain"
-    valid["stages_to_be_run"] = []
+    valid["stages_to_run"] = []
     assert config_valid(valid)
 
     invalid_workflow = valid.copy()
