@@ -46,7 +46,7 @@ slurm_config:
 ## DL1AB related settings
 
 # Set dl1ab as first step
-stages_to_be_run:
+stages_to_run:
   - dl1ab
   - merge_and_copy_dl1
   - train_pipe
