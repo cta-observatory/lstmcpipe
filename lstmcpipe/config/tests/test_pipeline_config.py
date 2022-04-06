@@ -54,7 +54,7 @@ def test_config_valid():
         config_valid(invalid_prod)
 
     missing_reference = valid.copy()
-    missing_reference["stages_to_be_run"] = ["dl1ab"]
+    missing_reference["stages_to_run"] = ["dl1ab"]
     with pytest.raises(KeyError):
         config_valid(missing_reference)
 
