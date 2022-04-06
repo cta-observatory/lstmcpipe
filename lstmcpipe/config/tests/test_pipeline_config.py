@@ -68,7 +68,7 @@ def test_complete_lstmcpipe_config():
     config = dummy_config.copy()
     config["workflow_kind"] = "lstchain"
     config["prod_type"] = "PathConfigProd5Trans80"
-    config["stages_to_be_run"] = ["r0_to_dl1"]
+    config["stages_to_run"] = ["r0_to_dl1"]
 
     parsed_config = complete_lstmcpipe_config(config)
     # date = datetime.today().strftime("%Y%m%d")
