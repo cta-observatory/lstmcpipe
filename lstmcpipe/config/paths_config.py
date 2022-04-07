@@ -89,7 +89,6 @@ class PathConfigProd5Trans80(PathConfig):
             'off0.0deg',
             'off0.4deg'
         ]
-        self.particles = self.training_particles + self.testing_particles
         self.paths = {}
         self.stages = [
             'r0_to_dl1',
