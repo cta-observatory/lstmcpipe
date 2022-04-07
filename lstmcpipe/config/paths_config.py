@@ -4,6 +4,7 @@ from datetime import date
 
 from . import base_config
 
+
 class PathConfig:
     """
     Base class to generate a Path configuration for a production
@@ -61,7 +62,6 @@ class PathConfig:
             yaml.dump(config_to_save, f)
 
 
-
 class PathConfigProd5Trans80(PathConfig):
     """
     Standard paths configuration for a prod5_trans_80 MC production
@@ -81,7 +81,7 @@ class PathConfigProd5Trans80(PathConfig):
 
     @property
     def particles(self):
-        return self.training_particles + self.testing_particles
+        return list(set(self.training_particles + self.testing_particles))
 
     def _data_level_dir(self, prod_id, data_level, particle, gamma_src_offset='off0.4deg'):
         """
