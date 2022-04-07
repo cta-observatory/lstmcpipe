@@ -75,10 +75,13 @@ class PathConfigProd5Trans80(PathConfig):
         self.training_particles = ['gamma-diffuse', 'proton']
         self.testing_particles = ['gamma', 'electron', 'proton']
         self.point_src_offsets = ['off0.0deg', 'off0.4deg']
-        self.particles = self.training_particles + self.testing_particles
         self.paths = {}
         self.stages = ['r0_to_dl1', 'train_test_split', 'merge_dl1', 'train_pipe', 'dl1_to_dl2',
                   'dl2_to_sensitivity', 'dl2_to_irfs']
+
+    @property
+    def particles(self):
+        return self.training_particles + self.testing_particles
 
     def _data_level_dir(self, prod_id, data_level, particle, gamma_src_offset='off0.4deg'):
         """
