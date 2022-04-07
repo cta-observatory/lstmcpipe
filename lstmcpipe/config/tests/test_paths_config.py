@@ -77,13 +77,13 @@ def test_PathConfigProd5Trans80_default():
     assert cfg.testing_particles == ["gamma", "electron", "proton"]
     assert cfg.zenith == "zenith_20deg"
     assert cfg.base_dir == \
-           "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{dummy_prodid}"
+           "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}"
     assert cfg.dl1_dir("gamma") == \
            "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg"
     assert cfg.dl2_dir("gamma") == \
            "/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg"
     assert cfg.dl2_output_file("gamma") == \
-           "/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/dl2_gamma_test_id_test.h5"
+           "/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/dl2_gamma_dummy_prodid_test.h5"
     assert cfg.irf_dir("gamma") == \
            "/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/dummy_prodid/gamma"
     assert cfg.merge_output_file("gamma", "train") == \
@@ -102,26 +102,30 @@ def test_PathConfigProd5Trans80_default():
            "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/test"
 
     for stg in cfg.stages:
-        assert isinstance(stg, list)
-        for path in stg:
+
+        prop = getattr(cfg, stg)
+        assert isinstance(prop, list)
+
+        for path in prop:
+
             assert isinstance(path, dict)
-            # r0_to_dl1, merge_dl1 abd dl1_to_dl2 only contains {input: , output: }
-            assert all(item in ["input", "output"] for item in path[0])
+            if stg != "dl2_to_irfs":  # TODO and merge_dl1 !!
+                assert all(item in ["input", "output"] for item in path)
+            else:
+                assert all(item in ["input", "output", "options"] for item in path)
 
             # Check if other stags contains other keys
-            # TODO
-            # assert option in merge
             if stg == "train_pipe":
-                assert isinstance(path[0]["input"], dict)
-                assert all(item in ["gamma", "proton"] for item in path[0]["input"])
+                assert isinstance(path["input"], dict)
+                assert all(item in ["gamma", "proton"] for item in path["input"])
             elif stg == "train_test_split":
-                assert isinstance(path[0]["output"], dict)
-                assert all(item in ["train", "test"] for item in path[0]["output"])
+                assert isinstance(path["output"], dict)
+                assert all(item in ["train", "test"] for item in path["output"])
             elif stg == "dl2_to_sensitivity":
-                assert isinstance(path[0]["input"], dict)
-                assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path[0]["input"])
+                assert isinstance(path["input"], dict)
+                assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path["input"])
             elif stg == "dl2_to_irfs":
-                assert "options" in path[0]
-                assert isinstance(path[0]["input"], dict)
-                assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path[0]["input"])
+                assert "options" in path
+                assert isinstance(path["input"], dict)
+                assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path["input"])
 
