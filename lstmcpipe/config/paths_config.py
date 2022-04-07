@@ -101,6 +101,10 @@ class PathConfigProd5Trans80(PathConfig):
             'dl2_to_irfs'
         ]
 
+    @property
+    def particles(self):
+        return self.training_particles + self.testing_particles
+
     def _data_level_dir(self, prod_id, data_level, particle, gamma_src_offset='off0.4deg'):
         """
 
@@ -401,17 +405,17 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
                 if particle == 'gamma':
                     for offset in self.point_src_offsets:
                         dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
-                        dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset=offset)
+                        dl1_output = self.dl1_dir(particle, gamma_src_offset=offset)
                         paths.append({
-                            'input': dl1_input,
-                            'output': dl1_output
+                          'input': dl1_input, 
+                          'output': dl1_output
                         })
                 else:
                     dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
-                    dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset='')
+                    dl1_output = self.dl1_dir(particle, gamma_src_offset='')
                     paths.append({
-                        'input': dl1_input,
-                        'output': dl1_output
+                      'input': dl1_input, 
+                      'output': dl1_output
                     })
         return paths
 
