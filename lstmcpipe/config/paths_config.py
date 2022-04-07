@@ -1,13 +1,17 @@
+#!/usr/bin/env python
+
 import os
 from ruamel.yaml import YAML
 from datetime import date
 
 from . import base_config
 
+
 class PathConfig:
     """
     Base class to generate a Path configuration for a production
     """
+
     def __init__(self, prod_id):
         self.prod_id = prod_id
         self.paths = {}
@@ -61,7 +65,6 @@ class PathConfig:
             yaml.dump(config_to_save, f)
 
 
-
 class PathConfigProd5Trans80(PathConfig):
     """
     Standard paths configuration for a prod5_trans_80 MC production
@@ -71,14 +74,32 @@ class PathConfigProd5Trans80(PathConfig):
         super().__init__(prod_id)
         self.prod_id = prod_id
         self.zenith = zenith
-        self.base_dir = '/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'
-        self.training_particles = ['gamma-diffuse', 'proton']
-        self.testing_particles = ['gamma', 'electron', 'proton']
-        self.point_src_offsets = ['off0.0deg', 'off0.4deg']
+        self.base_dir = \
+            '/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'
+        self.training_particles = [
+            'gamma-diffuse',
+            'proton'
+        ]
+        self.testing_particles = [
+            'gamma',
+            'electron',
+            'proton'
+        ]
+        self.point_src_offsets = [
+            'off0.0deg',
+            'off0.4deg'
+        ]
         self.particles = self.training_particles + self.testing_particles
         self.paths = {}
-        self.stages = ['r0_to_dl1', 'train_test_split', 'merge_dl1', 'train_pipe', 'dl1_to_dl2',
-                  'dl2_to_sensitivity', 'dl2_to_irfs']
+        self.stages = [
+            'r0_to_dl1',
+            'train_test_split',
+            'merge_dl1',
+            'train_pipe',
+            'dl1_to_dl2',
+            'dl2_to_sensitivity',
+            'dl2_to_irfs'
+        ]
 
     def _data_level_dir(self, prod_id, data_level, particle, gamma_src_offset='off0.4deg'):
         """
@@ -95,27 +116,45 @@ class PathConfigProd5Trans80(PathConfig):
         -------
         str: path to directory
         """
-        base = self.base_dir.format(data_level=data_level, particle=particle, zenith=self.zenith, prod_id=prod_id)
+        base = self.base_dir.format(
+            data_level=data_level,
+            particle=particle,
+            zenith=self.zenith,
+            prod_id=prod_id
+        )
         if particle == 'gamma':
             base = os.path.join(base, gamma_src_offset)
         return base
 
     def r0_dir(self, particle, gamma_src_offset='off0.4deg'):
         # for R0 dir there is no `prod_id` in the path
-        return os.path.realpath(self._data_level_dir(data_level='DL0', particle=particle,
-                                                     gamma_src_offset=gamma_src_offset, prod_id=''))
+        return os.path.realpath(self._data_level_dir(data_level='DL0',
+                                                     particle=particle,
+                                                     gamma_src_offset=gamma_src_offset,
+                                                     prod_id='')
+                                )
 
     def dl1_dir(self, particle, gamma_src_offset='off0.4deg'):
-        return self._data_level_dir(data_level='DL1', particle=particle, gamma_src_offset=gamma_src_offset,
+        return self._data_level_dir(data_level='DL1',
+                                    particle=particle,
+                                    gamma_src_offset=gamma_src_offset,
                                     prod_id=self.prod_id)
 
     def dl2_dir(self, particle, gamma_src_offset='off0.4deg'):
-        return self._data_level_dir(data_level='DL2', particle=particle, gamma_src_offset=gamma_src_offset,
+        return self._data_level_dir(data_level='DL2',
+                                    particle=particle,
+                                    gamma_src_offset=gamma_src_offset,
                                     prod_id=self.prod_id)
 
     def irf_dir(self, gamma_src_offset='diffuse'):
-        return os.path.join(os.path.realpath(self._data_level_dir(data_level='IRF', particle='', gamma_src_offset=gamma_src_offset,
-                                    prod_id=self.prod_id)), gamma_src_offset)
+        return os.path.join(
+            os.path.realpath(self._data_level_dir(data_level='IRF',
+                                                  particle='',
+                                                  gamma_src_offset=gamma_src_offset,
+                                                  prod_id=self.prod_id)
+                             ),
+            gamma_src_offset
+        )
 
     @property
     def r0_to_dl1(self):
@@ -133,10 +172,16 @@ class PathConfigProd5Trans80(PathConfig):
         return paths
 
     def train_dir(self, particle, gamma_src_offset='off0.4deg'):
-        return os.path.join(self.dl1_dir(particle, gamma_src_offset=gamma_src_offset), 'train')
+        return os.path.join(
+            self.dl1_dir(particle, gamma_src_offset=gamma_src_offset),
+            'train'
+        )
 
     def test_dir(self, particle, gamma_src_offset='off0.4deg'):
-        return os.path.join(self.dl1_dir(particle, gamma_src_offset=gamma_src_offset), 'test')
+        return os.path.join(
+            self.dl1_dir(particle, gamma_src_offset=gamma_src_offset),
+            'test'
+        )
 
     @property
     def train_test_split(self):
@@ -146,10 +191,20 @@ class PathConfigProd5Trans80(PathConfig):
                 for offset in self.point_src_offsets:
                     dl1 = self.dl1_dir(particle=particle, gamma_src_offset=offset)
                     paths.append(
-                        {'input': dl1, 'output': {'train': self.train_dir(particle), 'test': self.test_dir(particle)}})
+                        {'input': dl1,
+                         'output': {
+                             'train': self.train_dir(particle),
+                             'test': self.test_dir(particle)}
+                         })
             else:
                 dl1 = self.dl1_dir(particle=particle)
-                paths.append({'input': dl1, 'output': {'train': self.train_dir(particle), 'test': self.test_dir(particle)}})
+                paths.append({
+                    'input': dl1,
+                    'output': {
+                        'train': self.train_dir(particle),
+                        'test': self.test_dir(particle)
+                    }
+                })
         return paths
 
     def merge_output_file(self, particle, step, gamma_src_offset='off0.4deg'):
@@ -166,29 +221,46 @@ class PathConfigProd5Trans80(PathConfig):
                 for offset in self.point_src_offsets:
                     train = self.train_dir(particle)
                     output_file = self.merge_output_file(particle=particle, step='train', gamma_src_offset=offset)
-                    paths.append({'input': train, 'output': output_file})
+                    paths.append({
+                        'input': train,
+                        'output': output_file
+                    })
             else:
                 train = self.train_dir(particle)
                 output_file = self.merge_output_file(particle=particle, step='train')
-                paths.append({'input': train, 'output': output_file})
+                paths.append({
+                    'input': train,
+                    'output': output_file
+                })
 
         for particle in self.testing_particles:
             if particle == 'gamma':
                 for offset in self.point_src_offsets:
                     test = self.test_dir(particle)
                     output_file = self.merge_output_file(particle=particle, step='test', gamma_src_offset=offset)
-                    paths.append({'input': test, 'output': output_file})
+                    paths.append({
+                        'input': test,
+                        'output': output_file
+                    })
             else:
                 test = self.test_dir(particle)
                 output_file = self.merge_output_file(particle=particle, step='test')
-                paths.append({'input': test, 'output': output_file})
+                paths.append({
+                    'input': test,
+                    'output': output_file
+                })
 
         self.paths['merge_dl1'] = paths
         return paths
 
     def models_path(self):
-        p = self.base_dir.format(data_level='models', particle='', zenith=self.zenith, prod_id=self.prod_id).replace(
-            '/mc/', '/')
+        p = self.base_dir.format(
+            data_level='models',
+            particle='',
+            zenith=self.zenith,
+            prod_id=self.prod_id
+        ).replace('/mc/', '/')
+
         return os.path.realpath(p)
 
     @property
@@ -210,34 +282,45 @@ class PathConfigProd5Trans80(PathConfig):
                 for offset in self.point_src_offsets:
                     dl1 = self.merge_output_file(particle=particle, step='test', gamma_src_offset=offset)
                     dl2 = self.dl2_dir(particle, gamma_src_offset=offset)
-                    paths.append({'input': dl1, 'output': dl2})
+                    paths.append({
+                        'input': dl1,
+                        'output': dl2
+                    })
             else:
                 dl1 = self.merge_output_file(particle=particle, step='test')
                 dl2 = self.dl2_dir(particle)
-                paths.append({'input': dl1, 'output': dl2})
+                paths.append({
+                    'input': dl1,
+                    'output': dl2
+                })
         return paths
 
     def dl2_output_file(self, particle, gamma_src_offset='off0.4deg'):
         dl2_filename = os.path.basename(self.merge_output_file(particle=particle,
                                                                step='test',
                                                                gamma_src_offset=gamma_src_offset)).replace('dl1', 'dl2')
-        return os.path.join(self.dl2_dir(particle=particle, gamma_src_offset=gamma_src_offset),
-                            dl2_filename
-                            )
+        return os.path.join(
+            self.dl2_dir(particle=particle, gamma_src_offset=gamma_src_offset),
+            dl2_filename
+        )
 
     def sensitivity_file(self, offset):
-        return os.path.join(self.irf_dir(gamma_src_offset=offset), f'sensitivity_{self.prod_id}_{offset}.fits.gz')
+        return os.path.join(
+            self.irf_dir(gamma_src_offset=offset),
+            f'sensitivity_{self.prod_id}_{offset}.fits.gz'
+        )
 
     @property
     def dl2_to_sensitivity(self):
         paths = []
 
         def path_dict(gamma_part, offset):
-            d = {'input': {
-                'gamma_file': self.dl2_output_file(gamma_part),
-                'proton_file': self.dl2_output_file('proton'),
-                'electron_file': self.dl2_output_file('electron')
-            },
+            d = {
+                'input': {
+                    'gamma_file': self.dl2_output_file(gamma_part),
+                    'proton_file': self.dl2_output_file('proton'),
+                    'electron_file': self.dl2_output_file('electron')
+                },
                 'output': self.sensitivity_file(offset)
             }
             return d
@@ -256,11 +339,12 @@ class PathConfigProd5Trans80(PathConfig):
         paths = []
 
         def path_dict(gamma_part, offset):
-            d = {'input': {
-                'gamma_file': self.dl2_output_file(gamma_part),
-                'proton_file': self.dl2_output_file('proton'),
-                'electron_file': self.dl2_output_file('electron')
-            },
+            d = {
+                'input': {
+                    'gamma_file': self.dl2_output_file(gamma_part),
+                    'proton_file': self.dl2_output_file('proton'),
+                    'electron_file': self.dl2_output_file('electron')
+                },
                 'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
                 'options': '--point-like' if gamma_part == 'gamma' else ''
             }
@@ -280,8 +364,9 @@ class PathConfigProd5Trans80(PathConfig):
         paths = []
 
         def path_dict(offset):
-            d = {'input': self.sensitivity_file(offset),
-                 'output': self.sensitivity_file(offset).replace('fits.gz', 'png')
+            d = {
+                'input': self.sensitivity_file(offset),
+                'output': self.sensitivity_file(offset).replace('fits.gz', 'png')
             }
             return d
 
@@ -317,11 +402,17 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
                     for offset in self.point_src_offsets:
                         dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
                         dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset=offset)
-                        paths.append({'input': dl1_input, 'output': dl1_output})
+                        paths.append({
+                            'input': dl1_input,
+                            'output': dl1_output
+                        })
                 else:
                     dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
                     dl1_output = self.merge_output_file(particle=particle, step=step, gamma_src_offset='')
-                    paths.append({'input': dl1_input, 'output': dl1_output})
+                    paths.append({
+                        'input': dl1_input,
+                        'output': dl1_output
+                    })
         return paths
 
 
@@ -334,7 +425,8 @@ class PathConfigAllSky(PathConfig):
         super().__init__(prod_id)
         self.prod_id = prod_id
         self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/{pointing}"
-        self.training_dir = "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output"
+        self.training_dir = \
+            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output"
         self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output"
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.testing_particles = ['Crab']
@@ -394,8 +486,9 @@ class PathConfigAllSky(PathConfig):
             `DL0` or `DL1` or `DL2`
         particle: str
             `proton`, `gamma-diffuse`, `gamma` or `electron`
-        gamma_src_offset: str
-            for point source gammas only. `off0.0deg` or `off0.4deg`
+        prod_id:
+        pointing:
+
         Returns
         -------
         str: path to directory
@@ -442,10 +535,16 @@ class PathConfigAllSky(PathConfig):
         return paths
 
     def training_merged_dl1(self, particle):
-        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')), f'dl1_{particle}_merged.h5')
+        return os.path.join(
+            os.path.realpath(self.dl1_dir(particle, '')),
+            f'dl1_{particle}_merged.h5'
+        )
 
     def testing_merged_dl1(self, particle, pointing):
-        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')), f'dl1_{particle}_{pointing}_merged.h5')
+        return os.path.join(
+            os.path.realpath(self.dl1_dir(particle, '')),
+            f'dl1_{particle}_{pointing}_merged.h5'
+        )
 
     @property
     def merge_dl1(self):
@@ -506,10 +605,3 @@ class PathConfigAllSky(PathConfig):
     # @property
     # def dl2_to_irfs(self):
     #     # TODO?
-
-
-
-
-
-
-
