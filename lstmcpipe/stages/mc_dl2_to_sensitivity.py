@@ -43,7 +43,7 @@ def batch_dl2_to_sensitivity(
     jobid_for_check = []
     debug_log = {}
 
-    for paths in dict_paths["dl2_to_sensitivity"]:
+    for paths in dict_paths:
         job_logs, jobid = dl2_to_sensitivity(
             paths["input"],
             paths["output"],

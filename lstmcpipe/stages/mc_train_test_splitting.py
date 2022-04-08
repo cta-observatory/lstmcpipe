@@ -20,7 +20,7 @@ def batch_train_test_splitting(
 
     log.info("==== START {} ====".format("batch train_test_splitting"))
 
-    for paths in dict_paths["train_test_split"]:
+    for paths in dict_paths:
         job_logs, jobid = train_test_split(
             paths["input"],
             paths["output"],
@@ -62,10 +62,10 @@ def train_test_split(
     # create train, test output directories
     test_dir = Path(output_dirs["test"]).resolve()
     train_dir = Path(output_dirs["train"]).resolve()
-    check_empty_dir(test_dir)
-    check_empty_dir(train_dir)
     test_dir.mkdir(exist_ok=True)
     train_dir.mkdir(exist_ok=True)
+    check_empty_dir(test_dir)
+    check_empty_dir(train_dir)
 
     # tt ratio
     if "ratio" not in output_dirs:

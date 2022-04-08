@@ -82,7 +82,8 @@ class PathConfigProd5Trans80(PathConfig):
         self.testing_particles = [
             'gamma',
             'electron',
-            'proton'
+            'proton',
+            'gamma-diffuse',
         ]
         self.point_src_offsets = [
             'off0.0deg',
@@ -267,13 +268,13 @@ class PathConfigProd5Trans80(PathConfig):
 
     @property
     def train_pipe(self):
-        paths = [{
+        paths = {
             'input': {
                 'gamma': self.merge_output_file('gamma-diffuse', 'train'),
                 'proton': self.merge_output_file('proton', 'train')
             },
             'output': self.models_path()
-        }]
+        }
         return paths
 
     @property
@@ -286,6 +287,7 @@ class PathConfigProd5Trans80(PathConfig):
                     dl2 = self.dl2_dir(particle, gamma_src_offset=offset)
                     paths.append({
                         'input': dl1,
+                        'path_model': self.models_path(),
                         'output': dl2
                     })
             else:
@@ -293,6 +295,7 @@ class PathConfigProd5Trans80(PathConfig):
                 dl2 = self.dl2_dir(particle)
                 paths.append({
                     'input': dl1,
+                    'path_model': self.models_path(),
                     'output': dl2
                 })
         return paths
@@ -581,13 +584,13 @@ class PathConfigAllSky(PathConfig):
 
     @property
     def train_pipe(self):
-        paths = [{
+        paths = {
             'input': {
                 'gamma': self.training_merged_dl1('GammaDiffuse'),
                 'proton': self.training_merged_dl1('Protons'),
             },
             'output': self.models_path()
-        }]
+        }
         return paths
 
     @property
@@ -597,6 +600,7 @@ class PathConfigAllSky(PathConfig):
             for pointing in self.testing_pointings:
                 paths.append({
                     'input': self.testing_merged_dl1(particle, pointing),
+                    'path_model': self.models_path(),
                     'output': self.dl2_output_file(particle, pointing)
                 })
         return paths

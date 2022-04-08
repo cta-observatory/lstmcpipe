@@ -49,12 +49,12 @@ def batch_dl1_to_dl2(
 
     log.info("==== START {} ==== \n".format("batch dl1_to_dl2_workflow"))
 
-    for paths in dict_paths["dl1_to_dl2"]:
+    for paths in dict_paths:
 
         job_logs, jobid = dl1_to_dl2(
             paths["input"],
             paths["output"],
-            path_models=dict_paths["train"]["output"],
+            path_models=paths["path_model"],
             config_file=config_file,
             wait_jobid_train_pipe=jobid_from_training,
             batch_configuration=batch_config,
