@@ -61,7 +61,6 @@ class PathConfig:
 
         with open(filename, 'w') as f:
             yaml = YAML()
-            yaml.indent(mapping=2, offset=2)
             yaml.dump(config_to_save, f)
 
 
