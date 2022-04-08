@@ -29,7 +29,6 @@ for aut in metadata["author"]:
 version = metadata["version"]
 description = metadata["description"]
 
-
 scripts_list = find_scripts("lstmcpipe", "onsite_")
 
 entry_points = {
@@ -78,5 +77,6 @@ setup(
     ],
     scripts=scripts_list,
     entry_points=entry_points,
+    include_package_data=True,
     data_files=[('lstmcpipe', ['lstmcpipe/base_config_lstmcpipe.yaml'])],
 )
