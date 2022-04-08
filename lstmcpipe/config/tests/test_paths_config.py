@@ -3,6 +3,7 @@ import tempfile
 from ruamel.yaml import YAML
 
 from lstmcpipe.config import paths_config
+from lstmcpipe.config import pipeline_config
 
 default_stages = [
     "r0_to_dl1",
@@ -54,6 +55,7 @@ def test_path_config_save():
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
         YAML().load(open(f.name).read())
+        pipeline_config.load_config(f.name)
 
 
 def test_PathConfigProd5Trans80():
