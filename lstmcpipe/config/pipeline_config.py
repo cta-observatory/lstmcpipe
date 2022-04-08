@@ -84,7 +84,6 @@ def config_valid(loaded_config):
     # Allowed options
     compulsory_entries = [
         "workflow_kind",
-        "prod_type",
         "source_environment",
         "stages_to_run",
         "stages",
@@ -112,9 +111,6 @@ def config_valid(loaded_config):
             f"Please select an allowed `workflow_kind`: {allowed_workflows}"
         )
 
-    prod_type = loaded_config["prod_type"]
-    if prod_type not in allowed_prods:
-        raise Exception(f"Please selected an allowed production type: {allowed_prods}.")
 
     stages_to_be_run = loaded_config["stages_to_run"]
     if "dl1ab" in stages_to_be_run:
@@ -156,9 +152,8 @@ def complete_lstmcpipe_config(loaded_config):
     """
     config = loaded_config.copy()
 
-    sufix_prod_id = loaded_config.get("prod_id", "v00")
+    suffix_prod_id = loaded_config.get("prod_id", "v00")
     workflow_kind = loaded_config["workflow_kind"]
-    prod_type = loaded_config["prod_type"]
 
     # TODO ??
     # # to locate the source dl1 files
@@ -196,7 +191,7 @@ def complete_lstmcpipe_config(loaded_config):
         "PathConfigAllSky": "prod_all_sky",
     }
 
-    suffix_id = "_{}_{}".format(all_mc_prods[prod_type], sufix_prod_id)
+    suffix_id = "_{}".format(suffix_prod_id)
     config["prod_id"] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly
