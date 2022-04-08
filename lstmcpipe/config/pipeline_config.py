@@ -6,6 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+    
 
 def load_config(config_path):
     """
@@ -37,20 +38,6 @@ def load_config(config_path):
     log.info(f'\nPROD_ID to be used: {config["prod_id"]}')
     log.info("\nStages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
 
-    if "merge_dl1" in config["stages_to_run"]:
-        log.info("Merging options:" f"\n - No-image argument: {config['merge_dl1']['merging_no_image']}")
-
-    if "r0_to_dl1" in config["stages_to_run"]:
-        log.info(
-            "Simtel DL0 files will be get from:" + "\n - ".join([i["input"] for i in config["r0_to_dl1"]])
-        )
-    elif "dl1ab" in config["stages_to_run"]:
-        log.info(f'\nApplying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
-        log.info(
-            "\nDL1 .h5 files will be get from:" + "\n - ".join([i["input"] for i in config["dl1ab"]])
-        )
-    else:
-        pass
 
     log.info(
         "Slurm configuration:"

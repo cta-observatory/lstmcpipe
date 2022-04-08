@@ -183,8 +183,9 @@ def r0_to_dl1(
 
     log.info("{} raw R0 files".format(len(raw_files_list)))
 
+    output_dir = Path(output_dir)
     job_logs_dir = output_dir.joinpath("job_logs_r0dl1")
-    Path(job_logs_dir).mkdir(exist_ok=True)
+    Path(job_logs_dir).mkdir(exist_ok=True, parents=True)
 
     log.info("DL1 DATA DIR: {}".format(output_dir))
 
