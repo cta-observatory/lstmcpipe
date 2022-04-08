@@ -77,12 +77,7 @@ def config_valid(loaded_config):
         # TODO dl1_reference_id ?
     ]
     allowed_workflows = ["hiperta", "lstchain", "ctapipe"]
-    allowed_prods = [
-        "PathConfigProd5",
-        "PathConfigProd5Trans80",
-        "PathConfigProd5Trans80Dl1ab",
-        "PathConfigAllSky",
-    ]
+
 
     # Check allowed cases
     for item in compulsory_entries:
@@ -170,13 +165,6 @@ def complete_lstmcpipe_config(loaded_config):
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
-
-    all_mc_prods = {
-        "PathConfigProd5": "prod5",
-        "PathConfigProd5Trans80": "prod5_trans_80",
-        "PathConfigProd5Trans80Dl1ab": "prod5_trans_80",
-        "PathConfigAllSky": "prod_all_sky",
-    }
 
     suffix_id = "_{}".format(suffix_prod_id)
     config["prod_id"] = base_prod_id + suffix_id
