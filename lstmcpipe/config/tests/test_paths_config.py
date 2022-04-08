@@ -1,5 +1,6 @@
 import pytest
 import tempfile
+from ruamel.yaml import YAML
 
 from lstmcpipe.config import paths_config
 
@@ -52,6 +53,7 @@ def test_path_config_save():
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
+        YAML().load(open(f.name).read())
 
 
 def test_PathConfigProd5Trans80():
