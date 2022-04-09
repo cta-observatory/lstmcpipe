@@ -177,9 +177,9 @@ def main():
 
         update_scancel_file(scancel_file, jobs_from_dl1_processing)
         if r0_to_dl1:
-            all_job_ids.update({"r0_dl1": all_job_ids})
+            all_job_ids.update({"r0_dl1": jobs_from_dl1_processing})
         else:
-            all_job_ids.update({"dl1ab": all_job_ids})
+            all_job_ids.update({"dl1ab": jobs_from_dl1_processing})
     else:
         jobs_from_dl1_processing = ""
 
@@ -232,15 +232,15 @@ def main():
         all_job_ids.update({"train_pipe": job_from_train_pipe})
 
         # Plot the RF feature's importance
-        batch_plot_rf_features(
+        job_from_plot_rf_feat = batch_plot_rf_features(
             lstmcpipe_config['stages']['train_pipe'],
             Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
             logs=logs_files,
         )
-        all_job_ids.update({"plot_rf_feat": batch_plot_rf_features})
-        # TODO check if we want to update jobid from `batch_plot_rf_features` into scancel
+        update_scancel_file(scancel_file, job_from_plot_rf_feat)
+        all_job_ids.update({"plot_rf_feat": job_from_plot_rf_feat})
 
     else:
         job_from_train_pipe = ""

@@ -97,6 +97,11 @@ def batch_plot_rf_features(
         Single jobid from training stage.
     logs: dict
         Dictionary with logs files
+
+    Returns
+    -------
+    jobid : str
+        jobid of batched stage
     """
     log_rf_feat = {}
     log_debug = {}
@@ -131,6 +136,8 @@ def batch_plot_rf_features(
 
     log.info(" Random Forest importance's plot will be saved at: {}".format(models_dir))
     log.info("==== END {} ====".format("batch plot RF features importance"))
+
+    return jobid
 
 
 def train_pipe(
