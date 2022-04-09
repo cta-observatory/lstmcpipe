@@ -183,7 +183,11 @@ def r0_to_dl1(
 
     log.info("{} raw R0 files".format(len(raw_files_list)))
 
+    # If file exists, means that prod is being re-run
     output_dir = Path(output_dir)
+    if any(output_dir.iterdir()):
+        shutil.rmtree(output_dir)
+
     job_logs_dir = output_dir.joinpath("job_logs_r0dl1")
     Path(job_logs_dir).mkdir(exist_ok=True, parents=True)
 
@@ -356,11 +360,6 @@ def submit_dl1_jobs(
     number_of_sublists = len(file_list) // dl1_files_per_batched_job + int(
         len(file_list) % dl1_files_per_batched_job > 0
     )
-
-    if any(job_logs_dir.iterdir()):
-        for file in job_logs_dir.iterdir():
-            if file.is_file() and file.name.endswith(".sublist"):
-                file.unlink()
 
     for i in range(number_of_sublists):
         output_file = job_logs_dir.joinpath("{}_{}.sublist".format(filelist_name, i)).resolve().as_posix()
