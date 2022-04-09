@@ -356,6 +356,12 @@ def submit_dl1_jobs(
     number_of_sublists = len(file_list) // dl1_files_per_batched_job + int(
         len(file_list) % dl1_files_per_batched_job > 0
     )
+
+    if any(job_logs_dir.iterdir()):
+        for file in job_logs_dir.iterdir():
+            if file.is_file() and file.name.endswith(".sublist"):
+                file.unlink()
+
     for i in range(number_of_sublists):
         output_file = job_logs_dir.joinpath("{}_{}.sublist".format(filelist_name, i)).resolve().as_posix()
         with open(output_file, "w+") as out:
