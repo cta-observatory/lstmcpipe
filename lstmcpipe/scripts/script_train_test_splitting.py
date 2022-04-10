@@ -37,7 +37,7 @@ parser.add_argument(
 parser.add_argument(
     "--ratio",
     "-r",
-    type=str,
+    type=float,
     dest="ratio",
     help="Train-test splitting ratio",
     default=0.5
@@ -94,7 +94,7 @@ def main():
 
     train, test = train_test_split(file_list,
                                    random_state=42,
-                                   test_size=int(args.ratio),
+                                   test_size=float(args.ratio),
                                    shuffle=True
                                    )
 
