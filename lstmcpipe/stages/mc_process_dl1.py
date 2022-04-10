@@ -185,7 +185,7 @@ def r0_to_dl1(
 
     # If file exists, means that prod is being re-run
     output_dir = Path(output_dir)
-    if any(output_dir.iterdir()):
+    if output_dir.exists() and any(output_dir.iterdir()):
         shutil.rmtree(output_dir)
 
     job_logs_dir = output_dir.joinpath("job_logs_r0dl1")
