@@ -114,27 +114,35 @@ def batch_plot_rf_features(
     """
     log_rf_feat = {}
     log_debug = {}
+    all_jobs_plot_rf_feat = []
+
+    log.info("==== START {} ====".format("batch plot RF features importance"))
 
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
-    log.info("==== START {} ====".format("batch plot RF features importance"))
-    jobe = Path(models_dir).joinpath("job_plot_rf_feat_importance.e").resolve().as_posix()
-    jobo = Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance.o").resolve().as_posix()
+    for path in dict_paths:
+        models_dir = path["output"]
 
-    batch_cmd = f"lstmcpipe_plot_models_importance {models_dir} -cf {config_file}"
+        jobe = Path(models_dir).joinpath("job_plot_rf_feat_importance.e").resolve().as_posix()
+        jobo = Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance.o").resolve().as_posix()
 
-    slurm_cmd = "sbatch --parsable --mem=16G "
-    if slurm_account != "":
-        slurm_cmd += f" -A {slurm_account}"
-    slurm_cmd += (
-        f" --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} "
-        f' -J RF_importance --wrap="export MPLBACKEND=Agg; {source_env} {batch_cmd}"'
-    )
-    jobid = os.popen(slurm_cmd).read().strip("\n")
+        batch_cmd = f"lstmcpipe_plot_models_importance {models_dir} -cf {config_file}"
 
-    log_rf_feat[jobid] = slurm_cmd
-    log_debug[jobid] = "Single job_id to plot RF feature s importance"
+        slurm_cmd = "sbatch --parsable --mem=16G "
+        if slurm_account != "":
+            slurm_cmd += f" -A {slurm_account}"
+        slurm_cmd += (
+            f" --dependency=afterok:{train_jobid} -e {jobe} -o {jobo} "
+            f' -J RF_importance --wrap="export MPLBACKEND=Agg; {source_env} {batch_cmd}"'
+        )
+        jobid = os.popen(slurm_cmd).read().strip("\n")
+
+        log_rf_feat[jobid] = slurm_cmd
+        log_debug[jobid] = "Single job_id to plot RF feature s importance"
+        all_jobs_plot_rf_feat.append(jobid)
+
+    all_jobs_plot_rf_feat = ','.join(all_jobs_plot_rf_feat)
 
     save_log_to_file(log_rf_feat, logs["log_file"],
                      workflow_step="plot_RF_features_importance")
@@ -144,7 +152,7 @@ def batch_plot_rf_features(
     log.info(" Random Forest importance's plot will be saved at: {}".format(models_dir))
     log.info("==== END {} ====".format("batch plot RF features importance"))
 
-    return jobid
+    return all_jobs_plot_rf_feat
 
 
 def train_pipe(
