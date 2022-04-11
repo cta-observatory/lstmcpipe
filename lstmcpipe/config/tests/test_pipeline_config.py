@@ -48,11 +48,6 @@ def test_config_valid():
     with pytest.raises(Exception):
         config_valid(invalid_workflow)
 
-    invalid_prod = valid.copy()
-    invalid_prod["prod_type"] = "prod42"
-    with pytest.raises(Exception):
-        config_valid(invalid_prod)
-
     missing_reference = valid.copy()
     missing_reference["stages_to_run"] = ["dl1ab"]
     with pytest.raises(KeyError):
