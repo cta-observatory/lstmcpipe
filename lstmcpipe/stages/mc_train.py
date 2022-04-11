@@ -115,8 +115,6 @@ def batch_plot_rf_features(
     log_rf_feat = {}
     log_debug = {}
 
-    models_dir = dict_paths["output"]
-
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
