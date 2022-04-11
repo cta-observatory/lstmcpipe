@@ -101,19 +101,15 @@ def test_PathConfigProd5Trans80():
 
     for stg in cfg.stages:
         prop = getattr(cfg, stg)
+        assert isinstance(prop, list)
 
-        if stg == "train_pipe":
-            assert isinstance(prop, dict)
-            assert all(item in ["input", "output"] for item in prop)
-            assert all(item in ["gamma", "proton"] for item in prop["input"])
-        else:
-            assert isinstance(prop, list)
-            for path in prop:
-                assert isinstance(path, dict)
-            assert 'input' in path
-            assert 'output' in path
+        for path in prop:
+            assert isinstance(path, dict)
 
-            if stg == "train_test_split":
+            if stg == "train_pipe":
+                assert isinstance(path["input"], dict)
+                assert all(item in ["gamma", "proton"] for item in path["input"])
+            elif stg == "train_test_split":
                 assert isinstance(path["output"], dict)
                 assert all(item in ["train", "test"] for item in path["output"])
             elif stg == 'dl1_to_dl2':

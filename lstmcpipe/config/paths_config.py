@@ -258,13 +258,13 @@ class PathConfigProd5Trans80(PathConfig):
 
     @property
     def train_pipe(self):
-        paths = {
+        paths = [{
             'input': {
                 'gamma': self.merge_output_file('gamma-diffuse', 'train'),
                 'proton': self.merge_output_file('proton', 'train')
             },
             'output': self.models_path()
-        }
+        }]
         return paths
 
     @property
@@ -571,13 +571,13 @@ class PathConfigAllSky(PathConfig):
 
     @property
     def train_pipe(self):
-        paths = {
+        paths = [{
             'input': {
                 'gamma': self.training_merged_dl1('GammaDiffuse'),
                 'proton': self.training_merged_dl1('Protons'),
             },
             'output': self.models_path()
-        }
+        }]
         return paths
 
     @property

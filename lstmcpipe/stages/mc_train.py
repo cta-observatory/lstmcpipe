@@ -43,30 +43,39 @@ def batch_train_pipe(
         string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
     """
-    debug_log = {}
+    log_train = {}
+    debug_train = {}
+    jobid_for_dl1_to_dl2 = []
 
     log.info("==== START {} ====".format("batch mc_train_workflow"))
 
-    gamma_dl1_train_file = dict_paths["input"]["gamma"]
-    proton_dl1_train_file = dict_paths["input"]["proton"]
-    models_dir = dict_paths["output"]
+    for paths in dict_paths:
 
-    log_train, jobid_for_dl1_to_dl2 = train_pipe(
-        gamma_dl1_train_file,
-        proton_dl1_train_file,
-        models_dir,
-        config_file=config_file,
-        batch_configuration=batch_config,
-        wait_jobs_dl1=jobids_from_merge,
-    )
+        gamma_dl1_train_file = paths["input"]["gamma"]
+        proton_dl1_train_file = paths["input"]["proton"]
+        models_dir = paths["output"]
 
-    debug_log[jobid_for_dl1_to_dl2] = (
-        f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
-        f"_and_copy jobids"
-    )
+        job_logs, jobid = train_pipe(
+            gamma_dl1_train_file,
+            proton_dl1_train_file,
+            models_dir,
+            config_file=config_file,
+            batch_configuration=batch_config,
+            wait_jobs_dl1=jobids_from_merge,
+        )
+
+        log_train.update(job_logs)
+        jobid_for_dl1_to_dl2.append(jobid)
+
+        debug_train[jobid_for_dl1_to_dl2] = (
+            f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
+            f"_and_copy jobids"
+        )
+
+    jobid_for_dl1_to_dl2 = ",".join(jobid_for_dl1_to_dl2)
 
     save_log_to_file(log_train, logs["log_file"], workflow_step="train_pipe")
-    save_log_to_file(debug_log, logs["debug_file"], workflow_step="train_pipe")
+    save_log_to_file(debug_train, logs["debug_file"], workflow_step="train_pipe")
 
     log.info("==== END {} ====".format("batch mc_train_workflow"))
 
