@@ -67,7 +67,7 @@ def batch_train_pipe(
         log_train.update(job_logs)
         jobid_for_dl1_to_dl2.append(jobid)
 
-        debug_train[jobid_for_dl1_to_dl2] = (
+        debug_train[jobid] = (
             f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
             f"_and_copy jobids"
         )
