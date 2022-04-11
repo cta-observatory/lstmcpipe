@@ -48,7 +48,7 @@ class PathConfig:
         if self.paths == {}:
             raise ValueError("Empty paths, generate first")
 
-        config_to_save['prod_type'] = {self.__class__.__name__}
+        config_to_save['prod_type'] = self.__class__.__name__
         config_to_save['prod_id'] = self.prod_id
         config_to_save['stages_to_run'] = self.stages
         config_to_save['stages'] = self.paths
