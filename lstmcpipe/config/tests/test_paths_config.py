@@ -102,12 +102,11 @@ def test_PathConfigProd5Trans80():
     for stg in cfg.stages:
 
         prop = getattr(cfg, stg)
-        # assert isinstance(prop, list) or isinstance(prop, dict)
+        assert isinstance(prop, list) or isinstance(prop, dict)
 
         for path in prop:
-
-            # assert isinstance(path, dict)
-            # assert all(item in ["input", "output", "options"] for item in path)
+            if stg != "train_pipe":
+                assert all(item in ["input", "output"] for item in path)
 
             # Check if other stags contains other keys
             if stg == "train_pipe":
