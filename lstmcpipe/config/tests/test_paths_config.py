@@ -64,7 +64,7 @@ def test_PathConfigProd5Trans80():
     from lstmcpipe.config.paths_config import PathConfigProd5Trans80
     prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4'
     cfg = PathConfigProd5Trans80(prod_id)
-    paths = cfg.generate()
+    cfg.generate()
     assert cfg.prod_id == prod_id
 
     assert "/20200629_prod5_trans_80/" in cfg.base_dir
