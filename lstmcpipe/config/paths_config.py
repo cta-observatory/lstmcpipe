@@ -48,6 +48,7 @@ class PathConfig:
         if self.paths == {}:
             raise ValueError("Empty paths, generate first")
 
+        config_to_save['prod_type'] = self.__class__.__name__
         config_to_save['prod_id'] = self.prod_id
         config_to_save['stages_to_run'] = self.stages
         config_to_save['stages'] = self.paths
@@ -75,19 +76,9 @@ class PathConfigProd5Trans80(PathConfig):
         self.zenith = zenith
         self.base_dir = \
             '/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'
-        self.training_particles = [
-            'gamma-diffuse',
-            'proton'
-        ]
-        self.testing_particles = [
-            'gamma',
-            'electron',
-            'proton'
-        ]
-        self.point_src_offsets = [
-            'off0.0deg',
-            'off0.4deg'
-        ]
+        self.training_particles = ['gamma-diffuse', 'proton']
+        self.testing_particles = ['gamma', 'electron', 'proton', 'gamma-diffuse']
+        self.point_src_offsets = ['off0.0deg', 'off0.4deg']
         self.paths = {}
         self.stages = [
             'r0_to_dl1',
@@ -96,7 +87,7 @@ class PathConfigProd5Trans80(PathConfig):
             'train_pipe',
             'dl1_to_dl2',
             'dl2_to_sensitivity',
-            'dl2_to_irfs'
+            'dl2_to_irfs',
         ]
 
     @property
@@ -286,6 +277,7 @@ class PathConfigProd5Trans80(PathConfig):
                     dl2 = self.dl2_dir(particle, gamma_src_offset=offset)
                     paths.append({
                         'input': dl1,
+                        'path_model': self.models_path(),
                         'output': dl2
                     })
             else:
@@ -293,6 +285,7 @@ class PathConfigProd5Trans80(PathConfig):
                 dl2 = self.dl2_dir(particle)
                 paths.append({
                     'input': dl1,
+                    'path_model': self.models_path(),
                     'output': dl2
                 })
         return paths
@@ -327,12 +320,9 @@ class PathConfigProd5Trans80(PathConfig):
             }
             return d
 
-        for gamma_part in ['gamma-diffuse', 'gamma']:
-            if gamma_part == 'gamma-diffuse':
-                paths.append(path_dict(gamma_part, 'diffuse'))
-            else:
-                for offset in self.point_src_offsets:
-                    paths.append(path_dict(gamma_part, offset))
+        # sensitivity can be computed only on point source gammas at the moment
+        for offset in self.point_src_offsets:
+            paths.append(path_dict('gamma', offset))
 
         return paths
 
@@ -597,6 +587,7 @@ class PathConfigAllSky(PathConfig):
             for pointing in self.testing_pointings:
                 paths.append({
                     'input': self.testing_merged_dl1(particle, pointing),
+                    'path_model': self.models_path(),
                     'output': self.dl2_output_file(particle, pointing)
                 })
         return paths

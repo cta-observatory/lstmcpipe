@@ -37,7 +37,7 @@ parser.add_argument(
 parser.add_argument(
     "--ratio",
     "-r",
-    type=int,
+    type=float,
     dest="ratio",
     help="Train-test splitting ratio",
     default=0.5
@@ -89,11 +89,12 @@ def move_files(filelist, outdir):
 def main():
     args = parser.parse_args()
 
-    file_list = [file.resolve().as_posix() for file in Path(args.input_dir).iterdir() if file.is_file()]
+    file_list = [file.resolve().as_posix() for file in Path(args.input_dir).iterdir()
+                 if file.is_file() and file.name.endswith(".h5")]
 
     train, test = train_test_split(file_list,
                                    random_state=42,
-                                   test_size=int(args.ratio),
+                                   test_size=float(args.ratio),
                                    shuffle=True
                                    )
 

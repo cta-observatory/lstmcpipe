@@ -167,7 +167,7 @@ def main():
             dl1_config = Path(args.config_file_ctapipe).resolve().as_posix()
 
         jobs_from_dl1_processing = batch_process_dl1(
-            lstmcpipe_config,
+            lstmcpipe_config['stages'],
             conf_file=dl1_config,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -177,16 +177,16 @@ def main():
 
         update_scancel_file(scancel_file, jobs_from_dl1_processing)
         if r0_to_dl1:
-            all_job_ids.update({"r0_dl1": all_job_ids})
+            all_job_ids.update({"r0_dl1": jobs_from_dl1_processing})
         else:
-            all_job_ids.update({"dl1ab": all_job_ids})
+            all_job_ids.update({"dl1ab": jobs_from_dl1_processing})
     else:
         jobs_from_dl1_processing = ""
 
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
         jobs_from_splitting = batch_train_test_splitting(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']['train_test_split'],
             jobids_from_r0dl1=jobs_from_dl1_processing,
             batch_config=batch_config,
             logs=logs_files,
@@ -205,7 +205,7 @@ def main():
 
     if "merge_dl1" in stages_to_run:
         jobs_from_merge = batch_merge_dl1(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']["merge_dl1"],
             jobid_from_splitting=merge_wait_jobs,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -221,7 +221,7 @@ def main():
     if "train_pipe" in stages_to_run:
 
         job_from_train_pipe = batch_train_pipe(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']['train_pipe'],
             jobs_from_merge,
             config_file=Path(args.config_file_lst).resolve().as_posix(),
             batch_config=batch_config,
@@ -232,15 +232,15 @@ def main():
         all_job_ids.update({"train_pipe": job_from_train_pipe})
 
         # Plot the RF feature's importance
-        batch_plot_rf_features(
-            lstmcpipe_config,
+        job_from_plot_rf_feat = batch_plot_rf_features(
+            lstmcpipe_config['stages']['train_pipe'],
             Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
             logs=logs_files,
         )
-        all_job_ids.update({"plot_rf_feat": batch_plot_rf_features})
-        # TODO check if we want to update jobid from `batch_plot_rf_features` into scancel
+        update_scancel_file(scancel_file, job_from_plot_rf_feat)
+        all_job_ids.update({"plot_rf_feat": job_from_plot_rf_feat})
 
     else:
         job_from_train_pipe = ""
@@ -249,7 +249,7 @@ def main():
     if "dl1_to_dl2" in stages_to_run:
 
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']['dl1_to_dl2'],
             Path(args.config_file_lst).resolve().as_posix(),
             job_from_train_pipe,  # Single jobid from train
             batch_config=batch_config,
@@ -264,7 +264,7 @@ def main():
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         jobs_from_dl2_irf = batch_dl2_to_irfs(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']['dl2_to_irfs'],
             Path(args.config_file_lst).resolve().as_posix(),
             jobs_from_dl1_dl2,
             batch_config=batch_config,
@@ -277,7 +277,7 @@ def main():
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
         jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
-            lstmcpipe_config,
+            lstmcpipe_config['stages']['dl2_to_sensitivity'],
             jobs_from_dl1_dl2,
             batch_config=batch_config,
             logs=logs_files,

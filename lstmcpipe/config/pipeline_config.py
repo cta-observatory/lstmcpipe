@@ -6,6 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+    
 
 def load_config(config_path):
     """
@@ -37,20 +38,6 @@ def load_config(config_path):
     log.info(f'\nPROD_ID to be used: {config["prod_id"]}')
     log.info("\nStages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
 
-    if "merge_dl1" in config["stages_to_run"]:
-        log.info("Merging options:" f"\n - No-image argument: {config['merge_dl1']['merging_no_image']}")
-
-    if "r0_to_dl1" in config["stages_to_run"]:
-        log.info(
-            "Simtel DL0 files will be get from:" + "\n - ".join([i["input"] for i in config["r0_to_dl1"]])
-        )
-    elif "dl1ab" in config["stages_to_run"]:
-        log.info(f'\nApplying dl1ab processing to MC prod: {config["dl1_reference_id"]}')
-        log.info(
-            "\nDL1 .h5 files will be get from:" + "\n - ".join([i["input"] for i in config["dl1ab"]])
-        )
-    else:
-        pass
 
     log.info(
         "Slurm configuration:"
@@ -84,19 +71,13 @@ def config_valid(loaded_config):
     # Allowed options
     compulsory_entries = [
         "workflow_kind",
-        "prod_type",
         "source_environment",
         "stages_to_run",
         "stages",
         # TODO dl1_reference_id ?
     ]
     allowed_workflows = ["hiperta", "lstchain", "ctapipe"]
-    allowed_prods = [
-        "PathConfigProd5",
-        "PathConfigProd5Trans80",
-        "PathConfigProd5Trans80Dl1ab",
-        "PathConfigAllSky",
-    ]
+
 
     # Check allowed cases
     for item in compulsory_entries:
@@ -107,14 +88,12 @@ def config_valid(loaded_config):
             )
 
     workflow_kind = loaded_config["workflow_kind"]
+
     if workflow_kind not in allowed_workflows:
         raise Exception(
             f"Please select an allowed `workflow_kind`: {allowed_workflows}"
         )
 
-    prod_type = loaded_config["prod_type"]
-    if prod_type not in allowed_prods:
-        raise Exception(f"Please selected an allowed production type: {allowed_prods}.")
 
     stages_to_be_run = loaded_config["stages_to_run"]
     if "dl1ab" in stages_to_be_run:
@@ -156,9 +135,8 @@ def complete_lstmcpipe_config(loaded_config):
     """
     config = loaded_config.copy()
 
-    sufix_prod_id = loaded_config.get("prod_id", "v00")
+    suffix_prod_id = loaded_config.get("prod_id", "v00")
     workflow_kind = loaded_config["workflow_kind"]
-    prod_type = loaded_config["prod_type"]
 
     # TODO ??
     # # to locate the source dl1 files
@@ -188,15 +166,8 @@ def complete_lstmcpipe_config(loaded_config):
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
-
-    all_mc_prods = {
-        "PathConfigProd5": "prod5",
-        "PathConfigProd5Trans80": "prod5_trans_80",
-        "PathConfigProd5Trans80Dl1ab": "prod5_trans_80",
-        "PathConfigAllSky": "prod_all_sky",
-    }
-
-    suffix_id = "_{}_{}".format(all_mc_prods[prod_type], sufix_prod_id)
+    prod_type = f"_{loaded_config['prod_type']}" if 'prod_type' in loaded_config else ''
+    suffix_id = "_{}_{}".format(prod_type, suffix_prod_id)
     config["prod_id"] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly

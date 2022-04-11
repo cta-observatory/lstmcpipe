@@ -50,12 +50,12 @@ def batch_dl2_to_irfs(
     jobid_for_check = []
     debug_log = {}
 
-    for paths in dict_paths["dl2_to_irfs"]:
+    for paths in dict_paths:
 
         job_logs, jobid = dl2_to_irfs(
-            paths["gamma_file"],
-            paths["electron_file"],
-            paths["proton_file"],
+            paths["input"]["gamma_file"],
+            paths["input"]["electron_file"],
+            paths["input"]["proton_file"],
             paths["output"],
             config_file=config_file,
             irf_point_like=paths["options"],
@@ -84,7 +84,7 @@ def dl2_to_irfs(
     gamma_file,
     electron_file,
     proton_file,
-    output_dir,
+    outfile,
     config_file,
     irf_point_like,
     batch_configuration,
@@ -119,6 +119,8 @@ def dl2_to_irfs(
     """
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
+    
+    output_dir = Path(outfile).parent
 
     log_dl2_to_irfs = {}
 
@@ -126,7 +128,7 @@ def dl2_to_irfs(
 
     cmd = (
         f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -p {proton_file} -e {electron_file}"
-        f" -o {output_dir}"
+        f" -o {outfile}"
     )
     if config_file:
         cmd += f" --config={config_file}"

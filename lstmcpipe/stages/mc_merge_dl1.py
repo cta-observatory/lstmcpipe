@@ -38,7 +38,7 @@ def batch_merge_dl1(
     Returns
     -------
     jobids_for_train : str
-         Comma-sepparated str with all the job-ids to be passed to the next
+         Comma-separated str with all the job-ids to be passed to the next
          stage of the workflow (as a slurm dependency)
 
     """
@@ -55,13 +55,13 @@ def batch_merge_dl1(
 #        merge_flag = smart_merge
 #    log.debug("Merge flag set: {}".format(merge_flag))
 
-    for particle in dict_paths["merge_dl1"]:
+    for particle in dict_paths:
         job_logs, jobid_debug = merge_dl1(
             particle["input"],
             particle["output"],
             merging_options={
-                "no_image": dict_paths["merge_dl1"].get("no_image", True),
-                "smart": dict_paths["merge_dl1"].get("smart", False),
+                "no_image": particle.get("no_image", True),
+                "smart": particle.get("smart", False),
             },
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,

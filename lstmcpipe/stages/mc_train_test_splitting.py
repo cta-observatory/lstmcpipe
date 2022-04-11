@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import shutil
 import logging
 from pathlib import Path
 from lstmcpipe.workflow_management import save_log_to_file
@@ -20,7 +21,7 @@ def batch_train_test_splitting(
 
     log.info("==== START {} ====".format("batch train_test_splitting"))
 
-    for paths in dict_paths["train_test_split"]:
+    for paths in dict_paths:
         job_logs, jobid = train_test_split(
             paths["input"],
             paths["output"],
@@ -62,10 +63,11 @@ def train_test_split(
     # create train, test output directories
     test_dir = Path(output_dirs["test"]).resolve()
     train_dir = Path(output_dirs["train"]).resolve()
-    check_empty_dir(test_dir)
-    check_empty_dir(train_dir)
-    test_dir.mkdir(exist_ok=True)
-    train_dir.mkdir(exist_ok=True)
+    for direct in [test_dir, train_dir]:
+        if direct.exists() and any(direct.iterdir()):
+            shutil.rmtree(direct)
+    train_dir.mkdir(exist_ok=True, parents=True)
+    test_dir.mkdir(exist_ok=True, parents=True)
 
     # tt ratio
     if "ratio" not in output_dirs:
