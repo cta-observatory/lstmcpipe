@@ -100,20 +100,24 @@ def test_PathConfigProd5Trans80():
            f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/test"
 
     for stg in cfg.stages:
-
         prop = getattr(cfg, stg)
-        assert isinstance(prop, list) or isinstance(prop, dict)
 
-        for path in prop:
-            if stg != "train_pipe":
-                assert all(item in ["input", "output"] for item in path)
+        if stg == "train_pipe":
+            assert isinstance(prop, dict)
+            assert all(item in ["input", "output"] for item in prop)
+            assert all(item in ["gamma", "proton"] for item in prop["input"])
+        else:
+            assert isinstance(prop, list)
+            for path in prop:
+                assert isinstance(path, dict)
+            assert 'input' in path
+            assert 'output' in path
 
-            # Check if other stags contains other keys
-            if stg == "train_pipe":
-                assert all(item in ["gamma", "proton"] for item in prop["input"])
-            elif stg == "train_test_split":
+            if stg == "train_test_split":
                 assert isinstance(path["output"], dict)
                 assert all(item in ["train", "test"] for item in path["output"])
+            elif stg == 'dl1_to_dl2':
+                assert 'path_model' in path
             elif stg == "dl2_to_sensitivity":
                 assert isinstance(path["input"], dict)
                 assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path["input"])
