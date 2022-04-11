@@ -54,10 +54,10 @@ def test_path_config_save():
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
-        YAML().load(open(f.name).read())
-        loaded_cfg = pipeline_config.load_config(f.name)
-    assert loaded_cfg['prod_type'] == 'PathConfig'
-    assert loaded_cfg['prod_id'] == 'v00'
+        read_cfg = YAML().load(open(f.name).read())
+        pipeline_config.load_config(f.name)
+    assert read_cfg['prod_type'] == 'PathConfig'
+    assert read_cfg['prod_id'] == 'v00'
 
 
 def test_PathConfigProd5Trans80():
