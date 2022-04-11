@@ -91,7 +91,7 @@ def test_PathConfigProd5Trans80():
     assert cfg.models_path() == \
            f"/fefs/aswg/data/models/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}"
     assert cfg.r0_dir("gamma") == \
-           f"/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
+           "/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
     assert cfg.sensitivity_file(offset="0.0deg") == \
            f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/0.0deg/sensitivity_{prod_id}_0.0deg.fits.gz"
     assert cfg.train_dir("gamma") == \
