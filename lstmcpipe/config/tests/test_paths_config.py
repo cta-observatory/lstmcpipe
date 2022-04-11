@@ -62,7 +62,7 @@ def test_path_config_save():
 
 def test_PathConfigProd5Trans80():
     from lstmcpipe.config.paths_config import PathConfigProd5Trans80
-    prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
+    prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4'
     cfg = PathConfigProd5Trans80(prod_id)
     paths = cfg.generate()
     assert cfg.prod_id == prod_id
@@ -77,28 +77,29 @@ def test_PathConfigProd5Trans80():
     assert cfg.base_dir == \
            "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}"
     assert cfg.dl1_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg"
+           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
     assert cfg.dl2_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg"
+           f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
     assert cfg.dl2_output_file("gamma") == \
-           "/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/dl2_gamma_dummy_prodid_test.h5"
+           f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl2_gamma_{prod_id}_test.h5"
     assert cfg.irf_dir("gamma") == \
-           "/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/dummy_prodid/gamma"
+           f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/gamma"
     assert cfg.merge_output_file("gamma", "train") == \
-           "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/dl1_gamma_dummy_prodid_train.h5"
+           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_train.h5"
     assert cfg.merge_output_file("gamma", "test") == \
-           "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/dl1_gamma_dummy_prodid_test.h5"
+           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_test.h5"
     assert cfg.models_path() == \
-           "/fefs/aswg/data/models/20200629_prod5_trans_80/zenith_20deg/south_pointing/dummy_prodid"
+           f"/fefs/aswg/data/models/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}"
     assert cfg.r0_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
+           f"/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
     assert cfg.sensitivity_file(offset="0.0deg") == \
-           "/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/dummy_prodid/0.0deg/sensitivity_dummy_prodid_0.0deg.fits.gz"
+           f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/0.0deg/sensitivity_{prod_id}_0.0deg.fits.gz"
     assert cfg.train_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/train"
+           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/train"
     assert cfg.test_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/test"
-    dl2p = '/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/proton/zenith_20deg/south_pointing/20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
+           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/test"
+    dl2p = f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/proton/zenith_20deg/south_pointing/{prod_id}"
+    print(paths['dl1_to_dl2'])
     assert dl2p in [dl1todl2['output'] for dl1todl2 in paths['dl1_to_dl2']]
 
     for stg in cfg.stages:
