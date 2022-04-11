@@ -88,6 +88,7 @@ def config_valid(loaded_config):
             )
 
     workflow_kind = loaded_config["workflow_kind"]
+
     if workflow_kind not in allowed_workflows:
         raise Exception(
             f"Please select an allowed `workflow_kind`: {allowed_workflows}"
@@ -166,7 +167,7 @@ def complete_lstmcpipe_config(loaded_config):
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
 
-    suffix_id = "_{}".format(suffix_prod_id)
+    suffix_id = "_{}_{}".format(load_config['prod_type'], suffix_prod_id)
     config["prod_id"] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly
