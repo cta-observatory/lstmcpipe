@@ -162,12 +162,12 @@ def complete_lstmcpipe_config(loaded_config):
 
         # TODO parse version from hiPeRTA module
         import lstchain
-        base_prod_id = f"{year}{month}{day}_vRTA420_v{lstchain.__version__}"
+        base_prod_id = f"{year}{month}{day}_vRTA420_v{lstchain.__version__}:
 
     # Create the final config structure to be passed to the pipeline
     # 1 - Prod_id
-
-    suffix_id = "_{}_{}".format(load_config['prod_type'], suffix_prod_id)
+    prod_type = f"_{loaded_config['prod_type']}" if 'prod_type' in loaded_config else ''
+    suffix_id = "_{}".format(prod_type, suffix_prod_id)
     config["prod_id"] = base_prod_id + suffix_id
 
     # 2 - Parse source environment correctly
