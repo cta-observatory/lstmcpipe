@@ -61,26 +61,18 @@ def test_path_config_save():
 
 
 def test_PathConfigProd5Trans80():
-    # testing with an existing prod
-    prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
-    pcfg = paths_config.PathConfigProd5Trans80(prod_id)
-    paths = pcfg.generate()
-    dl2p = '/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/proton/zenith_20deg/south_pointing/20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
-    assert dl2p in [dl1todl2['output'] for dl1todl2 in paths['dl1_to_dl2']]
-    assert pcfg.prod_id == prod_id
-
-
-def test_PathConfigProd5Trans80_default():
     from lstmcpipe.config.paths_config import PathConfigProd5Trans80
-    prod_id = 'dummy_prodid'
+    prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
     cfg = PathConfigProd5Trans80(prod_id)
+    paths = cfg.generate()
+    assert cfg.prod_id == prod_id
 
     assert "/20200629_prod5_trans_80/" in cfg.base_dir
     assert all(stage in default_stages for stage in cfg.stages)
     assert all(particle in default_particles for particle in cfg.particles)
     assert all(offset in default_point_source_offs for offset in cfg.point_src_offsets)
     assert cfg.training_particles == ["gamma-diffuse", "proton"]
-    assert cfg.testing_particles == ["gamma", "electron", "proton"]
+    assert cfg.testing_particles == ["gamma", "electron", "proton", "gamma-diffuse"]
     assert cfg.zenith == "zenith_20deg"
     assert cfg.base_dir == \
            "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}"
@@ -106,6 +98,8 @@ def test_PathConfigProd5Trans80_default():
            "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/train"
     assert cfg.test_dir("gamma") == \
            "/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/dummy_prodid/off0.4deg/test"
+    dl2p = '/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/proton/zenith_20deg/south_pointing/20210416_v0.7.3_prod5_trans_80_local_taicut_8_4/'
+    assert dl2p in [dl1todl2['output'] for dl1todl2 in paths['dl1_to_dl2']]
 
     for stg in cfg.stages:
 
