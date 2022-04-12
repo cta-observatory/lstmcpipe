@@ -2,7 +2,7 @@
 
 import shutil
 from pathlib import Path
-from lstmcpipe import lstmcpipe_root_dir, __version__
+from lstmcpipe import prod_logs, __version__
 
 
 def backup_log(file):
@@ -39,7 +39,7 @@ def create_log_dir(prod_id):
     log_dir : Path
         Path to `prod_id` log directory
     """
-    log_dir = lstmcpipe_root_dir.joinpath("prod_logs", f"logs_{prod_id}")
+    log_dir = prod_logs.joinpath(f"logs_{prod_id}")
     log_dir.mkdir(exist_ok=True, parents=True)
     return log_dir
 

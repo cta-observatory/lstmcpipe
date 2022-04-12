@@ -11,11 +11,9 @@ def find_scripts(script_dir, prefix):
     script_list = [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
     return script_list
 
-
 def readfile(filename):
     with open(filename, "r+") as f:
         return f.read()
-
 
 # Read package info from codemeta.json
 with open(os.path.join(os.path.dirname(__file__), "codemeta.json")) as file:
@@ -28,7 +26,6 @@ for aut in metadata["author"]:
 
 version = metadata["version"]
 description = metadata["description"]
-
 
 scripts_list = find_scripts("lstmcpipe", "onsite_")
 
