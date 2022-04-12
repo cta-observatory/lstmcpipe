@@ -88,7 +88,6 @@ class PathConfigProd5Trans80(PathConfig):
             'dl1_to_dl2',
             'dl2_to_sensitivity',
             'dl2_to_irfs',
-            'plot_irfs'
         ]
 
     @property
