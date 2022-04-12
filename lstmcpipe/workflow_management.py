@@ -92,7 +92,7 @@ def batch_mc_production_check(
     cmd_wrap += (
         f"sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,"
         f"maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> {check_prod_file}; "
-        f"mv slurm-* IRFFITSWriter.provenance.log {log_directory.name};"
+        f"mv slurm-* {log_directory.absolute().name};"
     )
 
     batch_cmd = "sbatch -p short --parsable"
