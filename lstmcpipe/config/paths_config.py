@@ -426,12 +426,11 @@ class PathConfigAllSky(PathConfig):
         self.testing_particles = ['Crab']
 
         self.paths = {}
-        self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2']
+        self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
 
     def _search_pointings(self, particle):
         pointing_dirs = os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
         return pointing_dirs
-        # return [re.search('.*theta\_(.+?)_az\_(.+?)\_', dirname) for dirname in pointing_dirs]
 
     def training_pointings(self, particle):
         if not hasattr(self, '_training_pointings'):
@@ -625,24 +624,14 @@ class PathConfigAllSky(PathConfig):
     def dl2_to_irfs(self):
         paths = []
 
-#         def path_dict(gamma_part, offset):
-#             d = {
-#                 'input': {
-#                     'gamma_file': self.dl2_output_file(gamma_part),
-#                     'proton_file': self.dl2_output_file('proton'),
-#                     'electron_file': self.dl2_output_file('electron')
-#                 },
-#                 'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
-#                 'options': '--point-like' if gamma_part == 'gamma' else ''
-#             }
-#             return d
-
-#         for gamma_part in ['gamma-diffuse', 'gamma']:
-#             if gamma_part == 'gamma-diffuse':
-#                 paths.append(path_dict(gamma_part, 'diffuse'))
-#             else:
-#                 for offset in self.point_src_offsets:
-#                     paths.append(path_dict(gamma_part, offset))
+        for particle in self.testing_particles:
+            for pointing in self.testing_pointings(particle):
+                paths.append({
+                    'input': {'gamma_file': self.dl2_output_file(particle, pointing)},
+                    'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
+                    'options': '--point-like'
+                }
+                )
                     
         return paths
         
