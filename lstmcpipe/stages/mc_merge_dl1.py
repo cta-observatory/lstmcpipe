@@ -123,17 +123,20 @@ def merge_dl1(
         f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '
     )
 
-    # Close " of wrap
+    # command passed changes depending on the workflow_kind
     if workflow_kind == "lstchain":
         cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}'
 
     elif workflow_kind == "hiperta":
         # HiPeRTA workflow still uses --smart flag (lstchain v0.6.3)
         cmd += (
-            f"lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}"
+            f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}'
         )
     else:  # ctapipe case
         cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}  {merging_options}'
+
+    # IN ALL THE CASES we need to close the " of the wrap
+    cmd += '"'
 
     jobid_merge = os.popen(cmd).read().strip("\n")
     log_merge.update({jobid_merge: cmd})
