@@ -418,7 +418,7 @@ class PathConfigAllSky(PathConfig):
     def __init__(self, prod_id):
         super().__init__(prod_id)
         self.prod_id = prod_id
-        self.base_dir = "/fefs/aswg/data/mc/AllSky/{data_level}/{prod_id}/{particle}/{pointing}"
+        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/{pointing}"
         self.training_dir = \
             "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output"
         self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output"
