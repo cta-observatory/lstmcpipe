@@ -572,11 +572,10 @@ class PathConfigAllSky(PathConfig):
         for particle in self.training_particles:
             dl1 = self.dl1_dir(particle, '')
             merged_dl1 = self.training_merged_dl1(particle)
-            options = '--pattern */*.h5 --no-image',
             paths.append({
                 'input': dl1,
                 'output': merged_dl1,
-                'options': options
+                'options': '--pattern */*.h5 --no-image',
             })
 
         # for the testing, we merge per node
