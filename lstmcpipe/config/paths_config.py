@@ -627,7 +627,7 @@ class PathConfigAllSky(PathConfig):
         for particle in self.testing_particles:
             for pointing in self.testing_pointings(particle):
                 paths.append({
-                    'input': {'gamma_file': self.dl2_output_file(particle, pointing)
+                    'input': {'gamma_file': self.dl2_output_file(particle, pointing),
                               'proton_file': None,
                               'electron_file': None,
                              },
