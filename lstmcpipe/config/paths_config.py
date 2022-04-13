@@ -3,6 +3,8 @@
 import os
 from ruamel.yaml import YAML
 from datetime import date
+from copy import deepcopy
+import re
 
 from . import base_config
 
@@ -427,10 +429,11 @@ class PathConfigAllSky(PathConfig):
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2']
 
     def _search_pointings(self, particle):
-        return os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
+        pointing_dirs = os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
+        return pointing_dirs
+        # return [re.search('.*theta\_(.+?)_az\_(.+?)\_', dirname) for dirname in pointing_dirs]
 
-    @property
-    def training_pointings(self):
+    def training_pointings(self, particle):
         if not hasattr(self, '_training_pointings'):
             try:
                 self.load_pointings()
@@ -438,36 +441,59 @@ class PathConfigAllSky(PathConfig):
                 raise FileNotFoundError(
                     "The class must be run on the cluster to load available pointing nodes"
                 ) from e
-        return self._training_pointings
+        return self._training_pointings[particle]
 
-    @property
-    def testing_pointings(self):
-        if not hasattr(self, '_training_pointings'):
+    def testing_pointings(self, particle):
+        if not hasattr(self, '_testing_pointings'):
             try:
                 self.load_pointings()
             except FileNotFoundError as e:
                 raise FileNotFoundError(
                     "The class must be run on the cluster to load available pointing nodes"
                 ) from e
-        return self._testing_pointings
+        return self._testing_pointings[particle]
 
     def load_pointings(self):
         self._training_pointings = self._get_training_pointings()
         self._testing_pointings = self._get_testing_pointings()
+        
+    def _extract_pointing(self, text):
+        """
+        return a tuple ($0, $1) of pointings based on a text pattern `*_theta_{$0}_az_{$1}_`
+        """
+        return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)
+        
 
     def _get_training_pointings(self):
-        particle = self.training_particles[0]
-        pointings = set(self._search_pointings(particle))
-        for particle in self.training_particles[1:]:
-            pointings.intersection_update(self._search_pointings(particle))
-        return pointings
+        """
+        Find pointings that exist for all training particles
+        This is overly complicated because pointings directory names are not consistent particle-wise
+        see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
+        see testing pointings for a simpler implementation if this get solved
+        """
+        all_pointings = {}
+        intersected_pointings = {}
+        for particle in self.training_particles:
+            all_pointings[particle] = self._search_pointings(particle)
+        intersected_pointings = deepcopy(all_pointings)
+        
+        for particle, pointings_text in all_pointings.items():
+            for pointing_text in pointings_text:
+                pointing_tuple = self._extract_pointing(pointing_text)
+                for other_particles, other_pointings_text in all_pointings.items():
+                    other_pointings_tuples = [self._extract_pointing(pt) for pt in other_pointings_text]
+                    if pointing_tuple not in other_pointings_tuples:
+                        if pointing_text in intersected_pointings:
+                            intersected_pointings[particle].remove(pointing_text)
+        
+        return intersected_pointings
 
     def _get_testing_pointings(self):
         particle = self.testing_particles[0]
         pointings = set(self._search_pointings(particle))
         for particle in self.testing_particles[1:]:
             pointings.intersection_update(self._search_pointings(particle))
-        return pointings
+        return {particle: pointings for particle in self.testing_particles}
 
     def _data_level_dir(self, prod_id, data_level, particle, pointing):
         """
@@ -515,12 +541,12 @@ class PathConfigAllSky(PathConfig):
     def r0_to_dl1(self):
         paths = []
         for particle in self.training_particles:
-            for pointing in self.training_pointings:
+            for pointing in self.training_pointings(particle):
                 r0 = self.r0_dir(particle, pointing)
                 dl1 = self.dl1_dir(particle, pointing)
                 paths.append({'input': r0, 'output': dl1})
         for particle in self.testing_particles:
-            for pointing in self.testing_pointings:
+            for pointing in self.testing_pointings(particle):
                 r0 = self.r0_dir(particle, pointing)
                 dl1 = self.dl1_dir(particle, pointing)
                 paths.append({'input': r0, 'output': dl1})
@@ -554,7 +580,7 @@ class PathConfigAllSky(PathConfig):
 
         # for the testing, we merge per node
         for particle in self.testing_particles:
-            for pointing in self.testing_pointings:
+            for pointing in self.testing_pointings(particle):
                 dl1 = self.dl1_dir(particle, pointing)
                 merged_dl1 = self.testing_merged_dl1(particle, pointing)
                 paths.append({
@@ -584,7 +610,7 @@ class PathConfigAllSky(PathConfig):
     def dl1_to_dl2(self):
         paths = []
         for particle in self.testing_particles:
-            for pointing in self.testing_pointings:
+            for pointing in self.testing_pointings(particle):
                 paths.append({
                     'input': self.testing_merged_dl1(particle, pointing),
                     'path_model': self.models_path(),
@@ -595,6 +621,28 @@ class PathConfigAllSky(PathConfig):
     def dl2_output_file(self, particle, pointing):
         return os.path.join(self.dl2_dir(particle, pointing), f'dl2_{particle}_{pointing}.h5')
 
-    # @property
-    # def dl2_to_irfs(self):
-    #     # TODO?
+    @property
+    def dl2_to_irfs(self):
+        paths = []
+
+#         def path_dict(gamma_part, offset):
+#             d = {
+#                 'input': {
+#                     'gamma_file': self.dl2_output_file(gamma_part),
+#                     'proton_file': self.dl2_output_file('proton'),
+#                     'electron_file': self.dl2_output_file('electron')
+#                 },
+#                 'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
+#                 'options': '--point-like' if gamma_part == 'gamma' else ''
+#             }
+#             return d
+
+#         for gamma_part in ['gamma-diffuse', 'gamma']:
+#             if gamma_part == 'gamma-diffuse':
+#                 paths.append(path_dict(gamma_part, 'diffuse'))
+#             else:
+#                 for offset in self.point_src_offsets:
+#                     paths.append(path_dict(gamma_part, offset))
+                    
+        return paths
+        
