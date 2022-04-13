@@ -399,15 +399,15 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
                         dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
                         dl1_output = self.dl1_dir(particle, gamma_src_offset=offset)
                         paths.append({
-                          'input': dl1_input, 
-                          'output': dl1_output
+                            'input': dl1_input,
+                            'output': dl1_output
                         })
                 else:
                     dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
                     dl1_output = self.dl1_dir(particle, gamma_src_offset='')
                     paths.append({
-                      'input': dl1_input, 
-                      'output': dl1_output
+                        'input': dl1_input,
+                        'output': dl1_output
                     })
         return paths
 
@@ -457,13 +457,12 @@ class PathConfigAllSky(PathConfig):
     def load_pointings(self):
         self._training_pointings = self._get_training_pointings()
         self._testing_pointings = self._get_testing_pointings()
-        
+
     def _extract_pointing(self, text):
         """
         return a tuple ($0, $1) of pointings based on a text pattern `*_theta_{$0}_az_{$1}_`
         """
         return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)
-        
 
     def _get_training_pointings(self):
         """
@@ -473,11 +472,10 @@ class PathConfigAllSky(PathConfig):
         see testing pointings for a simpler implementation if this get solved
         """
         all_pointings = {}
-        intersected_pointings = {}
         for particle in self.training_particles:
             all_pointings[particle] = self._search_pointings(particle)
         intersected_pointings = deepcopy(all_pointings)
-        
+
         for particle, pointings_text in all_pointings.items():
             for pointing_text in pointings_text:
                 pointing_tuple = self._extract_pointing(pointing_text)
@@ -486,7 +484,7 @@ class PathConfigAllSky(PathConfig):
                     if pointing_tuple not in other_pointings_tuples:
                         if pointing_text in intersected_pointings:
                             intersected_pointings[particle].remove(pointing_text)
-        
+
         return intersected_pointings
 
     def _get_testing_pointings(self):
@@ -615,12 +613,13 @@ class PathConfigAllSky(PathConfig):
                 paths.append({
                     'input': self.testing_merged_dl1(particle, pointing),
                     'path_model': self.models_path(),
-                    'output': self.dl2_output_file(particle, pointing)
+                    'output': self.dl2_dir(particle, pointing)
                 })
         return paths
 
     def dl2_output_file(self, particle, pointing):
-        return os.path.join(self.dl2_dir(particle, pointing), f'dl2_{particle}_{pointing}.h5')
+        filename = self.testing_merged_dl1(particle, pointing).replace('dl1_', 'dl2_')
+        return os.path.join(self.dl2_dir(particle, pointing), filename)
 
     @property
     def dl2_to_irfs(self):
@@ -632,11 +631,10 @@ class PathConfigAllSky(PathConfig):
                     'input': {'gamma_file': self.dl2_output_file(particle, pointing),
                               'proton_file': None,
                               'electron_file': None,
-                             },
+                              },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
                     'options': '--point-like'
                 }
                 )
-                    
+
         return paths
-        
