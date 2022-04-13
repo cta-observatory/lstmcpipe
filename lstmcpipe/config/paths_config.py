@@ -218,14 +218,16 @@ class PathConfigProd5Trans80(PathConfig):
                     output_file = self.merge_output_file(particle=particle, step='train', gamma_src_offset=offset)
                     paths.append({
                         'input': train,
-                        'output': output_file
+                        'output': output_file,
+                        'options': '--no-image'
                     })
             else:
                 train = self.train_dir(particle)
                 output_file = self.merge_output_file(particle=particle, step='train')
                 paths.append({
                     'input': train,
-                    'output': output_file
+                    'output': output_file,
+                    'options': '--no-image'
                 })
 
         for particle in self.testing_particles:
@@ -570,7 +572,7 @@ class PathConfigAllSky(PathConfig):
         for particle in self.training_particles:
             dl1 = self.dl1_dir(particle, '')
             merged_dl1 = self.training_merged_dl1(particle)
-            options = {'pattern': '*/*.h5', 'no_image': True},
+            options = '--pattern */*.h5 --no-image',
             paths.append({
                 'input': dl1,
                 'output': merged_dl1,
@@ -584,7 +586,8 @@ class PathConfigAllSky(PathConfig):
                 merged_dl1 = self.testing_merged_dl1(particle, pointing)
                 paths.append({
                     'input': dl1,
-                    'output': merged_dl1
+                    'output': merged_dl1,
+                    'options': '--no-image'
                 })
 
         return paths
