@@ -59,10 +59,7 @@ def batch_merge_dl1(
         job_logs, jobid_debug = merge_dl1(
             particle["input"],
             particle["output"],
-            merging_options={
-                "no_image": particle.get("no_image", True),
-                "smart": particle.get("smart", False),
-            },
+            merging_options=particle.get('options', None),
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,
             workflow_kind=workflow_kind,
@@ -86,7 +83,7 @@ def merge_dl1(
         output_file,
         batch_configuration,
         wait_jobs_split="",
-        merging_options={},
+        merging_options=None,
         workflow_kind="lstchain",
 ):
     """
@@ -109,8 +106,7 @@ def merge_dl1(
     source_environment = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
-    flag_no_image = merging_options["no_image"]
-    flag_smart_merge = merging_options["smart"]
+    merging_options = "" if merging_options is None else merging_options
 
     log_merge = {}
 
@@ -129,19 +125,15 @@ def merge_dl1(
 
     # Close " of wrap
     if workflow_kind == "lstchain":
-        cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} --no-image"'
+        cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}'
 
     elif workflow_kind == "hiperta":
         # HiPeRTA workflow still uses --smart flag (lstchain v0.6.3)
         cmd += (
-            f"lstchain_merge_hdf5_files -d {input_dir} -o {output_file} --no-image {flag_no_image} "
-            f'--smart {flag_smart_merge}"'
+            f"lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}"
         )
     else:  # ctapipe case
-        if flag_no_image:
-            cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file} --skip-images --skip-simu-images"'
-        else:
-            cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}"'
+        cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}  {merging_options}'
 
     jobid_merge = os.popen(cmd).read().strip("\n")
     log_merge.update({jobid_merge: cmd})
