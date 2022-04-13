@@ -627,7 +627,10 @@ class PathConfigAllSky(PathConfig):
         for particle in self.testing_particles:
             for pointing in self.testing_pointings(particle):
                 paths.append({
-                    'input': {'gamma_file': self.dl2_output_file(particle, pointing)},
+                    'input': {'gamma_file': self.dl2_output_file(particle, pointing)
+                              'proton_file': None,
+                              'electron_file': None,
+                             },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
                     'options': '--point-like'
                 }
