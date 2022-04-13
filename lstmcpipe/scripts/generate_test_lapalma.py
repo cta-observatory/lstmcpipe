@@ -52,6 +52,8 @@ def generate_test_allsky(working_dir = '/fefs/aswg/workspace/lstmcpipe/data/mc/'
 
     pc = paths_config.PathConfigAllSky(f'test_prod_{date.today()}')
     pc.base_dir = os.path.join(working_dir, '{data_level}/{prod_id}/{particle}/{pointing}')
+    pc.training_dir = os.path.join(working_dir, "TrainingDataset/{particle}/sim_telarray/{pointing}/output")
+    pc.testing_dir = os.path.join(working_dir, "TestDataset/Crab/sim_telarray/{pointing}/output")
     pc.generate()
     pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
 
