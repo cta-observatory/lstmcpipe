@@ -127,9 +127,13 @@ def dl2_to_irfs(
     check_and_make_dir_without_verification(output_dir)
 
     cmd = (
-        f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -p {proton_file} -e {electron_file}"
-        f" -o {outfile}"
+        f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -o {outfile} "
     )
+    if proton_file is not None:
+        cmd += f" -p {proton_file}"
+    if electron_file is not None:
+        cmd += f" -e {electron_file}"
+
     if config_file:
         cmd += f" --config={config_file}"
 
