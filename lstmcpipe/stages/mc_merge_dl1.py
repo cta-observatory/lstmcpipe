@@ -60,8 +60,9 @@ def batch_merge_dl1(
             particle["input"],
             particle["output"],
             merging_options={
-                "no_image": particle.get("no_image", True),
-                "smart": particle.get("smart", False),
+                "no_image": particle['options'].get("no_image", True),
+                "smart": particle['options'].get("smart", False),
+                "pattern": particle['options'].get("pattern", "*.h5"),
             },
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,
@@ -86,7 +87,7 @@ def merge_dl1(
         output_file,
         batch_configuration,
         wait_jobs_split="",
-        merging_options={},
+        merging_options=None,
         workflow_kind="lstchain",
 ):
     """
@@ -109,8 +110,10 @@ def merge_dl1(
     source_environment = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
-    flag_no_image = merging_options["no_image"]
-    flag_smart_merge = merging_options["smart"]
+    merging_options = {} if merging_options is None else merging_options
+    flag_no_image = merging_options.get("no_image",  True)
+    flag_pattern = merging_options.get("pattern", None)
+
 
     log_merge = {}
 
@@ -129,19 +132,23 @@ def merge_dl1(
 
     # Close " of wrap
     if workflow_kind == "lstchain":
-        cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} --no-image"'
+        cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} '
+        if flag_no_image:
+            cmd += " --no-image "
+        if flag_pattern:
+            cmd += f" --pattern {flag_pattern}"
 
     elif workflow_kind == "hiperta":
         # HiPeRTA workflow still uses --smart flag (lstchain v0.6.3)
         cmd += (
             f"lstchain_merge_hdf5_files -d {input_dir} -o {output_file} --no-image {flag_no_image} "
-            f'--smart {flag_smart_merge}"'
         )
     else:  # ctapipe case
+        cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}'
         if flag_no_image:
-            cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file} --skip-images --skip-simu-images"'
-        else:
-            cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}"'
+            cmd += ' --skip-images --skip-simu-images'
+        if flag_pattern:
+            cmd += f' --pattern {flag_pattern}'
 
     jobid_merge = os.popen(cmd).read().strip("\n")
     log_merge.update({jobid_merge: cmd})

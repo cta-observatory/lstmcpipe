@@ -570,7 +570,7 @@ class PathConfigAllSky(PathConfig):
         for particle in self.training_particles:
             dl1 = self.dl1_dir(particle, '')
             merged_dl1 = self.training_merged_dl1(particle)
-            options = "-p */*.h5"
+            options = {'pattern': '*/*.h5', 'no_image': True},
             paths.append({
                 'input': dl1,
                 'output': merged_dl1,
