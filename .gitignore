@@ -13,3 +13,4 @@ lstmcpipe/__pycache__/
 # vim swap files
 *.swp
 prod_logs/
+_version.py
