@@ -14,6 +14,7 @@ lstmcpipe API documentation
    :maxdepth: 3
 
    productions
+   pipeline
    api/lstmcpipe
 
 

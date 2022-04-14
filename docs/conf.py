@@ -50,6 +50,7 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinxarg.ext",
     "sphinx.ext.napoleon",
+    "sphinxcontrib.mermaid"
 ]
 
 autosummary_generate = True
