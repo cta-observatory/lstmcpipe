@@ -618,7 +618,7 @@ class PathConfigAllSky(PathConfig):
         return paths
 
     def dl2_output_file(self, particle, pointing):
-        filename = self.testing_merged_dl1(particle, pointing).replace('dl1_', 'dl2_')
+        filename = os.path.basename(self.testing_merged_dl1(particle, pointing).replace('dl1_', 'dl2_'))
         return os.path.join(self.dl2_dir(particle, pointing), filename)
 
     @property
