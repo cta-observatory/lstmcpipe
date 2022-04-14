@@ -63,6 +63,7 @@ setup(
         "pyirf>=0.4",
         "matplotlib",
         "pytest",
+        "setuptools_scm"
     ],
     packages=find_packages(),
     tests_require=["pytest"],
@@ -78,4 +79,8 @@ setup(
     ],
     scripts=scripts_list,
     entry_points=entry_points,
+    use_scm_version={
+        "write_to": Path(__file__).parent.joinpath("lstmcpipe/_version.py"),
+        "write_to_template": "__version__ = '{version}'",
+    },
 )
