@@ -65,7 +65,7 @@ setup(
         "pytest",
         "setuptools_scm"
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude="lstmcpipe._dev_version"),
     tests_require=["pytest"],
     author=author_names,
     author_email="thomas.vuillaume@lapp.in2p3.fr",
