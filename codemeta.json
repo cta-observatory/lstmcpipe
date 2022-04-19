@@ -4,7 +4,7 @@
     "license": "https://spdx.org/licenses/MIT",
     "codeRepository": "git+https://github.com/cta-observatory/lstmcpipe.git",
     "dateCreated": "2019-09-09",
-    "datePublished": "2022-04-14",
+    "datePublished": "2022-04-19",
     "downloadUrl": "https://github.com/cta-observatory/lstmcpipe/archive/refs/tags/v0.6.3.tar.gz",
     "issueTracker": "https://github.com/cta-observatory/lstmcpipe/issues",
     "name": "lstmcpipe",
