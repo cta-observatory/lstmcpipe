@@ -59,9 +59,10 @@ setup(
         "pyirf>=0.4",
         "matplotlib",
         "pytest",
-        "ruamel.yaml>=0.17"
+        "ruamel.yaml>=0.17",
+        "setuptools_scm",
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude="lstmcpipe._dev_version"),
     tests_require=["pytest"],
     author=author_names,
     author_email="thomas.vuillaume@lapp.in2p3.fr",
@@ -77,4 +78,8 @@ setup(
     entry_points=entry_points,
     include_package_data=True,
     data_files=[('lstmcpipe', ['lstmcpipe/base_config_lstmcpipe.yaml'])],
+    use_scm_version={
+        "write_to": Path(__file__).parent.joinpath("lstmcpipe/_version.py"),
+        "write_to_template": "__version__ = '{version}'",
+    },
 )
