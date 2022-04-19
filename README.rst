@@ -89,8 +89,11 @@ code follows our guidelines and there is less work dealing with the code checker
 Quickstart
 ----------
 
-The way to launch either the full pipeline (r0 to IRFs) or a workflow with less stages (r0 to merging, for example) is
-the same; you should run the same command/launch the same script in any case;
+To generate your lstmcpipe configuration file, use `lstmcpipe_generate_config` command.
+If the type of production you want is not listed in the existing ones, you may create your own `PathConfig` class
+from an existing one, or generate a config from an existing prod type and edit the file manually.
+
+Once you have your configuration file, you way launch the pipeline with the described stages in the config using:
 
 .. code-block:: python
 
@@ -132,7 +135,6 @@ processing tool. These are:
 - ctapipe: ctapipe-stage1
 - rta: lstmcpipe_hiperta_r0_to_dl1lstchain (``lstmcpipe/hiperta/hiperta_r0_to_dl1lstchain.py``)
 
-Results can be found in ``running_analysis``
 
 **dl1ab**
 
@@ -147,11 +149,16 @@ For lstchain the dl1ab script is used, ctapipe can use the same script as for si
 processing. There is no support for hiperta!
 
 
-**merge_and_copy_dl1**
+**merge_dl1**
 
 In this stage the previously created dl1 files are merged so that you end up with
 train and test datesets for the next stages.
-Cleans and moves the ``running_analysis`` directory into ``DL1`` and ``analysis_logs``.
+
+
+**train_test_split**
+
+Split the dataset into training and testing datasets, performing a random selection of files with the specified ratio
+(default=0.5).
 
 **train_pipe**
 
