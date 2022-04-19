@@ -5,3 +5,4 @@ sphinx-argparse
 sphinxcontrib-napoleon
 GitPython
 tabulate
+sphinxcontrib-mermaid
