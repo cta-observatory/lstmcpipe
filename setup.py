@@ -11,11 +11,9 @@ def find_scripts(script_dir, prefix):
     script_list = [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
     return script_list
 
-
 def readfile(filename):
     with open(filename, "r+") as f:
         return f.read()
-
 
 # Read package info from codemeta.json
 with open(os.path.join(os.path.dirname(__file__), "codemeta.json")) as file:
@@ -29,7 +27,6 @@ for aut in metadata["author"]:
 version = metadata["version"]
 description = metadata["description"]
 
-
 scripts_list = find_scripts("lstmcpipe", "onsite_")
 
 entry_points = {
@@ -39,14 +36,14 @@ entry_points = {
         "lstmcpipe_plot_irfs = lstmcpipe.plots.plot_irfs:main",
         "lstmcpipe_hiperta_r0_to_dl1lstchain = lstmcpipe.hiperta.hiperta_r0_to_dl1lstchain:main",
         "lstmcpipe_dl2_to_sensitivity = lstmcpipe.scripts.script_dl2_to_sensitivity:main",
-        "lstmcpipe_utils_move_dir = lstmcpipe.scripts.script_merge_utils_move_dir:main",
-        "lstmcpipe_utils_cp_config = lstmcpipe.scripts.script_merge_utils_copy_config:main",
+        "lstmcpipe_train_test_split = lstmcpipe.scripts.script_train_test_splitting:main",
         "lstmcpipe_lst_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_lst:main",
         "lstmcpipe_lst_core_dl1ab = lstmcpipe.scripts.script_batch_filelist_lst_dl1ab:main",
         "lstmcpipe_cta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_cta:main",
         "lstmcpipe_rta_core_r0_dl1 = lstmcpipe.scripts.script_batch_filelist_rta:main",
         "lstmcpipe_compare_irfs = lstmcpipe.scripts.script_compare_irfs:main",
         "lstmcpipe_validate_config = lstmcpipe.scripts.script_lstmcpipe_validate_config:main",
+        "lstmcpipe_generate_config = lstmcpipe.scripts.lstmcpipe_generate_config:main",
     ]
 }
 
@@ -56,14 +53,14 @@ setup(
     description=description,
     install_requires=[
         "lstchain",
-        "pyyaml",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
         "pyirf>=0.4",
         "matplotlib",
         "pytest",
-        "setuptools_scm"
+        "ruamel.yaml>=0.17",
+        "setuptools_scm",
     ],
     packages=find_packages(exclude="lstmcpipe._dev_version"),
     tests_require=["pytest"],
@@ -79,6 +76,8 @@ setup(
     ],
     scripts=scripts_list,
     entry_points=entry_points,
+    include_package_data=True,
+    data_files=[('lstmcpipe', ['lstmcpipe/base_config_lstmcpipe.yaml'])],
     use_scm_version={
         "write_to": Path(__file__).parent.joinpath("lstmcpipe/_version.py"),
         "write_to_template": "__version__ = '{version}'",

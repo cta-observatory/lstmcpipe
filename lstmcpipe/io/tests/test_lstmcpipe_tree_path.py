@@ -1,5 +1,5 @@
 from pathlib import Path
-from lstmcpipe import lstmcpipe_root_dir
+from lstmcpipe import prod_logs
 
 
 def test_create_log_files():
@@ -59,5 +59,5 @@ def test_create_log_dir():
     from ..lstmcpipe_tree_path import create_log_dir
     log_dirname = create_log_dir("test_prodID")
     assert log_dirname.is_dir()
-    assert log_dirname.name == lstmcpipe_root_dir.joinpath("prod_logs", "logs_test_prodID").name
+    assert log_dirname.name == prod_logs.joinpath("logs_test_prodID").name
     log_dirname.rmdir()
