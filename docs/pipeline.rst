@@ -7,7 +7,7 @@ standard pipeline
 
 This is the typical MC pipeline
 
-..mermaid::
+.. mermaid::
 
     graph LR
         subgraph R0
