@@ -86,13 +86,13 @@ def batch_mc_production_check(
     )
 
     # Save machine info into the check file
-    check_prod_file = log_directory.joinpath(f"check_MC_{prod_id}.txt").name
+    check_prod_file = log_directory.joinpath(f"check_MC_{prod_id}.txt").absolute().as_posix()
 
     cmd_wrap = f"touch {check_prod_file}; "
     cmd_wrap += (
         f"sacct --format=jobid,jobname,nodelist,cputime,state,exitcode,avediskread,maxdiskread,avediskwrite,"
         f"maxdiskwrite,AveVMSize,MaxVMSize,avecpufreq,reqmem -j {all_pipeline_jobs} >> {check_prod_file}; "
-        f"mv slurm-* {log_directory.absolute().name};"
+        f"mv slurm-* IRFFITSWriter.provenance.log {log_directory.absolute().as_posix()} "
     )
 
     batch_cmd = "sbatch -p short --parsable"
