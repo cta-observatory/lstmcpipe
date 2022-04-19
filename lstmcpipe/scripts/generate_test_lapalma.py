@@ -16,7 +16,8 @@ from lstmcpipe.config import paths_config
 def generate_tree(base_dir, working_dir, nfiles):
     """
     Walk the base dir looking for simtels files
-    When a directory contains simtels files, it's tree structure is duplicated into the working dir and nfiles are symlinked there
+    When a directory contains simtels files, it's tree structure is duplicated into the working dir
+    and nfiles are symlinked there
     """
     base_dir = Path(base_dir)
     working_dir = Path(working_dir)
@@ -32,7 +33,8 @@ def generate_tree(base_dir, working_dir, nfiles):
 
 
 
-def generate_test_prod5trans80(working_dir = '/fefs/aswg/workspace/lstmcpipe/data/mc/', nfiles=5, path_to_config_file='.', overwrite=True):
+def generate_test_prod5trans80(working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/',
+                               nfiles=5, path_to_config_file='.', overwrite=True):
     base_dir = '/fefs/aswg/workspace/lstmcpipe/data/test_data/mc/DL0/20200629_prod5_trans_80/'
     working_dir = os.path.join(working_dir, 'DL0/20200629_prod5_trans_80/')
     
@@ -44,15 +46,17 @@ def generate_test_prod5trans80(working_dir = '/fefs/aswg/workspace/lstmcpipe/dat
     pc.save_yml(os.path.join(path_to_config_file, f'test_prod5trans80_{date.today()}.yaml'), overwrite=overwrite)
 
 
-def generate_test_allsky(working_dir = '/fefs/aswg/workspace/lstmcpipe/data/mc/', nfiles=5, path_to_config_file='.', overwrite=True):
-    base_dir = '/home/georgios.voutsinas/ws/AllSky/'
+def generate_test_allsky(working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/',
+                         nfiles=5, path_to_config_file='.', overwrite=True):
+    allsky_base_dir = '/home/georgios.voutsinas/ws/AllSky/'
     
-    generate_tree(base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
+    generate_tree(allsky_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
 
     pc = paths_config.PathConfigAllSky(f'test_prod_{date.today()}')
     pc.base_dir = os.path.join(working_dir, '{data_level}/AllSky/{prod_id}/{particle}/{pointing}')
-    pc.training_dir = os.path.join(working_dir, "DL0/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output_v1.4")
-    pc.testing_dir = os.path.join(working_dir, "DL0/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output_v1.4")
+    # config training dir are replaced with local ones
+    pc.training_dir = os.path.join(working_dir, pc.training_dir.replace(allsky_base_dir, 'DL0/AllSky/'))
+    pc.testing_dir = os.path.join(working_dir, pc.testing_dir.replace(allsky_base_dir, 'DL0/AllSky/'))
     pc.generate()
     pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
 
