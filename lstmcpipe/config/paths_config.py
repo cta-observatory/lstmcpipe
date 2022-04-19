@@ -422,8 +422,8 @@ class PathConfigAllSky(PathConfig):
         self.prod_id = prod_id
         self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/{pointing}"
         self.training_dir = \
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output"
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output"
+            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output_v1.4"
+        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output_v1.4"
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.testing_particles = ['Crab']
 
