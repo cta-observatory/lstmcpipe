@@ -10,7 +10,8 @@ def load_config(filename):
         return yaml.safe_load(f)
 
 
-def add_prod_table(production_dir, prod_file='productions.rst', lstmcpipe_repo_prod_config_url='https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/'):
+def add_prod_table(production_dir, prod_file='productions.rst',
+                   lstmcpipe_repo_prod_config_url='https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/'):
     """
 
     Parameters
@@ -25,7 +26,7 @@ def add_prod_table(production_dir, prod_file='productions.rst', lstmcpipe_repo_p
 
     commit_times = []
     prod_list = []
-    for prod_dir in Path(production_dir).iterdir():
+    for prod_dir in [d for d in Path(production_dir).iterdir() if d.is_dir()]:
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir, max_count=1))[0]
 
         yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml')]
