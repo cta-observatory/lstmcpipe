@@ -69,7 +69,8 @@ if __name__ == '__main__':
     parser.add_argument('--path_config_file', type=Path, default='.',
                         help='Path to save the corresponding config file')
     parser.add_argument('--working_dir', type=Path, default='/fefs/aswg/workspace/lstmcpipe/data/mc/',
-                        help='Your working dir')
+                        help='Your working dir where the DL0 tree will be generated, '
+                             '(such as /fefs/aswg/workspace/firstname.surname/data/mc/)')
 
     args = parser.parse_args()
     
