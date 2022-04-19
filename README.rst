@@ -212,7 +212,8 @@ while the second one contains the same plus all the commands passed to slurm.
 Steps explanation
 -----------------
 
-Job dependency between stages is done automatically. Also, the directory structure is created by every stage.
+The directory structure and the stages to run are determined by the config stages.
+After that, the job dependency between stages is done automatically.
     - If the full workflow is launched, directories will not be verified as containing data. Overwriting will only happen when a MC prods sharing the same ``prod_id`` and analysed the same day is run
     - If each step is launched independently (advanced users), no overwriting directory will take place prior confirmation from the user
 
