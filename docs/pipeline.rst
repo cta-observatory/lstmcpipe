@@ -11,44 +11,119 @@ Here is the typical MC pipeline for the prod3 and prod5 productions
 
     flowchart LR
         subgraph R0
-            gamma
-            proton
-            electron
+            gamma[R0 gamma]
+            proton[R0 proton]
+            electron[R0 electron]
         end
 
-        gamma --> r0dl1((r0_to_dl1))
-        proton --> r0dl1
-        electron --> r0dl1
+        gamma --> |r0_to_dl1| gamma_dl1[DL1 gamma]
+        proton --> |r0_to_dl1| proton_dl1[DL1 proton]
+        electron --> |r0_to_dl1| electron_dl1[DL1 electron]
 
         subgraph DL1
+            direction LR
             gamma_dl1
             proton_dl1
             electron_dl1
         end
 
-        r0dl1 --> gamma_dl1[DL1 gamma]
-        r0dl1 --> proton_dl1[DL1 proton]
-        r0dl1 --> electron_dl1[DL1 electron]
+
+        subgraph DL1-test[DL1 test]
+            direction LR
+            gamma_dl1_test[DL1 gamma]
+            proton_dl1_test[DL1 proton]
+            electron_dl1_test[DL1 electron]
+        end
+
+        subgraph DL1-train[DL1 train]
+            gamma_dl1_train[DL1 gamma]
+            proton_dl1_train[DL1 proton]
+        end
 
 
         gamma_dl1 --> train_test_split((train_test_split))
         proton_dl1 --> train_test_split
-        train_test_split --> DL1train[DL1 train]
-        train_test_split --> DL1test[DL1 test]
-        DL1train --> train_pipe((train_pipe))
+        train_test_split --> DL1-train
+        train_test_split --> gamma_dl1_test & proton_dl1_test
+        DL1-train --> train_pipe((train_pipe))
         train_pipe --> models
 
-        electron_dl1 --> DL1test
+        electron_dl1 --> electron_dl1_test
 
-        DL1train --> |dl1ab| DL1train
-        DL1test --> |dl1ab| DL1test
+        subgraph DL2-test[DL2 test]
+            direction LR
+            gamma_dl2_test[DL2 gamma]
+            proton_dl2_test[DL2 proton]
+            electron_dl2_test[DL2 electron]
+        end
 
-        models --> DL2
-        DL1test --> DL2[DL2 test]
+        models --> DL2-test
+        DL1-test --> DL2-test
 
-        DL2 --> |dl2_to_irf| IRF[IRFs]
-        DL2 --> |dl2_to_sensitivity| SENS[Sensitivity]
+        DL2-test --> |dl2_to_irf| IRF[IRFs]
+        DL2-test --> |dl2_to_sensitivity| SENS[Sensitivity]
         SENS --> plot[png plots]
+
+
+One can also start back from DL1, applying the dl1ab stage:
+
+.. mermaid::
+
+    flowchart LR
+        subgraph DL1a
+            gamma[DL1 gamma]
+            proton[DL1 proton]
+            electron[DL1 electron]
+        end
+
+        gamma --> |dl1ab| gamma_dl1[DL1 gamma]
+        proton --> |dl1ab| proton_dl1[DL1 proton]
+        electron --> |dl1ab| electron_dl1[DL1 electron]
+
+        subgraph DL1b
+            direction LR
+            gamma_dl1
+            proton_dl1
+            electron_dl1
+        end
+
+
+        subgraph DL1-test[DL1 test]
+            direction LR
+            gamma_dl1_test[DL1 gamma]
+            proton_dl1_test[DL1 proton]
+            electron_dl1_test[DL1 electron]
+        end
+
+        subgraph DL1-train[DL1 train]
+            gamma_dl1_train[DL1 gamma]
+            proton_dl1_train[DL1 proton]
+        end
+
+
+        gamma_dl1 --> train_test_split((train_test_split))
+        proton_dl1 --> train_test_split
+        train_test_split --> DL1-train
+        train_test_split --> gamma_dl1_test & proton_dl1_test
+        DL1-train --> train_pipe((train_pipe))
+        train_pipe --> models
+
+        electron_dl1 --> electron_dl1_test
+
+        subgraph DL2-test[DL2 test]
+            direction LR
+            gamma_dl2_test[DL2 gamma]
+            proton_dl2_test[DL2 proton]
+            electron_dl2_test[DL2 electron]
+        end
+
+        models --> DL2-test
+        DL1-test --> DL2-test
+
+        DL2-test --> |dl2_to_irf| IRF[IRFs]
+        DL2-test --> |dl2_to_sensitivity| SENS[Sensitivity]
+        SENS --> plot[png plots]
+
 
 
 AllSky production pipeline
