@@ -75,7 +75,10 @@ def main():
     prod_id = 'prod_00' if args.prod_id is None else args.prod_id
 
     # we get the class from its name and instantiate it with the required args
-    cfg = getattr(paths_config, args.config_class)(prod_id, **args.kwargs)
+    if args.kwargs:
+        cfg = getattr(paths_config, args.config_class)(prod_id, **args.kwargs)
+    else:
+        cfg = getattr(paths_config, args.config_class)(prod_id)
     cfg.generate()
     cfg.save_yml(output)
 
