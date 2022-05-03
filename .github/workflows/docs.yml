@@ -1,7 +1,6 @@
 name: "Pull Request Docs Check"
 on:
 - push
-- pull_request
 
 jobs:
   docs:
@@ -21,9 +20,9 @@ jobs:
       with:
         name: DocumentationHTML
         path: docs/_build/html/
-    - name: Deploy to gihub pages
+    - name: Deploy to github pages
       # only run on push to master
-#      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
