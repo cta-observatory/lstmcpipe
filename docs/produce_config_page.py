@@ -1,5 +1,5 @@
 from pathlib import Path
-import time
+# import time
 import yaml
 import git
 from tabulate import tabulate
@@ -40,14 +40,14 @@ def add_prod_table(production_dir, prod_file='productions.rst',
         else:
             print(f"No yml file in {prod_dir}")
 
-        prod_list.append([time.ctime(commit.committed_date),
+        prod_list.append([commit.authored_datetime.ctime(),
                           f"`{prod_dir.name} <{lstmcpipe_repo_prod_config_url+prod_dir.name}>`_",
                           prod_id]
                          )
-        commit_times.append(commit.committed_date)
+        commit_times.append(commit.authored_datetime.ctime())
 
     sorted_lists = sorted(zip(commit_times, prod_list))
-    prod_list = [prod for _,prod in sorted_lists]
+    prod_list = [prod for _, prod in sorted_lists]
 
     prod_txt += tabulate(prod_list, ['Request date', 'Directory name', 'Prod ID'], tablefmt='rst')
 
