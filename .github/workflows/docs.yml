@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
     - run: |
         . $CONDA/etc/profile.d/conda.sh
         conda config --set always_yes yes --set changeps1 no
@@ -18,7 +20,7 @@ jobs:
       with:
         name: DocumentationHTML
         path: docs/_build/html/
-    - name: Deploy to gihub pages
+    - name: Deploy to github pages
       # only run on push to master
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       uses: JamesIves/github-pages-deploy-action@3.7.1
