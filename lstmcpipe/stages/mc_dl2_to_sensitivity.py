@@ -139,7 +139,7 @@ def dl2_to_sensitivity(
     if slurm_account != "":
         cmd_plot += f" -A {slurm_account}"
     if slurm_options is not None:
-        batch_cmd += f" {slurm_options}"
+        cmd_plot += f" {slurm_options}"
     cmd_plot += (
         f" --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}"
         f' -J dl2_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd_plot}"'
