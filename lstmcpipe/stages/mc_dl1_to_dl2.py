@@ -58,6 +58,7 @@ def batch_dl1_to_dl2(
             config_file=config_file,
             wait_jobid_train_pipe=jobid_from_training,
             batch_configuration=batch_config,
+            slurm_options=paths.get("slurm_options", None),
         )
 
         log_dl1_to_dl2.update(job_logs)
@@ -85,6 +86,7 @@ def dl1_to_dl2(
     config_file,
     wait_jobid_train_pipe=None,
     batch_configuration='',
+    slurm_options=None,
 ):
     """
     Convert onsite files from dl1 to dl2
@@ -106,6 +108,8 @@ def dl1_to_dl2(
         Dictionary containing the (full) source_environment and the slurm_account strings
         to be passed to the sbatch commands
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
@@ -139,6 +143,8 @@ def dl1_to_dl2(
     batch_cmd = "sbatch --parsable -p short --mem=32G"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
+    if slurm_options is not None:
+        batch_cmd += f" {slurm_options}"
     if wait_jobid_train_pipe is not None:
         batch_cmd += f" --dependency=afterok:{wait_jobid_train_pipe}"
     batch_cmd += f' -J dl1_2 -e {jobe} -o {jobo} --wrap="{cmd}"'

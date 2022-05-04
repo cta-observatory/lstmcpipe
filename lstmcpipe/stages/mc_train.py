@@ -62,6 +62,7 @@ def batch_train_pipe(
             config_file=config_file,
             batch_configuration=batch_config,
             wait_jobs_dl1=jobids_from_merge,
+            slurm_options=paths.get("slurm_options", None),
         )
 
         log_train.update(job_logs)
@@ -162,6 +163,7 @@ def train_pipe(
     config_file=None,
     batch_configuration='',
     wait_jobs_dl1=None,
+    slurm_options=None,
 ):
     """
     Train RF from MC DL1 data (onsite LaPalma cluster)
@@ -183,6 +185,8 @@ def train_pipe(
     wait_jobs_dl1 : str
         A string (of chained job_ids separated by ',' and without spaces between each element), containing
         all the job_ids of the merging stage
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
@@ -217,6 +221,8 @@ def train_pipe(
     batch_cmd = "sbatch --parsable -p long --mem=32G"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
+    if slurm_options is not None:
+        batch_cmd += f" {slurm_options}"
     if wait_jobs_dl1 != "":
         batch_cmd += " --dependency=afterok:" + wait_jobs_dl1
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
