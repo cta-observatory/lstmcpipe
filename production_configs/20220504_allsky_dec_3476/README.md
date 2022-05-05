@@ -30,3 +30,10 @@ class PathConfigAllSky(PathConfig):
         self.paths = {}
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
 ```
+
+## Setup
+
+``` 
+lstmcpipe_generate_config PathConfigAllSky --prod_id allsky_dec_3476 --kwargs dec=dec_3476
+
+``` 
