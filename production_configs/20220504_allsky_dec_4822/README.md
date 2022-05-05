@@ -2,38 +2,10 @@
 
 ## lstchain config
 
-file constructed by merging:
+from
 https://github.com/cta-observatory/cta-lstchain/blob/1f3cf1f5b30ead161a4bcac760e00ada719655a8/lstchain/data/lstchain_standard_config.json
 
-and config send by Abelardo by email the 28-04-2022:
-```
-{
-  "image_modifier": {
-    "increase_nsb": true,
-    "extra_noise_in_dim_pixels": 1.27,
-    "extra_bias_in_dim_pixels": 0.665,
-    "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 2.08,
-    "increase_psf": false,
-    "smeared_light_fraction": 0
-  },
 
-  "tailcut": {
-    "picture_thresh":8,
-    "boundary_thresh":4,
-    "keep_isolated_pixels":false,
-    "min_number_picture_neighbors":2,
-    "use_only_main_island":false,
-    "delta_time": 2
-  },
-
-  "dynamic_cleaning": {
-    "apply": true,
-    "threshold": 267,
-    "fraction_cleaning_intensity": 0.03
-  },
-}
-```
 
 ## lstmcpipe config
 
