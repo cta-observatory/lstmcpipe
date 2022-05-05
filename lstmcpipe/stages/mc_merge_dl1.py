@@ -117,14 +117,16 @@ def merge_dl1(
     jobo = Path(output_file).parent.joinpath("merging-output.o")
     jobe = Path(output_file).parent.joinpath("merging-error.e")
 
-    cmd = "sbatch --parsable -p short"
+    cmd = "sbatch --parsable"
+    # TODO All slurm options/args can most probable be passed in a more intelligent way
+    if slurm_options is not None:
+        cmd += f" {slurm_options}"
+    else:
+        cmd += " -p short"
     if slurm_account != "":
         cmd += f" -A {slurm_account}"
     if wait_jobs_split != "":
         cmd += " --dependency=afterok:" + wait_jobs_split
-    # TODO All slurm options/args can most probable be passed in a more intelligent way
-    if slurm_options is not None:
-        cmd += f" {slurm_options}"
 
     cmd += (
         f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '

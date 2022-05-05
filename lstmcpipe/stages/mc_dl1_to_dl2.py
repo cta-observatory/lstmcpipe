@@ -140,11 +140,13 @@ def dl1_to_dl2(
     jobo = Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix()
 
     # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
-    batch_cmd = "sbatch --parsable -p short --mem=32G"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
+    batch_cmd = "sbatch --parsable"
     if slurm_options is not None:
         batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += "  -p short --mem=32G"
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
     if wait_jobid_train_pipe is not None:
         batch_cmd += f" --dependency=afterok:{wait_jobid_train_pipe}"
     batch_cmd += f' -J dl1_2 -e {jobe} -o {jobo} --wrap="{cmd}"'

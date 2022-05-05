@@ -115,11 +115,13 @@ def train_test_split(
     jobe = Path(input_dir).joinpath(input_dir, "split_tt_%j.e")
     jobo = Path(input_dir).joinpath(input_dir, "split_tt_%j.o")
 
-    batch_cmd = "sbatch --parsable -p short"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
+    batch_cmd = "sbatch --parsable"
     if slurm_options is not None:
         batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += " -p short"
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
     if wait_jobid_r0_dl1 is not None:
         batch_cmd += f" --dependency=afterok:{wait_jobid_r0_dl1}"
     batch_cmd += f' -J splitting_train_test -e {jobe} -o {jobo} --wrap="{cmd}"'

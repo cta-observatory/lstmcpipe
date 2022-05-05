@@ -402,12 +402,12 @@ def submit_dl1_jobs(
 
     # start 1 jobarray with all files included. The job selects its file based on its task id
     cmd = f'{base_cmd} -f {" ".join(sublist_names)} --output_dir {output_dir}'
-    slurm_cmd = "sbatch --parsable "
+    slurm_cmd = "sbatch --parsable"
     for key, value in default_slurm_options.items():
-        slurm_cmd += f"--{key} {value} "
+        slurm_cmd += f" --{key} {value}"
     if slurm_options is not None:
         slurm_cmd += f" {slurm_options}"
-    slurm_cmd += f'--wrap="{cmd}"'
+    slurm_cmd += f' --wrap="{cmd}"'
 
     jobid = os.popen(slurm_cmd).read().strip("\n")
     log.debug(f"Submitted batch job {jobid}")

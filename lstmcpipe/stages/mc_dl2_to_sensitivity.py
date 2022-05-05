@@ -135,11 +135,13 @@ def dl2_to_sensitivity(
     jobe_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.e")
     jobo_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.o")
 
-    cmd_plot = "sbatch --parsable -p short"
-    if slurm_account != "":
-        cmd_plot += f" -A {slurm_account}"
+    cmd_plot = "sbatch --parsable"
     if slurm_options is not None:
         cmd_plot += f" {slurm_options}"
+    else:
+        cmd_plot += " -p short"
+    if slurm_account != "":
+        cmd_plot += f" -A {slurm_account}"
     cmd_plot += (
         f" --dependency=afterok:{job_id_dl2_sens} -e {jobe_plot} -o {jobo_plot}"
         f' -J dl2_sens_plot --wrap="export MPLBACKEND=Agg; {source_env} {base_cmd_plot}"'

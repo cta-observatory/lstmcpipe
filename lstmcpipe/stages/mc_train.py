@@ -218,11 +218,14 @@ def train_pipe(
     jobe = Path(models_dir).joinpath("train_job.e").resolve().as_posix()
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long --mem=32G"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
+    batch_cmd = "sbatch --parsable"
+    # For training, we'd need at least 32G (AllSky) and long queue, user can change this value, though.
     if slurm_options is not None:
         batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += " -p long --mem=32G "
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
     if wait_jobs_dl1 != "":
         batch_cmd += " --dependency=afterok:" + wait_jobs_dl1
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '

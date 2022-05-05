@@ -146,11 +146,13 @@ def dl2_to_irfs(
     jobe = Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix()
     jobo = Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix()
 
-    batch_cmd = "sbatch --parsable -p short"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
+    batch_cmd = "sbatch --parsable"
     if slurm_options is not None:
         batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += " -p short"
+    if slurm_account != "":
+        batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
         f" --dependency=afterok:{wait_jobs_dl1dl2} -J dl2_IRF"
         f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
