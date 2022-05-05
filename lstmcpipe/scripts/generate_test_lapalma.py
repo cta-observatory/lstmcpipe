@@ -47,12 +47,12 @@ def generate_test_prod5trans80(working_dir='/fefs/aswg/workspace/lstmcpipe/data/
 
 
 def generate_test_allsky(working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/',
-                         nfiles=5, path_to_config_file='.', overwrite=True):
+                         nfiles=5, path_to_config_file='.', dec='dec_4822',  overwrite=True):
     allsky_base_dir = '/home/georgios.voutsinas/ws/AllSky/'
     
     generate_tree(allsky_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
 
-    pc = paths_config.PathConfigAllSky(f'test_prod_{date.today()}')
+    pc = paths_config.PathConfigAllSky(f'test_prod_{date.today()}', dec)
     pc.base_dir = os.path.join(working_dir, '{data_level}/AllSky/{prod_id}/{particle}/{pointing}')
     # config training dir are replaced with local ones
     pc.training_dir = os.path.join(working_dir, pc.training_dir.replace(allsky_base_dir, 'DL0/AllSky/'))

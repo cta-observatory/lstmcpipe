@@ -417,13 +417,13 @@ class PathConfigAllSky(PathConfig):
     Standard paths configuration for a prod5_trans_80 MC production
     """
 
-    def __init__(self, prod_id):
+    def __init__(self, prod_id, dec):
         super().__init__(prod_id)
         self.prod_id = prod_id
-        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/{pointing}"
-        self.training_dir = \
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output_v1.4"
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output_v1.4"
+        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/" + dec + "/{pointing}/"
+        self.training_dir = "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/" + dec + "/sim_telarray/{pointing}/output/"
+        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
+
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.testing_particles = ['Crab']
 
@@ -431,7 +431,13 @@ class PathConfigAllSky(PathConfig):
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
 
     def _search_pointings(self, particle):
-        pointing_dirs = os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
+        pointing_dirs_ = os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
+        # Check that pointings contain simtel files
+        pointing_dirs = []
+        for pointing in pointing_dirs_:
+            fullpath = self.r0_dir(particle, pointing)
+            if [f for f in os.listdir(fullpath) if f.endswith('.simtel.gz')]:
+                pointing_dirs.append(pointing)
         return pointing_dirs
 
     def training_pointings(self, particle):
