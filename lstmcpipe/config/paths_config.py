@@ -417,13 +417,15 @@ class PathConfigAllSky(PathConfig):
     Standard paths configuration for a prod5_trans_80 MC production
     """
 
-    def __init__(self, prod_id):
+    def __init__(self, prod_id, dec):
         super().__init__(prod_id)
         self.prod_id = prod_id
-        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/{pointing}"
-        self.training_dir = \
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/sim_telarray/{pointing}/output_v1.4"
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/Crab/sim_telarray/{pointing}/output_v1.4"
+        # self.base_dir = os.path.join("/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/", dec, "{pointing}")
+        self.base_dir = "/fefs/aswg/workspace/thomas.vuillaume/data/mc/{data_level}/AllSky/{prod_id}/{particle}/" + dec + "/sim_telarray/{pointing}/output"
+        self.training_dir = "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/" + dec + "/sim_telarray/{pointing}/output/"
+        # self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
+        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_10.0_az_102.199_/output_v1.4/"
+
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.testing_particles = ['Crab']
 
