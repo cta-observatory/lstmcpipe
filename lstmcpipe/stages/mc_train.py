@@ -129,7 +129,7 @@ def batch_plot_rf_features(
 
         batch_cmd = f"lstmcpipe_plot_models_importance {models_dir} -cf {config_file}"
 
-        slurm_cmd = "sbatch --parsable --mem=40G "
+        slurm_cmd = "sbatch --parsable --mem=16G "
         if slurm_account != "":
             slurm_cmd += f" -A {slurm_account}"
         slurm_cmd += (
@@ -214,7 +214,7 @@ def train_pipe(
     jobe = Path(models_dir).joinpath("train_job.e").resolve().as_posix()
 
     # 'sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} -e {jobe} -o {jobo} --wrap="{base_cmd}"'
-    batch_cmd = "sbatch --parsable -p long --mem=60G"
+    batch_cmd = "sbatch --parsable -p long --mem=32G"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     if wait_jobs_dl1 != "":
