@@ -68,7 +68,7 @@ def query_continue(question, default="no"):
         return answer
 
 
-def check_data_path(data_path, glob=None, rglob=None):
+def check_data_path(data_path, glob=None):
     """
     Check if the path to some data exists.
     Raise an Error if the path does not exist, is not a directory or does not contain data.
@@ -78,16 +78,14 @@ def check_data_path(data_path, glob=None, rglob=None):
     data_path: str
     glob: str
         Glob pattern to be passed
-    rglob: str
-        Rglob pattern to be passed
     """
     if not Path(data_path).exists():
         raise ValueError("The input directory must exist")
-    if not get_input_filelist(data_path, glob_pattern=glob, rglob_pattern=rglob):
+    if not get_input_filelist(data_path, glob_pattern=glob):
         raise ValueError("The input directory is empty")
 
 
-def get_input_filelist(data_path, glob_pattern=None, rglob_pattern=None):
+def get_input_filelist(data_path, glob_pattern=None):
     """
     Return list of files in `data_path`
 
@@ -96,22 +94,16 @@ def get_input_filelist(data_path, glob_pattern=None, rglob_pattern=None):
     data_path: str
         Directory path
     glob_pattern: str
-        Glob the given pattern
-    rglob_pattern: str
-        Recursively (adds "**/" in from of the pattern) glob the given pattern
+        Glob the given pattern. To Glob recursively, add "**/" in front of the string
 
     Returns
     -------
     list
     """
-    if glob_pattern is None and rglob_pattern is None:
+    if glob_pattern is None:
         _path = Path(data_path).iterdir()
-    elif glob_pattern is not None and rglob_pattern is None:
-        _path = Path(data_path).glob(str(glob_pattern))
-    elif glob_pattern is None and rglob_pattern is not None:
-        _path = Path(data_path).rglob(str(rglob_pattern))
     else:
-        raise ValueError("Choose between `glob_pattern` OR `rglob_pattern`, not both")
+        _path = Path(data_path).glob(str(glob_pattern))
 
     return [file.resolve().as_posix() for file in _path]
 

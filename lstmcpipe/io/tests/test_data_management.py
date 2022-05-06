@@ -22,11 +22,6 @@ def test_check_data_path_raise_value_error(create_tmp_dir):
     check_data_path(create_tmp_dir)
 
 
-@pytest.mark.xfail(raises=ValueError)
-def test_get_input_filelist_raise_value_error(create_tmp_dir):
-    get_input_filelist(create_tmp_dir, glob_pattern="*.h5", rglob_pattern="*.simtel.gz")
-
-
 def test_get_input_filelist(create_tmp_dir, create_tmp_subdir):
     for i in range(2):
         with open(create_tmp_dir.joinpath(f'LST-1.1.Run00101.{i:05d}.simtel.fz'), 'w'):
@@ -41,5 +36,5 @@ def test_get_input_filelist(create_tmp_dir, create_tmp_subdir):
 
     assert len(get_input_filelist(create_tmp_dir)) == 6  # 5 files plus subdir
     assert len(get_input_filelist(create_tmp_dir, glob_pattern="*.h5")) == 2
-    assert len(get_input_filelist(create_tmp_dir, rglob_pattern="*.simtel.fz")) == 4
+    assert len(get_input_filelist(create_tmp_dir, glob_pattern="**/*.simtel.fz")) == 4
 
