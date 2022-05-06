@@ -33,7 +33,7 @@ def test_get_input_filelist(create_tmp_dir, create_tmp_subdir):
             pass
         with open(create_tmp_dir.joinpath(f'LST-1.1.Run00102.{i:05d}.h5'), 'w'):
             pass
-    with open(create_tmp_dir.joinpath(f'some_file.log'), 'w'):
+    with open(create_tmp_dir.joinpath('some_file.log'), 'w'):
         pass
     for i in range(2):
         with open(create_tmp_subdir.joinpath(f'LST-1.1.Run00103.{i:05d}.simtel.fz'), 'w'):
