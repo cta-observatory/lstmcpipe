@@ -74,6 +74,7 @@ setup(
     scripts=scripts_list,
     entry_points=entry_points,
     include_package_data=True,
+    package_data={'lstmcpipe': ['codemeta.json']},
     data_files=[('lstmcpipe', ['lstmcpipe/base_config_lstmcpipe.yaml'])],
     use_scm_version={
         "write_to": Path(__file__).parent.joinpath("lstmcpipe/_version.py"),
