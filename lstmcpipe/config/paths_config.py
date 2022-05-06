@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+from pathlib import Path
 from ruamel.yaml import YAML
 from datetime import date
 from copy import deepcopy
@@ -645,5 +646,37 @@ class PathConfigAllSky(PathConfig):
                     'options': '--point-like'
                 }
                 )
+
+        return paths
+
+
+
+class PathConfigAllSkyDL1ab(PathConfigAllSky):
+
+    def __init__(self, starting_prod_id, new_prod_id, dec):
+        super().__init__(prod_id=new_prod_id, dec=dec)
+        self.starting_prod_id = starting_prod_id
+        self.stages.remove('r0_to_dl1')
+        self.stages.insert(0, 'dl1ab')
+        # the new stages are then: dl1ab, merge, train, dl1_to_dl2, dl2_to_irfs
+        self.dec = dec
+
+    @property
+    def dl1ab(self):
+        paths = []
+        former_config = PathConfigAllSky(self.starting_prod_id, self.dec)
+        def append_path(particle, pointing):
+            former_dl1 = former_config.dl1_dir(particle, pointing)
+            if Path(former_dl1).exists() and [f for f in Path(former_dl1).iterdir() if f.as_posix().endswith('.h5')]:
+                target_dl1 = self.dl1_dir(particle, pointing)
+                paths.append({'input': former_dl1, 'output': target_dl1})
+                
+        for particle in self.training_particles:
+            for pointing in self.training_pointings(particle):
+                append_path(particle, pointing)
+
+        for particle in self.testing_particles:
+            for pointing in self.testing_pointings(particle):
+                append_path(particle, pointing)
 
         return paths
