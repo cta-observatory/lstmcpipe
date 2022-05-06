@@ -656,8 +656,8 @@ class PathConfigAllSkyDL1ab(PathConfigAllSky):
         super().__init__(prod_id=new_prod_id, dec=dec)
         self.starting_prod_id = starting_prod_id
         self.stages.remove('r0_to_dl1')
-        self.stages.remove('merge_dl1')
         self.stages.insert(0, 'dl1ab')
+        # the new stages are then: dl1ab, merge, train, dl1_to_dl2, dl2_to_irfs
         self.dec = dec
 
     @property
