@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Licensed under a MIT license - see LICENSE.rst
 
-import os
 import json
 from pathlib import Path
 from setuptools import setup, find_packages
@@ -11,9 +10,8 @@ def find_scripts(script_dir, prefix):
     script_list = [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
     return script_list
 
-
 # Read package info from codemeta.json
-with open(os.path.join(os.path.dirname(__file__), "codemeta.json")) as file:
+with open(Path(__file__).parent.joinpath("codemeta.json")) as file:
     metadata = json.load(file)
 
 project_name = metadata["name"]
