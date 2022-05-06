@@ -109,7 +109,7 @@ def get_input_filelist(data_path, glob_pattern=None, rglob_pattern=None):
     elif glob_pattern is not None and rglob_pattern is None:
         _path = Path(data_path).glob(str(glob_pattern))
     elif glob_pattern is None and rglob_pattern is not None:
-        _path = Path(data_path).rglob(str(glob_pattern))
+        _path = Path(data_path).rglob(str(rglob_pattern))
     else:
         raise ValueError("Choose between `glob_pattern` OR `rglob_pattern`, not both")
 
