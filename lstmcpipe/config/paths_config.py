@@ -609,7 +609,8 @@ class PathConfigAllSky(PathConfig):
                 'gamma': self.training_merged_dl1('GammaDiffuse'),
                 'proton': self.training_merged_dl1('Protons'),
             },
-            'output': self.models_path()
+            'output': self.models_path(),
+            'slurm_options': '-p long --mem=80G'
         }]
         return paths
 
