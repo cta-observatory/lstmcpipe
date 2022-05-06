@@ -674,8 +674,8 @@ class PathConfigAllSkyDL1ab(PathConfigAllSky):
             for pointing in self.training_pointings(particle):
                 append_path(particle, pointing)
 
-        for particle in pc.testing_particles:
-            for pointing in pc.testing_pointings(particle):
+        for particle in self.testing_particles:
+            for pointing in self.testing_pointings(particle):
                 append_path(particle, pointing)
 
         return paths
