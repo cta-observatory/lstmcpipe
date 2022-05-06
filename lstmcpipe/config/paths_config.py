@@ -423,7 +423,7 @@ class PathConfigAllSky(PathConfig):
         super().__init__(prod_id)
         self.prod_id = prod_id
         self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/" + dec + "/{pointing}/"
-        self.training_dir = "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/" + dec + "/sim_telarray/{pointing}/output/"
+        self.training_dir = "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/" + dec + "/sim_telarray/{pointing}/output_v1.4/"
         self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
 
         self.training_particles = ['GammaDiffuse', 'Protons']
