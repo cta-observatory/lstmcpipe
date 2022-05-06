@@ -3,6 +3,7 @@
 import os
 import sys
 import shutil
+from pathlib import Path
 from distutils.util import strtobool
 
 
@@ -67,7 +68,7 @@ def query_continue(question, default="no"):
         return answer
 
 
-def check_data_path(data_path):
+def check_data_path(data_path, glob=None, rglob=None):
     """
     Check if the path to some data exists.
     Raise an Error if the path does not exist, is not a directory or does not contain data.
@@ -75,32 +76,44 @@ def check_data_path(data_path):
     Parameters
     ----------
     data_path: str
+    glob: str
+        Glob pattern to be passed
+    rglob: str
+        Rglob pattern to be passed
     """
-    if not os.path.exists(data_path):
+    if not Path(data_path).exists():
         raise ValueError("The input directory must exist")
-    if get_input_filelist(data_path) == []:
+    if not get_input_filelist(data_path, glob_pattern=glob, rglob_pattern=rglob):
         raise ValueError("The input directory is empty")
-    # if not data_path.startswith(BASE_DIR):
-    #     raise ValueError("The root directory for the data is supposed to be {}".format(BASE_DIR))
 
 
-def get_input_filelist(data_path):
+def get_input_filelist(data_path, glob_pattern=None, rglob_pattern=None):
     """
     Return list of files in `data_path`
 
     Parameters
     ----------
     data_path: str
+        Directory path
+    glob_pattern: str
+        Glob the given pattern
+    rglob_pattern: str
+        Recursively (adds "**/" in from of the pattern) glob the given pattern
 
     Returns
     -------
-    list of str
+    list
     """
-    return [
-        os.path.abspath(os.path.join(data_path, f))
-        for f in os.listdir(data_path)
-        if os.path.isfile(os.path.join(data_path, f))
-    ]
+    if glob_pattern is None and rglob_pattern is None:
+        _path = Path(data_path).iterdir()
+    elif glob_pattern is not None and rglob_pattern is None:
+        _path = Path(data_path).glob(str(glob_pattern))
+    elif glob_pattern is None and rglob_pattern is not None:
+        _path = Path(data_path).rglob(str(glob_pattern))
+    else:
+        raise ValueError("Choose between `glob_pattern` OR `rglob_pattern`, not both")
+
+    return [file.resolve().as_posix() for file in _path]
 
 
 def check_and_make_dir(directory):
