@@ -15,6 +15,22 @@ def batch_train_test_splitting(
         batch_config,
         logs,
 ):
+    """
+
+    Parameters
+    ----------
+    dict_paths: dict
+    jobids_from_r0dl1: str
+    batch_config: dict
+        Dictionary containing the (full) source_environment and the slurm_account strings to be passed
+        to `merge_dl1` and `compose_batch_command_of_script` functions.
+    logs: dict
+        Dictionary with logs files
+
+    Returns
+    -------
+
+    """
     log_splitting = {}
     debug_log = {}
     jobids_for_merging = []
@@ -27,6 +43,7 @@ def batch_train_test_splitting(
             paths["output"],
             wait_jobid_r0_dl1=jobids_from_r0dl1,
             batch_configuration=batch_config,
+            slurm_options=paths.get("slurm_options", None),
         )
 
         log_splitting.update(job_logs)
@@ -50,7 +67,23 @@ def train_test_split(
         output_dirs,
         batch_configuration,
         wait_jobid_r0_dl1=None,
+        slurm_options=None,
 ):
+    """
+
+    Parameters
+    ----------
+    input_dir: str
+    output_dirs: dict
+    batch_configuration: dict
+    wait_jobid_r0_dl1: str
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
+
+    Returns
+    -------
+
+    """
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
@@ -82,7 +115,11 @@ def train_test_split(
     jobe = Path(input_dir).joinpath(input_dir, "split_tt_%j.e")
     jobo = Path(input_dir).joinpath(input_dir, "split_tt_%j.o")
 
-    batch_cmd = "sbatch --parsable -p short"
+    batch_cmd = "sbatch --parsable"
+    if slurm_options is not None:
+        batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += " -p short"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     if wait_jobid_r0_dl1 is not None:

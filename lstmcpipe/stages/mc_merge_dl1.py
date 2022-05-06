@@ -33,7 +33,7 @@ def batch_merge_dl1(
         Defines workflow kind (lstchain, ctapipe, hiperta)
     logs: dict
         Dictionary with logs files
-    jobid_from_splitting:
+    jobid_from_splitting: str
 
     Returns
     -------
@@ -55,14 +55,15 @@ def batch_merge_dl1(
 #        merge_flag = smart_merge
 #    log.debug("Merge flag set: {}".format(merge_flag))
 
-    for particle in dict_paths:
+    for paths in dict_paths:
         job_logs, jobid_debug = merge_dl1(
-            particle["input"],
-            particle["output"],
-            merging_options=particle.get('options', None),
+            paths["input"],
+            paths["output"],
+            merging_options=paths.get('options', None),
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,
             workflow_kind=workflow_kind,
+            slurm_options=paths.get("slurm_options", None),
         )
 
         log_merge.update(job_logs)
@@ -85,6 +86,7 @@ def merge_dl1(
         wait_jobs_split="",
         merging_options=None,
         workflow_kind="lstchain",
+        slurm_options=None,
 ):
     """
 
@@ -96,11 +98,13 @@ def merge_dl1(
     wait_jobs_split: str
     merging_options: dict
     workflow_kind: str
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
     log_merge: dict
-    jobid_merge: dict
+    jobid_merge: str
 
     """
     source_environment = batch_configuration["source_environment"]
@@ -110,14 +114,19 @@ def merge_dl1(
 
     log_merge = {}
 
-    cmd = "sbatch --parsable -p short"
+    jobo = Path(output_file).parent.joinpath("merging-output.o")
+    jobe = Path(output_file).parent.joinpath("merging-error.e")
+
+    cmd = "sbatch --parsable"
+    # TODO All slurm options/args can most probable be passed in a more intelligent way
+    if slurm_options is not None:
+        cmd += f" {slurm_options}"
+    else:
+        cmd += " -p short"
     if slurm_account != "":
         cmd += f" -A {slurm_account}"
     if wait_jobs_split != "":
         cmd += " --dependency=afterok:" + wait_jobs_split
-
-    jobo = Path(output_file).parent.joinpath("merging-output.o")
-    jobe = Path(output_file).parent.joinpath("merging-error.e")
 
     cmd += (
         f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '

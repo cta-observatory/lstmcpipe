@@ -49,6 +49,7 @@ def batch_dl2_to_sensitivity(
             paths["output"],
             batch_configuration=batch_config,
             wait_jobs_dl1_dl2=job_ids_from_dl1_dl2,
+            slurm_options=paths.get("slurm_options", None),
         )
         jobid_for_check.append(jobid)
         log_dl2_to_sensitivity.update(job_logs)
@@ -72,6 +73,7 @@ def dl2_to_sensitivity(
     output,
     batch_configuration,
     wait_jobs_dl1_dl2,
+    slurm_options=None,
 ):
     """
     Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse
@@ -87,6 +89,8 @@ def dl2_to_sensitivity(
         sbatch commands
     wait_jobs_dl1_dl2: str
         Comma-separated string with the jobs (dependency) to wait for before launching the cmd
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
@@ -131,7 +135,11 @@ def dl2_to_sensitivity(
     jobe_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.e")
     jobo_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.o")
 
-    cmd_plot = "sbatch --parsable -p short"
+    cmd_plot = "sbatch --parsable"
+    if slurm_options is not None:
+        cmd_plot += f" {slurm_options}"
+    else:
+        cmd_plot += " -p short"
     if slurm_account != "":
         cmd_plot += f" -A {slurm_account}"
     cmd_plot += (

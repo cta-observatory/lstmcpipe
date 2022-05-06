@@ -61,6 +61,7 @@ def batch_dl2_to_irfs(
             irf_point_like=paths["options"],
             batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
+            slurm_options=paths.get("slurm_options", None),
         )
 
         log_dl2_to_irfs.update(log_dl2_to_irfs)
@@ -89,6 +90,7 @@ def dl2_to_irfs(
     irf_point_like,
     batch_configuration,
     wait_jobs_dl1dl2,
+    slurm_options=None
 ):
     """
     Batches interactively the lstchain `lstchain_create_irf_files` entry point.
@@ -98,7 +100,7 @@ def dl2_to_irfs(
     gamma_file: str
     electron_file: str
     proton_file: str
-    output_dir: str
+    outfile: str
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
     irf_point_like: str
@@ -109,6 +111,8 @@ def dl2_to_irfs(
     wait_jobs_dl1dl2: str
         Comma separated string with the job ids of previous stages (dl1_to_dl2 stage) to be passed as dependencies to
         the create_irfs_files job to be batched.
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
@@ -142,7 +146,11 @@ def dl2_to_irfs(
     jobe = Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix()
     jobo = Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix()
 
-    batch_cmd = "sbatch --parsable -p short"
+    batch_cmd = "sbatch --parsable"
+    if slurm_options is not None:
+        batch_cmd += f" {slurm_options}"
+    else:
+        batch_cmd += " -p short"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += (

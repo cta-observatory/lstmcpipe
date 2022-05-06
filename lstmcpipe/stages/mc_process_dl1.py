@@ -62,6 +62,7 @@ def batch_process_dl1(
                 config_file=conf_file,
                 batch_config=batch_config,
                 workflow_kind=workflow_kind,
+                slurm_options=paths.get("slurm_options", None),
             )
             log_process_dl1.update(job_logs)
             jobids_dl1_processing_stage.append(jobid)
@@ -77,6 +78,7 @@ def batch_process_dl1(
                 config_file=conf_file,
                 batch_config=batch_config,
                 workflow_kind=workflow_kind,
+                slurm_options=paths.get("slurm_options", None),
             )
 
             log_process_dl1.update(job_logs)
@@ -102,6 +104,7 @@ def r0_to_dl1(
     batch_config=None,
     debug_mode=False,
     keep_rta_file=False,
+    slurm_options=None,
 ):
     """
     R0 to DL1 MC onsite conversion.
@@ -121,6 +124,8 @@ def r0_to_dl1(
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
+    slurm_options: str
+        Extra slurm options to be passed
 
     # HIPERTA ARGUMENTS
     keep_rta_file : bool
@@ -203,6 +208,7 @@ def r0_to_dl1(
         job_logs_dir=job_logs_dir,
         slurm_account=slurm_account,
         filelist_name="r0_to_dl1",
+        slurm_options=slurm_options,
     )
 
     # copy config into working dir
@@ -226,6 +232,7 @@ def reprocess_dl1(
     config_file=None,
     batch_config=None,
     dl1_files_per_job=50,
+    slurm_options=None,
 ):
     """
     Reprocessing of existing dl1 files.
@@ -248,6 +255,8 @@ def reprocess_dl1(
         One of the supported pipelines. Defines the command to be run on r0 files
     dl1_files_per_job: int
         Number of dl1 files to be processed per job array that was batched.
+    slurm_options: str
+        Extra slurm options to be passed to the sbatch command
 
     Returns
     -------
@@ -300,6 +309,7 @@ def reprocess_dl1(
         job_logs_dir=job_logs_dir,
         slurm_account=slurm_account,
         filelist_name="dl1ab",
+        slurm_options=slurm_options,
     )
 
     # copy config into working dir
@@ -328,6 +338,7 @@ def submit_dl1_jobs(
     filelist_name,
     n_jobs_parallel=100,
     dl1_processing="r0_dl1",
+    slurm_options=None,
 ):
     """
     Compose sbatch command and batches it
@@ -345,6 +356,8 @@ def submit_dl1_jobs(
     filelist_name: str
     n_jobs_parallel: int
     dl1_processing: str
+    slurm_options: str
+        Extra slurm options to be passed
 
     Returns
     -------
@@ -374,7 +387,7 @@ def submit_dl1_jobs(
 
     sublist_names = [f.as_posix() for f in Path(job_logs_dir).glob("*.sublist")]  # Number of sublists ??
 
-    slurm_options = {
+    default_slurm_options = {
         "output": job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
         "error": job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
         "array": f"0-{len(sublist_names)-1}%{n_jobs_parallel}",
@@ -382,17 +395,19 @@ def submit_dl1_jobs(
     }
 
     # All files to long queue
-    slurm_options.update({"partition": "long"})
+    default_slurm_options.update({"partition": "long"})
     # `sbatch -A` is the --account slurm argument
     if slurm_account != '':
-        slurm_options.update({"account": slurm_account})
+        default_slurm_options.update({"account": slurm_account})
 
     # start 1 jobarray with all files included. The job selects its file based on its task id
     cmd = f'{base_cmd} -f {" ".join(sublist_names)} --output_dir {output_dir}'
-    slurm_cmd = "sbatch --parsable "
-    for key, value in slurm_options.items():
-        slurm_cmd += f"--{key} {value} "
-    slurm_cmd += f'--wrap="{cmd}"'
+    slurm_cmd = "sbatch --parsable"
+    for key, value in default_slurm_options.items():
+        slurm_cmd += f" --{key} {value}"
+    if slurm_options is not None:
+        slurm_cmd += f" {slurm_options}"
+    slurm_cmd += f' --wrap="{cmd}"'
 
     jobid = os.popen(slurm_cmd).read().strip("\n")
     log.debug(f"Submitted batch job {jobid}")
