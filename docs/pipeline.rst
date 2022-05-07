@@ -129,7 +129,7 @@ One can also start back from DL1, applying the dl1ab stage:
 AllSky production pipeline
 --------------------------
 
-Here is the pipeline for the AllSky MC production:
+Standard AllSky production pipeline **for one training declination**
 
 .. mermaid::
 
@@ -158,10 +158,11 @@ Here is the pipeline for the AllSky MC production:
 
         models --> DL2-GammaCrab
 
-        DL1-GammaCrab -----> DL2-GammaCrab
-        DL2-GammaCrab[DL2 Gamma Crab \n - node a\n - node b\n - node c]
+        DL1-GammaCrab --> |merge_dl1| DL1-GammaCrab-merged[DL1 Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
+        DL1-GammaCrab-merged ----> DL2-GammaCrab
+        DL2-GammaCrab[DL2 Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
 
         DL2-GammaCrab --> |dl2_to_irf| IRF-GammaCrab
-        IRF-GammaCrab[IRF Gamma Crab \n - node a\n - node b\n - node c]
+        IRF-GammaCrab[IRF Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
 
 
