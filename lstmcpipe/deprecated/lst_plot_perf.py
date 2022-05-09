@@ -10,9 +10,7 @@ from ctaplot.plots import plot_binned_stat
 parser = argparse.ArgumentParser(description="Reconstruct events")
 
 # Required arguments
-parser.add_argument(
-    "--gamma_file", "-fg", type=str, dest="gamma_file", help="path to a DL1 HDF5 file"
-)
+parser.add_argument("--gamma_file", "-fg", type=str, dest="gamma_file", help="path to a DL1 HDF5 file")
 
 # Required arguments
 # parser.add_argument('--datafile', '-fp', type=str,
@@ -103,9 +101,7 @@ def plot_binned_stat_grid(data, x_col, **binned_stat_args):
     ncol = 4
     nrows = n // ncol + 1 * (n % ncol > 0)
 
-    fig, axes = plt.subplots(
-        nrows=nrows, ncols=ncol, figsize=(20, 20 * 0.66 * (nrows / ncol)), sharex=False
-    )
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncol, figsize=(20, 20 * 0.66 * (nrows / ncol)), sharex=False)
 
     raxes = axes.ravel()
     cols = list(data.columns)
@@ -141,9 +137,7 @@ def plot_binned_stat_grid(data, x_col, **binned_stat_args):
 if __name__ == "__main__":
 
     gamma = pd.read_hdf(args.gamma_file, key=dl2_params_lstcam_key)
-    selection = (
-        (gamma.intensity > 200) & (gamma.leakage < 0.2) & (gamma.gammaness > 0.5)
-    )
+    selection = (gamma.intensity > 200) & (gamma.leakage < 0.2) & (gamma.gammaness > 0.5)
     selected_gamma = gamma[selection]
 
     plot_histograms(gamma, save_dir=os.path.join(args.outdir, "hist"), bins=100)
@@ -178,9 +172,7 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(10, 7))
     ax = ctaplot.plot_energy_resolution_cta_performance("north", color="black", ax=ax)
-    ax = ctaplot.plot_energy_resolution(
-        gamma.mc_energy, gamma.reco_energy, label="all gammas", ax=ax
-    )
+    ax = ctaplot.plot_energy_resolution(gamma.mc_energy, gamma.reco_energy, label="all gammas", ax=ax)
     ax = ctaplot.plot_energy_resolution(
         selected_gamma.mc_energy,
         selected_gamma.reco_energy,

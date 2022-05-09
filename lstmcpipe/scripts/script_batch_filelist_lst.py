@@ -7,8 +7,7 @@ import subprocess
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Batches the r0_to_dl1 lstchain stage for all the files "
-        "within a text file."
+        description="Batches the r0_to_dl1 lstchain stage for all the files " "within a text file."
     )
     parser.add_argument(
         "--file_list",

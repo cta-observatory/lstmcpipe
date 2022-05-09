@@ -67,8 +67,7 @@ def batch_dl2_to_irfs(
         log_dl2_to_irfs.update(log_dl2_to_irfs)
         jobid_for_check.append(jobid)
         debug_log[jobid] = (
-            f"jobid from dl2_to_irfs stage that depends of the dl1_to_dl2 stage "
-            f"job_ids; {job_ids_from_dl1_dl2}"
+            f"jobid from dl2_to_irfs stage that depends of the dl1_to_dl2 stage " f"job_ids; {job_ids_from_dl1_dl2}"
         )
 
     jobid_for_check = ",".join(jobid_for_check)
@@ -90,7 +89,7 @@ def dl2_to_irfs(
     irf_point_like,
     batch_configuration,
     wait_jobs_dl1dl2,
-    slurm_options=None
+    slurm_options=None,
 ):
     """
     Batches interactively the lstchain `lstchain_create_irf_files` entry point.
@@ -123,16 +122,14 @@ def dl2_to_irfs(
     """
     source_env = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
-    
+
     output_dir = Path(outfile).parent
 
     log_dl2_to_irfs = {}
 
     check_and_make_dir_without_verification(output_dir)
 
-    cmd = (
-        f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -o {outfile} "
-    )
+    cmd = f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -o {outfile} "
     if proton_file is not None:
         cmd += f" -p {proton_file}"
     if electron_file is not None:
@@ -154,8 +151,7 @@ def dl2_to_irfs(
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += (
-        f" --dependency=afterok:{wait_jobs_dl1dl2} -J dl2_IRF"
-        f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
+        f" --dependency=afterok:{wait_jobs_dl1dl2} -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
     )
 
     job_id_dl2_irfs = os.popen(batch_cmd).read().strip("\n")
@@ -163,9 +159,6 @@ def dl2_to_irfs(
 
     # Copy config into working dir
     if config_file:
-        shutil.copyfile(
-            config_file,
-            Path(output_dir).joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, Path(output_dir).joinpath(Path(config_file).name))
 
     return log_dl2_to_irfs, job_id_dl2_irfs

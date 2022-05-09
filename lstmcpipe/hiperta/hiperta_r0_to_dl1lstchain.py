@@ -17,12 +17,7 @@ def main():
     )
 
     parser.add_argument(
-        "--infile",
-        "-i",
-        type=str,
-        dest="infile",
-        help="mc r0 file to be run with hiperta_r0_dl1",
-        required=True
+        "--infile", "-i", type=str, dest="infile", help="mc r0 file to be run with hiperta_r0_dl1", required=True
     )
 
     parser.add_argument(
@@ -71,9 +66,7 @@ def main():
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
-    output_reorganized_filename = os.path.join(
-        args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile)
-    )
+    output_reorganized_filename = os.path.join(args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?

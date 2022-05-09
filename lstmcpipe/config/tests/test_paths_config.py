@@ -62,6 +62,7 @@ def test_path_config_save():
 
 def test_PathConfigProd5Trans80():
     from lstmcpipe.config.paths_config import PathConfigProd5Trans80
+
     prod_id = '20210416_v0.7.3_prod5_trans_80_local_taicut_8_4'
     cfg = PathConfigProd5Trans80(prod_id)
     cfg.generate()
@@ -74,30 +75,51 @@ def test_PathConfigProd5Trans80():
     assert cfg.training_particles == ["gamma-diffuse", "proton"]
     assert cfg.testing_particles == ["gamma", "electron", "proton", "gamma-diffuse"]
     assert cfg.zenith == "zenith_20deg"
-    assert cfg.base_dir == \
-           "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}"
-    assert cfg.dl1_dir("gamma") == \
-           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
-    assert cfg.dl2_dir("gamma") == \
-           f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
-    assert cfg.dl2_output_file("gamma") == \
-           f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl2_gamma_{prod_id}_test.h5"
-    assert cfg.irf_dir("gamma") == \
-           f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/gamma"
-    assert cfg.merge_output_file("gamma", "train") == \
-           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_train.h5"
-    assert cfg.merge_output_file("gamma", "test") == \
-           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_test.h5"
-    assert cfg.models_path() == \
-           f"/fefs/aswg/data/models/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}"
-    assert cfg.r0_dir("gamma") == \
-           "/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
-    assert cfg.sensitivity_file(offset="0.0deg") == \
-           f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/0.0deg/sensitivity_{prod_id}_0.0deg.fits.gz"
-    assert cfg.train_dir("gamma") == \
-           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/train"
-    assert cfg.test_dir("gamma") == \
-           f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/test"
+    assert (
+        cfg.base_dir
+        == "/fefs/aswg/data/mc/{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}"
+    )
+    assert (
+        cfg.dl1_dir("gamma")
+        == f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
+    )
+    assert (
+        cfg.dl2_dir("gamma")
+        == f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg"
+    )
+    assert (
+        cfg.dl2_output_file("gamma")
+        == f"/fefs/aswg/data/mc/DL2/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl2_gamma_{prod_id}_test.h5"
+    )
+    assert (
+        cfg.irf_dir("gamma")
+        == f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/gamma"
+    )
+    assert (
+        cfg.merge_output_file("gamma", "train")
+        == f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_train.h5"
+    )
+    assert (
+        cfg.merge_output_file("gamma", "test")
+        == f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/dl1_gamma_{prod_id}_test.h5"
+    )
+    assert cfg.models_path() == f"/fefs/aswg/data/models/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}"
+    assert (
+        cfg.r0_dir("gamma")
+        == "/fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/off0.4deg"
+    )
+    assert (
+        cfg.sensitivity_file(offset="0.0deg")
+        == f"/fefs/aswg/data/mc/IRF/20200629_prod5_trans_80/zenith_20deg/south_pointing/{prod_id}/0.0deg/sensitivity_{prod_id}_0.0deg.fits.gz"
+    )
+    assert (
+        cfg.train_dir("gamma")
+        == f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/train"
+    )
+    assert (
+        cfg.test_dir("gamma")
+        == f"/fefs/aswg/data/mc/DL1/20200629_prod5_trans_80/gamma/zenith_20deg/south_pointing/{prod_id}/off0.4deg/test"
+    )
 
     for stg in cfg.stages:
         prop = getattr(cfg, stg)
@@ -121,4 +143,3 @@ def test_PathConfigProd5Trans80():
                 assert "options" in path
                 assert isinstance(path["input"], dict)
                 assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path["input"])
-

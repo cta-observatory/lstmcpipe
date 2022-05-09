@@ -13,14 +13,15 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
 
+sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 import json
 import datetime
+
 with open(os.path.join(os.path.dirname(__file__), "..", "codemeta.json")) as file:
     metadata = json.load(file)
 
@@ -30,13 +31,10 @@ author = ""
 for aut in metadata["author"]:
     author += f"{aut['givenName']} {aut['familyName']},"
 
-copyright = "{}.  Last updated {}".format(
-   author, datetime.datetime.now().strftime("%d %b %Y %H:%M")
-)
+copyright = "{}.  Last updated {}".format(author, datetime.datetime.now().strftime("%d %b %Y %H:%M"))
 
 # The full version, including alpha/beta/rc tags
 release = metadata['version']
-
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,7 +48,7 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinxarg.ext",
     "sphinx.ext.napoleon",
-    "sphinxcontrib.mermaid"
+    "sphinxcontrib.mermaid",
 ]
 
 autosummary_generate = True

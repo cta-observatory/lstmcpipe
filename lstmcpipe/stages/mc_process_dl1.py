@@ -7,10 +7,7 @@ import shutil
 import logging
 from pathlib import Path
 from lstmcpipe.workflow_management import save_log_to_file
-from lstmcpipe.io.data_management import (
-    check_data_path,
-    get_input_filelist
-)
+from lstmcpipe.io.data_management import check_data_path, get_input_filelist
 
 
 log = logging.getLogger(__name__)
@@ -164,9 +161,7 @@ def r0_to_dl1(
         base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
-        base_cmd = (
-            f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
-        )
+        base_cmd = f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
         if keep_rta_file:
             base_cmd += " --keep_rta_file"
         if debug_mode:
@@ -220,10 +215,7 @@ def r0_to_dl1(
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file,
-            job_logs_dir.joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, job_logs_dir.joinpath(Path(config_file).name))
 
     # save file lists into logs
     shutil.move("r0_to_dl1.list", job_logs_dir)
@@ -321,10 +313,7 @@ def reprocess_dl1(
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file,
-            job_logs_dir.joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, job_logs_dir.joinpath(Path(config_file).name))
 
     # save file lists into logs
     shutil.move("dl1ab.list", job_logs_dir)
@@ -384,9 +373,7 @@ def submit_dl1_jobs(
     for i in range(number_of_sublists):
         output_file = job_logs_dir.joinpath("{}_{}.sublist".format(filelist_name, i)).resolve().as_posix()
         with open(output_file, "w+") as out:
-            for line in file_list[
-                i * dl1_files_per_batched_job: dl1_files_per_batched_job * (i + 1)
-            ]:
+            for line in file_list[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:
                 out.write(line)
                 out.write("\n")
 
@@ -398,7 +385,7 @@ def submit_dl1_jobs(
         "output": job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
         "error": job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
         "array": f"0-{len(sublist_names)-1}%{n_jobs_parallel}",
-        "job-name": f"{job_type_id}-{dl1_processing}"
+        "job-name": f"{job_type_id}-{dl1_processing}",
     }
 
     # All files to long queue
