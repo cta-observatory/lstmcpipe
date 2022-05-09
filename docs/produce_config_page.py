@@ -22,6 +22,7 @@ def add_prod_table(
         path to the production configs directory
     prod_file: str
         RST prod file to update
+    lstmcpipe_repo_prod_config_url: str
     """
 
     prod_txt = '\n'
@@ -36,7 +37,7 @@ def add_prod_table(
             try:
                 conf = load_config(yml_list[0])
                 prod_id = conf['prod_id']
-            except:
+            except:  # noqa
                 print(f"Could not load prod id for {prod_dir.name}")
                 prod_id = ''
         else:

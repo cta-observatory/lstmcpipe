@@ -20,3 +20,11 @@ repos:
       - --exclude="""\.git |
         \.__pycache__|
         build"""
+
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v1.2.3
+    hooks:
+    - id: flake8
+      language_version: python3
+      args:
+        - "--max-line-length=120"

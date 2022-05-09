@@ -13,14 +13,12 @@
 
 import os
 import sys
+import json
+import datetime
 
 sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information -----------------------------------------------------
-
-import json
-import datetime
 
 with open(os.path.join(os.path.dirname(__file__), "..", "codemeta.json")) as file:
     metadata = json.load(file)
@@ -35,7 +33,6 @@ copyright = "{}.  Last updated {}".format(author, datetime.datetime.now().strfti
 
 # The full version, including alpha/beta/rc tags
 release = metadata['version']
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -61,14 +58,12 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
-
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

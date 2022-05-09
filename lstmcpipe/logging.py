@@ -49,8 +49,9 @@ def setup_logging(logfile=None, verbose=False):
         log.addHandler(file_handler)
         log.debug("Added logging handler with log file {}".format(logfile))
 
-    # numba produces a ton of logs when set to debug and the solution of using enviroment variables seems to be inconsistent
-    # We dont expect to look through thousands of lines of numba logging anytime soon, so it gets ignored explicitly
+    # numba produces a ton of logs when set to debug and the solution of using enviroment variables seems to be
+    # inconsistent. We dont expect to look through thousands of lines of numba logging anytime soon, so it gets
+    # ignored explicitly
     logging.getLogger("numba").setLevel(logging.WARNING)
 
     return log

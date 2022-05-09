@@ -32,7 +32,7 @@ def list_config_classes():
             cls_base = getattr(paths_config, att).__mro__
             if paths_config.PathConfig in cls_base:
                 all_attrs.append(att)
-        except:
+        except:  # noqa
             pass
     return all_attrs
 

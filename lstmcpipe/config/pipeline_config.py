@@ -84,7 +84,7 @@ def config_valid(loaded_config):
 
     stages_to_be_run = loaded_config["stages_to_run"]
     if "dl1ab" in stages_to_be_run:
-        if not "dl1_reference_id" in loaded_config:
+        if "dl1_reference_id" not in loaded_config:
             raise KeyError(
                 "The key dl1_reference_id has to be set in order to locate " "the input files for the dl1ab stage"
             )

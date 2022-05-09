@@ -186,7 +186,7 @@ class PathConfigProd5Trans80(PathConfig):
         return paths
 
     def merge_output_file(self, particle, step, gamma_src_offset='off0.4deg'):
-        if not step in ['train', 'test']:
+        if step not in ['train', 'test']:
             raise ValueError("Only steps accepted: train or test")
         dl1 = self.dl1_dir(particle=particle, gamma_src_offset=gamma_src_offset)
         return os.path.join(dl1, f'dl1_{particle}_{self.prod_id}_{step}.h5')
@@ -415,7 +415,7 @@ class PathConfigAllSky(PathConfig):
         """
         return a tuple ($0, $1) of pointings based on a text pattern `*_theta_{$0}_az_{$1}_`
         """
-        return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)
+        return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)  # noqa
 
     def _get_training_pointings(self):
         """

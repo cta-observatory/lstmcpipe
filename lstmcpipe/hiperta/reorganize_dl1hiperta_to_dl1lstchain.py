@@ -349,7 +349,7 @@ def stack_by_telid(dl1_pointer, focal=28):
     tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
     try:
         tel_ids = [tel["telId"][0] for tel in dl1_pointer]
-    except:
+    except:  # noqa
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i + 1 for i in range(len(tels_params))]
 
