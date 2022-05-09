@@ -59,7 +59,7 @@ def batch_process_dl1(
         for paths in dict_paths["r0_to_dl1"]:
 
             try:
-                check_data_path(paths["input"], rglob="*.simtel.gz")
+                check_data_path(paths["input"], glob="*.simtel.gz")
             except ValueError:
                 debug_log["**EMPTY_R0_DIR**"] = f'{paths["input"]} directory does not contain any simtel.gz file'
                 continue
@@ -181,7 +181,7 @@ def r0_to_dl1(
 
     log.info("Working on DL0 files in {}".format(input_dir))
 
-    raw_files_list = get_input_filelist(rglob_pattern="*.simtel.gz")
+    raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
 
     if len(raw_files_list) < 50:
         dl1_files_per_job = 20
