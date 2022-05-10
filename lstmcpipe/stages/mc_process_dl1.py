@@ -6,7 +6,6 @@ import os
 import shutil
 import logging
 from pathlib import Path
-import subprocess
 from lstmcpipe.workflow_management import save_log_to_file
 from lstmcpipe.io.data_management import (
     check_data_path,
