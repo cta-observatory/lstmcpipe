@@ -6,7 +6,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-    
 
 def load_config(config_path):
     """
@@ -32,12 +31,9 @@ def load_config(config_path):
 
     config = complete_lstmcpipe_config(loaded_config)
 
-    log.info(
-        f'************ - lstMCpipe will be launch using the {config["workflow_kind"]} pipeline:- ************'
-    )
+    log.info(f'************ - lstMCpipe will be launch using the {config["workflow_kind"]} pipeline:- ************')
     log.info(f'\nPROD_ID to be used: {config["prod_id"]}')
     log.info("\nStages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
-
 
     log.info(
         "Slurm configuration:"
@@ -45,9 +41,7 @@ def load_config(config_path):
         + f"\n - Slurm account: {config['batch_config']['slurm_account']}"
     )
 
-    log.warning(
-        "\n! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !"
-    )
+    log.warning("\n! Subdirectories with the same PROD_ID and analysed the same day will be overwritten !")
 
     return config
 
@@ -78,38 +72,27 @@ def config_valid(loaded_config):
     ]
     allowed_workflows = ["hiperta", "lstchain", "ctapipe"]
 
-
     # Check allowed cases
     for item in compulsory_entries:
         if item not in loaded_config:
-            raise Exception(
-                f"The lstMCpipe configuration was not generated correctly. \n"
-                f"Missing: {item} key"
-            )
+            raise Exception(f"The lstMCpipe configuration was not generated correctly. \n" f"Missing: {item} key")
 
     workflow_kind = loaded_config["workflow_kind"]
 
     if workflow_kind not in allowed_workflows:
-        raise Exception(
-            f"Please select an allowed `workflow_kind`: {allowed_workflows}"
-        )
-
+        raise Exception(f"Please select an allowed `workflow_kind`: {allowed_workflows}")
 
     stages_to_be_run = loaded_config["stages_to_run"]
     if "dl1ab" in stages_to_be_run:
-        if not "dl1_reference_id" in loaded_config:
+        if "dl1_reference_id" not in loaded_config:
             raise KeyError(
-                "The key dl1_reference_id has to be set in order to locate "
-                "the input files for the dl1ab stage"
+                "The key dl1_reference_id has to be set in order to locate " "the input files for the dl1ab stage"
             )
 
     dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
     dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
     if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
-        raise KeyError(
-            "Please specify a simtel monte carlo file to "
-            "compare observed noise against."
-        )
+        raise KeyError("Please specify a simtel monte carlo file to " "compare observed noise against.")
     elif not dl1_noise_tune_data_run and dl1_noise_tune_mc_run:
         raise KeyError("Please specify an observed dl1 file to " "tune the images.")
 
@@ -151,17 +134,20 @@ def complete_lstmcpipe_config(loaded_config):
     if workflow_kind == "lstchain":
 
         import lstchain
+
         base_prod_id = f"{year}{month}{day}_v{lstchain.__version__}"
 
     elif workflow_kind == "ctapipe":
 
         import ctapipe
+
         base_prod_id = f"{year}{month}{day}_vctapipe{ctapipe.__version__}"
 
     elif workflow_kind == "hiperta":  # RTA
 
         # TODO parse version from hiPeRTA module
         import lstchain
+
         base_prod_id = f"{year}{month}{day}_vRTA420_v{lstchain.__version__}"
 
     # Create the final config structure to be passed to the pipeline

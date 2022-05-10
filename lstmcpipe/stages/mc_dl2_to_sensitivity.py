@@ -129,9 +129,7 @@ def dl2_to_sensitivity(
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
 
     # Create plot from sensitivity files
-    base_cmd_plot = (
-        f'lstmcpipe_plot_irfs -f {output} -o {output.replace(".fits.gz", ".png")}'
-    )
+    base_cmd_plot = f'lstmcpipe_plot_irfs -f {output} -o {output.replace(".fits.gz", ".png")}'
     jobe_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.e")
     jobo_plot = Path(output).parent.joinpath("job_plot_sensitivity-%j.o")
 

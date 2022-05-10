@@ -41,10 +41,8 @@ def query_yes_no(question, default="yes"):
         else:
             try:
                 return bool(strtobool(choice))
-            except:
-                sys.stdout.write(
-                    "Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n"
-                )
+            except:  # noqa
+                sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
 def query_continue(question, default="no"):
@@ -120,9 +118,7 @@ def check_and_make_dir(directory):
     """
     if os.path.exists(directory) and os.listdir(directory) != []:
         clean = query_continue(
-            "The directory {} is not empty. Do you want to remove its content?".format(
-                directory
-            ),
+            "The directory {} is not empty. Do you want to remove its content?".format(directory),
             default="no",
         )
         if clean:

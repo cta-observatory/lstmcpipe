@@ -49,11 +49,11 @@ def batch_merge_dl1(
     log.info("==== START {} ====".format("batch merge_and_copy_dl1_workflow"))
     # TODO Lukas: merging option will come inside the
     #  dict_paths["merge_dl1"]["merging_options"]
-#    if isinstance(smart_merge, str):
-#        merge_flag = "lst" in smart_merge
-#    else:
-#        merge_flag = smart_merge
-#    log.debug("Merge flag set: {}".format(merge_flag))
+    #    if isinstance(smart_merge, str):
+    #        merge_flag = "lst" in smart_merge
+    #    else:
+    #        merge_flag = smart_merge
+    #    log.debug("Merge flag set: {}".format(merge_flag))
 
     for paths in dict_paths:
         job_logs, jobid_debug = merge_dl1(
@@ -80,13 +80,13 @@ def batch_merge_dl1(
 
 
 def merge_dl1(
-        input_dir,
-        output_file,
-        batch_configuration,
-        wait_jobs_split="",
-        merging_options=None,
-        workflow_kind="lstchain",
-        slurm_options=None,
+    input_dir,
+    output_file,
+    batch_configuration,
+    wait_jobs_split="",
+    merging_options=None,
+    workflow_kind="lstchain",
+    slurm_options=None,
 ):
     """
 
@@ -128,9 +128,7 @@ def merge_dl1(
     if wait_jobs_split != "":
         cmd += " --dependency=afterok:" + wait_jobs_split
 
-    cmd += (
-        f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '
-    )
+    cmd += f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '
 
     # command passed changes depending on the workflow_kind
     if workflow_kind == "lstchain":
@@ -138,9 +136,7 @@ def merge_dl1(
 
     elif workflow_kind == "hiperta":
         # HiPeRTA workflow still uses --smart flag (lstchain v0.6.3)
-        cmd += (
-            f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}'
-        )
+        cmd += f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file}  {merging_options}'
     else:  # ctapipe case
         cmd += f'ctapipe-merge --input-dir {input_dir} --output {output_file}  {merging_options}'
 

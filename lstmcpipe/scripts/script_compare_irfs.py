@@ -55,29 +55,27 @@ def main():
     parser = argparse.ArgumentParser(description="Produce IRFs comparative plots")
 
     # Required arguments
-    parser.add_argument('--filelist', '-f',
-                        type=str,
-                        nargs='*',
-                        dest='filelist',
-                        help='List of IRF files',
-                        required=True
-                        )
+    parser.add_argument(
+        '--filelist', '-f', type=str, nargs='*', dest='filelist', help='List of IRF files', required=True
+    )
 
     # optional
-    parser.add_argument('--outfile', '-o', action='store', type=Path,
-                        dest='outfile',
-                        help='Path of the outfile',
-                        default='compare_irfs.png',
-                        )
+    parser.add_argument(
+        '--outfile',
+        '-o',
+        action='store',
+        type=Path,
+        dest='outfile',
+        help='Path of the outfile',
+        default='compare_irfs.png',
+    )
 
-    parser.add_argument('--add-cta-north',
-                        action='store_true',
-                        dest='cta_north',
-                        help='add CTA north performances curves'
-                        )
+    parser.add_argument(
+        '--add-cta-north', action='store_true', dest='cta_north', help='add CTA north performances curves'
+    )
 
     args = parser.parse_args()
-    plot_comparison(args.filelist, args.outfile,  args.cta_north)
+    plot_comparison(args.filelist, args.outfile, args.cta_north)
 
 
 if __name__ == '__main__':
