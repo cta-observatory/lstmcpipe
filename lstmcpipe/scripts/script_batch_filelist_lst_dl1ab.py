@@ -3,7 +3,6 @@
 import argparse
 from os import environ
 from os.path import join, basename
-import subprocess
 from lstmcpipe.utils import rerun_cmd
 
 

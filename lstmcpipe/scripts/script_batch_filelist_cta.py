@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import subprocess
 from os.path import join, basename
 from os import environ
 from lstmcpipe.utils import rerun_cmd

@@ -3,7 +3,6 @@
 import argparse
 from os import environ
 from pathlib import Path
-import subprocess
 from lstmcpipe.utils import rerun_cmd
 
 def main():
