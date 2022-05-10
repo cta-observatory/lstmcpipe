@@ -6,8 +6,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 
 parser = argparse.ArgumentParser(
-    description="Script to move a directory and its content after creating the destination"
-    " directory."
+    description="Script to move a directory and its content after creating the destination" " directory."
 )
 
 parser.add_argument(
@@ -34,21 +33,10 @@ parser.add_argument(
     help="Output directory for train dataset",
 )
 
-parser.add_argument(
-    "--ratio",
-    "-r",
-    type=float,
-    dest="ratio",
-    help="Train-test splitting ratio",
-    default=0.5
-)
+parser.add_argument("--ratio", "-r", type=float, dest="ratio", help="Train-test splitting ratio", default=0.5)
 
 parser.add_argument(
-    "--log_dir",
-    "-l",
-    type=Path,
-    dest="log_dir",
-    help="Directory to store training and testing filelists"
+    "--log_dir", "-l", type=Path, dest="log_dir", help="Directory to store training and testing filelists"
 )
 
 
@@ -89,14 +77,13 @@ def move_files(filelist, outdir):
 def main():
     args = parser.parse_args()
 
-    file_list = [file.resolve().as_posix() for file in Path(args.input_dir).iterdir()
-                 if file.is_file() and file.name.endswith(".h5")]
+    file_list = [
+        file.resolve().as_posix()
+        for file in Path(args.input_dir).iterdir()
+        if file.is_file() and file.name.endswith(".h5")
+    ]
 
-    train, test = train_test_split(file_list,
-                                   random_state=42,
-                                   test_size=float(args.ratio),
-                                   shuffle=True
-                                   )
+    train, test = train_test_split(file_list, random_state=42, test_size=float(args.ratio), shuffle=True)
 
     write_filelist(train, args.log_dir, dataset="training")
     write_filelist(test, args.log_dir, dataset="testing")

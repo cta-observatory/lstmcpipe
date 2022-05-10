@@ -60,9 +60,8 @@ parser.add_argument(
     action="store",
     type=str,
     dest="config_file_lst",
-    help="Path to a lstchain-like configuration file. "
-    "RF classifier and regressor arguments must be declared here !",
-    required=True
+    help="Path to a lstchain-like configuration file. " "RF classifier and regressor arguments must be declared here !",
+    required=True,
 )
 
 parser.add_argument(
@@ -87,9 +86,7 @@ parser.add_argument(
     default=None,
 )
 
-parser.add_argument(
-    "--debug", action="store_true", help="print debug messages to stderr"
-)
+parser.add_argument("--debug", action="store_true", help="print debug messages to stderr")
 parser.add_argument(
     "--log-file",
     action="store",
@@ -109,7 +106,7 @@ def main():
     Main lstmcpipe script. This will launch the selected stages and start the processing.
     The jobs are submitted, but not awaited meaning that the analysis will be going on after
     the script has exited. To look at the submitted jobs, you can use e.g. `squeue -u $USER`.
-    
+
     Arguments, that can be passed via the command line:
     ---------------------------------------------------
     --config_mc_prod / -c

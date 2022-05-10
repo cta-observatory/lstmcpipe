@@ -7,11 +7,10 @@ from pathlib import Path
 
 def test_save_log_to_file():
     from ..workflow_management import save_log_to_file
+
     outfile_yml = Path('dummy_log.yml')
 
-    dummy_log = {
-        'dummy_jobid': 'sbatch --parsable --wrap="sleep 10"'
-    }
+    dummy_log = {'dummy_jobid': 'sbatch --parsable --wrap="sleep 10"'}
     save_log_to_file(dummy_log, outfile_yml)
 
     assert outfile_yml.exists()

@@ -11,13 +11,7 @@ from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 log = logging.getLogger(__name__)
 
 
-def batch_train_pipe(
-        dict_paths,
-        jobids_from_merge,
-        config_file,
-        batch_config,
-        logs
-):
+def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, logs):
     """
     Function to batch the lstchain train_pipe once the proton and gamma-diffuse merge_and_copy_dl1 batched jobs have
     finished.
@@ -69,8 +63,7 @@ def batch_train_pipe(
         jobid_for_dl1_to_dl2.append(jobid)
 
         debug_train[jobid] = (
-            f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge"
-            f"_and_copy jobids"
+            f"The single jobid from train_pipe that depends of {jobids_from_merge} - merge" f"_and_copy jobids"
         )
 
     jobid_for_dl1_to_dl2 = ",".join(jobid_for_dl1_to_dl2)
@@ -84,12 +77,12 @@ def batch_train_pipe(
 
 
 def batch_plot_rf_features(
-        dict_paths,
-        config_file,
-        batch_configuration,
-        train_jobid,
-        logs,
-    ):
+    dict_paths,
+    config_file,
+    batch_configuration,
+    train_jobid,
+    logs,
+):
     """
     Batches the plot_model_importance.py script that creates a .png with the RF feature's importance models
     after the RF are trained.
@@ -145,10 +138,8 @@ def batch_plot_rf_features(
 
     all_jobs_plot_rf_feat = ','.join(all_jobs_plot_rf_feat)
 
-    save_log_to_file(log_rf_feat, logs["log_file"],
-                     workflow_step="plot_RF_features_importance")
-    save_log_to_file(log_debug, logs["debug_file"],
-                     workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_rf_feat, logs["log_file"], workflow_step="plot_RF_features_importance")
+    save_log_to_file(log_debug, logs["debug_file"], workflow_step="plot_RF_features_importance")
 
     log.info(" Random Forest importance's plot will be saved at: {}".format(models_dir))
     log.info("==== END {} ====".format("batch plot RF features importance"))
@@ -235,9 +226,6 @@ def train_pipe(
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file,
-            Path(models_dir).joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, Path(models_dir).joinpath(Path(config_file).name))
 
     return log_train, jobid_train

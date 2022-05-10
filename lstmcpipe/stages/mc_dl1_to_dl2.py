@@ -65,9 +65,7 @@ def batch_dl1_to_dl2(
 
         # Single particle dl1_dl2 jobid to be appended
         jobid_for_dl2_to_dl3.append(jobid)
-        debug_log[jobid] = (
-            f"dl1_to_dl2 jobid that depends on : {jobid_from_training} training job"
-        )
+        debug_log[jobid] = f"dl1_to_dl2 jobid that depends on : {jobid_from_training} training job"
 
     jobid_for_dl2_to_dl3 = ",".join(jobid_for_dl2_to_dl3)
 
@@ -130,8 +128,7 @@ def dl1_to_dl2(
 
     log_dl1_to_dl2 = {}
 
-    cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" \
-          f" -o {output_dir}"
+    cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" f" -o {output_dir}"
 
     if config_file is not None:
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
@@ -156,9 +153,6 @@ def dl1_to_dl2(
     log_dl1_to_dl2.update({jobid_dl1_to_dl2: batch_cmd})
 
     if config_file is not None:
-        shutil.copyfile(
-            config_file,
-            Path(output_dir).joinpath(Path(config_file).name)
-        )
+        shutil.copyfile(config_file, Path(output_dir).joinpath(Path(config_file).name))
 
     return log_dl1_to_dl2, jobid_dl1_to_dl2

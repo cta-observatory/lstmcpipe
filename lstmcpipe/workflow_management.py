@@ -80,10 +80,7 @@ def batch_mc_production_check(
     all_pipeline_jobs = ",".join(all_pipeline_jobs)
 
     # Copy lstmcpipe config used to log directory
-    shutil.copyfile(
-        Path(prod_config_file).resolve(),
-        log_directory.joinpath(f"config_MC_prod_{prod_id}.yml")
-    )
+    shutil.copyfile(Path(prod_config_file).resolve(), log_directory.joinpath(f"config_MC_prod_{prod_id}.yml"))
 
     # Save machine info into the check file
     check_prod_file = log_directory.joinpath(f"check_MC_{prod_id}.txt").absolute().as_posix()
@@ -98,16 +95,12 @@ def batch_mc_production_check(
     batch_cmd = "sbatch -p short --parsable"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
-    batch_cmd += (
-        f" --dependency=afterok:{all_pipeline_jobs} -J prod_check"
-        f' --wrap="{source_env} {cmd_wrap}"'
-    )
+    batch_cmd += f" --dependency=afterok:{all_pipeline_jobs} -J prod_check" f' --wrap="{source_env} {cmd_wrap}"'
 
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
     debug_log.update({f"prod_check_{jobid}": batch_cmd})
 
-    save_log_to_file(debug_log, logs_files["debug_file"],
-                     workflow_step="check_full_workflow")
+    save_log_to_file(debug_log, logs_files["debug_file"], workflow_step="check_full_workflow")
 
     return jobid

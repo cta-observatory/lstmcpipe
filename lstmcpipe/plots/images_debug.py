@@ -53,9 +53,7 @@ def main(filename, config_file=None):
     dl1_parameters_table = Table.read(filename, path=dl1_params_lstcam_key)
     images_table = Table.read(filename, path=dl1_images_lstcam_key)
 
-    dl1_table = join(
-        dl1_parameters_table, images_table, keys=["event_id", "tel_id", "obs_id"]
-    )
+    dl1_table = join(dl1_parameters_table, images_table, keys=["event_id", "tel_id", "obs_id"])
 
     params_cleaning = get_cleaning_config(config_file)
 

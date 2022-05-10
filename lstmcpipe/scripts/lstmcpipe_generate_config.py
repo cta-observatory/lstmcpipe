@@ -33,7 +33,7 @@ def list_config_classes():
             cls_base = getattr(paths_config, att).__mro__
             if paths_config.PathConfig in cls_base:
                 all_attrs.append(att)
-        except:
+        except:  # noqa
             pass
     return all_attrs
 
@@ -62,40 +62,29 @@ def main():
     parser = argparse.ArgumentParser(description="Generate a lstmcpipe config.")
 
     # Required arguments
-    parser.add_argument(dest='config_class',
-                        type=str,
-                        help=f'Config class name to use. '
-                             f'List of implemented classes: {list_config_classes()}'
-                        )
+    parser.add_argument(
+        dest='config_class',
+        type=str,
+        help=f'Config class name to use. ' f'List of implemented classes: {list_config_classes()}',
+    )
 
-    parser.add_argument('--prod_id',
-                        type=str,
-                        help='production ID'
-                        )
+    parser.add_argument('--prod_id', type=str, help='production ID')
 
-    parser.add_argument('--output', '-o',
-                        type=Path,
-                        help='Path to the output file to dump the generated config. '
-                             'Optional, if not provided, the file is dumped locally',
-                        default=None
-                        )
+    parser.add_argument(
+        '--output',
+        '-o',
+        type=Path,
+        help='Path to the output file to dump the generated config. '
+        'Optional, if not provided, the file is dumped locally',
+        default=None,
+    )
 
-    parser.add_argument('--lstchain_conf',
-                        type=Path,
-                        help='Path to the lstchain config file',
-                        default=Path('lstchain_conf.json')
-                        )
-
-    parser.add_argument('--overwrite',
-                        action='store_true',
-                        help='Overwrite lstmcpipe and lstchain configs',
-                        )
-
-    parser.add_argument('--kwargs',
-                        nargs='*',
-                        action=ParseKwargs,
-                        help="optional kwargs for the requested config class. Use as: --kwargs option1=foo option2=bar"
-                        )
+    parser.add_argument(
+        '--kwargs',
+        nargs='*',
+        action=ParseKwargs,
+        help="optional kwargs for the requested config class. Use as: --kwargs option1=foo option2=bar",
+    )
 
     args = parser.parse_args()
 
