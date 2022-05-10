@@ -6,6 +6,7 @@ import os
 import shutil
 import logging
 from pathlib import Path
+import subprocess
 from lstmcpipe.workflow_management import save_log_to_file
 from lstmcpipe.io.data_management import (
     check_data_path,
@@ -422,3 +423,30 @@ def submit_dl1_jobs(
     jobid2log.update({jobid: slurm_cmd})
 
     return jobid2log, jobid
+
+
+def rerun_r0_dl1(cmd, simtel_file, outdir, max_ntry=2):
+    """
+    rerun r0_to_dl1 process given by `cmd` as long as the exit code is 0 and number of try < max_ntry
+    move the failed output file to subdir failed_outputs
+
+    Parameters
+    ----------
+    cmd: str
+    simtel_file: Path
+    outdir: Path
+    max_ntry: int
+    """
+    ret = -1
+    ntry = 1
+    while ret != 0 and ntry < max_ntry:
+        ret = subprocess.run(cmd)
+        if ret.returncode != 0:
+            outfile = Path(outdir).joinpath('dl1_' + simtel_file.replace('.simtel.gz', '.h5'))
+            failed_jobs_subdir = Path(outdir).joinpath('failed_outputs')
+            if outfile.exists():
+                failed_jobs_subdir.mkdir(exist_ok=True)
+                outfile_target = failed_jobs_subdir.joinpath(outfile.name)
+                print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
+                outfile.rename(outfile_target)
+        ntry += 1

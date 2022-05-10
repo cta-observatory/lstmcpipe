@@ -2,7 +2,9 @@
 
 import argparse
 from os import environ
+from pathlib import Path
 import subprocess
+from lstmcpipe.stages.mc_process_dl1 import rerun_r0_dl1
 
 
 def main():
@@ -54,7 +56,8 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            subprocess.run(cmd)
+            rerun_r0_dl1(cmd, file, args.output_dir, max_ntry=2)
+
 
 
 if __name__ == "__main__":
