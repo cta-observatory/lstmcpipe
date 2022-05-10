@@ -58,4 +58,3 @@ def main():
                 cmd.append("--config={}".format(args.config_file))
 
             rerun_cmd(cmd, output, max_ntry=2)
-            subprocess.run(cmd)
