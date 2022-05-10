@@ -11,8 +11,8 @@ def rerun_cmd(cmd, outfile, max_ntry=2):
     ----------
     cmd: str
     simtel_file: Path
-    outdir: Path
     outfile: Path
+        path to the cmd output file
     max_ntry: int
     """
     outfile = Path(outfile)
