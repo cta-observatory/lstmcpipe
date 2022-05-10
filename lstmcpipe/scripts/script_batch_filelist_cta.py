@@ -4,6 +4,7 @@ import argparse
 import subprocess
 from os.path import join, basename
 from os import environ
+from lstmcpipe.utils import rerun_cmd
 
 
 def main():
@@ -55,4 +56,6 @@ def main():
             cmd = ["ctapipe-stage1", f"--input={file}", f"--output={output}"]
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
+
+            rerun_cmd(cmd, output, max_ntry=2)
             subprocess.run(cmd)

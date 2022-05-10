@@ -4,6 +4,7 @@ import argparse
 from os import environ
 from os.path import join, basename
 import subprocess
+from lstmcpipe.utils import rerun_cmd
 
 
 def main():
@@ -54,7 +55,7 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            subprocess.run(cmd)
+            rerun_cmd(cmd, output, max_ntry=2)
 
 
 if __name__ == "__main__":

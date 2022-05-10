@@ -4,8 +4,7 @@ import argparse
 from os import environ
 from pathlib import Path
 import subprocess
-from lstmcpipe.stages.mc_process_dl1 import rerun_r0_dl1
-
+from lstmcpipe.utils import rerun_cmd
 
 def main():
     parser = argparse.ArgumentParser(
@@ -56,8 +55,8 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            rerun_r0_dl1(cmd, file, args.output_dir, max_ntry=2)
-
+            outfile = Path(args.output_dir).joinpath('dl1_' + file.replace('.simtel.gz', '.h5'))
+            rerun_cmd(cmd, outfile, args.output_dir, max_ntry=2)
 
 
 if __name__ == "__main__":
