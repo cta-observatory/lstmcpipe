@@ -399,15 +399,28 @@ class PathConfigAllSkyBase(PathConfig):
         if data_level not in ['models', 'DL1', 'DL2', 'IRF']:
             raise ValueError("data_level should be DL1, DL2 or IRF")
         return os.path.realpath(
-            self.base_dir.format(data_level=data_level, particle=particle, pointing=pointing, prod_id=prod_id, dec=dec,
-                                 dataset_type=dataset_type))
+            self.base_dir.format(
+                data_level=data_level,
+                particle=particle,
+                pointing=pointing,
+                prod_id=prod_id,
+                dec=dec,
+                dataset_type=dataset_type,
+            )
+        )
 
     def r0_dir(self):
         raise NotImplementedError("Should be implemented in child class")
 
     def dl1_dir(self, particle, pointing, dataset_type, dec):
-        return self._data_level_dir(data_level='DL1', particle=particle, pointing=pointing, prod_id=self.prod_id,
-                                    dataset_type=dataset_type, dec=dec)
+        return self._data_level_dir(
+            data_level='DL1',
+            particle=particle,
+            pointing=pointing,
+            prod_id=self.prod_id,
+            dataset_type=dataset_type,
+            dec=dec,
+        )
 
     def dl2_dir(self, particle, pointing, dataset_type):
         raise NotImplementedError("Should be implemented in child class if necessary")
@@ -416,10 +429,9 @@ class PathConfigAllSkyBase(PathConfig):
         raise NotImplementedError("Should be implemented in child class if necessary")
 
     def models_dir(self):
-        p = self.base_dir.format(data_level='models', particle='', pointing='', prod_id=self.prod_id, dataset_type='',
-                                 dec=self.dec).replace(
-            '/mc/', '/'
-        )
+        p = self.base_dir.format(
+            data_level='models', particle='', pointing='', prod_id=self.prod_id, dataset_type='', dec=self.dec
+        ).replace('/mc/', '/')
         return os.path.realpath(p)
 
     @property
@@ -452,9 +464,9 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
-                + dec
-                + "/sim_telarray/{pointing}/output_v1.4/"
+            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
+            + dec
+            + "/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
@@ -475,8 +487,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         return [
             d.name
             for d in r0_pointing_path.iterdir()
-            if d.is_dir()
-            and list(Path(self.r0_dir(particle, d.name)).glob('*.simtel.gz'))
+            if d.is_dir() and list(Path(self.r0_dir(particle, d.name)).glob('*.simtel.gz'))
         ]
 
     def training_pointings(self, particle):
@@ -494,10 +505,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
         see testing pointings for a simpler implementation if this get solved
         """
-        all_pointings = {
-            particle: self._search_pointings(particle)
-            for particle in self.training_particles
-        }
+        all_pointings = {particle: self._search_pointings(particle) for particle in self.training_particles}
 
         intersected_pointings = deepcopy(all_pointings)
 
@@ -506,10 +514,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                 pointing_tuple = self._extract_pointing(pointing_text)
                 for other_particles, other_pointings_text in all_pointings.items():
                     other_pointings_tuples = [self._extract_pointing(pt) for pt in other_pointings_text]
-                    if (
-                        pointing_tuple not in other_pointings_tuples
-                        and pointing_text in intersected_pointings
-                    ):
+                    if pointing_tuple not in other_pointings_tuples and pointing_text in intersected_pointings:
                         intersected_pointings[particle].remove(pointing_text)
 
         return intersected_pointings
@@ -567,7 +572,6 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
 
 class PathConfigAllSkyTesting(PathConfigAllSkyBase):
-
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
@@ -607,12 +611,24 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return super().dl1_dir(particle='', pointing=pointing, dataset_type=self.dataset_type, dec='')
 
     def dl2_dir(self, pointing):
-        return self._data_level_dir(data_level='DL2', particle='', pointing=pointing, prod_id=self.prod_id,
-                                    dataset_type=self.dataset_type, dec=self.dec)
+        return self._data_level_dir(
+            data_level='DL2',
+            particle='',
+            pointing=pointing,
+            prod_id=self.prod_id,
+            dataset_type=self.dataset_type,
+            dec=self.dec,
+        )
 
     def irf_dir(self, pointing):
-        return self._data_level_dir(data_level='IRF', particle='', pointing=pointing, prod_id=self.prod_id,
-                                    dataset_type=self.dataset_type, dec=self.dec)
+        return self._data_level_dir(
+            data_level='IRF',
+            particle='',
+            pointing=pointing,
+            prod_id=self.prod_id,
+            dataset_type=self.dataset_type,
+            dec=self.dec,
+        )
 
     @property
     def r0_to_dl1(self):
@@ -676,7 +692,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
 
 class PathConfigAllSkyFull(PathConfig):
-
     def __init__(self, prod_id, dec_list):
         """
         Does training and testing for a list of declinations
