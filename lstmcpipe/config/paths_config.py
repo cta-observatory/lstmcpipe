@@ -359,37 +359,125 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
         return paths
 
 
-class PathConfigAllSky(PathConfig):
+class PathConfigAllSkyBase(PathConfig):
     """
     Standard paths configuration for a prod5_trans_80 MC production
+    dataset_type: 'Training' or 'Testing'
     """
 
     def __init__(self, prod_id, dec):
         super().__init__(prod_id)
         self.prod_id = prod_id
-        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{particle}/" + dec + "/{pointing}/"
-        self.training_dir = (
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/"
-            + dec
-            + "/sim_telarray/{pointing}/output_v1.4/"
-        )
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
-
-        self.training_particles = ['GammaDiffuse', 'Protons']
-        self.testing_particles = ['Crab']
+        self.dec = dec
+        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/"
 
         self.paths = {}
-        self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
+        self.stages = ['r0_to_dl1', 'merge_dl1']
+
+    def _extract_pointing(self, text):
+        """
+        return a tuple ($0, $1) of pointings based on a text pattern `*_theta_{$0}_az_{$1}_`
+        """
+        return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)  # noqa
+
+    def _data_level_dir(self, prod_id, data_level, particle, pointing, dec, dataset_type):
+        """
+
+        Parameters
+        ----------
+        data_level: str
+            `DL0` or `DL1` or `DL2`
+        particle: str
+            `proton`, `gamma-diffuse`, `gamma` or `electron`
+        prod_id:
+        pointing:
+
+        Returns
+        -------
+        str: path to directory
+        """
+        if data_level not in ['models', 'DL1', 'DL2', 'IRF']:
+            raise ValueError("data_level should be DL1, DL2 or IRF")
+        return os.path.realpath(
+            self.base_dir.format(data_level=data_level, particle=particle, pointing=pointing, prod_id=prod_id, dec=dec,
+                                 dataset_type=dataset_type))
+
+    def r0_dir(self):
+        raise NotImplementedError
+
+    def dl1_dir(self, particle, pointing, dataset_type, dec):
+        return self._data_level_dir(data_level='DL1', particle=particle, pointing=pointing, prod_id=self.prod_id,
+                                    dataset_type=dataset_type, dec=dec)
+
+    def dl2_dir(self, particle, pointing, dataset_type):
+        raise NotImplementedError
+
+    def irf_dir(self, pointing, dataset_type):
+        raise NotImplementedError
+
+    def models_dir(self):
+        p = self.base_dir.format(data_level='models', particle='', pointing='', prod_id=self.prod_id, dataset_type='',
+                                 dec=self.dec).replace(
+            '/mc/', '/'
+        )
+        return os.path.realpath(p)
+
+    @property
+    def r0_to_dl1(self):
+        raise NotImplementedError
+
+    @property
+    def merge_dl1(self):
+        raise NotImplementedError
+
+    @property
+    def train_pipe(self):
+        raise NotImplementedError
+
+    @property
+    def dl1_to_dl2(self):
+        raise NotImplementedError
+
+    def dl2_output_file(self, particle, pointing):
+        raise NotImplementedError
+
+    @property
+    def dl2_to_irfs(self):
+        raise NotImplementedError
+
+
+class PathConfigAllSkyTraining(PathConfigAllSkyBase):
+    """
+    Base class for training all sky production.
+    Handles a single declination from R0 up to RF generation.
+    """
+
+    def __init__(self, prod_id, dec):
+        super().__init__(prod_id, dec)
+        self.training_dir = (
+                "/fefs/aswg/workspace/georgios.voutsinas/AllSky/TrainingDataset/{particle}/"
+                + dec
+                + "/sim_telarray/{pointing}/output_v1.4/"
+        )
+        self.training_particles = ['GammaDiffuse', 'Protons']
+        self.dataset_type = 'TrainingDataset'
+        self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe']
+
+    def r0_dir(self, particle, pointing):
+        # for R0 dir there is no `prod_id` in the path
+        if particle in self.training_particles:
+            return self.training_dir.format(particle=particle, pointing=pointing)
+        else:
+            raise ValueError("unknown particle")
 
     def _search_pointings(self, particle):
-        pointing_dirs_ = os.listdir(self.r0_dir(particle=particle, pointing='$$$').split('$$$')[0])
-        # Check that pointings contain simtel files
-        pointing_dirs = []
-        for pointing in pointing_dirs_:
-            fullpath = self.r0_dir(particle, pointing)
-            if [f for f in os.listdir(fullpath) if f.endswith('.simtel.gz')]:
-                pointing_dirs.append(pointing)
-        return pointing_dirs
+        """
+        list directories in r0_path that contain simtel files
+        """
+        r0_pointing_path = Path(self.r0_dir(particle, pointing='$$$').split('$$$')[0])
+        return [d.name for d in r0_pointing_path.iterdir() if
+                d.is_dir() and [f for f in Path(self.r0_dir(particle, d.name)).iterdir() if
+                                f.name.endswith('.simtel.gz')]]
 
     def training_pointings(self, particle):
         if not hasattr(self, '_training_pointings'):
@@ -398,24 +486,6 @@ class PathConfigAllSky(PathConfig):
             except FileNotFoundError as e:
                 raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
         return self._training_pointings[particle]
-
-    def testing_pointings(self, particle):
-        if not hasattr(self, '_testing_pointings'):
-            try:
-                self.load_pointings()
-            except FileNotFoundError as e:
-                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
-        return self._testing_pointings[particle]
-
-    def load_pointings(self):
-        self._training_pointings = self._get_training_pointings()
-        self._testing_pointings = self._get_testing_pointings()
-
-    def _extract_pointing(self, text):
-        """
-        return a tuple ($0, $1) of pointings based on a text pattern `*_theta_{$0}_az_{$1}_`
-        """
-        return re.search('.*theta\_(.+?)_az\_(.+?)\_', text)  # noqa
 
     def _get_training_pointings(self):
         """
@@ -440,52 +510,11 @@ class PathConfigAllSky(PathConfig):
 
         return intersected_pointings
 
-    def _get_testing_pointings(self):
-        particle = self.testing_particles[0]
-        pointings = set(self._search_pointings(particle))
-        for particle in self.testing_particles[1:]:
-            pointings.intersection_update(self._search_pointings(particle))
-        return {particle: pointings for particle in self.testing_particles}
-
-    def _data_level_dir(self, prod_id, data_level, particle, pointing):
-        """
-
-        Parameters
-        ----------
-        data_level: str
-            `DL0` or `DL1` or `DL2`
-        particle: str
-            `proton`, `gamma-diffuse`, `gamma` or `electron`
-        prod_id:
-        pointing:
-
-        Returns
-        -------
-        str: path to directory
-        """
-        if data_level not in ['models', 'DL1', 'DL2', 'IRF']:
-            raise ValueError("data_level should be DL1, DL2 or IRF")
-        return self.base_dir.format(data_level=data_level, particle=particle, pointing=pointing, prod_id=prod_id)
-
-    def r0_dir(self, particle, pointing):
-        # for R0 dir there is no `prod_id` in the path
-        if particle in self.training_particles:
-            return self.training_dir.format(particle=particle, pointing=pointing)
-        elif particle in self.testing_particles:
-            return self.testing_dir.format(pointing=pointing)
-        else:
-            raise ValueError("unknown particle")
+    def load_pointings(self):
+        self._training_pointings = self._get_training_pointings()
 
     def dl1_dir(self, particle, pointing):
-        return self._data_level_dir(data_level='DL1', particle=particle, pointing=pointing, prod_id=self.prod_id)
-
-    def dl2_dir(self, particle, pointing):
-        return self._data_level_dir(data_level='DL2', particle=particle, pointing=pointing, prod_id=self.prod_id)
-
-    def irf_dir(self, pointing):
-        return os.path.realpath(
-            self._data_level_dir(data_level='IRF', particle='', pointing=pointing, prod_id=self.prod_id)
-        )
+        return super().dl1_dir(particle=particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
 
     @property
     def r0_to_dl1(self):
@@ -495,18 +524,12 @@ class PathConfigAllSky(PathConfig):
                 r0 = self.r0_dir(particle, pointing)
                 dl1 = self.dl1_dir(particle, pointing)
                 paths.append({'input': r0, 'output': dl1})
-        for particle in self.testing_particles:
-            for pointing in self.testing_pointings(particle):
-                r0 = self.r0_dir(particle, pointing)
-                dl1 = self.dl1_dir(particle, pointing)
-                paths.append({'input': r0, 'output': dl1})
+
         return paths
 
     def training_merged_dl1(self, particle):
-        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')), f'dl1_{particle}_merged.h5')
-
-    def testing_merged_dl1(self, particle, pointing):
-        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')), f'dl1_{particle}_{pointing}_merged.h5')
+        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')),
+                            f'dl1_{self.prod_id}_{self.dec}_{particle}_merged.h5')
 
     @property
     def merge_dl1(self):
@@ -520,23 +543,11 @@ class PathConfigAllSky(PathConfig):
                     'input': dl1,
                     'output': merged_dl1,
                     'options': '--pattern */*.h5 --no-image',
+                    'slurm_options': '-p long',
                 }
             )
 
-        # for the testing, we merge per node
-        for particle in self.testing_particles:
-            for pointing in self.testing_pointings(particle):
-                dl1 = self.dl1_dir(particle, pointing)
-                merged_dl1 = self.testing_merged_dl1(particle, pointing)
-                paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
-
         return paths
-
-    def models_path(self):
-        p = self.base_dir.format(data_level='models', particle='', pointing='', prod_id=self.prod_id).replace(
-            '/mc/', '/'
-        )
-        return os.path.realpath(p)
 
     @property
     def train_pipe(self):
@@ -546,77 +557,134 @@ class PathConfigAllSky(PathConfig):
                     'gamma': self.training_merged_dl1('GammaDiffuse'),
                     'proton': self.training_merged_dl1('Protons'),
                 },
-                'output': self.models_path(),
-                'slurm_options': '-p long --mem=80G',
+                'output': self.models_dir(),
+                'slurm_options': '-p xxl --mem=100G --cpus-per-task=16',
             }
         ]
+        return paths
+
+
+class PathConfigAllSkyTesting(PathConfigAllSkyBase):
+
+    def __init__(self, prod_id, dec):
+        super().__init__(prod_id, dec)
+        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
+        self.dataset_type = 'TestingDataset'
+        self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
+
+    def testing_pointings(self):
+        if not hasattr(self, '_testing_pointings'):
+            try:
+                self.load_pointings()
+            except FileNotFoundError as e:
+                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
+        return self._testing_pointings
+
+    def r0_dir(self, pointing):
+        return self.testing_dir.format(pointing=pointing)
+
+    def _search_pointings(self):
+        """
+        list directories in r0_path that contain simtel files
+        """
+        r0_pointing_path = Path(self.r0_dir(pointing='$$$').split('$$$')[0])
+        return [d.name for d in r0_pointing_path.iterdir() if
+                d.is_dir() and [f for f in Path(self.r0_dir(d.name)).iterdir() if f.name.endswith('.simtel.gz')]]
+
+    def load_pointings(self):
+        self._testing_pointings = self._get_testing_pointings()
+
+    def _get_testing_pointings(self):
+        return self._search_pointings()
+
+    def dl1_dir(self, pointing):
+        # no declination for DL1 for TestingDataset
+        return super().dl1_dir(particle='', pointing=pointing, dataset_type=self.dataset_type, dec='')
+
+    def dl2_dir(self, pointing):
+        return self._data_level_dir(data_level='DL2', particle='', pointing=pointing, prod_id=self.prod_id,
+                                    dataset_type=self.dataset_type, dec=self.dec)
+
+    def irf_dir(self, pointing):
+        return self._data_level_dir(data_level='IRF', particle='', pointing=pointing, prod_id=self.prod_id,
+                                    dataset_type=self.dataset_type, dec=self.dec)
+
+    @property
+    def r0_to_dl1(self):
+        paths = []
+        for pointing in self.testing_pointings():
+            r0 = self.r0_dir(pointing)
+            dl1 = self.dl1_dir(pointing)
+            paths.append({'input': r0, 'output': dl1})
+        return paths
+
+    def testing_merged_dl1(self, pointing):
+        return os.path.join(self.dl1_dir(''), f'dl1_{self.prod_id}_{pointing}_merged.h5')
+
+    @property
+    def merge_dl1(self):
+        # for the training particles, all the nodes get merged
+        paths = []
+        # for the testing, we merge per node
+        for pointing in self.testing_pointings():
+            dl1 = self.dl1_dir(pointing)
+            merged_dl1 = self.testing_merged_dl1(pointing)
+            paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
+
         return paths
 
     @property
     def dl1_to_dl2(self):
         paths = []
-        for particle in self.testing_particles:
-            for pointing in self.testing_pointings(particle):
-                paths.append(
-                    {
-                        'input': self.testing_merged_dl1(particle, pointing),
-                        'path_model': self.models_path(),
-                        'output': self.dl2_dir(particle, pointing),
-                    }
-                )
+        for pointing in self.testing_pointings():
+            paths.append(
+                {
+                    'input': self.testing_merged_dl1(pointing),
+                    'path_model': self.models_dir(),
+                    'output': self.dl2_dir(pointing),
+                }
+            )
         return paths
 
-    def dl2_output_file(self, particle, pointing):
-        filename = os.path.basename(self.testing_merged_dl1(particle, pointing).replace('dl1_', 'dl2_'))
-        return os.path.join(self.dl2_dir(particle, pointing), filename)
+    def dl2_output_file(self, pointing):
+        filename = os.path.basename(self.testing_merged_dl1(pointing).replace('dl1_', 'dl2_'))
+        return os.path.join(self.dl2_dir(pointing), filename)
 
     @property
     def dl2_to_irfs(self):
         paths = []
 
-        for particle in self.testing_particles:
-            for pointing in self.testing_pointings(particle):
-                paths.append(
-                    {
-                        'input': {
-                            'gamma_file': self.dl2_output_file(particle, pointing),
-                            'proton_file': None,
-                            'electron_file': None,
-                        },
-                        'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
-                        'options': '--point-like',
-                    }
-                )
+        for pointing in self.testing_pointings():
+            paths.append(
+                {
+                    'input': {
+                        'gamma_file': self.dl2_output_file(pointing),
+                        'proton_file': None,
+                        'electron_file': None,
+                    },
+                    'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
+                    'options': '--point-like',
+                }
+            )
 
         return paths
 
 
-class PathConfigAllSkyDL1ab(PathConfigAllSky):
-    def __init__(self, starting_prod_id, new_prod_id, dec):
-        super().__init__(prod_id=new_prod_id, dec=dec)
-        self.starting_prod_id = starting_prod_id
-        self.stages.remove('r0_to_dl1')
-        self.stages.insert(0, 'dl1ab')
-        # the new stages are then: dl1ab, merge, train, dl1_to_dl2, dl2_to_irfs
-        self.dec = dec
+class PathConfigAllSkyFull(PathConfig):
+
+    def __init__(self, prod_id, dec_list):
+        self.prod_id = prod_id
+        self.dec_list = dec_list
+        self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
+
+        self.train_configs = {dec: PathConfigAllSkyTraining(prod_id, dec) for dec in dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
 
     @property
-    def dl1ab(self):
+    def r0_to_dl1(self):
         paths = []
-        former_config = PathConfigAllSky(self.starting_prod_id, self.dec)
-
-        def append_path(particle, pointing):
-            former_dl1 = former_config.dl1_dir(particle, pointing)
-            if Path(former_dl1).exists() and [f for f in Path(former_dl1).iterdir() if f.as_posix().endswith('.h5')]:
-                target_dl1 = self.dl1_dir(particle, pointing)
-                paths.append({'input': former_dl1, 'output': target_dl1})
-
-        for particle in self.training_particles:
-            for pointing in self.training_pointings(particle):
-                append_path(particle, pointing)
-
-        for particle in self.testing_particles:
-            for pointing in self.testing_pointings(particle):
-                append_path(particle, pointing)
-
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].r0_to_dl1)
+        paths.extend(self.test_configs[self.dec_list[0]].r0_to_dl1)
         return paths
+
