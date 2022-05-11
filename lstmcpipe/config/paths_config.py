@@ -6,6 +6,8 @@ from ruamel.yaml import YAML
 from datetime import date
 from copy import deepcopy
 import re
+import numpy as np
+import matplotlib.pyplot as plt
 
 from . import base_config
 from ..version import __version__
