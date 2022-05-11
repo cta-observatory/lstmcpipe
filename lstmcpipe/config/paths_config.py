@@ -672,11 +672,17 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
 
 class PathConfigAllSkyFull(PathConfig):
-    """
-    Does training and testing for a list of declinations
-    """
 
     def __init__(self, prod_id, dec_list):
+        """
+        Does training and testing for a list of declinations
+
+        Parameters
+        ----------
+        prod_id: str
+        dec_list: [str]
+        """
+        super().__init__(prod_id)
         self.prod_id = prod_id
         self.dec_list = dec_list
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
