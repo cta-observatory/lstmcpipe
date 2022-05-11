@@ -51,6 +51,7 @@ def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
 
     cfg = get_standard_config()
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
+    cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
     cfg['source_config']['EventSource']['allowed_tels'] = [1]
     with open(filename, 'w') as file:
         json.dump(cfg, file)
