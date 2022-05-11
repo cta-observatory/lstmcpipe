@@ -708,13 +708,21 @@ class PathConfigAllSkyFull(PathConfig):
 
     @property
     def train_pipe(self):
-        return [self.train_configs[dec].train_pipe for dec in self.dec_list]
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].train_pipe)
+        return paths
 
     @property
     def dl1_to_dl2(self):
-        return [self.test_configs[dec].dl1_to_dl2 for dec in self.dec_list]
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.test_configs[dec].dl1_to_dl2)
+        return paths
 
     @property
     def dl2_to_irfs(self):
-        return [self.test_configs[dec].dl2_to_irfs for dec in self.dec_list]
-
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.test_configs[dec].dl2_to_irfs)
+        return paths
