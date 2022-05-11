@@ -59,7 +59,7 @@ class PathConfig:
         config_to_save['stages_to_run'] = self.stages
         config_to_save['stages'] = self.paths
 
-        if os.path.exists(filename) and not (overwrite or append):
+        if os.path.exists(filename) and not overwrite and not append:
             raise FileExistsError(f"{filename} exists. Set overwrite=True or append=True")
         if append and overwrite:
             raise ValueError("Append or overwrite, not both ;-)")
@@ -494,9 +494,11 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
         see testing pointings for a simpler implementation if this get solved
         """
-        all_pointings = {}
-        for particle in self.training_particles:
-            all_pointings[particle] = self._search_pointings(particle)
+        all_pointings = {
+            particle: self._search_pointings(particle)
+            for particle in self.training_particles
+        }
+
         intersected_pointings = deepcopy(all_pointings)
 
         for particle, pointings_text in all_pointings.items():
@@ -504,9 +506,11 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                 pointing_tuple = self._extract_pointing(pointing_text)
                 for other_particles, other_pointings_text in all_pointings.items():
                     other_pointings_tuples = [self._extract_pointing(pt) for pt in other_pointings_text]
-                    if pointing_tuple not in other_pointings_tuples:
-                        if pointing_text in intersected_pointings:
-                            intersected_pointings[particle].remove(pointing_text)
+                    if (
+                        pointing_tuple not in other_pointings_tuples
+                        and pointing_text in intersected_pointings
+                    ):
+                        intersected_pointings[particle].remove(pointing_text)
 
         return intersected_pointings
 
