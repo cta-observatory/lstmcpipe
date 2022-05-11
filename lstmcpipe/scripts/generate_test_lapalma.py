@@ -62,10 +62,18 @@ def generate_test_allsky(
     pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
     # config training dir are replaced with local ones
     for dec in decs:
-        pc.train_configs[dec].base_dir = os.path.join(working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/')
-        pc.test_configs[dec].base_dir = os.path.join(working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/')
-        pc.train_configs[dec].training_dir = os.path.join(working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/'))
-        pc.test_configs[dec].testing_dir = os.path.join(working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/'))
+        pc.train_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pc.test_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pc.train_configs[dec].training_dir = os.path.join(
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+        )
+        pc.test_configs[dec].testing_dir = os.path.join(
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+        )
     pc.generate()
     pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
 
