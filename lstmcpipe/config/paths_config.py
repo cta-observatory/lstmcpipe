@@ -372,7 +372,7 @@ class PathConfigAllSkyBase(PathConfig):
         self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/"
 
         self.paths = {}
-        self.stages = ['r0_to_dl1', 'merge_dl1']
+        self.stages = []
 
     def _extract_pointing(self, text):
         """
@@ -403,17 +403,17 @@ class PathConfigAllSkyBase(PathConfig):
                                  dataset_type=dataset_type))
 
     def r0_dir(self):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
     def dl1_dir(self, particle, pointing, dataset_type, dec):
         return self._data_level_dir(data_level='DL1', particle=particle, pointing=pointing, prod_id=self.prod_id,
                                     dataset_type=dataset_type, dec=dec)
 
     def dl2_dir(self, particle, pointing, dataset_type):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     def irf_dir(self, pointing, dataset_type):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     def models_dir(self):
         p = self.base_dir.format(data_level='models', particle='', pointing='', prod_id=self.prod_id, dataset_type='',
@@ -424,26 +424,23 @@ class PathConfigAllSkyBase(PathConfig):
 
     @property
     def r0_to_dl1(self):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
     @property
     def merge_dl1(self):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
     @property
     def train_pipe(self):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
     @property
     def dl1_to_dl2(self):
-        raise NotImplementedError
-
-    def dl2_output_file(self, particle, pointing):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
     @property
     def dl2_to_irfs(self):
-        raise NotImplementedError
+        raise NotImplementedError("Should be implemented in child class")
 
 
 class PathConfigAllSkyTraining(PathConfigAllSkyBase):
@@ -475,9 +472,12 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         list directories in r0_path that contain simtel files
         """
         r0_pointing_path = Path(self.r0_dir(particle, pointing='$$$').split('$$$')[0])
-        return [d.name for d in r0_pointing_path.iterdir() if
-                d.is_dir() and [f for f in Path(self.r0_dir(particle, d.name)).iterdir() if
-                                f.name.endswith('.simtel.gz')]]
+        return [
+            d.name
+            for d in r0_pointing_path.iterdir()
+            if d.is_dir()
+            and list(Path(self.r0_dir(particle, d.name)).glob('*.simtel.gz'))
+        ]
 
     def training_pointings(self, particle):
         if not hasattr(self, '_training_pointings'):
@@ -528,8 +528,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         return paths
 
     def training_merged_dl1(self, particle):
-        return os.path.join(os.path.realpath(self.dl1_dir(particle, '')),
-                            f'dl1_{self.prod_id}_{self.dec}_{particle}_merged.h5')
+        return os.path.join(self.dl1_dir(particle, ''), f'dl1_{self.prod_id}_{self.dec}_{particle}_merged.h5')
 
     @property
     def merge_dl1(self):
@@ -546,7 +545,6 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'slurm_options': '-p long',
                 }
             )
-
         return paths
 
     @property
@@ -588,8 +586,11 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         list directories in r0_path that contain simtel files
         """
         r0_pointing_path = Path(self.r0_dir(pointing='$$$').split('$$$')[0])
-        return [d.name for d in r0_pointing_path.iterdir() if
-                d.is_dir() and [f for f in Path(self.r0_dir(d.name)).iterdir() if f.name.endswith('.simtel.gz')]]
+        return [
+            d.name
+            for d in r0_pointing_path.iterdir()
+            if d.is_dir() and list(Path(self.r0_dir(d.name)).glob('*.simtel.gz'))
+        ]
 
     def load_pointings(self):
         self._testing_pointings = self._get_testing_pointings()
@@ -671,6 +672,9 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
 
 class PathConfigAllSkyFull(PathConfig):
+    """
+    Does training and testing for a list of declinations
+    """
 
     def __init__(self, prod_id, dec_list):
         self.prod_id = prod_id
@@ -687,4 +691,24 @@ class PathConfigAllSkyFull(PathConfig):
             paths.extend(self.train_configs[dec].r0_to_dl1)
         paths.extend(self.test_configs[self.dec_list[0]].r0_to_dl1)
         return paths
+
+    @property
+    def merge_dl1(self):
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].merge_dl1)
+        paths.extend(self.test_configs[self.dec_list[0]].merge_dl1)
+        return paths
+
+    @property
+    def train_pipe(self):
+        return [self.train_configs[dec].train_pipe for dec in self.dec_list]
+
+    @property
+    def dl1_to_dl2(self):
+        return [self.test_configs[dec].dl1_to_dl2 for dec in self.dec_list]
+
+    @property
+    def dl2_to_irfs(self):
+        return [self.test_configs[dec].dl2_to_irfs for dec in self.dec_list]
 
