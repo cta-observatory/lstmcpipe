@@ -25,6 +25,7 @@ jobs:
         run: |
           pip install ruamel.yaml
           python .github/workflows/dev/codemeta2citation.py
+          cat CITATION.cff
       - name: Commit CFF
         uses: EndBug/add-and-commit@v9
         with:
