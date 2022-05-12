@@ -13,7 +13,10 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
       - name: convert codemeta
-        run: eossr-codemeta2zenodo -i codemeta.json --overwrite
+        run: | 
+        eossr-codemeta2zenodo -i codemeta.json --overwrite
+        cat .zenodo.json
+
       - uses: EndBug/add-and-commit@v9
         with:
           add: '.zenodo.json'
