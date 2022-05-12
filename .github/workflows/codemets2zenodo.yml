@@ -1,0 +1,22 @@
+name: codemeta2zenodo
+
+on:
+  pull_request:
+    paths:
+      - 'codemeta.json'
+
+jobs:
+  build:
+    container:
+      image: gitlab-registry.in2p3.fr/escape2020/wp3/eossr:v0.6
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: convert codemeta
+        run: eossr-codemeta2zenodo -i codemeta.json --overwrite
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: '.zenodo.json'
+          message: 'Automatic conversion from codemeta.json to .zenodo.json'
