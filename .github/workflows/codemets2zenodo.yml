@@ -1,24 +1,30 @@
-name: codemeta2zenodo
+name: CodeMeta2CFF
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason'
+        required: false
+        default: 'Manual trigger'
 
 jobs:
-  codemeta2zenodo:
-    runs-on: ubuntu-latest
-    container:
-      image: gitlab-registry.in2p3.fr/escape2020/wp3/eossr:v0.6
+  CodeMeta2CFF:
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
-      - uses: caltechlibrary/codemeta2cff@v0.0.3
-      - name: cat
-        run: | 
-#          eossr-codemeta2zenodo -i codemeta.json --overwrite;
-          cat CITATION.cff
-
-      - uses: EndBug/add-and-commit@v9
+      - name: Convert CFF
+        uses: caltechlibrary/codemeta2cff@main
+      - name: Commit CFF
+        uses: EndBug/add-and-commit@v9
         with:
+          message: 'Add CITATION.cff for release'
           add: 'CITATION.cff'
-          message: 'Automatic conversion from codemeta.json to CITATION.cff'
+          branch: 'main'
