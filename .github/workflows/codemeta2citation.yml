@@ -24,7 +24,7 @@ jobs:
       - name: Convert CFF
         run: |
           pip install -y ruamel.yaml
-          python dev/codemeta2citation.py
+          python .github/workflows/dev/codemeta2citation.py
       - name: Commit CFF
         uses: EndBug/add-and-commit@v9
         with:
