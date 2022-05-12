@@ -6,15 +6,10 @@ from lstmcpipe.config.pipeline_config import (
 import tempfile
 import os
 import pytest
+
 # from datetime import datetime
 
-yaml_keys = [
-    "prod_id",
-    "stages_to_run",
-    "prod_type",
-    "workflow_kind",
-    "stages"
-]
+yaml_keys = ["prod_id", "stages_to_run", "prod_type", "workflow_kind", "stages"]
 dummy_config = {k: None for k in yaml_keys}
 dummy_config["merging_options"] = {"no_image": False}
 dummy_config["source_environment"] = {"source_file": "src_file", "conda_env": "env"}
@@ -69,9 +64,7 @@ def test_complete_lstmcpipe_config():
     # date = datetime.today().strftime("%Y%m%d")
     # TODO test check some paths
     # TODO test check model path
-    assert (
-        parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
-    )
+    assert parsed_config["batch_config"]["source_environment"] == "source src_file; conda activate env; "
     assert parsed_config["batch_config"]["slurm_account"] == ""
     assert parsed_config["stages_to_run"] == ["r0_to_dl1"]
     assert parsed_config["workflow_kind"] == "lstchain"

@@ -43,8 +43,7 @@ parser.add_argument(
     "-i",
     type=str,
     dest="infile",
-    help="dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script "
-    "to be re-organized",
+    help="dl1 output file of the `hipecta_hdf5_r1_to_dl1.py` or `hiperta_r1_dl1` script " "to be re-organized",
     default=None,
 )
 
@@ -80,9 +79,7 @@ def add_column_table(table, ColClass, col_label, values):
     d[col_label] = ColClass()  # add column
 
     # Step 2: Create new temporary table:
-    newtable = tables.Table(
-        table._v_file.root, "_temp_table", d, filters=table.filters
-    )  # new table
+    newtable = tables.Table(table._v_file.root, "_temp_table", d, filters=table.filters)  # new table
     table.attrs._f_copy(newtable)  # copy attributes
     # Copy table rows, also add new column values:
     for row, value in zip(table, values):
@@ -122,7 +119,7 @@ def disp(cog_x, cog_y, src_x, src_y):
     """
     disp_dx = src_x - cog_x
     disp_dy = src_y - cog_y
-    disp_norm = np.sqrt(disp_dx ** 2 + disp_dy ** 2)
+    disp_norm = np.sqrt(disp_dx**2 + disp_dy**2)
     if hasattr(disp_dx, "__len__"):
         disp_angle = np.arctan(disp_dy / disp_dx)
         disp_angle[disp_dx == 0] = np.pi / 2.0 * np.sign(disp_dy[disp_dx == 0])
@@ -164,13 +161,9 @@ def sky_to_camera(alt, az, focal, pointing_alt, pointing_az):
     -------
     camera frame: `astropy.coordinates.sky_coordinate.SkyCoord`
     """
-    pointing_direction = SkyCoord(
-        alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame
-    )
+    pointing_direction = SkyCoord(alt=clip_alt(pointing_alt), az=pointing_az, frame=horizon_frame)
 
-    camera_frame = CameraFrame(
-        focal_length=focal, telescope_pointing=pointing_direction
-    )
+    camera_frame = CameraFrame(focal_length=focal, telescope_pointing=pointing_direction)
 
     event_direction = SkyCoord(alt=clip_alt(alt), az=az, frame=horizon_frame)
 
@@ -202,13 +195,9 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         None
     """
     with tables.open_file(dl1_file) as hfile:
-        run_array_dir = copy.copy(
-            hfile.root.simulation.run_config.col("run_array_direction")[0]
-        )
+        run_array_dir = copy.copy(hfile.root.simulation.run_config.col("run_array_direction")[0])
         # Remember that /telescope has been moved previously
-        focal = copy.copy(
-            hfile.root.instrument.telescope.optics.col("equivalent_focal_length")[0]
-        )
+        focal = copy.copy(hfile.root.instrument.telescope.optics.col("equivalent_focal_length")[0])
 
     df = pd.read_hdf(dl1_file, key=table_path)
     source_pos_in_camera = sky_to_camera(
@@ -242,13 +231,9 @@ def add_disp_and_mc_type_to_parameters_table(dl1_file, table_path):
         tab = file.root[table_path]
         add_column_table(tab, tables.Float32Col, "src_y", source_pos_in_camera.y.value)
         tab = file.root[table_path]
-        add_column_table(
-            tab, tables.Float32Col, "mc_alt_tel", np.ones(len(df)) * run_array_dir[1]
-        )
+        add_column_table(tab, tables.Float32Col, "mc_alt_tel", np.ones(len(df)) * run_array_dir[1])
         tab = file.root[table_path]
-        add_column_table(
-            tab, tables.Float32Col, "mc_az_tel", np.ones(len(df)) * run_array_dir[0]
-        )
+        add_column_table(tab, tables.Float32Col, "mc_az_tel", np.ones(len(df)) * run_array_dir[0])
         if "gamma" in dl1_file:
             tab = file.root[table_path]
             add_column_table(tab, tables.Float32Col, "mc_type", np.zeros(len(df)))
@@ -293,12 +278,8 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     )
 
     hfile_out = tables.open_file(output_filename, "w")
-    hfile_out.copy_node(
-        hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter
-    )
-    hfile_out.copy_node(
-        hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter
-    )
+    hfile_out.copy_node(hfile.root.instrument, newparent=hfile_out.root, recursive=True, filters=filter)
+    hfile_out.copy_node(hfile.root.simulation, newparent=hfile_out.root, recursive=True, filters=filter)
     hfile_out.copy_node(hfile_tmp.root.dl1, newparent=hfile_out.root, recursive=True)
     hfile_out.copy_children(
         hfile_tmp2.root.dl1.event.telescope,
@@ -307,9 +288,7 @@ def create_final_h5(hfile, hfile_tmp, hfile_tmp2, output_filename):
     )
 
     # Move the telescope table from /instrument/subarray to /instrument (lstchain output file dl1 format)
-    hfile_out.move_node(
-        "/instrument/subarray/telescope", newparent="/instrument", createparents=True
-    )
+    hfile_out.move_node("/instrument/subarray/telescope", newparent="/instrument", createparents=True)
     hfile_out.close()
 
 
@@ -370,7 +349,7 @@ def stack_by_telid(dl1_pointer, focal=28):
     tels_params = [Table(tel.parameters.read()) for tel in dl1_pointer]
     try:
         tel_ids = [tel["telId"][0] for tel in dl1_pointer]
-    except:
+    except:  # noqa
         # if the tel_id column does not exist, we assign tel ids by simple iteration
         tel_ids = [i + 1 for i in range(len(tels_params))]
 
@@ -385,9 +364,7 @@ def stack_by_telid(dl1_pointer, focal=28):
 
     # adding stupid tel_id to the image table as well
     for image_tab, tel_id in zip(images, tel_ids):
-        image_tab.add_column(
-            Column(tel_id * np.ones(len(image_tab)), dtype=int), name="tel_id"
-        )
+        image_tab.add_column(Column(tel_id * np.ones(len(image_tab)), dtype=int), name="tel_id")
 
     stacked_images = vstack(images)
     if "event_id" not in stacked_images.columns:
@@ -438,9 +415,7 @@ def reorganize_dl1(input_filename, output_filename):
 
     # File has not been reorganized yet ! Thus, the path for optics is inside /instrument/subarray/telescope
     # only valid for LSTs !
-    focal = hfile.root.instrument.subarray.telescope.optics.col(
-        "equivalent_focal_length"
-    )[0]
+    focal = hfile.root.instrument.subarray.telescope.optics.col("equivalent_focal_length")[0]
     table_dl1, table_imags = stack_by_telid(dl1, focal=focal)
 
     # Join together with the mc_events, compute log of mc_energy and dump it
@@ -449,9 +424,7 @@ def reorganize_dl1(input_filename, output_filename):
 
     # write tmp files
     table_dl1.write(_param, format="hdf5", path=dl1_params_lstcam_key, overwrite=True)
-    table_imags.write(
-        _images, format="hdf5", path=dl1_images_lstcam_key, overwrite=True
-    )
+    table_imags.write(_images, format="hdf5", path=dl1_images_lstcam_key, overwrite=True)
 
     # open tmp files
     _hfile_param = tables.open_file(_param, "r")

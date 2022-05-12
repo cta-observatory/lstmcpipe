@@ -25,19 +25,22 @@ def main():
     parser = argparse.ArgumentParser(description="Validate your lstmcpipe config")
 
     # Required arguments
-    parser.add_argument(dest='lstmcpipe_config_filename',
-                        type=Path,
-                        help='Path to lstmcpipe config file',
-                        )
+    parser.add_argument(
+        dest='lstmcpipe_config_filename',
+        type=Path,
+        help='Path to lstmcpipe config file',
+    )
 
     # optional
-    parser.add_argument('--lstchain_config', '-lc',
-                        action='store',
-                        type=Path,
-                        dest='lstchain_config_filename',
-                        help='Path to the lstchain config file.',
-                        default=None,
-                        )
+    parser.add_argument(
+        '--lstchain_config',
+        '-lc',
+        action='store',
+        type=Path,
+        dest='lstchain_config_filename',
+        help='Path to the lstchain config file.',
+        default=None,
+    )
 
     args = parser.parse_args()
 

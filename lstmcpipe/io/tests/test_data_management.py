@@ -37,4 +37,3 @@ def test_get_input_filelist(create_tmp_dir, create_tmp_subdir):
     assert len(get_input_filelist(create_tmp_dir)) == 6  # 5 files plus subdir
     assert len(get_input_filelist(create_tmp_dir, glob_pattern="*.h5")) == 2
     assert len(get_input_filelist(create_tmp_dir, glob_pattern="**/*.simtel.fz")) == 4
-

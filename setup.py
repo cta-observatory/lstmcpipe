@@ -10,6 +10,7 @@ def find_scripts(script_dir, prefix):
     script_list = [f for f in Path(script_dir).iterdir() if f.name.startswith(prefix)]
     return script_list
 
+
 # Read package info from codemeta.json
 with open(Path(__file__).parent.joinpath("codemeta.json")) as file:
     metadata = json.load(file)

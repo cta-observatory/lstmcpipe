@@ -7,10 +7,7 @@ from lstmcpipe.utils import rerun_cmd
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Batches the ctapipe-stage1 for all the files "
-        "within a text file."
-    )
+    parser = argparse.ArgumentParser(description="Batches the ctapipe-stage1 for all the files " "within a text file.")
     parser.add_argument(
         "--file_list",
         "-f",
@@ -48,9 +45,7 @@ def main():
 
             # ctapipe takes the output filename
             # so we need to construct it first
-            output = join(
-                args.output_dir, basename(file.replace(".simtel.gz", ".dl1.h5"))
-            )
+            output = join(args.output_dir, basename(file.replace(".simtel.gz", ".dl1.h5")))
 
             cmd = ["ctapipe-stage1", f"--input={file}", f"--output={output}"]
             if args.config_file:

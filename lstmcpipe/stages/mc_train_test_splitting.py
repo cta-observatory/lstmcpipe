@@ -10,10 +10,10 @@ log = logging.getLogger(__name__)
 
 
 def batch_train_test_splitting(
-        dict_paths,
-        jobids_from_r0dl1,
-        batch_config,
-        logs,
+    dict_paths,
+    jobids_from_r0dl1,
+    batch_config,
+    logs,
 ):
     """
 
@@ -48,9 +48,7 @@ def batch_train_test_splitting(
 
         log_splitting.update(job_logs)
         jobids_for_merging.append(jobid)
-        debug_log[jobid] = (
-            f"Train test splitting jobid that depends on : {jobids_from_r0dl1}"
-        )
+        debug_log[jobid] = f"Train test splitting jobid that depends on : {jobids_from_r0dl1}"
 
     jobids_for_merging = ",".join(jobids_for_merging)
 
@@ -63,11 +61,11 @@ def batch_train_test_splitting(
 
 
 def train_test_split(
-        input_dir,
-        output_dirs,
-        batch_configuration,
-        wait_jobid_r0_dl1=None,
-        slurm_options=None,
+    input_dir,
+    output_dirs,
+    batch_configuration,
+    wait_jobid_r0_dl1=None,
+    slurm_options=None,
 ):
     """
 
@@ -108,8 +106,10 @@ def train_test_split(
     else:
         ratio = output_dirs["ratio"]
 
-    cmd = f"{source_env} lstmcpipe_train_test_split -i {input_dir} --otest {test_dir}" \
-          f" --otrain {train_dir} -r {ratio} -l {test_dir.parent}"
+    cmd = (
+        f"{source_env} lstmcpipe_train_test_split -i {input_dir} --otest {test_dir}"
+        f" --otrain {train_dir} -r {ratio} -l {test_dir.parent}"
+    )
 
     # TODO check these dirs
     jobe = Path(input_dir).joinpath(input_dir, "split_tt_%j.e")

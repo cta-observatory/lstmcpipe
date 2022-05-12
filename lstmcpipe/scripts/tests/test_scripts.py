@@ -9,9 +9,7 @@ import pkg_resources
 def find_entry_points(package_name):
     """from: https://stackoverflow.com/a/47383763/3838691"""
     entrypoints = [
-        ep.name
-        for ep in pkg_resources.iter_entry_points("console_scripts")
-        if ep.module_name.startswith(package_name)
+        ep.name for ep in pkg_resources.iter_entry_points("console_scripts") if ep.module_name.startswith(package_name)
     ]
     return entrypoints
 
@@ -24,8 +22,7 @@ def run_script(*args):
 
     if result.returncode != 0:
         raise ValueError(
-            f"Running {args[0]} failed with return code {result.returncode}"
-            f", output: \n {result.stdout}"
+            f"Running {args[0]} failed with return code {result.returncode}" f", output: \n {result.stdout}"
         )
 
 
