@@ -23,7 +23,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Convert CFF
         run: |
-          pip install -y ruamel.yaml
+          pip install ruamel.yaml
           python .github/workflows/dev/codemeta2citation.py
       - name: Commit CFF
         uses: EndBug/add-and-commit@v9
