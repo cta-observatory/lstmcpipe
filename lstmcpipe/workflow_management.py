@@ -3,10 +3,10 @@
 # Enrique Garcia Nov 2019
 
 import os
-from ruamel.yaml import YAML
 import shutil
 import logging
 from pathlib import Path
+from ruamel.yaml import YAML
 
 
 log = logging.getLogger(__name__)
