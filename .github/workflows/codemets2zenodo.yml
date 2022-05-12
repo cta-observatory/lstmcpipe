@@ -2,8 +2,6 @@ name: codemeta2zenodo
 
 on:
   [push, pull_request]:
-    paths:
-      - 'codemeta.json'
 
 jobs:
   codemeta2zenodo:
