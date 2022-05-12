@@ -12,12 +12,14 @@ jobs:
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: convert codemeta
+      - name: CodeMeta2CFF
+        uses: caltechlibrary/codemeta2cff@v0.0.3
+      - name: cat
         run: | 
-          eossr-codemeta2zenodo -i codemeta.json --overwrite;
-          cat .zenodo.json
+#          eossr-codemeta2zenodo -i codemeta.json --overwrite;
+          cat CITATION.cff
 
       - uses: EndBug/add-and-commit@v9
         with:
-          add: '.zenodo.json'
-          message: 'Automatic conversion from codemeta.json to .zenodo.json'
+          add: 'CITATION.cff'
+          message: 'Automatic conversion from codemeta.json to CITATION.cff'
