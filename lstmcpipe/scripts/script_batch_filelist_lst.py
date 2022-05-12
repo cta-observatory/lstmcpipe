@@ -53,7 +53,8 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            outfile = Path(args.output_dir).joinpath('dl1_' + file.replace('.simtel.gz', '.h5'))
+            file = Path(file)
+            outfile = file.parent.joinpath('dl1_' + file.name.replace('.simtel.gz', '.h5')).as_posix()
             rerun_cmd(cmd, outfile, max_ntry=2)
 
 
