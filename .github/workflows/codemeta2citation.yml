@@ -22,7 +22,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Convert CFF
-        uses: caltechlibrary/codemeta2cff@main
+        run: python dev/codemeta2citation.py
       - name: Commit CFF
         uses: EndBug/add-and-commit@v9
         with:
