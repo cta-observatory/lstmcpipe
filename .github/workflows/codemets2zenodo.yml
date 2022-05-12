@@ -14,8 +14,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: convert codemeta
         run: | 
-        eossr-codemeta2zenodo -i codemeta.json --overwrite
-        cat .zenodo.json
+          eossr-codemeta2zenodo -i codemeta.json --overwrite
+          cat .zenodo.json
 
       - uses: EndBug/add-and-commit@v9
         with:
