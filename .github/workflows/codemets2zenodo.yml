@@ -1,7 +1,6 @@
 name: codemeta2zenodo
 
-on:
-  [push, pull_request]:
+on: [push, pull_request]
 
 jobs:
   codemeta2zenodo:
