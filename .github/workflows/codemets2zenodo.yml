@@ -1,7 +1,7 @@
 name: codemeta2zenodo
 
 on:
-  pull_request:
+  [push, pull_request]:
     paths:
       - 'codemeta.json'
 
