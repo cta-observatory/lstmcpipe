@@ -2,6 +2,7 @@ from lstmcpipe.utils import rerun_cmd
 import tempfile
 from pathlib import Path
 
+
 def test_rerun_cmd():
 
     with tempfile.TemporaryDirectory() as tmp_dir:
