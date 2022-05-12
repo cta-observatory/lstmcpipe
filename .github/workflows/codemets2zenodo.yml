@@ -6,7 +6,8 @@ on:
       - 'codemeta.json'
 
 jobs:
-  build:
+  codemeta2zenodo:
+    runs-on: ubuntu-latest
     container:
       image: gitlab-registry.in2p3.fr/escape2020/wp3/eossr:v0.6
     steps:
