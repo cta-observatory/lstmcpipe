@@ -10,6 +10,7 @@ import re
 from . import base_config
 from ..version import __version__
 
+_crab_dec = 'dec_2276'
 
 class PathConfig:
     """
@@ -565,7 +566,8 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'proton': self.training_merged_dl1('Protons'),
                 },
                 'output': self.models_dir(),
-                'slurm_options': '-p xxl --mem=100G --cpus-per-task=16',
+                'slurm_options': '-p xxl --mem=160G --cpus-per-task=16' if self.dec == _crab_dec
+                else '-p xxl --mem=100G --cpus-per-task=16',
             }
         ]
         return paths
@@ -663,7 +665,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
-                    'slurm_options': '--mem=50GB'
+                    'slurm_options': '--mem=80GB' if self.dec == _crab_dec else '--mem=50GB'
                 }
             )
         return paths
@@ -692,30 +694,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return paths
 
 
-class PathConfigAllSkyTrainingDec2276(PathConfigAllSkyTraining):
-    """
-    Specific memory requirements to train dec_2276 (Crab) = 160GB
-    """
-    @property
-    def train_pipe(self):
-        paths = super().train_pipe
-        for p in paths:
-            p['slurm_options'] = '-p xxl --mem=160G --cpus-per-task=16'
-        return paths
-
-
-class PathConfigAllSkyTestingDec2276(PathConfigAllSkyTesting):
-    """
-    Specific memory requirements to apply RF for dec_2276 (Crab) = 80GB
-    """
-    @property
-    def dl1_to_dl2(self):
-        paths = super().dl1_to_dl2
-        for p in paths:
-            p['slurm_options'] = '--mem=80G'
-        return paths
-
-
 class PathConfigAllSkyFull(PathConfig):
     def __init__(self, prod_id, dec_list):
         """
@@ -731,11 +709,8 @@ class PathConfigAllSkyFull(PathConfig):
         self.dec_list = dec_list
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
 
-        # some declinations require specific sub-configs:
-        train_classes = {'dec_2276': PathConfigAllSkyTrainingDec2276}
-        test_classes = {'dec_2276': PathConfigAllSkyTrainingDec2276}
-        self.train_configs = {dec: train_classes.get(dec, PathConfigAllSkyTraining)(prod_id, dec) for dec in dec_list}
-        self.test_configs = {dec: test_classes.get(dec, PathConfigAllSkyTesting)(prod_id, dec) for dec in dec_list}
+        self.train_configs = {dec: PathConfigAllSkyTraining(prod_id, dec) for dec in dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
 
     @property
     def r0_to_dl1(self):
