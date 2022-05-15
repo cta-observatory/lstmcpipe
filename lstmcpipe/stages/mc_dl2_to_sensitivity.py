@@ -119,8 +119,10 @@ def dl2_to_sensitivity(
     cmd_sens = "sbatch --parsable -p short --mem 32G"
     if slurm_account != "":
         cmd_sens += f" -A {slurm_account}"
+    if wait_jobs_dl1_dl2 is not None:
+        cmd_sens += f" --dependency=afterok:{wait_jobs_dl1_dl2}"
     cmd_sens += (
-        f" --dependency=afterok:{wait_jobs_dl1_dl2} -e {jobe_sens} -o {jobo_sens}"
+        f" -e {jobe_sens} -o {jobo_sens}"
         f' -J dl2_sens --wrap="{source_env} {base_cmd_sens}"'
     )
 
