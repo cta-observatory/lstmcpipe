@@ -464,9 +464,9 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
-            + dec
-            + "/sim_telarray/{pointing}/output_v1.4/"
+                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
+                + dec
+                + "/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
@@ -783,4 +783,25 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
             target_dl1 = self.dl1_dir(pointing)
             paths.append({'input': source_dl1, 'output': target_dl1})
 
+        return paths
+
+
+class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
+
+    def __init__(self, source_prod_id, target_prod_id, dec_list):
+        super().__init__(target_prod_id, dec_list)
+        self.source_prod_id = source_prod_id
+        self.stages = ['dl1ab', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
+        self.train_configs = {dec: PathConfigAllSkyTrainingDL1ab(source_prod_id, target_prod_id, dec) for dec in
+                              dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTestingDL1ab(source_prod_id, target_prod_id, dec) for dec in
+                             dec_list}
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].dl1ab)
+        # we do only one DL1 test for one dec (dec does not matter, so we take the first one)
+        paths.extend(self.test_configs[self.dec_list[0]].dl1ab)
         return paths
