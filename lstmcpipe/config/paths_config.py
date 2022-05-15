@@ -765,3 +765,22 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
                 paths.append({'input': source_dl1, 'output': target_dl1})
 
         return paths
+
+
+class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
+
+    def __init__(self, source_prod_id, target_prod_id, dec):
+        super().__init__(target_prod_id, dec)
+        self.stages = ['dl1ab', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
+        self.source_prod_id = source_prod_id
+        self.source_config = PathConfigAllSkyTesting(source_prod_id, dec)
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for pointing in self.testing_pointings():
+            source_dl1 = self.source_config.dl1_dir(pointing)
+            target_dl1 = self.dl1_dir(pointing)
+            paths.append({'input': source_dl1, 'output': target_dl1})
+
+        return paths
