@@ -745,3 +745,23 @@ class PathConfigAllSkyFull(PathConfig):
         for dec in self.dec_list:
             paths.extend(self.test_configs[dec].dl2_to_irfs)
         return paths
+
+
+class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
+
+    def __init__(self, source_prod_id, target_prod_id, dec):
+        super().__init__(target_prod_id, dec)
+        self.stages = ['dl1ab', 'merge_dl1', 'train_pipe']
+        self.source_prod_id = source_prod_id
+        self.source_config = PathConfigAllSkyTraining(source_prod_id, dec)
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for particle in self.training_particles:
+            for pointing in self.training_pointings(particle):
+                source_dl1 = self.source_config.dl1_dir(particle, pointing)
+                target_dl1 = self.dl1_dir(particle, pointing)
+                paths.append({'input': source_dl1, 'output': target_dl1})
+
+        return paths
