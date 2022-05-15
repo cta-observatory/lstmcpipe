@@ -663,6 +663,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
+                    'slurm_options': '--mem=80GB'
                 }
             )
         return paths
@@ -688,6 +689,18 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                 }
             )
 
+        return paths
+
+
+class PathConfigAllSkyTrainingDec2276(PathConfigAllSkyTraining):
+    """
+    Specific memory requirements to train dec_2276 (Crab) = 160GB
+    """
+    @property
+    def train_pipe(self):
+        paths = super().train_pipe
+        for p in paths:
+            p['slurm_options'] = '-p xxl --mem=160G --cpus-per-task=16'
         return paths
 
 
