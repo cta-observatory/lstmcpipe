@@ -410,7 +410,7 @@ class PathConfigAllSkyBase(PathConfig):
         )
 
     def r0_dir(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     def dl1_dir(self, particle, pointing, dataset_type, dec):
         return self._data_level_dir(
@@ -436,23 +436,23 @@ class PathConfigAllSkyBase(PathConfig):
 
     @property
     def r0_to_dl1(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def merge_dl1(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def train_pipe(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def dl1_to_dl2(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def dl2_to_irfs(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
 
 class PathConfigAllSkyTraining(PathConfigAllSkyBase):
@@ -663,7 +663,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
-                    'slurm_options': '--mem=80GB'
+                    'slurm_options': '--mem=50GB'
                 }
             )
         return paths
@@ -704,6 +704,18 @@ class PathConfigAllSkyTrainingDec2276(PathConfigAllSkyTraining):
         return paths
 
 
+class PathConfigAllSkyTestingDec2276(PathConfigAllSkyTesting):
+    """
+    Specific memory requirements to apply RF for dec_2276 (Crab) = 80GB
+    """
+    @property
+    def dl1_to_dl2(self):
+        paths = super().dl1_to_dl2
+        for p in paths:
+            p['slurm_options'] = '--mem=80G'
+        return paths
+
+
 class PathConfigAllSkyFull(PathConfig):
     def __init__(self, prod_id, dec_list):
         """
@@ -719,8 +731,11 @@ class PathConfigAllSkyFull(PathConfig):
         self.dec_list = dec_list
         self.stages = ['r0_to_dl1', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
 
-        self.train_configs = {dec: PathConfigAllSkyTraining(prod_id, dec) for dec in dec_list}
-        self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
+        # some declinations require specific sub-configs:
+        train_classes = {'dec_2276': PathConfigAllSkyTrainingDec2276}
+        test_classes = {'dec_2276': PathConfigAllSkyTrainingDec2276}
+        self.train_configs = {dec: train_classes.get(dec, PathConfigAllSkyTraining)(prod_id, dec) for dec in dec_list}
+        self.test_configs = {dec: test_classes.get(dec, PathConfigAllSkyTesting)(prod_id, dec) for dec in dec_list}
 
     @property
     def r0_to_dl1(self):
