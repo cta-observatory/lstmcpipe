@@ -329,15 +329,30 @@ class PathConfigProd5Trans80(PathConfig):
                     paths.append(path_dict(offset))
         return paths
 
+    
 
 class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
-    def __init__(self, starting_prod_id, new_prod_id, zenith='zenith_20deg'):
+    def __init__(self, starting_prod_id, new_prod_id, zenith='zenith_20deg', run_checker=True):
         super(PathConfigProd5Trans80DL1ab, self).__init__(prod_id=new_prod_id, zenith=zenith)
         self.starting_prod_id = starting_prod_id
         self.stages.remove('r0_to_dl1')
         self.stages.remove('train_test_split')
         self.stages.remove('merge_dl1')
         self.stages.insert(0, 'dl1ab')
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for step in ['train', 'test']:
+            for particle in self.particles:
+                if particle == 'gamma':
+                    for offset in self.point_src_offsets:
+                        dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
+                else:
+                    dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
+                if not Path(dl1_input).exists():
+                    raise FileNotFoundError(f"file {dl1_input} should exist")
+                    
 
     def starting_dl1(self, particle, step, gamma_src_offset='off0.4deg'):
         former_merged_dl1 = self.merge_output_file(particle=particle, step=step, gamma_src_offset=gamma_src_offset)
