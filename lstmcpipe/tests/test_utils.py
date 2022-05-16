@@ -24,7 +24,7 @@ def test_rerun_cmd():
 
 def test_rerun_cmd_lstchain_mc_r0_to_dl1():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        cmd = f'lstchain_mc_r0_to_dl1 -o {tmp_dir}'
+        cmd = ['lstchain_mc_r0_to_dl1', '-o', tmp_dir]
         outfile = Path(tmp_dir, 'dl1_gamma_test_large.h5')
         # first try should succeed
         ntry = rerun_cmd(cmd, outfile, max_ntry=3)
