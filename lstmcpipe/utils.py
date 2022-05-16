@@ -1,6 +1,7 @@
 from pathlib import Path
 import shutil
 import subprocess
+import json
 
 
 def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_kwargs):
@@ -38,3 +39,30 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
 
         ntry += 1
     return ntry-1
+
+
+
+def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
+    from lstchain.io.config import get_standard_config
+    
+    filename = Path(filename)
+
+    if filename.exists() and not overwrite:
+        raise FileExistsError(f"{filename} exists already")
+
+    cfg = get_standard_config()
+    cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
+    cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
+    cfg['source_config']['EventSource']['allowed_tels'] = [1]
+    cfg['random_forest_energy_regressor_args']['min_samples_leaf'] = 10
+    cfg['random_forest_disp_regressor_args']['min_samples_leaf'] = 10
+    cfg['random_forest_disp_classifier_args']['min_samples_leaf'] = 10
+    cfg['random_forest_particle_classifier_args']['min_samples_leaf'] = 10
+    cfg['random_forest_energy_regressor_args']['n_jobs'] = -1
+    cfg['random_forest_disp_regressor_args']['n_jobs'] = -1
+    cfg['random_forest_disp_classifier_args']['n_jobs'] = -1
+    cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
+    
+    with open(filename, 'w') as file:
+        json.dump(cfg, file)
+    print(f"Modified lstchain config dumped in {filename}")

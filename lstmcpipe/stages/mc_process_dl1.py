@@ -293,7 +293,8 @@ def reprocess_dl1(
             newfile.write(f)
             newfile.write("\n")
 
-    job_logs_dir = output_dir.joinpath("job_logs_dl1ab")
+    Path(output_dir).mkdir(exist_ok=True, parents=True)
+    job_logs_dir = Path(output_dir).joinpath("job_logs_dl1ab")
     Path(job_logs_dir).mkdir(exist_ok=True)
 
     log.info("DL1ab DATA DIR: {}".format(output_dir))
@@ -308,6 +309,7 @@ def reprocess_dl1(
         job_logs_dir=job_logs_dir,
         slurm_account=slurm_account,
         filelist_name="dl1ab",
+        dl1_processing="dl1ab",
         slurm_options=slurm_options,
     )
 
