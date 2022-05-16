@@ -752,11 +752,32 @@ class PathConfigAllSkyFull(PathConfig):
 
 class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
 
-    def __init__(self, source_prod_id, target_prod_id, dec):
+    def __init__(self, source_prod_id, target_prod_id, dec, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec: str
+            the declination
+        run_checker: boolean
+            True to check if the source prod exists
+        """
         super().__init__(target_prod_id, dec)
         self.stages = ['dl1ab', 'merge_dl1', 'train_pipe']
         self.source_prod_id = source_prod_id
         self.source_config = PathConfigAllSkyTraining(source_prod_id, dec)
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for particle in self.training_particles:
+            for pointing in self.training_pointings(particle):
+                source_dl1 = Path(self.source_config.dl1_dir(particle, pointing))
+                if not source_dl1.exists():
+                    raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
 
     @property
     def dl1ab(self):
@@ -772,11 +793,31 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
 
 class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
 
-    def __init__(self, source_prod_id, target_prod_id, dec):
+    def __init__(self, source_prod_id, target_prod_id, dec, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec: str
+            the declination
+        run_checker: boolean
+            True to check if the source prod exists
+        """
         super().__init__(target_prod_id, dec)
         self.stages = ['dl1ab', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
         self.source_prod_id = source_prod_id
         self.source_config = PathConfigAllSkyTesting(source_prod_id, dec)
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for pointing in self.testing_pointings():
+            source_dl1 = Path(self.source_config.dl1_dir(pointing))
+            if not source_dl1.exists():
+                raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
 
     @property
     def dl1ab(self):
