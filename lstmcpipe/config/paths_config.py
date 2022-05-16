@@ -10,6 +10,7 @@ import re
 from . import base_config
 from ..version import __version__
 
+_crab_dec = 'dec_2276'
 
 class PathConfig:
     """
@@ -410,7 +411,7 @@ class PathConfigAllSkyBase(PathConfig):
         )
 
     def r0_dir(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     def dl1_dir(self, particle, pointing, dataset_type, dec):
         return self._data_level_dir(
@@ -436,23 +437,23 @@ class PathConfigAllSkyBase(PathConfig):
 
     @property
     def r0_to_dl1(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def merge_dl1(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def train_pipe(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def dl1_to_dl2(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
     @property
     def dl2_to_irfs(self):
-        raise NotImplementedError("Should be implemented in child class")
+        raise NotImplementedError("Should be implemented in child class if necessary")
 
 
 class PathConfigAllSkyTraining(PathConfigAllSkyBase):
@@ -565,7 +566,8 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'proton': self.training_merged_dl1('Protons'),
                 },
                 'output': self.models_dir(),
-                'slurm_options': '-p xxl --mem=100G --cpus-per-task=16',
+                'slurm_options': '-p xxl --mem=160G --cpus-per-task=16' if self.dec == _crab_dec
+                else '-p xxl --mem=100G --cpus-per-task=16',
             }
         ]
         return paths
@@ -663,6 +665,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
+                    'slurm_options': '--mem=80GB' if self.dec == _crab_dec else '--mem=50GB'
                 }
             )
         return paths

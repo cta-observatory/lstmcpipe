@@ -2,8 +2,8 @@
 
 import argparse
 from os import environ
-import subprocess
-
+from pathlib import Path
+from lstmcpipe.utils import rerun_cmd
 
 def main():
     parser = argparse.ArgumentParser(
@@ -43,7 +43,7 @@ def main():
     # lstchain takes the output dir and constructs filenanmes itself
     with open(file_for_this_job, "r") as filelist:
         for file in filelist:
-            file = file.strip("\n")
+            file = Path(file.strip("\n"))
 
             cmd = [
                 "lstchain_mc_r0_to_dl1",
@@ -53,7 +53,8 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            subprocess.run(cmd)
+            outfile = file.parent.joinpath('dl1_' + file.name.replace('.simtel.gz', '.h5')).as_posix()
+            rerun_cmd(cmd, outfile, max_ntry=2)
 
 
 if __name__ == "__main__":

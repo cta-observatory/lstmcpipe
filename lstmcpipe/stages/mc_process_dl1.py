@@ -409,3 +409,4 @@ def submit_dl1_jobs(
     jobid2log.update({jobid: slurm_cmd})
 
     return jobid2log, jobid
+
