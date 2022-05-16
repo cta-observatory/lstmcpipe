@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 import subprocess
 
 
@@ -33,6 +34,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
                 failed_jobs_subdir.mkdir(exist_ok=True)
                 outfile_target = failed_jobs_subdir.joinpath(outfile.name)
                 print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
-                outfile.rename(outfile_target)
+                shutil.move(outfile, outfile_target)
+
         ntry += 1
     return ntry-1
