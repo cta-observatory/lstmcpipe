@@ -480,7 +480,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
+                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/"
                 + dec
                 + "/sim_telarray/{pointing}/output_v1.4/"
         )

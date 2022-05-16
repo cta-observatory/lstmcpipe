@@ -5,6 +5,7 @@ from datetime import date
 import warnings
 
 from lstmcpipe.config import paths_config
+from lstmcpipe.utils import dump_lstchain_std_config
 
 
 class ParseKwargs(argparse.Action):
@@ -37,30 +38,6 @@ def list_config_classes():
             pass
     return all_attrs
 
-
-def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
-    try:
-        from lstchain.io.config import get_standard_config
-    except ImportError:
-        warnings.warn("Could not load get_standard_config from lstchain.io.config - standard config won't be generated")
-        return None
-    import json
-
-    if Path(filename).exists() and not overwrite:
-        raise FileExistsError(f"{filename} exists already")
-
-    cfg = get_standard_config()
-    cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
-    cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
-    cfg['source_config']['EventSource']['allowed_tels'] = [1]
-    cfg['random_forest_energy_regressor_args']['min_samples_leaf'] = 10
-    cfg['random_forest_disp_regressor_args']['min_samples_leaf'] = 10
-    cfg['random_forest_disp_classifier_args']['min_samples_leaf'] = 10
-    cfg['random_forest_particle_classifier_args']['min_samples_leaf'] = 10
-    with open(filename, 'w') as file:
-        json.dump(cfg, file)
-    print(f"Modified lstchain config dumped in {filename}")
-    return filename
 
 
 def main():
