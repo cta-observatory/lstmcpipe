@@ -16,6 +16,11 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
         path to the cmd output file
     max_ntry: int
     run_kwargs: kwargs for subprocess.run
+
+    Returns
+    -------
+    ntry: int
+        number of tries actually run
     """
     outfile = Path(outfile)
     ret = -1
@@ -30,3 +35,4 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
                 print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
                 outfile.rename(outfile_target)
         ntry += 1
+    return ntry-1
