@@ -832,14 +832,24 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
 
 class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
 
-    def __init__(self, source_prod_id, target_prod_id, dec_list):
+    def __init__(self, source_prod_id, target_prod_id, dec_list, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec_list: [str]
+            list of declinations
+        run_checker: boolean
+            True to check if the source prod exists
+        """
         super().__init__(target_prod_id, dec_list)
         self.source_prod_id = source_prod_id
         self.stages = ['dl1ab', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
-        self.train_configs = {dec: PathConfigAllSkyTrainingDL1ab(source_prod_id, target_prod_id, dec) for dec in
-                              dec_list}
-        self.test_configs = {dec: PathConfigAllSkyTestingDL1ab(source_prod_id, target_prod_id, dec) for dec in
-                             dec_list}
+        self.train_configs = {dec: PathConfigAllSkyTrainingDL1ab(source_prod_id, target_prod_id, dec, run_checker=run_checker) for dec in dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTestingDL1ab(source_prod_id, target_prod_id, dec, run_checker=run_checker) for dec in dec_list}
 
     @property
     def dl1ab(self):
