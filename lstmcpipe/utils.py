@@ -21,8 +21,8 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
     ret = -1
     ntry = 1
     while ret != 0 and ntry <= max_ntry:
-        ret = subprocess.run(cmd, **run_kwargs)
-        if ret.returncode != 0:
+        ret = subprocess.run(cmd, **run_kwargs).returncode
+        if ret != 0:
             failed_jobs_subdir = outfile.parent.joinpath(subdir_failures)
             if outfile.exists():
                 failed_jobs_subdir.mkdir(exist_ok=True)
