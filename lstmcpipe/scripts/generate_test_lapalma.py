@@ -33,7 +33,7 @@ def generate_tree(base_dir, working_dir, nfiles):
 
 
 def generate_test_prod5trans80(
-    working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/', nfiles=5, path_to_config_file='.', overwrite=True
+    working_dir, nfiles=5, path_to_config_file='.', overwrite=True
 ):
     base_dir = '/fefs/aswg/workspace/lstmcpipe/data/test_data/mc/DL0/20200629_prod5_trans_80/'
     working_dir = os.path.join(working_dir, 'DL0/20200629_prod5_trans_80/')
@@ -49,7 +49,7 @@ def generate_test_prod5trans80(
 
 
 def generate_test_allsky(
-    working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/',
+    working_dir,
     nfiles=5,
     path_to_config_file='.',
     decs=['dec_4822', 'dec_931'],
@@ -133,10 +133,21 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.working_dir is None:
+        user = os.environ['USER']
+        if user == 'lstanalyzer':
+            working_dir = '/fefs/aswg/workspace/lstmcpipe/data/mc'
+        else:
+            working_dir = f'/fefs/aswg/workspace/{user}/data/mc'
+        if not Path(working_dir).exists():
+            raise FileNotFoundError(f"working dir {working_dir} does not exist, provide one")
+    else:
+        working_dir = args.working_dir
+
     if args.prod_type == 'prod5trans80':
-        generate_test_prod5trans80(args.working_dir, args.nfiles, args.path_config_file)
+        generate_test_prod5trans80(working_dir, args.nfiles, args.path_config_file)
     elif args.prod_type == 'allsky':
-        generate_test_allsky(args.working_dir, args.nfiles, args.path_config_file)
+        generate_test_allsky(working_dir, args.nfiles, args.path_config_file)
     else:
         raise NotImplementedError("Unknown prod type")
         
