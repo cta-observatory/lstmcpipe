@@ -50,6 +50,14 @@ def test_config_valid():
     with pytest.raises(KeyError):
         config_valid(missing_reference)
 
+    missing_reference["stages"] = {"dl1ab": []}
+
+    missing_reference["dl1_noise_tune_data_run"] = "file"
+    with pytest.raises(KeyError):
+        config_valid(missing_reference)
+    missing_reference["dl1_noise_tune_mc_run"] = "file"
+    config_valid(missing_reference)
+
 
 def test_complete_lstmcpipe_config():
     """

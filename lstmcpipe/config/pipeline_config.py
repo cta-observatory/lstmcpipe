@@ -50,7 +50,7 @@ def config_valid(loaded_config):
     """
     Test if the given dictionary contains valid values for the
     r0_to_dl3 processing.
-    TODO: The stages should be checked aswell.
+
     Not all combinations are sensible!
 
     Parameters:
@@ -68,7 +68,6 @@ def config_valid(loaded_config):
         "source_environment",
         "stages_to_run",
         "stages",
-        # TODO dl1_reference_id ?
     ]
     allowed_workflows = ["hiperta", "lstchain", "ctapipe"]
 
@@ -91,6 +90,14 @@ def config_valid(loaded_config):
     for stage in stages_to_run:
         if stage not in loaded_config['stages']:
             raise KeyError(f"Missing paths for stage {stage} provided in stages_to_run")
+
+    dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
+    dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
+
+    if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
+        raise KeyError("Please specify a simtel monte carlo file to compare observed noise against.")
+    if dl1_noise_tune_mc_run and not dl1_noise_tune_data_run:
+        raise KeyError("Please specify an observed dl1 file to tune the images.")
     
     log.debug("Configuration deemed valid")
 
