@@ -51,6 +51,7 @@ def test_path_config_generate():
 
 def test_path_config_save():
     pcfg = paths_config.PathConfig('v00')
+    pcfg.stages = ['r0_to_dl1']
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
