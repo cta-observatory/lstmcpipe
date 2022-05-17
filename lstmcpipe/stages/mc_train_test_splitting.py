@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import os
 import shutil
 import logging
 from pathlib import Path
-from lstmcpipe.workflow_management import save_log_to_file
+from ..slurm_utils import SbatchLstMCStage
+from ..workflow_management import save_log_to_file
 
 log = logging.getLogger(__name__)
 
@@ -82,9 +82,6 @@ def train_test_split(
     -------
 
     """
-    source_env = batch_configuration["source_environment"]
-    slurm_account = batch_configuration["slurm_account"]
-
     log_splitting = {}
 
     input_dir = Path(input_dir).resolve()
@@ -107,27 +104,23 @@ def train_test_split(
         ratio = output_dirs["ratio"]
 
     cmd = (
-        f"{source_env} lstmcpipe_train_test_split -i {input_dir} --otest {test_dir}"
+        f"lstmcpipe_train_test_split -i {input_dir} --otest {test_dir}"
         f" --otrain {train_dir} -r {ratio} -l {test_dir.parent}"
     )
 
-    # TODO check these dirs
-    jobe = Path(input_dir).joinpath(input_dir, "split_tt_%j.e")
-    jobo = Path(input_dir).joinpath(input_dir, "split_tt_%j.o")
+    sbatch_tt_splitting = SbatchLstMCStage(
+        "train_test_splitting",
+        wrap_command=cmd,
+        slurm_error=Path(input_dir).joinpath(input_dir, "split_tt_%j.e"),
+        slurm_output=Path(input_dir).joinpath(input_dir, "split_tt_%j.o"),
+        slurm_deps=wait_jobid_r0_dl1,
+        slurm_options=slurm_options,
+        slurm_account=batch_configuration["slurm_account"],
+        source_environment=batch_configuration["source_environment"],
+    )
 
-    batch_cmd = "sbatch --parsable"
-    if slurm_options is not None:
-        batch_cmd += f" {slurm_options}"
-    else:
-        batch_cmd += " -p short"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
-    if wait_jobid_r0_dl1 is not None:
-        batch_cmd += f" --dependency=afterok:{wait_jobid_r0_dl1}"
-    batch_cmd += f' -J splitting_train_test -e {jobe} -o {jobo} --wrap="{cmd}"'
-
-    jobid_split = os.popen(batch_cmd).read().strip("\n")
-    log_splitting.update({jobid_split: batch_cmd})
+    jobid_split = sbatch_tt_splitting.submit
+    log_splitting.update({jobid_split: sbatch_tt_splitting.slurm_command})
 
     return log_splitting, jobid_split
 
