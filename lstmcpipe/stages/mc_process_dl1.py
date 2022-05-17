@@ -278,7 +278,7 @@ def reprocess_dl1(
     else:
         base_cmd = ""
         jobtype_id = ""
-        log.critical("Please, selected an allowed workflow kind.")
+        log.critical(f"Unknown workflow {workflow_kind}")
         exit(-1)
 
     log.info("Working on DL1 files in {}".format(input_dir))
