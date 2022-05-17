@@ -63,9 +63,9 @@ class SbatchLstMCStage:
         self.compose_wrap_command(wrap_command, source_environment, backend)
         self.stage_default_options(stage)
 
-    def __repr__(self):
+    def __str__(self):
         # return full string
-        return self._slurm_command()
+        return self.slurm_command
 
     @property
     def _valid_stages(self):
@@ -91,7 +91,8 @@ class SbatchLstMCStage:
             backend = backend.strip() + "; "
         self.wrap_cmd = f'--wrap="{backend}{source_env}{wrap_command}"'
 
-    def _slurm_command(self):
+    @property
+    def slurm_command(self):
         if self.slurm_options is not None:
             return (
                 f"{self.base_slurm_command} {self.job_name} {self.slurm_options}"
@@ -138,7 +139,7 @@ class SbatchLstMCStage:
                 "You must first define the command to be batched: " "SbatchLstMCStage().wrap_command('COMMAND')"
             )
         else:
-            jobid = run_command(self._slurm_command())
+            jobid = run_command(self.slurm_command)
             return jobid
 
     def r0_dl1_options(self, process_dl1_job_name="r0_dl1", array="0-0%100"):
