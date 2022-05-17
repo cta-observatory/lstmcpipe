@@ -2,6 +2,8 @@
 
 # clean directory for DL1 files with wrong parameters table shape
 # see https://github.com/cta-observatory/cta-lstchain/issues/978
+# simply delete files with wrong table shape
+
 
 import logging
 from pathlib import Path
