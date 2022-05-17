@@ -4,6 +4,7 @@ import os
 import shutil
 import logging
 from pathlib import Path
+from lstmcpipe.slurm_utils import SbatchLstMCStage
 from lstmcpipe.workflow_management import save_log_to_file
 from lstmcpipe.io.data_management import check_and_make_dir_without_verification
 
@@ -128,13 +129,23 @@ def dl1_to_dl2(
 
     log_dl1_to_dl2 = {}
 
-    cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" f" -o {output_dir}"
+    cmd = f"lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" f" -o {output_dir}"
 
     if config_file is not None:
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
 
     jobe = Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix()
     jobo = Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix()
+
+    # TODO change everything in a single call --> thius change slurm_utils
+    sbatch_dl1_dl2 = SbatchLstMCStage(
+        slurm_error=jobe, slurm_output=jobo, slurm_deps=wait_jobid_train_pipe, slurm_account=slurm_account
+    )
+
+    sbatch_dl1_dl2.dl1_dl2_default_options()  # -p short --mem=32G
+    sbatch_dl1_dl2.compose_wrap_command(wrap_command=cmd, source_env=source_environment)
+
+    jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit
 
     # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
     batch_cmd = "sbatch --parsable"
