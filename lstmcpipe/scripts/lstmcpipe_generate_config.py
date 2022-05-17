@@ -2,7 +2,6 @@
 import argparse
 from pathlib import Path
 from datetime import date
-import warnings
 
 from lstmcpipe.config import paths_config
 from lstmcpipe.utils import dump_lstchain_std_config
