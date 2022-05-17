@@ -798,7 +798,7 @@ class PathConfigAllSkyFull(PathConfig):
         paths.extend(self.test_configs[self.dec_list[0]].merge_dl1)
         return paths
     
-    def plot_pointings(self, training=True, testing=False, ax=None, **kwargs):
+    def plot_pointings(self, fig=None, projection=None, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         
@@ -812,30 +812,12 @@ class PathConfigAllSkyFull(PathConfig):
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
         """
-        ax = plt.gca() if ax is None else ax
-        training_pointings = []
-        for p in self.training_particles:
-            for pp in self.training_pointings(p):
-                training_pointings.append(list(self._extract_pointing(pp).groups()))
-        training_pointings = np.array(training_pointings).astype(float)
 
-        testing_pointings = []
-        for p in self.testing_particles:
-            for pp in self.testing_pointings(p):
-                testing_pointings.append(list(self._extract_pointing(pp).groups()))
-        testing_pointings = np.array(testing_pointings).astype(float)
+        for dec, tr in self.train_configs.items():
+            fig = tr.plot_pointings(fig=fig, projection=projection, **kwargs)
 
-        if training:
-            kwargs.setdefault('label', 'training pointings')
-            ax.scatter(training_pointings[:,1], training_pointings[:,0], **kwargs)
-        if testing:
-            kwargs.setdefault('label', 'testing pointings')
-            ax.scatter(testing_pointings[:,1], testing_pointings[:,0], **kwargs)
-        ax.set_xlabel('Azimuth [deg]')
-        ax.set_ylabel('Altitude [deg]')
-        ax.legend()
-
-        return ax
+        fig = list(self.test_configs.values())[0].plot_pointings(fig=fig, projection=projection, **kwargs)
+        return fig
 
     @property
     def train_pipe(self):
