@@ -284,7 +284,7 @@ def reprocess_dl1(
     log.info("Working on DL1 files in {}".format(input_dir))
 
     check_data_path(input_dir)
-    dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).rglob("*.h5")]
+    dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).glob("*.h5")]
 
     log.info("{} DL1 files".format(len(dl1ab_filelist)))
 
