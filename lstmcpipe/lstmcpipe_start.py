@@ -140,9 +140,6 @@ def main():
     logs_files, scancel_file, logs_dir = create_log_files(prod_id)
     all_job_ids = {}
 
-    if "r0_to_dl1" in stages_to_run and "reprocess_dl1" in stages_to_run:
-        raise Exception("There can only be one stage producing dl1 files")
-
     # 1 STAGE --> R0/1 to DL1 or reprocessing of existing dl1a files
     r0_to_dl1 = "r0_to_dl1" in stages_to_run
     dl1ab = "dl1ab" in stages_to_run
