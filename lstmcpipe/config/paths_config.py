@@ -329,15 +329,30 @@ class PathConfigProd5Trans80(PathConfig):
                     paths.append(path_dict(offset))
         return paths
 
+    
 
 class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
-    def __init__(self, starting_prod_id, new_prod_id, zenith='zenith_20deg'):
+    def __init__(self, starting_prod_id, new_prod_id, zenith='zenith_20deg', run_checker=True):
         super(PathConfigProd5Trans80DL1ab, self).__init__(prod_id=new_prod_id, zenith=zenith)
         self.starting_prod_id = starting_prod_id
         self.stages.remove('r0_to_dl1')
         self.stages.remove('train_test_split')
         self.stages.remove('merge_dl1')
         self.stages.insert(0, 'dl1ab')
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for step in ['train', 'test']:
+            for particle in self.particles:
+                if particle == 'gamma':
+                    for offset in self.point_src_offsets:
+                        dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset=offset)
+                else:
+                    dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
+                if not Path(dl1_input).exists():
+                    raise FileNotFoundError(f"file {dl1_input} should exist")
+                    
 
     def starting_dl1(self, particle, step, gamma_src_offset='off0.4deg'):
         former_merged_dl1 = self.merge_output_file(particle=particle, step=step, gamma_src_offset=gamma_src_offset)
@@ -465,9 +480,9 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset//{particle}/"
-            + dec
-            + "/sim_telarray/{pointing}/output_v1.4/"
+                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/"
+                + dec
+                + "/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
@@ -747,4 +762,115 @@ class PathConfigAllSkyFull(PathConfig):
         paths = []
         for dec in self.dec_list:
             paths.extend(self.test_configs[dec].dl2_to_irfs)
+        return paths
+
+
+class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
+
+    def __init__(self, source_prod_id, target_prod_id, dec, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec: str
+            the declination
+        run_checker: boolean
+            True to check if the source prod exists
+        """
+        super().__init__(target_prod_id, dec)
+        self.stages = ['dl1ab', 'merge_dl1', 'train_pipe']
+        self.source_prod_id = source_prod_id
+        self.source_config = PathConfigAllSkyTraining(source_prod_id, dec)
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for particle in self.training_particles:
+            for pointing in self.training_pointings(particle):
+                source_dl1 = Path(self.source_config.dl1_dir(particle, pointing))
+                if not source_dl1.exists():
+                    raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for particle in self.training_particles:
+            for pointing in self.training_pointings(particle):
+                source_dl1 = self.source_config.dl1_dir(particle, pointing)
+                target_dl1 = self.dl1_dir(particle, pointing)
+                paths.append({'input': source_dl1, 'output': target_dl1})
+
+        return paths
+
+
+class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
+
+    def __init__(self, source_prod_id, target_prod_id, dec, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec: str
+            the declination
+        run_checker: boolean
+            True to check if the source prod exists
+        """
+        super().__init__(target_prod_id, dec)
+        self.stages = ['dl1ab', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
+        self.source_prod_id = source_prod_id
+        self.source_config = PathConfigAllSkyTesting(source_prod_id, dec)
+        if run_checker:
+            self.check_source_prod()
+        
+    def check_source_prod(self):
+        for pointing in self.testing_pointings():
+            source_dl1 = Path(self.source_config.dl1_dir(pointing))
+            if not source_dl1.exists():
+                raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for pointing in self.testing_pointings():
+            source_dl1 = self.source_config.dl1_dir(pointing)
+            target_dl1 = self.dl1_dir(pointing)
+            paths.append({'input': source_dl1, 'output': target_dl1})
+
+        return paths
+
+
+class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
+
+    def __init__(self, source_prod_id, target_prod_id, dec_list, run_checker=True):
+        """
+        Parameters
+        ----------
+        source_prod_id: str
+            the source prod ID
+        target_prod_id: str
+            the target prod ID
+        dec_list: [str]
+            list of declinations
+        run_checker: boolean
+            True to check if the source prod exists
+        """
+        super().__init__(target_prod_id, dec_list)
+        self.source_prod_id = source_prod_id
+        self.stages = ['dl1ab', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
+        self.train_configs = {dec: PathConfigAllSkyTrainingDL1ab(source_prod_id, target_prod_id, dec, run_checker=run_checker) for dec in dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTestingDL1ab(source_prod_id, target_prod_id, dec, run_checker=run_checker) for dec in dec_list}
+
+    @property
+    def dl1ab(self):
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].dl1ab)
+        # we do only one DL1 test for one dec (dec does not matter, so we take the first one)
+        paths.extend(self.test_configs[self.dec_list[0]].dl1ab)
         return paths
