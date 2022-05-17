@@ -125,7 +125,7 @@ def merge_dl1(
         cmd += " -p short"
     if slurm_account != "":
         cmd += f" -A {slurm_account}"
-    if wait_jobs_split != "":
+    if wait_jobs_split is not None:
         cmd += " --dependency=afterok:" + wait_jobs_split
 
     cmd += f' -J merge -e {jobe} -o {jobo} --wrap="{source_environment} '

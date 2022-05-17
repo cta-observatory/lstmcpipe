@@ -175,7 +175,7 @@ def main():
         else:
             all_job_ids.update({"dl1ab": jobs_from_dl1_processing})
     else:
-        jobs_from_dl1_processing = ""
+        jobs_from_dl1_processing = None
 
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
@@ -209,7 +209,7 @@ def main():
         update_scancel_file(scancel_file, jobs_from_merge)
         all_job_ids.update({"merge_and_copy_dl1": jobs_from_merge})
     else:
-        jobs_from_merge = ""
+        jobs_from_merge = None
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
@@ -237,7 +237,7 @@ def main():
         all_job_ids.update({"plot_rf_feat": job_from_plot_rf_feat})
 
     else:
-        job_from_train_pipe = ""
+        job_from_train_pipe = None
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
@@ -253,7 +253,7 @@ def main():
         update_scancel_file(scancel_file, jobs_from_dl1_dl2)
         all_job_ids.update({"dl1_to_dl2": jobs_from_dl1_dl2})
     else:
-        jobs_from_dl1_dl2 = ""
+        jobs_from_dl1_dl2 = None
 
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:

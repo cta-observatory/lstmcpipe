@@ -217,7 +217,7 @@ def train_pipe(
         batch_cmd += " -p long --mem=32G "
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
-    if wait_jobs_dl1 != "":
+    if wait_jobs_dl1 is not None:
         batch_cmd += " --dependency=afterok:" + wait_jobs_dl1
     batch_cmd += f' -J train_pipe -e {jobe} -o {jobo} --wrap="{cmd}" '
 

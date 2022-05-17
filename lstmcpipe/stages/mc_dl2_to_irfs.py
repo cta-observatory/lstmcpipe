@@ -150,8 +150,10 @@ def dl2_to_irfs(
         batch_cmd += " -p short"
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
+    if wait_jobs_dl1dl2 is not None:
+        batch_cmd += f" --dependency=afterok:{wait_jobs_dl1dl2}"
     batch_cmd += (
-        f" --dependency=afterok:{wait_jobs_dl1dl2} -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
+        f" -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
     )
 
     job_id_dl2_irfs = os.popen(batch_cmd).read().strip("\n")
