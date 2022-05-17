@@ -46,6 +46,7 @@ def test_config_valid():
 
     missing_reference = valid.copy()
     missing_reference["stages_to_run"] = ["dl1ab"]
+    # dl1ab stage is not described
     with pytest.raises(KeyError):
         config_valid(missing_reference)
 

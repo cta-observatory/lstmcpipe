@@ -87,6 +87,10 @@ def config_valid(loaded_config):
         raise ValueError(f"No stages to run: {stages_to_run}")
     if 'r0_to_dl1' in stages_to_run and 'dl1ab' in stages_to_run:
         raise ValueError("r0_to_dl1 and dl1ab cannot be both in stages")
+
+    for stage in stages_to_run:
+        if stage not in loaded_config['stages']:
+            raise KeyError(f"Missing paths for stage {stage} provided in stages_to_run")
     
     log.debug("Configuration deemed valid")
 
