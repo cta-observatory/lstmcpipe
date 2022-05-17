@@ -55,8 +55,22 @@ def main():
         '--output',
         '-o',
         type=Path,
-        help='Path to the output file to dump the generated config. '
+        help='Path to the output file to dump the generated lstmcpipe config. '
         'Optional, if not provided, the file is dumped locally',
+        default=None,
+    )
+
+    parser.add_argument(
+        '--overwrite',
+        action='store_true',
+        help='Overwrite config file'
+    )
+
+    parser.add_argument(
+        '--lstchain_conf',
+        type=Path,
+        help='Path to the lstchain config to dump. '
+             'Optional, if not provided, the file is dumped locally',
         default=None,
     )
 
@@ -85,8 +99,8 @@ def main():
 
     print(f"lstmcpipe config saved in {output}")
 
-    lstchain_file = args.lstchain_conf
-    lstchain_file = dump_lstchain_std_config(filename=lstchain_file)
+    lstchain_file = f'lstchain_config_{date.today()}.yaml' if args.lstchain_conf is None else args.lstchain_conf
+    dump_lstchain_std_config(filename=lstchain_file, overwrite=args.overwrite)
     print(f"To start the process with dumped configs, run:\n\nlstmcpipe -c {output} -conf_lst {lstchain_file}\n\n")
 
 
