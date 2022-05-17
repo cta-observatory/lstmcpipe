@@ -44,7 +44,7 @@ if __name__ == '__main__':
         error_file = f'./clean_dir_{prod_id}_{node}.e'
         output_file = f'./clean_dir_{prod_id}_{node}.o'
 
-        cmd = f'{source_env} python /fefs/aswg/workspace/lstmcpipe/analysis/cleandir.py {dir_i}'
+        cmd = f'{source_env} python ./cleandir.py {dir_i}'
 
         slurm_cmd = f'sbatch --parsable --error={error_file} --output={output_file} --wrap="{cmd}"'
 
