@@ -3,8 +3,7 @@
 import shutil
 import logging
 from pathlib import Path
-from ..slurm_utils import SbatchLstMCStage
-from ..utils import save_log_to_file
+from ..utils import save_log_to_file, SbatchLstMCStage
 
 log = logging.getLogger(__name__)
 

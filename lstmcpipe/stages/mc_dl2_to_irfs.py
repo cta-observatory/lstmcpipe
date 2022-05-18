@@ -6,8 +6,7 @@
 import shutil
 import logging
 from pathlib import Path
-from ..slurm_utils import SbatchLstMCStage
-from ..utils import save_log_to_file
+from ..utils import save_log_to_file, SbatchLstMCStage
 from ..io.data_management import check_and_make_dir_without_verification
 
 
