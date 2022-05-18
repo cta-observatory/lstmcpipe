@@ -2,13 +2,12 @@
 
 # Code to reduce R0 data to DL1 onsite (La Palma cluster)
 
-import os
 import shutil
 import logging
 from pathlib import Path
-from lstmcpipe.workflow_management import save_log_to_file
-from lstmcpipe.io.data_management import check_data_path, get_input_filelist
-
+from ..slurm_utils import SbatchLstMCStage
+from ..workflow_management import save_log_to_file
+from ..io.data_management import check_data_path, get_input_filelist
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +75,6 @@ def batch_process_dl1(
     else:
 
         for paths in dict_paths["dl1ab"]:
-
             job_logs, jobid = reprocess_dl1(
                 paths["input"],
                 paths["output"],
@@ -151,17 +149,14 @@ def r0_to_dl1(
 
     log.info("Starting R0 to DL1 processing for files in dir : {}".format(input_dir))
 
-    source_environment = batch_config["source_environment"]
-    slurm_account = batch_config["slurm_account"]
-
     if workflow_kind == "lstchain":
-        base_cmd = f"{source_environment} lstmcpipe_lst_core_r0_dl1 -c {config_file} "
+        base_cmd = f"lstmcpipe_lst_core_r0_dl1 -c {config_file} "
         jobtype_id = "LST"
     elif workflow_kind == "ctapipe":
-        base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
+        base_cmd = f"lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
-        base_cmd = f"{source_environment} lstmcpipe_rta_core_r0_dl1 -c {config_file} "
+        base_cmd = f"lstmcpipe_rta_core_r0_dl1 -c {config_file} "
         if keep_rta_file:
             base_cmd += " --keep_rta_file"
         if debug_mode:
@@ -208,8 +203,8 @@ def r0_to_dl1(
         job_type_id=jobtype_id,
         dl1_files_per_batched_job=dl1_files_per_job,
         job_logs_dir=job_logs_dir,
-        slurm_account=slurm_account,
-        filelist_name="r0_to_dl1",
+        batch_config=batch_config,
+        dl1_processing_type="r0_to_dl1",
         slurm_options=slurm_options,
     )
 
@@ -266,14 +261,11 @@ def reprocess_dl1(
     """
     log.info("Applying DL1ab on DL1 files in {}".format(input_dir))
 
-    source_environment = batch_config["source_environment"]
-    slurm_account = batch_config["slurm_account"]
-
     if workflow_kind == "lstchain":
-        base_cmd = f"{source_environment} lstmcpipe_lst_core_dl1ab -c {config_file} "
+        base_cmd = f"lstmcpipe_lst_core_dl1ab -c {config_file} "
         jobtype_id = "LST"
     elif workflow_kind == "ctapipe":
-        base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
+        base_cmd = f"lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     else:
         base_cmd = ""
@@ -306,8 +298,8 @@ def reprocess_dl1(
         job_type_id=jobtype_id,
         dl1_files_per_batched_job=dl1_files_per_job,
         job_logs_dir=job_logs_dir,
-        slurm_account=slurm_account,
-        filelist_name="dl1ab",
+        batch_config=batch_config,
+        dl1_processing_type="dl1ab",
         slurm_options=slurm_options,
     )
 
@@ -330,11 +322,10 @@ def submit_dl1_jobs(
     job_type_id,
     dl1_files_per_batched_job,
     job_logs_dir,
-    slurm_account,
-    filelist_name,
+    batch_config,
     n_jobs_parallel=100,
-    dl1_processing="r0_dl1",
-    slurm_options=None,
+    dl1_processing_type="r0_to_dl1",
+    slurm_options="",
 ):
     """
     Compose sbatch command and batches it
@@ -348,10 +339,9 @@ def submit_dl1_jobs(
     job_type_id: str
     dl1_files_per_batched_job: int
     job_logs_dir: Path
-    slurm_account: str
-    filelist_name: str
+    batch_config: dict
     n_jobs_parallel: int
-    dl1_processing: str
+    dl1_processing_type: str
     slurm_options: str
         Extra slurm options to be passed
 
@@ -361,7 +351,6 @@ def submit_dl1_jobs(
     jobid: str
 
     """
-
     jobid2log = {}
 
     log.info("output dir: {}".format(output_dir))
@@ -371,9 +360,9 @@ def submit_dl1_jobs(
     )
 
     for i in range(number_of_sublists):
-        output_file = job_logs_dir.joinpath("{}_{}.sublist".format(filelist_name, i)).resolve().as_posix()
+        output_file = job_logs_dir.joinpath("{}_{}.sublist".format(dl1_processing_type, i)).resolve().as_posix()
         with open(output_file, "w+") as out:
-            for line in file_list[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:
+            for line in file_list[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:  # noqa
                 out.write(line)
                 out.write("\n")
 
@@ -381,31 +370,35 @@ def submit_dl1_jobs(
 
     sublist_names = [f.as_posix() for f in Path(job_logs_dir).glob("*.sublist")]  # Number of sublists ??
 
-    default_slurm_options = {
-        "output": job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
-        "error": job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
-        "array": f"0-{len(sublist_names)-1}%{n_jobs_parallel}",
-        "job-name": f"{job_type_id}-{dl1_processing}",
-    }
-
-    # All files to long queue
-    default_slurm_options.update({"partition": "long"})
-    # `sbatch -A` is the --account slurm argument
-    if slurm_account != '':
-        default_slurm_options.update({"account": slurm_account})
-
     # start 1 jobarray with all files included. The job selects its file based on its task id
     cmd = f'{base_cmd} -f {" ".join(sublist_names)} --output_dir {output_dir}'
-    slurm_cmd = "sbatch --parsable"
-    for key, value in default_slurm_options.items():
-        slurm_cmd += f" --{key} {value}"
-    if slurm_options is not None:
-        slurm_cmd += f" {slurm_options}"
-    slurm_cmd += f' --wrap="{cmd}"'
 
-    jobid = os.popen(slurm_cmd).read().strip("\n")
+    sbatch_process_dl1 = SbatchLstMCStage(
+        dl1_processing_type,
+        wrap_command=cmd,
+        slurm_error=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
+        slurm_output=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
+        slurm_account=batch_config["slurm_account"],
+        source_environment=batch_config["source_environment"],
+    )
+    if dl1_processing_type == "r0_to_dl1":
+        sbatch_process_dl1.r0_dl1_options(
+            process_dl1_job_name=f"{job_type_id}-{dl1_processing_type}",
+            array=f"0-{len(sublist_names) - 1}%{n_jobs_parallel}",
+            partition="long",
+            extra_slurm_options="",
+        )
+    elif dl1_processing_type == "dl1ab":
+        sbatch_process_dl1.dl1ab_options(
+            process_dl1ab_job_name=f"{job_type_id}-{dl1_processing_type}",
+            array=f"0-{len(sublist_names) - 1}%{n_jobs_parallel}",
+            partition="long",
+            extra_slurm_options="",
+        )
+
+    jobid = sbatch_process_dl1.submit
     log.debug(f"Submitted batch job {jobid}")
 
-    jobid2log.update({jobid: slurm_cmd})
+    jobid2log.update({jobid: sbatch_process_dl1.slurm_command})
 
     return jobid2log, jobid

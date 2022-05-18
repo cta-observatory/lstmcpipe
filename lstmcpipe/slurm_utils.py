@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import warnings
 import subprocess as sp
 
 
@@ -23,7 +24,7 @@ def run_command(*args):
     stdout, _ = cmd.communicate()
 
     if cmd.returncode != 0:
-        raise ValueError(f"Running {args[0]} failed with return code {cmd.returncode}" f", output: \n {stdout}")
+        raise ValueError(f"Running `{args[0]}` failed with return code {cmd.returncode}, output: \n {stdout}")
     else:
         return stdout.strip('\n')
 
@@ -36,6 +37,7 @@ class SbatchLstMCStage:
     def __init__(
         self,
         stage,
+        wrap_command,
         slurm_output=None,
         slurm_error=None,
         job_name=None,
@@ -43,7 +45,6 @@ class SbatchLstMCStage:
         slurm_partition=None,
         slurm_deps=None,
         slurm_options=None,
-        wrap_command=None,
         source_environment="",
         backend="",
     ):
@@ -57,11 +58,11 @@ class SbatchLstMCStage:
         self.slurm_partition = f"--partition={slurm_account}" if slurm_partition is not None else "--partition=short"
         self.slurm_options = f"{slurm_options}" if slurm_options is not None else None
 
-        self.wrap_cmd = None
+        self.stage_default_options(stage)
         self.slurm_dependencies = None
         self.check_slurm_dependencies(slurm_deps)
+        self.wrap_cmd = wrap_command
         self.compose_wrap_command(wrap_command, source_environment, backend)
-        self.stage_default_options(stage)
 
     def __str__(self):
         # return full string
@@ -70,7 +71,7 @@ class SbatchLstMCStage:
     @property
     def _valid_stages(self):
         return [
-            "r0_dl1",
+            "r0_to_dl1",
             "dl1ab",
             "merge_dl1",
             "train_test_splitting",
@@ -83,8 +84,8 @@ class SbatchLstMCStage:
         ]
 
     def compose_wrap_command(self, wrap_command=None, source_env="", backend=""):
-        if wrap_command is None:
-            raise ValueError("You must pass a command to be batched! ")
+        if wrap_command is None or wrap_command == "":
+            warnings.warn("You must pass a command to be batched! ")
         if source_env != "" and not source_env.strip().endswith(";"):
             source_env = source_env.strip() + "; "
         if backend != "" and not backend.strip().endswith(";"):
@@ -120,10 +121,11 @@ class SbatchLstMCStage:
             raise ValueError(f"Please select a valid stage: \n{', '.join(self._valid_stages)}")
 
         _default_options = {
-            "r0_dl1": getattr(self, "r0_dl1_options"),
+            "r0_to_dl1": getattr(self, "r0_dl1_options"),
             "dl1ab": getattr(self, "dl1ab_options"),
             "merge_dl1": getattr(self, "merge_dl1_default_options"),
             "train_test_splitting": getattr(self, "train_test_splitting_default_options"),
+            "train_pipe": getattr(self, "trainpipe_default_options"),
             "RF_importance": getattr(self, "train_plot_rf_feat_default_options"),
             "dl1_dl2": getattr(self, "dl1_dl2_default_options"),
             "dl2_IRFs": getattr(self, "dl2_irfs_default_options"),
@@ -142,13 +144,13 @@ class SbatchLstMCStage:
             jobid = run_command(self.slurm_command)
             return jobid
 
-    def r0_dl1_options(self, process_dl1_job_name="r0_dl1", array="0-0%100"):
+    def r0_dl1_options(self, process_dl1_job_name="r0_dl1", array="0-0%100", partition="long", extra_slurm_options=""):
         self.job_name = f"--job-name={process_dl1_job_name}"
-        self.slurm_options = f"--partition=long --array={array}"
+        self.slurm_options = f"--partition={partition} --array={array} {extra_slurm_options}"
 
-    def dl1ab_options(self, process_dl1ab_job_name="dl1ab", array="0-0%100"):
+    def dl1ab_options(self, process_dl1ab_job_name="dl1ab", array="0-0%100", partition="long", extra_slurm_options=""):
         self.job_name = f"--job-name={process_dl1ab_job_name}"
-        self.slurm_options = f"--partition=long --array={array}"
+        self.slurm_options = f"--partition={partition} --array={array} {extra_slurm_options}"
 
     def merge_dl1_default_options(self):
         self.job_name = "--job-name=merge"
