@@ -121,7 +121,7 @@ def dl1_to_dl2(
     source_environment = batch_configuration["source_environment"]
     slurm_account = batch_configuration["slurm_account"]
 
-    log.info("Working on DL1 files in {}".format(Path(input_file).parent.as_posix()))
+    log.info("\nStartinng DL1-Dl2 processing for file files in {}".format(Path(input_file).parent.as_posix()))
 
     check_and_make_dir_without_verification(output_dir)
     log.info("Output dir: {}".format(output_dir))
@@ -151,6 +151,8 @@ def dl1_to_dl2(
     # Batch the job at La Palma
     jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
     log_dl1_to_dl2.update({jobid_dl1_to_dl2: batch_cmd})
+
+    log.info(f"Submitted batch job {jobid_dl1_to_dl2}")
 
     if config_file is not None:
         shutil.copyfile(config_file, Path(output_dir).joinpath(Path(config_file).name))
