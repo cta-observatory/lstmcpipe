@@ -6,7 +6,7 @@ import shutil
 import logging
 from pathlib import Path
 from ..slurm_utils import SbatchLstMCStage
-from ..workflow_management import save_log_to_file
+from ..utils import save_log_to_file
 from ..io.data_management import check_data_path, get_input_filelist
 
 log = logging.getLogger(__name__)
