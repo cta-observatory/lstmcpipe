@@ -6,9 +6,12 @@ from ruamel.yaml import YAML
 from datetime import date
 from copy import deepcopy
 import re
+import numpy as np
 
 from . import base_config
 from ..version import __version__
+from ..plots.pointings import plot_pointings
+
 
 _crab_dec = 'dec_2276'
 
@@ -506,7 +509,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
             if d.is_dir() and list(Path(self.r0_dir(particle, d.name)).glob('*.simtel.gz'))
         ]
 
-    def training_pointings(self, particle):
+    def pointing_dirs(self, particle):
         if not hasattr(self, '_training_pointings'):
             try:
                 self.load_pointings()
@@ -538,6 +541,33 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def load_pointings(self):
         self._training_pointings = self._get_training_pointings()
 
+    @property
+    def pointings(self):
+        """
+        All pointings in rad
+
+        Returns
+        -------
+        `astropy.quantity`
+        """
+        training_pointings = []
+        for p in self.training_particles:
+            for pp in self.pointing_dirs(p):
+                training_pointings.append(list(self._extract_pointing(pp).groups()))
+        training_pointings = np.array(training_pointings).astype(float)[:, [1, 0]]
+
+        pointings = np.deg2rad(training_pointings) - np.array([np.pi, 0])
+        return pointings
+
+    def plot_pointings(self, fig=None, projection=None, **kwargs):
+        """
+        Produce a scatter plot of the pointings based on parsed pointings paths
+        """
+
+        kwargs.setdefault('label', f'Training {self.dec}')
+        fig = plot_pointings(self.pointings, fig=fig, projection=projection, **kwargs)
+        return fig
+
     def dl1_dir(self, particle, pointing):
         return super().dl1_dir(particle=particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
 
@@ -545,7 +575,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def r0_to_dl1(self):
         paths = []
         for particle in self.training_particles:
-            for pointing in self.training_pointings(particle):
+            for pointing in self.pointing_dirs(particle):
                 r0 = self.r0_dir(particle, pointing)
                 dl1 = self.dl1_dir(particle, pointing)
                 paths.append({'input': r0, 'output': dl1})
@@ -595,7 +625,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         self.dataset_type = 'TestingDataset'
         self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
 
-    def testing_pointings(self):
+    def pointing_dirs(self):
         if not hasattr(self, '_testing_pointings'):
             try:
                 self.load_pointings()
@@ -622,6 +652,31 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
     def _get_testing_pointings(self):
         return self._search_pointings()
+
+    @property
+    def pointings(self):
+        """
+        All pointings in rad
+
+        Returns
+        -------
+        `astropy.quantity`
+        """
+        pointings = []
+        for pp in self.pointing_dirs():
+            pointings.append(list(self._extract_pointing(pp).groups()))
+        pointings = np.array(pointings).astype(float)[:, [1,0]]
+        pointings = np.deg2rad(pointings) - np.array([np.pi, 0])
+        return pointings * u.rad
+
+    def plot_pointings(self, fig=None, projection=None, **kwargs):
+        """
+        Produce a scatter plot of the pointings based on parsed pointings paths
+        """
+
+        kwargs.setdefault('label', f'Testing')
+        fig = plot_pointings(self.pointings, fig=fig, projection=projection, **kwargs)
+        return fig
 
     def dl1_dir(self, pointing):
         # no declination for DL1 for TestingDataset
@@ -650,7 +705,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     @property
     def r0_to_dl1(self):
         paths = []
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             r0 = self.r0_dir(pointing)
             dl1 = self.dl1_dir(pointing)
             paths.append({'input': r0, 'output': dl1})
@@ -664,7 +719,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         # for the training particles, all the nodes get merged
         paths = []
         # for the testing, we merge per node
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             dl1 = self.dl1_dir(pointing)
             merged_dl1 = self.testing_merged_dl1(pointing)
             paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
@@ -674,7 +729,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     @property
     def dl1_to_dl2(self):
         paths = []
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             paths.append(
                 {
                     'input': self.testing_merged_dl1(pointing),
@@ -693,7 +748,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     def dl2_to_irfs(self):
         paths = []
 
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             paths.append(
                 {
                     'input': {
@@ -764,6 +819,27 @@ class PathConfigAllSkyFull(PathConfig):
             paths.extend(self.test_configs[dec].dl2_to_irfs)
         return paths
 
+    def plot_pointings(self, fig=None, projection=None, **kwargs):
+        """
+        Produce a scatter plot of the pointings based on parsed pointings paths
+
+        Parameters
+        ----------
+        training : bool
+            Plot training pointings
+        testing: bool
+            Plot testing pointings
+        ax: `matplotlib.pyplot.axis`
+        kwargs: dict
+            kwargs for `matplotlib.pyplot.scatter`
+        """
+
+        for dec, tr in self.train_configs.items():
+            fig = tr.plot_pointings(fig=fig, projection=projection, **kwargs)
+
+        fig = list(self.test_configs.values())[0].plot_pointings(fig=fig, projection=projection, **kwargs)
+        return fig
+
 
 class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
 
@@ -789,7 +865,7 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
         
     def check_source_prod(self):
         for particle in self.training_particles:
-            for pointing in self.training_pointings(particle):
+            for pointing in self.pointing_dirs(particle):
                 source_dl1 = Path(self.source_config.dl1_dir(particle, pointing))
                 if not source_dl1.exists():
                     raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
@@ -798,7 +874,7 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
     def dl1ab(self):
         paths = []
         for particle in self.training_particles:
-            for pointing in self.training_pointings(particle):
+            for pointing in self.pointing_dirs(particle):
                 source_dl1 = self.source_config.dl1_dir(particle, pointing)
                 target_dl1 = self.dl1_dir(particle, pointing)
                 paths.append({'input': source_dl1, 'output': target_dl1})
@@ -829,7 +905,7 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
             self.check_source_prod()
         
     def check_source_prod(self):
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             source_dl1 = Path(self.source_config.dl1_dir(pointing))
             if not source_dl1.exists():
                 raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
@@ -837,7 +913,7 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
     @property
     def dl1ab(self):
         paths = []
-        for pointing in self.testing_pointings():
+        for pointing in self.pointing_dirs():
             source_dl1 = self.source_config.dl1_dir(pointing)
             target_dl1 = self.dl1_dir(pointing)
             paths.append({'input': source_dl1, 'output': target_dl1})
