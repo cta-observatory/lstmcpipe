@@ -560,14 +560,14 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         pointings = np.deg2rad(training_pointings) - np.array([np.pi, 0])
         return pointings
 
-    def plot_pointings(self, fig=None, projection=None, **kwargs):
+    def plot_pointings(self, ax=None, projection=None, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         """
 
         kwargs.setdefault('label', f'Training {self.dec}')
-        fig = plot_pointings(self.pointings, fig=fig, projection=projection, **kwargs)
-        return fig
+        ax = plot_pointings(self.pointings, ax=ax, projection=projection, **kwargs)
+        return ax
 
     def dl1_dir(self, particle, pointing):
         return super().dl1_dir(particle=particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
@@ -670,14 +670,14 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         pointings = np.deg2rad(pointings) - np.array([np.pi, 0])
         return pointings * u.rad
 
-    def plot_pointings(self, fig=None, projection=None, **kwargs):
+    def plot_pointings(self, ax=None, projection=None, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         """
 
         kwargs.setdefault('label', f'Testing')
-        fig = plot_pointings(self.pointings, fig=fig, projection=projection, **kwargs)
-        return fig
+        ax = plot_pointings(self.pointings, ax=ax, projection=projection, **kwargs)
+        return ax
 
     def dl1_dir(self, pointing):
         # no declination for DL1 for TestingDataset
@@ -820,26 +820,25 @@ class PathConfigAllSkyFull(PathConfig):
             paths.extend(self.test_configs[dec].dl2_to_irfs)
         return paths
 
-    def plot_pointings(self, fig=None, projection=None, **kwargs):
+    def plot_pointings(self, ax=None, projection='aitoff', **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
         Parameters
         ----------
-        training : bool
-            Plot training pointings
-        testing: bool
-            Plot testing pointings
-        ax: `matplotlib.pyplot.axis`
+        ax : `matplotlib.pyplot.Axis`
+        projection: str or None
+            'aitoff' | 'hammer' | 'lambert' | 'mollweide'
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
         """
+        dec = list(self.train_configs)[0]
+        ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, **kwargs)
+        for dec, tr in list(self.train_configs.items())[1:]:
+            ax = tr.plot_pointings(ax=ax, **kwargs)
 
-        for dec, tr in self.train_configs.items():
-            fig = tr.plot_pointings(fig=fig, projection=projection, **kwargs)
-
-        fig = list(self.test_configs.values())[0].plot_pointings(fig=fig, projection=projection, **kwargs)
-        return fig
+        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, **kwargs)
+        return ax
 
 
 class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):

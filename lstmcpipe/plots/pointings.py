@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_pointings(pointings, fig=None, projection=None, **kwargs):
+def plot_pointings(pointings, ax=None, projection=None, **kwargs):
     """
     Produce a scatter plot of the pointings based on parsed pointings paths
 
@@ -17,14 +17,19 @@ def plot_pointings(pointings, fig=None, projection=None, **kwargs):
     kwargs: dict
         kwargs for `matplotlib.pyplot.scatter`
     """
-    fig = plt.gcf() if fig is None else fig
-    ax = fig.add_subplot(111, projection=projection)
+    if ax and projection:
+        raise ValueError("ax and projection are exclusive")
+        
+    if ax is None:
+        fig = plt.gcf()
+        ax = fig.add_subplot(111, projection=projection)
 
     ax.scatter(pointings[:, 0], pointings[:, 1], **kwargs)
 
     ax.set_xlabel('Azimuth')
     ax.set_ylabel('Altitude')
     ax.legend()
+    ax.grid(True)
 
-    return fig
+    return ax
 
