@@ -10,6 +10,7 @@ import os
 import argparse
 
 from lstmcpipe.config import paths_config
+from lstmcpipe.utils import dump_lstchain_std_config
 
 
 def generate_tree(base_dir, working_dir, nfiles):
@@ -32,7 +33,7 @@ def generate_tree(base_dir, working_dir, nfiles):
 
 
 def generate_test_prod5trans80(
-    working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/', nfiles=5, path_to_config_file='.', overwrite=True
+    working_dir, nfiles=5, path_to_config_file='.', overwrite=True
 ):
     base_dir = '/fefs/aswg/workspace/lstmcpipe/data/test_data/mc/DL0/20200629_prod5_trans_80/'
     working_dir = os.path.join(working_dir, 'DL0/20200629_prod5_trans_80/')
@@ -48,23 +49,71 @@ def generate_test_prod5trans80(
 
 
 def generate_test_allsky(
-    working_dir='/fefs/aswg/workspace/lstmcpipe/data/mc/',
+    working_dir,
     nfiles=5,
     path_to_config_file='.',
-    dec='dec_4822',
+    decs=['dec_4822', 'dec_931'],
     overwrite=True,
 ):
-    allsky_base_dir = '/home/georgios.voutsinas/ws/AllSky/'
+    allsky_train_base_dir = '/home/georgios.voutsinas/ws/AllSky'
+    allsky_test_base_dir = '/home/georgios.voutsinas/ws/AllSky'
 
-    generate_tree(allsky_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
+    generate_tree(allsky_train_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
 
-    pc = paths_config.PathConfigAllSky(f'test_prod_{date.today()}', dec)
-    pc.base_dir = os.path.join(working_dir, '{data_level}/AllSky/{prod_id}/{particle}/{pointing}')
+    pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
+    pcdl1ab = paths_config.PathConfigAllSkyFullDL1ab(f'test_prod_{date.today()}', f'test_prod_{date.today()}_dl1ab', decs, run_checker=False)
+    
     # config training dir are replaced with local ones
-    pc.training_dir = os.path.join(working_dir, pc.training_dir.replace(allsky_base_dir, 'DL0/AllSky/'))
-    pc.testing_dir = os.path.join(working_dir, pc.testing_dir.replace(allsky_base_dir, 'DL0/AllSky/'))
+    for dec in decs:
+        pc.train_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pc.test_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pc.train_configs[dec].training_dir = os.path.join(
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+        )
+        pc.test_configs[dec].testing_dir = os.path.join(
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+        )
+        pcdl1ab.train_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pcdl1ab.train_configs[dec].source_config.base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pcdl1ab.test_configs[dec].base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pcdl1ab.test_configs[dec].source_config.base_dir = os.path.join(
+            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+        )
+        pcdl1ab.train_configs[dec].training_dir = os.path.join(
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+        )
+        pcdl1ab.train_configs[dec].source_config.training_dir = os.path.join(
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+        )
+        pcdl1ab.test_configs[dec].testing_dir = os.path.join(
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+        )
+        pcdl1ab.test_configs[dec].source_config.testing_dir = os.path.join(
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+        )
+        
     pc.generate()
+    for stage_name, stage_steps in pc.paths.items():
+        for step in stage_steps:
+            step['slurm_options'] = '-p short'
     pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
+    
+    pcdl1ab.generate()
+    for stage_name, stage_steps in pcdl1ab.paths.items():
+        for step in stage_steps:
+            step['slurm_options'] = '-p short'
+    pcdl1ab.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}_dl1ab.yaml'), overwrite=overwrite)
+
 
 
 if __name__ == '__main__':
@@ -72,7 +121,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate test tree')
 
     parser.add_argument('prod_type', type=str, help='prod5trans80 or allsky')
-    parser.add_argument('--nfiles', type=int, default=5, help='Number of files')
+    parser.add_argument('--nfiles', type=int, default=2, help='Number of files')
     parser.add_argument('--path_config_file', type=Path, default='.', help='Path to save the corresponding config file')
     parser.add_argument(
         '--working_dir',
@@ -84,9 +133,22 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.working_dir is None:
+        user = os.environ['USER']
+        if user == 'lstanalyzer':
+            working_dir = '/fefs/aswg/workspace/lstmcpipe/data/mc'
+        else:
+            working_dir = f'/fefs/aswg/workspace/{user}/data/mc'
+        if not Path(working_dir).exists():
+            raise FileNotFoundError(f"working dir {working_dir} does not exist, provide one")
+    else:
+        working_dir = args.working_dir
+
     if args.prod_type == 'prod5trans80':
-        generate_test_prod5trans80(args.working_dir, args.nfiles, args.path_config_file)
+        generate_test_prod5trans80(working_dir, args.nfiles, args.path_config_file)
     elif args.prod_type == 'allsky':
-        generate_test_allsky(args.working_dir, args.nfiles, args.path_config_file)
+        generate_test_allsky(working_dir, args.nfiles, args.path_config_file)
     else:
         raise NotImplementedError("Unknown prod type")
+        
+    dump_lstchain_std_config(filename=Path(args.path_config_file, 'lstchain_config.json'), overwrite=True)

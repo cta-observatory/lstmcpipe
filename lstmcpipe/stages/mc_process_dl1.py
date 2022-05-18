@@ -278,13 +278,13 @@ def reprocess_dl1(
     else:
         base_cmd = ""
         jobtype_id = ""
-        log.critical("Please, selected an allowed workflow kind.")
+        log.critical(f"Unknown workflow {workflow_kind}")
         exit(-1)
 
     log.info("Working on DL1 files in {}".format(input_dir))
 
     check_data_path(input_dir)
-    dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).rglob("*.h5")]
+    dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).glob("*.h5")]
 
     log.info("{} DL1 files".format(len(dl1ab_filelist)))
 
@@ -293,7 +293,8 @@ def reprocess_dl1(
             newfile.write(f)
             newfile.write("\n")
 
-    job_logs_dir = output_dir.joinpath("job_logs_dl1ab")
+    Path(output_dir).mkdir(exist_ok=True, parents=True)
+    job_logs_dir = Path(output_dir).joinpath("job_logs_dl1ab")
     Path(job_logs_dir).mkdir(exist_ok=True)
 
     log.info("DL1ab DATA DIR: {}".format(output_dir))
@@ -308,6 +309,7 @@ def reprocess_dl1(
         job_logs_dir=job_logs_dir,
         slurm_account=slurm_account,
         filelist_name="dl1ab",
+        dl1_processing="dl1ab",
         slurm_options=slurm_options,
     )
 
@@ -409,3 +411,4 @@ def submit_dl1_jobs(
     jobid2log.update({jobid: slurm_cmd})
 
     return jobid2log, jobid
+

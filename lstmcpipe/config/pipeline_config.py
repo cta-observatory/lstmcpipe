@@ -50,7 +50,7 @@ def config_valid(loaded_config):
     """
     Test if the given dictionary contains valid values for the
     r0_to_dl3 processing.
-    TODO: The stages should be checked aswell.
+
     Not all combinations are sensible!
 
     Parameters:
@@ -68,7 +68,6 @@ def config_valid(loaded_config):
         "source_environment",
         "stages_to_run",
         "stages",
-        # TODO dl1_reference_id ?
     ]
     allowed_workflows = ["hiperta", "lstchain", "ctapipe"]
 
@@ -82,20 +81,24 @@ def config_valid(loaded_config):
     if workflow_kind not in allowed_workflows:
         raise Exception(f"Please select an allowed `workflow_kind`: {allowed_workflows}")
 
-    stages_to_be_run = loaded_config["stages_to_run"]
-    if "dl1ab" in stages_to_be_run:
-        if "dl1_reference_id" not in loaded_config:
-            raise KeyError(
-                "The key dl1_reference_id has to be set in order to locate " "the input files for the dl1ab stage"
-            )
+    stages_to_run = loaded_config["stages_to_run"]
+    if not stages_to_run:
+        raise ValueError(f"No stages to run: {stages_to_run}")
+    if 'r0_to_dl1' in stages_to_run and 'dl1ab' in stages_to_run:
+        raise ValueError("r0_to_dl1 and dl1ab cannot be both in stages")
+
+    for stage in stages_to_run:
+        if stage not in loaded_config['stages']:
+            raise KeyError(f"Missing paths for stage {stage} provided in stages_to_run")
 
     dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
     dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
-    if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
-        raise KeyError("Please specify a simtel monte carlo file to " "compare observed noise against.")
-    elif not dl1_noise_tune_data_run and dl1_noise_tune_mc_run:
-        raise KeyError("Please specify an observed dl1 file to " "tune the images.")
 
+    if dl1_noise_tune_data_run and not dl1_noise_tune_mc_run:
+        raise KeyError("Please specify a simtel monte carlo file to compare observed noise against.")
+    if dl1_noise_tune_mc_run and not dl1_noise_tune_data_run:
+        raise KeyError("Please specify an observed dl1 file to tune the images.")
+    
     log.debug("Configuration deemed valid")
 
     return True

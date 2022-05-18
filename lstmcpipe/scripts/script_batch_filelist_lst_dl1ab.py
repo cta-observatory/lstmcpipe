@@ -3,12 +3,12 @@
 import argparse
 from os import environ
 from os.path import join, basename
-import subprocess
+from lstmcpipe.utils import rerun_cmd
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Batches the r0_to_dl1 lstchain stage for all the files " "within a text file."
+        description="Batches the dl1ab lstchain stage for all the files within a text file."
     )
     parser.add_argument(
         "--file_list",
@@ -53,7 +53,7 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            subprocess.run(cmd)
+            rerun_cmd(cmd, output, max_ntry=2)
 
 
 if __name__ == "__main__":
