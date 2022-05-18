@@ -563,7 +563,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         pointings[:,1] = np.pi/2. - pointings[:,1]
         return pointings * u.rad
 
-    def plot_pointings(self, ax=None, projection=None, grid3d=True, **kwargs):
+    def plot_pointings(self, ax=None, projection=None, add_grid3d=True, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
@@ -573,6 +573,8 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+        add_grid3d: bool
+            add a 3D grid in case of projection='3d'
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
 
@@ -582,7 +584,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         """
 
         kwargs.setdefault('label', f'Training {self.dec}')
-        ax = plot_pointings(self.pointings, ax=ax, projection=projection, **kwargs)
+        ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
         return ax
 
     def dl1_dir(self, particle, pointing):
@@ -698,6 +700,8 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+        add_grid3d: bool
+            add a 3D grid in case of projection='3d'
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
 
@@ -859,6 +863,8 @@ class PathConfigAllSkyFull(PathConfig):
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+        add_grid3d: bool
+            add a 3D grid in case of projection='3d'
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
         """

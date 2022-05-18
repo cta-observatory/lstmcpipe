@@ -13,6 +13,8 @@ def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwar
     ax : `matplotlib.pyplot.Axis`
     projection: str or None
         'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+    add_grid3d: bool
+        add a 3D grid in case of projection='3d'
     kwargs: dict
         kwargs for `matplotlib.pyplot.scatter`
 
@@ -27,7 +29,7 @@ def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwar
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection=projection)
     elif isinstance(ax, mpl_toolkits.mplot3d.axes3d.Axes3D):
-        projection='3d'
+        projection = '3d'
         
     if projection == '3d':
         r = 1.
