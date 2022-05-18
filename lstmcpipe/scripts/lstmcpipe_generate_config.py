@@ -99,7 +99,7 @@ def main():
 
     print(f"lstmcpipe config saved in {output}")
 
-    lstchain_file = f'lstchain_config_{date.today()}.yaml' if args.lstchain_conf is None else args.lstchain_conf
+    lstchain_file = f'lstchain_config_{date.today()}.json' if args.lstchain_conf is None else args.lstchain_conf
     dump_lstchain_std_config(filename=lstchain_file, overwrite=args.overwrite)
     print(f"To start the process with dumped configs, run:\n\nlstmcpipe -c {output} -conf_lst {lstchain_file}\n\n")
 
