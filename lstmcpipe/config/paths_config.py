@@ -709,7 +709,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         -------
         ax: `matplotlib.pyplot.axis`
         """
-        kwargs.setdefault('label', f'Testing')
+        kwargs.setdefault('label', 'Testing')
         ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
         return ax
 
@@ -865,8 +865,14 @@ class PathConfigAllSkyFull(PathConfig):
             'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
         add_grid3d: bool
             add a 3D grid in case of projection='3d'
-        kwargs: dict
+        train_kwargs: dict | None
             kwargs for `matplotlib.pyplot.scatter`
+        test_kwargs: dict | None
+            kwargs for `matplotlib.pyplot.scatter`
+
+        Returns
+        -------
+        `matplotlib.pyplot.axis`
         """
         train_kwargs = {} if train_kwargs is None else train_kwargs
         test_kwargs = {} if test_kwargs is None else test_kwargs
