@@ -556,11 +556,14 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
             for pp in self.pointing_dirs(p):
                 training_pointings.append(list(self._extract_pointing(pp).groups()))
         training_pointings = np.array(training_pointings).astype(float)[:, [1, 0]]
+        # these are in degrees between 
 
-        pointings = np.deg2rad(training_pointings) - np.array([np.pi, 0])
-        return pointings
+        pointings = np.deg2rad(training_pointings)
+        pointings[:,0] -= np.pi
+        pointings[:,1] = np.pi/2. - pointings[:,1]
+        return pointings * u.rad
 
-    def plot_pointings(self, ax=None, projection=None, **kwargs):
+    def plot_pointings(self, ax=None, projection=None, grid3d=True, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         """
@@ -667,16 +670,18 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         for pp in self.pointing_dirs():
             pointings.append(list(self._extract_pointing(pp).groups()))
         pointings = np.array(pointings).astype(float)[:, [1,0]]
-        pointings = np.deg2rad(pointings) - np.array([np.pi, 0])
+        pointings = np.deg2rad(pointings)
+        pointings[:,0] -= np.pi
+        pointings[:,1] = np.pi/2. - pointings[:,1]
         return pointings * u.rad
 
-    def plot_pointings(self, ax=None, projection=None, **kwargs):
+    def plot_pointings(self, ax=None, projection=None, add_grid3d=False, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         """
 
         kwargs.setdefault('label', f'Testing')
-        ax = plot_pointings(self.pointings, ax=ax, projection=projection, **kwargs)
+        ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
         return ax
 
     def dl1_dir(self, pointing):
@@ -820,7 +825,7 @@ class PathConfigAllSkyFull(PathConfig):
             paths.extend(self.test_configs[dec].dl2_to_irfs)
         return paths
 
-    def plot_pointings(self, ax=None, projection='aitoff', **kwargs):
+    def plot_pointings(self, ax=None, projection='aitoff', add_grid3d=False, train_kwargs=None, test_kwargs=None):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
@@ -832,12 +837,17 @@ class PathConfigAllSkyFull(PathConfig):
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
         """
+        train_kwargs = {} if train_kwargs is None else train_kwargs
+        test_kwargs = {} if test_kwargs is None else test_kwargs
+        test_kwargs.setdefault('color', 'black')
+        test_kwargs.setdefault('marker', '*')
+        
         dec = list(self.train_configs)[0]
-        ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, **kwargs)
+        ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, **train_kwargs)
         for dec, tr in list(self.train_configs.items())[1:]:
-            ax = tr.plot_pointings(ax=ax, **kwargs)
+            ax = tr.plot_pointings(ax=ax, add_grid3d=False, **train_kwargs)
 
-        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, **kwargs)
+        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, add_grid3d=add_grid3d, **test_kwargs)
         return ax
 
 
