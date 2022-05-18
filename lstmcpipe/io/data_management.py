@@ -78,9 +78,9 @@ def check_data_path(data_path, glob=None):
         Glob pattern to be passed
     """
     if not Path(data_path).exists():
-        raise ValueError("The input directory must exist")
+        raise ValueError(f"The input directory {data_path} must exist")
     if not get_input_filelist(data_path, glob_pattern=glob):
-        raise ValueError("The input directory is empty")
+        raise ValueError(f"The input directory {data_path} is empty")
 
 
 def get_input_filelist(data_path, glob_pattern=None):

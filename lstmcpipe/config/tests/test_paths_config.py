@@ -51,11 +51,11 @@ def test_path_config_generate():
 
 def test_path_config_save():
     pcfg = paths_config.PathConfig('v00')
+    pcfg.stages = ['r0_to_dl1']
     pcfg.paths = {'a': 'rick'}
     with tempfile.NamedTemporaryFile() as f:
         pcfg.save_yml(f.name, overwrite=True)
         read_cfg = YAML().load(open(f.name).read())
-        pipeline_config.load_config(f.name)
     assert read_cfg['prod_type'] == 'PathConfig'
     assert read_cfg['prod_id'] == 'v00'
 
@@ -147,3 +147,7 @@ def test_PathConfigProd5Trans80():
                 assert "options" in path
                 assert isinstance(path["input"], dict)
                 assert all(item in ["gamma_file", "proton_file", "electron_file"] for item in path["input"])
+
+        with tempfile.NamedTemporaryFile() as f:
+            cfg.save_yml(f.name, overwrite=True)
+            pipeline_config.load_config(f.name)

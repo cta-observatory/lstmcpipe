@@ -35,7 +35,8 @@ def test_config_valid():
     valid = dummy_config.copy()
     valid["prod_type"] = "PathConfigProd5Trans80"
     valid["workflow_kind"] = "lstchain"
-    valid["stages_to_run"] = []
+    valid["stages_to_run"] = ["r0_to_dl1"]
+    valid["stages"] = {"r0_to_dl1": [{"input": None, "output": None}]}
     assert config_valid(valid)
 
     invalid_workflow = valid.copy()
@@ -45,8 +46,17 @@ def test_config_valid():
 
     missing_reference = valid.copy()
     missing_reference["stages_to_run"] = ["dl1ab"]
+    # dl1ab stage is not described
     with pytest.raises(KeyError):
         config_valid(missing_reference)
+
+    missing_reference["stages"] = {"dl1ab": []}
+
+    missing_reference["dl1_noise_tune_data_run"] = "file"
+    with pytest.raises(KeyError):
+        config_valid(missing_reference)
+    missing_reference["dl1_noise_tune_mc_run"] = "file"
+    config_valid(missing_reference)
 
 
 def test_complete_lstmcpipe_config():
