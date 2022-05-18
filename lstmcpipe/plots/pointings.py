@@ -5,19 +5,20 @@ import numpy as np
 
 def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwargs):
     """
-    Produce a scatter plot of the pointings based on parsed pointings paths
+    Produce a scatter plot of the pointings
 
     Parameters
     ----------
-    pointings: numpy.array
-        2D (alt, az)
-    training : bool
-        Plot training pointings
-    testing: bool
-        Plot testing pointings
-    ax: `matplotlib.pyplot.axis`
+    pointings: 2D array of `astropy.quantities` or numpy array in rad
+    ax : `matplotlib.pyplot.Axis`
+    projection: str or None
+        'aitoff' | 'hammer' | 'lambert' | 'mollweide'
     kwargs: dict
         kwargs for `matplotlib.pyplot.scatter`
+
+    Returns
+    -------
+    ax: `matplotlib.pyplot.axis`
     """
     if ax and projection:
         raise ValueError("ax and projection are exclusive")

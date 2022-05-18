@@ -679,7 +679,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
         """
-
         kwargs.setdefault('label', f'Testing')
         ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
         return ax
