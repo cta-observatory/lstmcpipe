@@ -563,6 +563,19 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def plot_pointings(self, ax=None, projection=None, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
+
+        Parameters
+        ----------
+        pointings: 2D array of `astropy.quantities` or numpy array in rad
+        ax : `matplotlib.pyplot.Axis`
+        projection: str or None
+            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+        kwargs: dict
+            kwargs for `matplotlib.pyplot.scatter`
+
+        Returns
+        -------
+        ax: `matplotlib.pyplot.axis`
         """
 
         kwargs.setdefault('label', f'Training {self.dec}')
@@ -673,6 +686,19 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     def plot_pointings(self, ax=None, projection=None, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
+
+        Parameters
+        ----------
+        pointings: 2D array of `astropy.quantities` or numpy array in rad
+        ax : `matplotlib.pyplot.Axis`
+        projection: str or None
+            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+        kwargs: dict
+            kwargs for `matplotlib.pyplot.scatter`
+
+        Returns
+        -------
+        ax: `matplotlib.pyplot.axis`
         """
         kwargs.setdefault('label', 'Testing')
         ax = plot_pointings(self.pointings, ax=ax, projection=projection, **kwargs)
@@ -827,7 +853,7 @@ class PathConfigAllSkyFull(PathConfig):
         ----------
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
-            'aitoff' | 'hammer' | 'lambert' | 'mollweide'
+            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
         kwargs: dict
             kwargs for `matplotlib.pyplot.scatter`
         """

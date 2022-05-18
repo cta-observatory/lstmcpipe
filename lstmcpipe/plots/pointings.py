@@ -10,7 +10,7 @@ def plot_pointings(pointings, ax=None, projection=None, **kwargs):
     pointings: 2D array of `astropy.quantities` or numpy array in rad
     ax : `matplotlib.pyplot.Axis`
     projection: str or None
-        'aitoff' | 'hammer' | 'lambert' | 'mollweide'
+        'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
     kwargs: dict
         kwargs for `matplotlib.pyplot.scatter`
 
