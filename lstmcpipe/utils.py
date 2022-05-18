@@ -64,5 +64,5 @@ def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
     cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
     
     with open(filename, 'w') as file:
-        json.dump(cfg, file)
+        json.dump(cfg, file, indent=4)
     print(f"Modified lstchain config dumped in {filename}")
