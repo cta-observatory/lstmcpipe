@@ -23,7 +23,8 @@
         "workflow",
         "pipeline",
         "CTA",
-        "ground-based telescopes"
+        "ground-based telescopes",
+        "slurm"
     ],
     "programmingLanguage": [
         "Python 3"
