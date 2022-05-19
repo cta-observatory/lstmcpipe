@@ -77,7 +77,8 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
             if 'az_tel' not in cfg[rf_feature]:
                 cfg[rf_feature].append('az_tel')
 
-    print("Updating std lstchain config with:")
+    extra_msg = "for AllSky prod" if allsky else ""
+    print(f"Updating std lstchain config {extra_msg} with:")
     pprint(cfg)
 
     std_cfg.update(cfg)
