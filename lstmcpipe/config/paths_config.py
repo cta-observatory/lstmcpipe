@@ -572,7 +572,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
-            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+            '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
         add_grid3d: bool
             add a 3D grid in case of projection='3d'
         kwargs: dict
@@ -699,7 +699,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
-            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+            '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
         add_grid3d: bool
             add a 3D grid in case of projection='3d'
         kwargs: dict
@@ -862,7 +862,7 @@ class PathConfigAllSkyFull(PathConfig):
         ----------
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
-            'aitoff' | 'hammer' | 'lambert' | 'mollweide' |  '3d'
+            '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
         add_grid3d: bool
             add a 3D grid in case of projection='3d'
         train_kwargs: dict | None
