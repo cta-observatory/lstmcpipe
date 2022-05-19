@@ -563,7 +563,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         pointings[:,1] = np.pi/2. - pointings[:,1]
         return pointings * u.rad
 
-    def plot_pointings(self, ax=None, projection=None, add_grid3d=True, **kwargs):
+    def plot_pointings(self, ax=None, projection='polar', add_grid3d=True, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
@@ -686,11 +686,11 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
             pointings.append(list(self._extract_pointing(pp).groups()))
         pointings = np.array(pointings).astype(float)[:, [1,0]]
         pointings = np.deg2rad(pointings)
-        pointings[:,0] -= np.pi
-        pointings[:,1] = np.pi/2. - pointings[:,1]
+        pointings[:, 0] -= np.pi
+        pointings[:, 1] = np.pi/2. - pointings[:, 1]
         return pointings * u.rad
 
-    def plot_pointings(self, ax=None, projection=None, add_grid3d=False, **kwargs):
+    def plot_pointings(self, ax=None, projection='polar', add_grid3d=False, **kwargs):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
@@ -854,7 +854,7 @@ class PathConfigAllSkyFull(PathConfig):
             paths.extend(self.test_configs[dec].dl2_to_irfs)
         return paths
 
-    def plot_pointings(self, ax=None, projection='aitoff', add_grid3d=False, train_kwargs=None, test_kwargs=None):
+    def plot_pointings(self, ax=None, projection='polar', add_grid3d=False, train_kwargs=None, test_kwargs=None):
         """
         Produce a scatter plot of the pointings based on parsed pointings paths
 
