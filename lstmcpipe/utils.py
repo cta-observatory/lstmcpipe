@@ -2,6 +2,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import json
+from pprint import pprint
 
 
 def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_kwargs):
@@ -50,7 +51,13 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     if filename.exists() and not overwrite:
         raise FileExistsError(f"{filename} exists already")
 
-    cfg = get_standard_config()
+    std_cfg = get_standard_config()
+    cfg = {'LocalPeakWindowSum': {}, 'GlobalPeakWindowSum': {}, 'source_config': {'EventSource': {}},
+           'random_forest_energy_regressor_args': {}, 'random_forest_disp_regressor_args': {},
+           'random_forest_disp_classifier_args': {}, 'random_forest_particle_classifier_args': {},
+           'energy_regression_features': {}, 'disp_regression_features': {}, 'disp_classification_features': {},
+           'particle_classification_features': {}}
+
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
     cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
     cfg['source_config']['EventSource']['allowed_tels'] = [1]
@@ -69,7 +76,12 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
                 cfg[rf_feature].append('alt_tel')
             if 'az_tel' not in cfg[rf_feature]:
                 cfg[rf_feature].append('az_tel')
+
+    print("Updating std lstchain config with:")
+    pprint(cfg)
+
+    std_cfg.update(cfg)
     
     with open(filename, 'w') as file:
         json.dump(cfg, file, indent=4)
-    print(f"Modified lstchain config dumped in {filename}")
+    print(f"\nModified lstchain config dumped in {filename}. Check full config thoroughly.")
