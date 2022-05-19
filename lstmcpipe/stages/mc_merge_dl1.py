@@ -146,6 +146,7 @@ def merge_dl1(
     jobid_merge = os.popen(cmd).read().strip("\n")
     log_merge.update({jobid_merge: cmd})
 
+    log.info(f"\nMerging DL1 file from {input_dir} dir into {output_file} file.")
     log.info(f"Submitted batch job {jobid_merge}")
 
     return log_merge, jobid_merge

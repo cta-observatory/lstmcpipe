@@ -152,12 +152,12 @@ def dl2_to_irfs(
         batch_cmd += f" -A {slurm_account}"
     if wait_jobs_dl1dl2 is not None:
         batch_cmd += f" --dependency=afterok:{wait_jobs_dl1dl2}"
-    batch_cmd += (
-        f" -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
-    )
+    batch_cmd += f" -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
 
     job_id_dl2_irfs = os.popen(batch_cmd).read().strip("\n")
     log_dl2_to_irfs.update({job_id_dl2_irfs: batch_cmd})
+
+    log.info(f"Submitted batch job {job_id_dl2_irfs}")
 
     # Copy config into working dir
     if config_file:

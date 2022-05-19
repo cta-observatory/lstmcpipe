@@ -224,6 +224,8 @@ def train_pipe(
     jobid_train = os.popen(batch_cmd).read().strip("\n")
     log_train[jobid_train] = batch_cmd
 
+    log.info(f"Submitted batch job {jobid_train}")
+
     # copy config into working dir
     if config_file is not None:
         shutil.copyfile(config_file, Path(models_dir).joinpath(Path(config_file).name))
