@@ -121,14 +121,14 @@ def dl2_to_sensitivity(
         cmd_sens += f" -A {slurm_account}"
     if wait_jobs_dl1_dl2 is not None:
         cmd_sens += f" --dependency=afterok:{wait_jobs_dl1_dl2}"
-    cmd_sens += (
-        f" -e {jobe_sens} -o {jobo_sens}"
-        f' -J dl2_sens --wrap="{source_env} {base_cmd_sens}"'
-    )
+    cmd_sens += f" -e {jobe_sens} -o {jobo_sens}" f' -J dl2_sens --wrap="{source_env} {base_cmd_sens}"'
 
     job_id_dl2_sens = os.popen(cmd_sens).read().strip("\n")
     log_dl2_to_sensitivity.update({job_id_dl2_sens: cmd_sens})
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
+
+    log.info(f"Output dir of sensitivity file: {output}")
+    log.info(f"Submitted batch job {job_id_dl2_sens}")
 
     # Create plot from sensitivity files
     base_cmd_plot = f'lstmcpipe_plot_irfs -f {output} -o {output.replace(".fits.gz", ".png")}'
@@ -150,5 +150,8 @@ def dl2_to_sensitivity(
     job_id_plot_sens = os.popen(cmd_plot).read().strip("\n")
     log_dl2_to_sensitivity.update({job_id_plot_sens: cmd_plot})
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
+
+    log.info(f"Output dir of sensitivity plots: {output}")
+    log.info(f"Submitted batch job {job_id_plot_sens}")
 
     return log_dl2_to_sensitivity, ",".join(jobids_dl2_to_sensitivity)

@@ -16,7 +16,7 @@ def find_train_dirs(config):
     dirs = []
     for dec, train in config.train_configs.items():
         for particle in train.training_particles:
-            for pointing in train.training_pointings(particle):
+            for pointing in train.pointing_dirs(particle):
                 dirs.append(train.dl1_dir(particle, pointing))
 
     return dirs
@@ -25,7 +25,7 @@ def find_train_dirs(config):
 def find_test_dirs(config):
     dirs = []
     for dec, test in config.test_configs.items():
-        for pointing in test.testing_pointings():
+        for pointing in test.pointing_dirs():
             dirs.append(test.dl1_dir(pointing))
 
     return dirs

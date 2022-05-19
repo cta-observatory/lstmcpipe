@@ -34,7 +34,7 @@ def setup_logging(logfile=None, verbose=False):
     log = logging.getLogger()
     log.level = level
 
-    stream_formatter = logging.Formatter(fmt="%(levelname)s\n%(message)s\n", datefmt="%H:%M:%S")
+    stream_formatter = logging.Formatter(fmt="%(levelname)-8s|%(message)s", datefmt="%H:%M:%S")
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(stream_formatter)
     log.addHandler(stream_handler)
