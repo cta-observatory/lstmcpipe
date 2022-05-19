@@ -11,8 +11,7 @@ lstMCpipe
   :target: https://codecov.io/gh/cta-observatory/lstmcpipe
 .. |documentation| image:: https://img.shields.io/badge/lstmcpipe-documentation-orange
   :target: https://cta-observatory.github.io/lstmcpipe/
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6525311.svg
-  :target: https://doi.org/10.5281/zenodo.6525311
+
    
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
 With this package, the analysis/creation of R1/DL0/DL1/DL2/IRFs can be orchestrated.
@@ -25,6 +24,9 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Cite us
 -------
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
+  :target: https://doi.org/10.5281/zenodo.6460727
+  
 If you use lstMCpipe, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
 
 
