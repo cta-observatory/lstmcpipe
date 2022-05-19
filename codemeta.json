@@ -4,14 +4,14 @@
     "license": "https://spdx.org/licenses/MIT",
     "codeRepository": "git+https://github.com/cta-observatory/lstmcpipe.git",
     "dateCreated": "2019-09-09",
-    "datePublished": "2022-05-06",
-    "downloadUrl": "https://github.com/cta-observatory/lstmcpipe/archive/refs/tags/v0.7.3.tar.gz",
+    "datePublished": "2022-05-19",
+    "downloadUrl": "https://github.com/cta-observatory/lstmcpipe/archive/refs/tags/v0.8.0.tar.gz",
     "issueTracker": "https://github.com/cta-observatory/lstmcpipe/issues",
     "name": "lstmcpipe",
-    "version": "0.7.3",
+    "version": "0.8.0",
     "description": "Scripts to ease the reduction of MC data on the LST cluster at La Palma. With this package, the analysis/creation of R1/DL0/DL1/DL2/IRFs can be orchestrated.",
     "applicationCategory": "CTA, LST",
-    "releaseNotes": "**Full Changelog**: https://github.com/cta-observatory/lstmcpipe/compare/v0.7.2...v0.7.3",
+    "releaseNotes": "**Full Changelog**: https://github.com/cta-observatory/lstmcpipe/compare/v0.7.3...v0.8.0",
     "funding": "824064",
     "developmentStatus": "active",
     "isPartOf": "https://www.cta-observatory.org/",
@@ -22,7 +22,8 @@
     "keywords": [
         "workflow",
         "pipeline",
-        "monte-carlo"
+        "CTA",
+        "ground-based telescopes"
     ],
     "programmingLanguage": [
         "Python 3"
