@@ -2,6 +2,7 @@
     "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
     "@type": "SoftwareSourceCode",
     "license": "https://spdx.org/licenses/MIT",
+    "identifier": "10.5281/zenodo.6460727",
     "codeRepository": "git+https://github.com/cta-observatory/lstmcpipe.git",
     "dateCreated": "2019-09-09",
     "datePublished": "2022-05-19",
