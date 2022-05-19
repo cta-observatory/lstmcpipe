@@ -8,6 +8,8 @@ def codemeta2citation(codemeta_path='codemeta.json', citation_path='CITATION.cff
     citation = {'title': codemeta['name'],
                 'type': 'software',
                 'authors': [],
+                'message': 'If you use this software, please cite it using Zenodo from https://doi.org/10.5281/zenodo.6460727',
+                'license': codemeta['license'],
                 }
     for author in codemeta['author']:
         citation['authors'].append({
