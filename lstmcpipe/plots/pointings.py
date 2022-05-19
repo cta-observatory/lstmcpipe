@@ -5,7 +5,7 @@ import numpy as np
 import astropy.units as u
 
 
-def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwargs):
+def plot_pointings(pointings, ax=None, projection='polar', add_grid3d=False, **kwargs):
     """
     Produce a scatter plot of the pointings
 
