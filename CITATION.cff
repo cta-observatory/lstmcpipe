@@ -13,3 +13,5 @@ authors:
   given-names: Lukas
   orcid: https://orcid.org/0000-0001-7110-0533
   email: lukas.nickel@tu-dortmund.de
+message: If you use this software, please cite it using Zenodo from https://doi.org/10.5281/zenodo.6460727
+license: https://spdx.org/licenses/MIT
