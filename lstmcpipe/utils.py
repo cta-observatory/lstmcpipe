@@ -42,7 +42,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
 
 
 
-def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
+def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, overwrite=False):
     from lstchain.io.config import get_standard_config
     
     filename = Path(filename)
@@ -62,6 +62,13 @@ def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
     cfg['random_forest_disp_regressor_args']['n_jobs'] = -1
     cfg['random_forest_disp_classifier_args']['n_jobs'] = -1
     cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
+    if allsky:
+        for rf_feature in ['energy_regression_features', 'disp_regression_features',
+                           'disp_classification_features', 'particle_classification_features']:
+            if 'alt_tel' not in cfg[rf_feature]:
+                cfg[rf_feature].append('alt_tel')
+            if 'az_tel' not in cfg[rf_feature]:
+                cfg[rf_feature].append('az_tel')
     
     with open(filename, 'w') as file:
         json.dump(cfg, file, indent=4)
