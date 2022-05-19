@@ -1,6 +1,8 @@
 import mpl_toolkits
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import astropy.units as u
 
 
 def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwargs):
@@ -30,6 +32,8 @@ def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwar
         ax = fig.add_subplot(111, projection=projection)
     elif isinstance(ax, mpl_toolkits.mplot3d.axes3d.Axes3D):
         projection = '3d'
+    elif isinstance(ax, matplotlib.projections.polar.PolarAxes):
+        projection = 'polar'
         
     if projection == '3d':
         r = 1.
@@ -52,6 +56,12 @@ def plot_pointings(pointings, ax=None, projection=None, add_grid3d=False, **kwar
         ax.set_xlim3d([-r*box_ratio, r*box_ratio])
         ax.set_ylim3d([-r*box_ratio, r*box_ratio])
         ax.set_zlim3d([-r*box_ratio, r*box_ratio])
+        
+    elif projection == 'polar':
+        ax.scatter(pointings[:, 0], np.pi/2.*u.rad - pointings[:, 1], **kwargs)
+        ax.set_xlabel('Azimuth')
+        ax.set_ylabel('Zenith')
+        
         
     else:
         ax.scatter(pointings[:, 0], pointings[:, 1], **kwargs)
