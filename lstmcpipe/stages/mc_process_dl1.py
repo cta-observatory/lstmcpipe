@@ -149,7 +149,7 @@ def r0_to_dl1(
         A list of all the jobs sent for input dir
     """
 
-    log.info("Starting R0 to DL1 processing for files in dir : {}".format(input_dir))
+    log.info("\nStarting R0 to DL1 processing for files in dir : {}".format(input_dir))
 
     source_environment = batch_config["source_environment"]
     slurm_account = batch_config["slurm_account"]
@@ -173,8 +173,6 @@ def r0_to_dl1(
         jobtype_id = ''
         log.critical("Please, select an allowed workflow kind.")
         exit(-1)
-
-    log.info("Working on DL0 files in {}".format(input_dir))
 
     raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
 
@@ -281,8 +279,6 @@ def reprocess_dl1(
         log.critical(f"Unknown workflow {workflow_kind}")
         exit(-1)
 
-    log.info("Working on DL1 files in {}".format(input_dir))
-
     check_data_path(input_dir)
     dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).glob("*.h5")]
 
@@ -297,7 +293,7 @@ def reprocess_dl1(
     job_logs_dir = Path(output_dir).joinpath("job_logs_dl1ab")
     Path(job_logs_dir).mkdir(exist_ok=True)
 
-    log.info("DL1ab DATA DIR: {}".format(output_dir))
+    log.info("DL1ab destination DATA DIR: {}".format(output_dir))
 
     jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(
         input_dir,
@@ -366,8 +362,6 @@ def submit_dl1_jobs(
 
     jobid2log = {}
 
-    log.info("output dir: {}".format(output_dir))
-
     number_of_sublists = len(file_list) // dl1_files_per_batched_job + int(
         len(file_list) % dl1_files_per_batched_job > 0
     )
@@ -375,7 +369,7 @@ def submit_dl1_jobs(
     for i in range(number_of_sublists):
         output_file = job_logs_dir.joinpath("{}_{}.sublist".format(filelist_name, i)).resolve().as_posix()
         with open(output_file, "w+") as out:
-            for line in file_list[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:
+            for line in file_list[i * dl1_files_per_batched_job : dl1_files_per_batched_job * (i + 1)]:  # noqa
                 out.write(line)
                 out.write("\n")
 
@@ -411,4 +405,3 @@ def submit_dl1_jobs(
     jobid2log.update({jobid: slurm_cmd})
 
     return jobid2log, jobid
-
