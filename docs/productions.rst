@@ -1,7 +1,17 @@
-===============
-Production list
-===============
 
-Find below the list of lstmcpipe productions.
-Real source names are not provided here. To find the actual source name corresponding to its ID used in the prod ID,
-visit the `LST wiki page <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_.
+========================  ========================================================================================================================================================================================================  ===================================
+Request date              Directory name                                                                                                                                                                                            Prod ID
+========================  ========================================================================================================================================================================================================  ===================================
+Fri Mar  4 08:44:21 2022  `psf_tuned_zen20 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/psf_tuned_zen20>`_                                                                                          zen20az180_dl1ab_tuned_psf
+Fri Mar  4 08:44:21 2022  `template_prod <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/template_prod>`_                                                                                              template
+Fri Mar  4 18:00:52 2022  `psf_tuned_zen40 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/psf_tuned_zen40>`_                                                                                          zen40az180_dl1ab_tuned_psf
+Mon Mar  7 15:01:27 2022  `nsb_tuned_zen40_scr1 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/nsb_tuned_zen40_scr1>`_                                                                                zen40az180_dl1ab_tuned_nsb_src1
+Tue Mar  8 10:21:55 2022  `nsb_psf_tuned_zen40_src2 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/nsb_psf_tuned_zen40_src2>`_                                                                        zen40az180_dl1ab_tuned_nsb_psf_src2
+Wed Mar 16 19:07:06 2022  `20210416_v0.7.3_prod5_trans_80_local_taicut_8_4 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20210416_v0.7.3_prod5_trans_80_local_taicut_8_4>`_                          local_taicut_8_4
+Wed Mar 16 19:07:06 2022  `20210506_v0.7.3_prod5_trans_80_zen40deg_local_tailcut_8_4 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20210506_v0.7.3_prod5_trans_80_zen40deg_local_tailcut_8_4>`_      zen40deg_local_tailcut_8_4
+Wed Mar 16 19:07:06 2022  `20210923_v0.7.5_prod5_trans_80_dynamic_cleaning <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20210923_v0.7.5_prod5_trans_80_dynamic_cleaning>`_                          dynamic_cleaning
+Wed Mar 16 19:07:06 2022  `20220218_v0.9.2_prod5_trans_80_dl1ab_tune_MC_to_Crab <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20220218_v0.9.2_prod5_trans_80_dl1ab_tune_MC_to_Crab>`_                dl1ab_tune_MC_to_Crab
+Wed Mar 16 19:07:06 2022  `20220304_v0.9.3_prod5_trans_80_zen40az180_local_tailcut_8_4 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20220304_v0.9.3_prod5_trans_80_zen40az180_local_tailcut_8_4>`_  zen40az180_local_tailcut_8_4
+Mon Mar 21 11:50:01 2022  `20220215_v0.9.1_prod5_trans_80_local_tailcut_8_4 <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20220215_v0.9.1_prod5_trans_80_local_tailcut_8_4>`_                        local_tailcut_8_4
+Thu May 19 15:33:32 2022  `20220518_allsky_dec2276_tuned <https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/20220518_allsky_dec2276_tuned>`_                                                              20220518_allsky_dec2276_tuned
+========================  ========================================================================================================================================================================================================  ===================================
