@@ -164,7 +164,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "alt_tel",
+        "az_tel"
     ],
     "disp_method": "disp_norm_sign",
     "disp_regression_features": [
@@ -175,7 +177,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "alt_tel",
+        "az_tel"
     ],
     "disp_classification_features": [
         "log_intensity",
@@ -185,7 +189,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "alt_tel",
+        "az_tel"
     ],
     "particle_classification_features": [
         "log_intensity",
@@ -200,7 +206,9 @@
         "leakage_intensity_width_2",
         "log_reco_energy",
         "reco_disp_norm",
-        "reco_disp_sign"
+        "reco_disp_sign",
+        "alt_tel",
+        "az_tel"
     ],
     "allowed_tels": [
         1,
