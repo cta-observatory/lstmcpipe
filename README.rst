@@ -30,6 +30,45 @@ Cite us
 If you use lstMCpipe, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
 
 
+Install
+-------
+
+As as user:
+
+.. code-block::
+
+    wget https://raw.githubusercontent.com/cta-observatory/lstmcpipe/master/environment.yml
+    conda env create -f environment.yml
+    conda activate lstmcpipe
+    pip install lstmcpipe
+
+This will setup a new enviroment with lstchain and other needed tools available in supported versions.
+If you already have your lstchain conda environment, you may simply activate it and install lstmcpipe there using `pip install lstmcpipe`.
+
+
+HIPERTA (referred to as rta in the following) support is builtin, but no installation instructions can be provided as of now.
+
+Alternatively, you can install `lstmcpipe` in your own enviroment to use different versions of the
+analysis pipelines.
+WARNING: Due to changing APIs and data models, we cannot support other versions than the ones specified in
+the enviroment.
+
+As as developer:
+
+.. code-block::
+
+    git clone https://github.com/cta-observatory/lstmcpipe.git
+    cd lstmcpipe
+    conda env create -n lstmcpipe_dev -f environment.yml
+    conda activate lstmcpipe_dev
+    pip install -e .
+    pre-commit install
+
+This will setup a pre-commit hook: Given that you are in the right enviroment, it will run and format files you are about
+to commit with `black`. (You need to stage the changes again after that). This ensures the formatting of the
+code follows our guidelines and there is less work dealing with the code checker in the CI.
+
+
 Requesting a MC analysis
 ------------------------
 You may find the list of already run productions in the documentation.
@@ -54,45 +93,6 @@ The proposed configuration will be tested for validity by continuous integration
 
 Depending on the number of requests, we may give priorities.
 
-
-
-Install
--------
-
-As as user:
-
-.. code-block::
-
-    git clone https://github.com/cta-observatory/lstmcpipe.git
-    cd lstmcpipe
-    conda env create -n lstmcpipe -f environment.yml
-    conda activate lstmcpipe
-    pip install .
-
-This will setup a new enviroment with lstchain and other needed tools available in supported versions.
-At this point in time, this fixes `ctapipe` to the version, that `lstchain` depends on.
-Splitting the requirements and supporting different pipelines independently is a work in progress.
-HIPERTA (referred to as rta in the following) support is builtin, but no installation instructions can be provided as of now.
-
-Alternatively, you can install `lstmcpipe` in your own enviroment to use different versions of the
-analysis pipelines.
-WARNING: Due to changing APIs and data models, we cannot support other versions than the ones specified in
-the enviroment.
-
-As as developer:
-
-.. code-block::
-
-    git clone https://github.com/cta-observatory/lstmcpipe.git
-    cd lstmcpipe
-    conda env create -n lstmcpipe_dev -f environment.yml
-    conda activate lstmcpipe_dev
-    pip install -e .
-    pre-commit install
-
-This will setup a pre-commit hook: Given that you are in the right enviroment, it will run and format files you are about
-to commit with `black`. (You need to stage the changes again after that). This ensures the formatting of the
-code follows our guidelines and there is less work dealing with the code checker in the CI.
 
 
 Quickstart
