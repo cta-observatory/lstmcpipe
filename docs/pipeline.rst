@@ -1,7 +1,8 @@
+===================
 lstmcpipe pipelines
 ===================
 
-
+-----------------------
 Prod3 & Prod5 pipelines
 -----------------------
 
@@ -125,7 +126,7 @@ One can also start back from DL1, applying the dl1ab stage:
         SENS --> plot[png plots]
 
 
-
+--------------------------
 AllSky production pipeline
 --------------------------
 

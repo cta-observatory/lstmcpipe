@@ -50,7 +50,7 @@ def add_prod_table(
                 prod_id,
             ]
         )
-        commit_times.append(commit.authored_datetime.ctime())
+        commit_times.append(commit.authored_datetime)
 
     sorted_lists = sorted(zip(commit_times, prod_list))
     prod_list = [prod for _, prod in sorted_lists]
