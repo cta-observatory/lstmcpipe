@@ -2,7 +2,7 @@
 
 import argparse
 import subprocess
-import os
+from os import environ
 
 
 def main():
@@ -37,22 +37,26 @@ def main():
     parser.add_argument(
         "--keep_file",
         "-k",
-        action='store_true',
+        action="store_true",
         dest="keep_file",
         help="Keep output of hiperta. Set by default to False",
     )
     parser.add_argument(
         "--debug_mode",
         "-d",
-        action='store_true',
+        action="store_true",
         dest="debug_mode",
         help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
     )
     args = parser.parse_args()
 
-    task_id = int(os.environ["SLURM_ARRAY_TASK_ID"])
-    file_for_this_job = args.file_list[task_id]
-    print("Using file: ", file_for_this_job)
+    task_id = int(environ.get("SLURM_ARRAY_TASK_ID", -1))
+    # Running script manually:
+    if len(args.file_list) == 1 and task_id == -1:
+        file_for_this_job = args.file_list[0]
+    else:
+        file_for_this_job = args.file_list[task_id]
+    print("Processing files in: ", file_for_this_job)
 
     with open(file_for_this_job, "r") as filelist:
         for file in filelist:
