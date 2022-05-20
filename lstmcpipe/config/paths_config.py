@@ -880,11 +880,11 @@ class PathConfigAllSkyFull(PathConfig):
         test_kwargs.setdefault('marker', '*')
         
         dec = list(self.train_configs)[0]
-        ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, **train_kwargs)
+        ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, add_grid3d=add_grid3d, **train_kwargs)
         for dec, tr in list(self.train_configs.items())[1:]:
-            ax = tr.plot_pointings(ax=ax, add_grid3d=False, **train_kwargs)
+            ax = tr.plot_pointings(ax=ax, projection=projection, add_grid3d=False, **train_kwargs)
 
-        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, add_grid3d=add_grid3d, **test_kwargs)
+        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, projection=projection, add_grid3d=False, **test_kwargs)
         return ax
 
 
