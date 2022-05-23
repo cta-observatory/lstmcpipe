@@ -131,6 +131,7 @@ def merge_dl1(
     jobid_merge = sbatch_merge_dl1.submit
     log_merge.update({jobid_merge: sbatch_merge_dl1.slurm_command})
 
+    log.info(f"\nMerging DL1 file from {input_dir} dir into {output_file} file.")
     log.info(f"Submitted batch job {jobid_merge}")
 
     return log_merge, jobid_merge

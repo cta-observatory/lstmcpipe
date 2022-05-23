@@ -209,6 +209,8 @@ def train_pipe(
     jobid_train = sbatch_train_pipe.submit
     log_train.update({jobid_train: sbatch_train_pipe.slurm_command})
 
+    log.info(f"Submitted batch job {jobid_train}")
+
     # copy config into working dir
     if config_file is not None:
         shutil.copyfile(config_file, Path(models_dir).joinpath(Path(config_file).name))

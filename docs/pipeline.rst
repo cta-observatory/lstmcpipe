@@ -1,7 +1,8 @@
+===================
 lstmcpipe pipelines
 ===================
 
-
+-----------------------
 Prod3 & Prod5 pipelines
 -----------------------
 
@@ -125,9 +126,12 @@ One can also start back from DL1, applying the dl1ab stage:
         SENS --> plot[png plots]
 
 
-
+--------------------------
 AllSky production pipeline
 --------------------------
+
+R0 to IRFs
+==========
 
 Standard AllSky production pipeline **for one training declination**
 
@@ -164,5 +168,31 @@ Standard AllSky production pipeline **for one training declination**
 
         DL2-GammaCrab --> |dl2_to_irf| IRF-GammaCrab
         IRF-GammaCrab[IRF Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
+
+
+To produce a config to run such a pipeline, typically run **on the cluster**:
+
+.. code-block::
+
+    lstmcpipe_generate_config PathConfigAllSkyFull --prod_id whatagreatprod --dec_list dec_2276
+
+
+This will generate a lstmcpipe config file and a lstchain config file.
+
+Please:
+ * check thoroughly the lstmcpipe config
+ * modify the lstchain config as you wish
+
+
+DL1ab
+=====
+
+The DL1ab workflow is very similar, only starting from an existing DL1 dataset.
+
+You typically want to run **on the cluster**:
+
+.. code-block::
+
+    lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --source_prod_id whatagreatprod --target_prod_id anothergreatprod
 
 

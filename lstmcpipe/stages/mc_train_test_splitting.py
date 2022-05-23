@@ -85,7 +85,7 @@ def train_test_split(
 
     input_dir = Path(input_dir).resolve()
 
-    log.info("Splitting files within the {} dir".format(input_dir.as_posix()))
+    log.info("\nSplitting files within the {} dir".format(input_dir.as_posix()))
 
     # create train, test output directories
     test_dir = Path(output_dirs["test"]).resolve()
@@ -120,6 +120,9 @@ def train_test_split(
 
     jobid_split = sbatch_tt_splitting.submit
     log_splitting.update({jobid_split: sbatch_tt_splitting.slurm_command})
+
+    log.info(f"\nSplitting files from {input_dir} dir into testing {test_dir} dir and training {train_dir} dir.")
+    log.info(f"Submitted batch job {jobid_split}")
 
     return log_splitting, jobid_split
 

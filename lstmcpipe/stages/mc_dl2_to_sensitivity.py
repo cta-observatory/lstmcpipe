@@ -123,6 +123,9 @@ def dl2_to_sensitivity(
     log_dl2_to_sensitivity.update({job_id_dl2_sens: job_id_dl2_sens.slurm_command})
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
 
+    log.info(f"Output dir of sensitivity file: {output}")
+    log.info(f"Submitted batch job {job_id_dl2_sens}")
+
     # Create plot from sensitivity files
     cmd_plot_sens = f'lstmcpipe_plot_irfs -f {output} -o {output.replace(".fits.gz", ".png")}'
 
@@ -141,5 +144,8 @@ def dl2_to_sensitivity(
     job_id_plot_sens = sbatch_plot_sens.submit
     log_dl2_to_sensitivity.update({job_id_plot_sens: sbatch_plot_sens.slurm_command})
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
+
+    log.info(f"Output dir of sensitivity plots: {output}")
+    log.info(f"Submitted batch job {job_id_plot_sens}")
 
     return log_dl2_to_sensitivity, ",".join(jobids_dl2_to_sensitivity)

@@ -142,6 +142,8 @@ def dl1_to_dl2(
     jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit
     log_dl1_to_dl2.update({jobid_dl1_to_dl2: sbatch_dl1_dl2.slurm_command})
 
+    log.info(f"Submitted batch job {jobid_dl1_to_dl2}")
+
     if config_file is not None:
         shutil.copyfile(config_file, Path(output_dir).joinpath(Path(config_file).name))
 

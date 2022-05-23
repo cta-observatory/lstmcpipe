@@ -146,7 +146,7 @@ def r0_to_dl1(
         A list of all the jobs sent for input dir
     """
 
-    log.info("Starting R0 to DL1 processing for files in dir : {}".format(input_dir))
+    log.info("\nStarting R0 to DL1 processing for files in dir : {}".format(input_dir))
 
     if workflow_kind == "lstchain":
         base_cmd = f"lstmcpipe_lst_core_r0_dl1 -c {config_file} "
@@ -167,8 +167,6 @@ def r0_to_dl1(
         jobtype_id = ''
         log.critical("Please, select an allowed workflow kind.")
         exit(-1)
-
-    log.info("Working on DL0 files in {}".format(input_dir))
 
     raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
 
@@ -272,8 +270,6 @@ def reprocess_dl1(
         log.critical(f"Unknown workflow {workflow_kind}")
         exit(-1)
 
-    log.info("Working on DL1 files in {}".format(input_dir))
-
     check_data_path(input_dir)
     dl1ab_filelist = [file.resolve().as_posix() for file in Path(input_dir).glob("*.h5")]
 
@@ -288,7 +284,7 @@ def reprocess_dl1(
     job_logs_dir = Path(output_dir).joinpath("job_logs_dl1ab")
     Path(job_logs_dir).mkdir(exist_ok=True)
 
-    log.info("DL1ab DATA DIR: {}".format(output_dir))
+    log.info("DL1ab destination DATA DIR: {}".format(output_dir))
 
     jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(
         input_dir,
@@ -352,8 +348,6 @@ def submit_dl1_jobs(
 
     """
     jobid2log = {}
-
-    log.info("output dir: {}".format(output_dir))
 
     number_of_sublists = len(file_list) // dl1_files_per_batched_job + int(
         len(file_list) % dl1_files_per_batched_job > 0

@@ -148,6 +148,8 @@ def dl2_to_irfs(
     job_id_dl2_irfs = sbatch_dl2_irfs.submit
     log_dl2_to_irfs.update({job_id_dl2_irfs: sbatch_dl2_irfs.slurm_command})
 
+    log.info(f"Submitted batch job {job_id_dl2_irfs}")
+
     # Copy config into working dir
     if config_file:
         shutil.copyfile(config_file, Path(output_dir).joinpath(Path(config_file).name))

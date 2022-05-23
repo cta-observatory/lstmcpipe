@@ -74,6 +74,8 @@ def main():
         default=None,
     )
 
+    parser.add_argument('--dec_list', nargs='+', help='Use only with AllSkyFull prods', default=None)
+
     parser.add_argument(
         '--kwargs',
         nargs='*',
@@ -89,17 +91,20 @@ def main():
     output = f'lstmcpipe_config_{date.today()}_{args.config_class}.yaml' if args.output is None else args.output
     prod_id = 'prod_00' if args.prod_id is None else args.prod_id
 
-    # we get the class from its name and instantiate it with the required args
+    kwargs = {}
+    if args.dec_list:
+        kwargs.update({'dec_list': args.dec_list})
     if args.kwargs:
-        cfg = getattr(paths_config, args.config_class)(prod_id, **args.kwargs)
-    else:
-        cfg = getattr(paths_config, args.config_class)(prod_id)
+        kwargs.update(args.kwargs)
+
+    # we get the class from its name and instantiate it with the required args
+    cfg = getattr(paths_config, args.config_class)(prod_id, **kwargs)
     cfg.generate()
     cfg.save_yml(output, overwrite=args.overwrite)
 
     print(f"lstmcpipe config saved in {output}")
 
-    lstchain_file = f'lstchain_config_{date.today()}.yaml' if args.lstchain_conf is None else args.lstchain_conf
+    lstchain_file = f'lstchain_config_{date.today()}.json' if args.lstchain_conf is None else args.lstchain_conf
     dump_lstchain_std_config(filename=lstchain_file, overwrite=args.overwrite)
     print(f"To start the process with dumped configs, run:\n\nlstmcpipe -c {output} -conf_lst {lstchain_file}\n\n")
 
