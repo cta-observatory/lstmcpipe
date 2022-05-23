@@ -24,8 +24,10 @@ def plot_pointings(pointings, ax=None, projection='polar', add_grid3d=False, **k
     -------
     ax: `matplotlib.pyplot.axis`
     """
+    
     if ax and projection:
-        raise ValueError("ax and projection are exclusive")
+        if not isinstance(ax, matplotlib.projections.get_projection_class(projection)):
+            raise ValueError(f"ax of type {type(ax)} and projection {projection} are exclusive")
         
     if ax is None:
         fig = plt.gcf()
