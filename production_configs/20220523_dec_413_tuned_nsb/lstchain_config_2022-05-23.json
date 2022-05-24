@@ -306,8 +306,8 @@
 
     "image_modifier": {
         "increase_nsb": true,
-        "extra_noise_in_dim_pixels": 0.937
-        "extra_bias_in_dim_pixels": 0.323
+        "extra_noise_in_dim_pixels": 0.937,
+        "extra_bias_in_dim_pixels": 0.323,
         "transition_charge": 8,
         "extra_noise_in_bright_pixels": 1.041
     }
