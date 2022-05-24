@@ -2,10 +2,16 @@
 import argparse
 import yaml
 from pathlib import Path
+import tempfile
 
 # from lstmcpipe.config import load_config
 from lstmcpipe.config.pipeline_config import config_valid
 from lstchain.io.config import read_configuration_file
+from ctapipe.utils import get_dataset_path
+
+
+def test_mc_r0():
+    return get_dataset_path("gamma_test_large.simtel.gz")
 
 
 def validate_lstmcpipe(filename):
@@ -17,8 +23,13 @@ def validate_lstmcpipe(filename):
     config_valid(config)
 
 
-def validate_lstchain(filename):
+def validate_lstchain(filename, stage):
     read_configuration_file(filename)
+    if stage == 'r0_to_dl1':
+
+        cmd = ['lstchain_mc_r0_to_dl1', '-f', test_mc_r0(), '-c', filename]
+        run(cmd)
+
 
 
 def main():
