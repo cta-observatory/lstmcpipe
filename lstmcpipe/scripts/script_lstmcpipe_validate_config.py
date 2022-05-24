@@ -1,20 +1,9 @@
 # #!/usr/bin/env python
 import argparse
-import yaml
 from pathlib import Path
 
-# from lstmcpipe.config import load_config
-from lstmcpipe.config.pipeline_config import config_valid
+from lstmcpipe.config.pipeline_config import load_config
 from lstchain.io.config import read_configuration_file
-
-
-def validate_lstmcpipe(filename):
-    # config = load_config(filename)
-    with open(filename) as f:
-        config = yaml.safe_load(f)
-    if 'prod_id' not in config:
-        raise ValueError(f"No prod ID in config {filename}")
-    config_valid(config)
 
 
 def validate_lstchain(filename):
@@ -44,10 +33,13 @@ def main():
 
     args = parser.parse_args()
 
-    validate_lstmcpipe(args.lstmcpipe_config_filename)
+    load_config(args.lstmcpipe_config_filename)
     if args.lstchain_config_filename is not None:
         validate_lstchain(args.lstchain_config_filename)
+
+    print("Valid configs :)")
 
 
 if __name__ == '__main__':
     main()
+
