@@ -32,7 +32,7 @@ def add_prod_table(
     for prod_dir in [d for d in Path(production_dir).iterdir() if d.is_dir()]:
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir, max_count=1))[0]
 
-        yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml')]
+        yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml') or f.name.endswith('.yaml')]
         if yml_list:
             try:
                 conf = load_config(yml_list[0])
@@ -43,11 +43,14 @@ def add_prod_table(
         else:
             print(f"No yml file in {prod_dir}")
 
+        markdowns = list(prod_dir.glob('*.md'))
+        readme = open(markdowns[0]).read() if markdowns else ""
         prod_list.append(
             [
                 commit.authored_datetime.date(),
                 f"`{prod_dir.name} <{lstmcpipe_repo_prod_config_url+prod_dir.name}>`_",
                 prod_id,
+                readme,
             ]
         )
         commit_times.append(commit.authored_datetime)
@@ -55,7 +58,7 @@ def add_prod_table(
     sorted_lists = sorted(zip(commit_times, prod_list))
     prod_list = [prod for _, prod in sorted_lists]
 
-    prod_txt += tabulate(prod_list, ['Request date', 'Directory name', 'Prod ID'], tablefmt='rst')
+    prod_txt += tabulate(prod_list, ['Request date', 'Directory name', 'Prod ID', 'readme'], tablefmt='rst')
 
     with open(prod_file, 'a') as f:
         f.write(prod_txt)
