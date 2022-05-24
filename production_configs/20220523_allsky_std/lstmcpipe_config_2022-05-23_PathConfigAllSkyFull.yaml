@@ -1,0 +1,1220 @@
+# lstmcpipe generated config from PathConfigAllSkyFull - 2022-05-23
+
+workflow_kind: lstchain
+
+# prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: 20220523_allsky_std
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.6
+
+slurm_config:
+# dpps is the default account for lstanalyzer - other users should use aswg
+  user_account: dpps
+
+# If the image modifier settings should be calculated on the fly
+# set paths to an observed dl1 file and a simtel mc file
+# dl1_noise_tune_data_run: /fefs/aswg/data/real/DL1/20201121/v0.9.1/tailcut84/dl1_LST-1.Run02988.0000.h5
+# dl1_noise_tune_mc_run: /fefs/aswg/data/mc/DL0/20200629_prod5_trans_80/proton/zenith_20deg/south_pointing/proton_20deg_180deg_run1___cta-prod5-lapalma_4LSTs_MAGIC_desert-2158m_mono.simtel.gz
+
+lstmcpipe_version: 0.8.2
+prod_type: PathConfigAllSkyFull
+stages_to_run:
+- r0_to_dl1
+- merge_dl1
+- train_pipe
+- dl1_to_dl2
+- dl2_to_irfs
+stages:
+  r0_to_dl1:
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_42.97_az_341.542_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_42.97_az_341.542_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_38.108_az_3.026_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_38.108_az_3.026_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_45.843_az_21.868_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_45.843_az_21.868_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_63.758_az_26.097_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_63.758_az_26.097_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_42.97_az_18.458_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_42.97_az_18.458_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_38.108_az_356.974_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_38.108_az_356.974_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_52.643_az_25.884_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_52.643_az_25.884_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_60.06_az_333.314_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_60.06_az_333.314_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_63.758_az_333.903_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_63.758_az_333.903_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_56.326_az_26.642_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_56.326_az_26.642_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_40.633_az_14.086_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_40.633_az_14.086_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_56.326_az_333.358_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_56.326_az_333.358_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_52.643_az_334.116_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_52.643_az_334.116_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_45.843_az_338.112_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_45.843_az_338.112_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_38.973_az_8.859_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_38.973_az_8.859_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_49.111_az_24.322_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_49.111_az_24.322_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_38.973_az_351.141_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_38.973_az_351.141_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_40.633_az_345.914_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_40.633_az_345.914_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_60.06_az_26.686_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_60.06_az_26.686_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_6676/sim_telarray/node_corsika_theta_49.111_az_335.678_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/node_corsika_theta_49.111_az_335.678_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_42.97_az_341.542_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_42.97_az_341.542_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_38.108_az_3.026_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_38.108_az_3.026_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_45.843_az_21.868_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_45.843_az_21.868_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_63.758_az_26.097_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_63.758_az_26.097_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_42.97_az_18.458_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_42.97_az_18.458_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_38.108_az_356.974_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_38.108_az_356.974_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_52.643_az_25.884_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_52.643_az_25.884_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_60.06_az_333.314_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_60.06_az_333.314_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_63.758_az_333.903_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_63.758_az_333.903_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_56.326_az_26.642_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_56.326_az_26.642_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_40.633_az_14.086_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_40.633_az_14.086_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_56.326_az_333.358_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_56.326_az_333.358_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_52.643_az_334.116_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_52.643_az_334.116_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_45.843_az_338.112_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_45.843_az_338.112_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_38.973_az_8.859_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_38.973_az_8.859_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_49.111_az_24.322_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_49.111_az_24.322_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_38.973_az_351.141_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_38.973_az_351.141_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_40.633_az_345.914_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_40.633_az_345.914_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_60.06_az_26.686_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_60.06_az_26.686_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_6676/sim_telarray/node_corsika_theta_49.111_az_335.678_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/node_corsika_theta_49.111_az_335.678_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_63.806_az_207.004_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_63.806_az_207.004_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_69.813_az_142.697_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_69.813_az_142.697_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_62.212_az_156.789_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_62.212_az_156.789_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_67.624_az_214.053_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_67.624_az_214.053_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.895_az_169.087_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.895_az_169.087_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_63.806_az_152.996_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_63.806_az_152.996_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.036_az_182.202_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.036_az_182.202_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.324_az_186.587_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.324_az_186.587_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_69.813_az_217.303_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_69.813_az_217.303_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_62.212_az_203.211_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_62.212_az_203.211_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_60.852_az_160.748_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_60.852_az_160.748_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_59.742_az_164.856_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_59.742_az_164.856_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.036_az_177.798_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.036_az_177.798_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_65.615_az_210.62_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_65.615_az_210.62_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.895_az_190.913_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.895_az_190.913_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_58.324_az_173.413_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_58.324_az_173.413_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_67.624_az_145.947_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_67.624_az_145.947_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_60.852_az_199.252_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_60.852_az_199.252_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_65.615_az_149.38_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_65.615_az_149.38_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_min_2924/sim_telarray/node_corsika_theta_59.742_az_195.144_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/node_corsika_theta_59.742_az_195.144_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_63.806_az_207.004_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_63.806_az_207.004_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_69.813_az_142.697_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_69.813_az_142.697_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_62.212_az_156.789_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_62.212_az_156.789_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_67.624_az_214.053_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_67.624_az_214.053_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.895_az_169.087_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.895_az_169.087_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_63.806_az_152.996_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_63.806_az_152.996_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.036_az_182.202_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.036_az_182.202_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.324_az_186.587_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.324_az_186.587_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_69.813_az_217.303_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_69.813_az_217.303_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_62.212_az_203.211_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_62.212_az_203.211_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_60.852_az_160.748_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_60.852_az_160.748_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_59.742_az_164.856_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_59.742_az_164.856_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.036_az_177.798_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.036_az_177.798_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_65.615_az_210.62_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_65.615_az_210.62_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.895_az_190.913_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.895_az_190.913_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_58.324_az_173.413_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_58.324_az_173.413_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_67.624_az_145.947_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_67.624_az_145.947_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_60.852_az_199.252_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_60.852_az_199.252_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_65.615_az_149.38_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_65.615_az_149.38_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/Protons/dec_min_2924/sim_telarray/node_corsika_theta_59.742_az_195.144_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/node_corsika_theta_59.742_az_195.144_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_87.604_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_87.604_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_283.075_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_283.075_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_216.698_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_216.698_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_175.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_197.973_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_197.973_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_110.312_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_110.312_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_14.984_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_14.984_az_175.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_230.005_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_230.005_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_175.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_10.0_az_248.117_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_10.0_az_248.117_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_231.243_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_231.243_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_99.126_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_99.126_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_251.19_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_251.19_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_248.099_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_248.099_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_126.498_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_126.498_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_206.875_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_206.875_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_133.619_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_133.619_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_203.916_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_203.916_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_214.263_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_214.263_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_146.4_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_146.4_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_301.217_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_301.217_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_10.0_az_102.199_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_10.0_az_102.199_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_60.528_az_223.818_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_223.818_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_262.712_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_262.712_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_208.633_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_208.633_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_49.119_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_49.119_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_14.984_az_355.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_14.984_az_355.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_67.271_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_67.271_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_102.217_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_102.217_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_143.441_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_143.441_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_355.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_355.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_175.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_43.197_az_120.311_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_120.311_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_136.053_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_136.053_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_175.158_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_240.004_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_240.004_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_141.683_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_141.683_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_68.068_az_119.073_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_119.073_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_52.374_az_152.343_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_152.343_
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/node_theta_32.059_az_175.158_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_175.158_
+  merge_dl1:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/dl1_20220523_allsky_std_dec_6676_GammaDiffuse_merged.h5
+    options: --pattern */*.h5 --no-image
+    slurm_options: -p long
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/dl1_20220523_allsky_std_dec_6676_Protons_merged.h5
+    options: --pattern */*.h5 --no-image
+    slurm_options: -p long
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/dl1_20220523_allsky_std_dec_min_2924_GammaDiffuse_merged.h5
+    options: --pattern */*.h5 --no-image
+    slurm_options: -p long
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/dl1_20220523_allsky_std_dec_min_2924_Protons_merged.h5
+    options: --pattern */*.h5 --no-image
+    slurm_options: -p long
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_87.604_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_87.604__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_283.075_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_283.075__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_216.698_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_216.698__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_175.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_197.973_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_197.973__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_110.312_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_110.312__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_14.984_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_175.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_230.005_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_230.005__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_175.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_10.0_az_248.117_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_248.117__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_231.243_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_231.243__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_99.126_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_99.126__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_251.19_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_251.19__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_248.099_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_248.099__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_126.498_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_126.498__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_206.875_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_206.875__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_133.619_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_133.619__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_203.916_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_203.916__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_214.263_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_214.263__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_146.4_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_146.4__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_301.217_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_301.217__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_10.0_az_102.199_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_102.199__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_60.528_az_223.818_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_223.818__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_262.712_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_262.712__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_208.633_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_208.633__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_49.119_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_49.119__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_14.984_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_355.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_67.271_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_67.271__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_102.217_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_102.217__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_143.441_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_143.441__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_355.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_175.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_43.197_az_120.311_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_120.311__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_136.053_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_136.053__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_175.158__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_240.004_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_240.004__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_141.683_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_141.683__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_68.068_az_119.073_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_119.073__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_52.374_az_152.343_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_152.343__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/node_theta_32.059_az_175.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_175.158__merged.h5
+    options: --no-image
+  train_pipe:
+  - input:
+      gamma: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/GammaDiffuse/dl1_20220523_allsky_std_dec_6676_GammaDiffuse_merged.h5
+      proton: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_6676/Protons/dl1_20220523_allsky_std_dec_6676_Protons_merged.h5
+    output: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    slurm_options: -p xxl --mem=100G --cpus-per-task=16
+  - input:
+      gamma: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/GammaDiffuse/dl1_20220523_allsky_std_dec_min_2924_GammaDiffuse_merged.h5
+      proton: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TrainingDataset/dec_min_2924/Protons/dl1_20220523_allsky_std_dec_min_2924_Protons_merged.h5
+    output: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    slurm_options: -p xxl --mem=100G --cpus-per-task=16
+  dl1_to_dl2:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_87.604__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_87.604_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_283.075__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_283.075_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_216.698__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_216.698_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_197.973__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_197.973_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_110.312__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_110.312_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_230.005__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_230.005_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_248.117__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_248.117_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_231.243__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_231.243_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_99.126__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_99.126_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_251.19__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_251.19_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_248.099__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_248.099_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_126.498__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_126.498_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_206.875__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_206.875_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_133.619__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_133.619_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_203.916__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_203.916_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_214.263__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_214.263_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_146.4__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_146.4_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_301.217__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_301.217_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_102.199__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_102.199_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_223.818__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_223.818_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_262.712__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_262.712_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_208.633__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_208.633_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_49.119__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_49.119_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_355.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_67.271__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_67.271_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_102.217__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_102.217_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_143.441__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_143.441_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_355.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_120.311__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_120.311_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_136.053__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_136.053_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_240.004__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_240.004_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_141.683__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_141.683_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_119.073__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_119.073_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_152.343__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_152.343_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_87.604__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_87.604_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_283.075__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_283.075_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_216.698__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_216.698_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_197.973__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_197.973_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_110.312__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_110.312_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_230.005__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_230.005_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_248.117__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_248.117_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_231.243__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_231.243_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_99.126__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_99.126_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_251.19__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_251.19_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_248.099__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_248.099_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_126.498__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_126.498_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_206.875__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_206.875_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_133.619__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_133.619_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_203.916__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_203.916_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_214.263__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_214.263_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_146.4__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_146.4_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_301.217__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_301.217_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_10.0_az_102.199__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_102.199_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_60.528_az_223.818__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_223.818_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_262.712__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_262.712_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_208.633__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_208.633_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_49.119__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_49.119_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_14.984_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_355.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_67.271__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_67.271_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_102.217__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_102.217_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_143.441__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_143.441_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_355.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_43.197_az_120.311__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_120.311_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_136.053__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_136.053_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_175.158_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_240.004__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_240.004_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_141.683__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_141.683_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_68.068_az_119.073__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_119.073_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_52.374_az_152.343__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_152.343_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220523_allsky_std/TestingDataset/dl1_20220523_allsky_std_node_theta_32.059_az_175.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220523_allsky_std/dec_min_2924
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_175.158_
+    slurm_options: --mem=50GB
+  dl2_to_irfs:
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_87.604_/dl2_20220523_allsky_std_node_theta_43.197_az_87.604__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_87.604_/irf_20220523_allsky_std_node_theta_43.197_az_87.604_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_283.075_/dl2_20220523_allsky_std_node_theta_68.068_az_283.075__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_283.075_/irf_20220523_allsky_std_node_theta_68.068_az_283.075_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_216.698_/dl2_20220523_allsky_std_node_theta_52.374_az_216.698__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_216.698_/irf_20220523_allsky_std_node_theta_52.374_az_216.698_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_175.158_/dl2_20220523_allsky_std_node_theta_60.528_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_175.158_/irf_20220523_allsky_std_node_theta_60.528_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_197.973_/dl2_20220523_allsky_std_node_theta_52.374_az_197.973__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_197.973_/irf_20220523_allsky_std_node_theta_52.374_az_197.973_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_110.312_/dl2_20220523_allsky_std_node_theta_52.374_az_110.312__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_110.312_/irf_20220523_allsky_std_node_theta_52.374_az_110.312_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_175.158_/dl2_20220523_allsky_std_node_theta_14.984_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_175.158_/irf_20220523_allsky_std_node_theta_14.984_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_230.005_/dl2_20220523_allsky_std_node_theta_43.197_az_230.005__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_230.005_/irf_20220523_allsky_std_node_theta_43.197_az_230.005_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_175.158_/dl2_20220523_allsky_std_node_theta_43.197_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_175.158_/irf_20220523_allsky_std_node_theta_43.197_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_248.117_/dl2_20220523_allsky_std_node_theta_10.0_az_248.117__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_248.117_/irf_20220523_allsky_std_node_theta_10.0_az_248.117_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_231.243_/dl2_20220523_allsky_std_node_theta_68.068_az_231.243__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_231.243_/irf_20220523_allsky_std_node_theta_68.068_az_231.243_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_99.126_/dl2_20220523_allsky_std_node_theta_60.528_az_99.126__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_99.126_/irf_20220523_allsky_std_node_theta_60.528_az_99.126_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_251.19_/dl2_20220523_allsky_std_node_theta_60.528_az_251.19__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_251.19_/irf_20220523_allsky_std_node_theta_60.528_az_251.19_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_248.099_/dl2_20220523_allsky_std_node_theta_32.059_az_248.099__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_248.099_/irf_20220523_allsky_std_node_theta_32.059_az_248.099_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_126.498_/dl2_20220523_allsky_std_node_theta_60.528_az_126.498__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_126.498_/irf_20220523_allsky_std_node_theta_60.528_az_126.498_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_206.875_/dl2_20220523_allsky_std_node_theta_43.197_az_206.875__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_206.875_/irf_20220523_allsky_std_node_theta_43.197_az_206.875_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_133.619_/dl2_20220523_allsky_std_node_theta_52.374_az_133.619__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_133.619_/irf_20220523_allsky_std_node_theta_52.374_az_133.619_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_203.916_/dl2_20220523_allsky_std_node_theta_60.528_az_203.916__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_203.916_/irf_20220523_allsky_std_node_theta_60.528_az_203.916_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_214.263_/dl2_20220523_allsky_std_node_theta_32.059_az_214.263__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_214.263_/irf_20220523_allsky_std_node_theta_32.059_az_214.263_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_146.4_/dl2_20220523_allsky_std_node_theta_60.528_az_146.4__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_146.4_/irf_20220523_allsky_std_node_theta_60.528_az_146.4_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_301.217_/dl2_20220523_allsky_std_node_theta_52.374_az_301.217__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_301.217_/irf_20220523_allsky_std_node_theta_52.374_az_301.217_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_102.199_/dl2_20220523_allsky_std_node_theta_10.0_az_102.199__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_10.0_az_102.199_/irf_20220523_allsky_std_node_theta_10.0_az_102.199_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_223.818_/dl2_20220523_allsky_std_node_theta_60.528_az_223.818__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_60.528_az_223.818_/irf_20220523_allsky_std_node_theta_60.528_az_223.818_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_262.712_/dl2_20220523_allsky_std_node_theta_43.197_az_262.712__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_262.712_/irf_20220523_allsky_std_node_theta_43.197_az_262.712_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_208.633_/dl2_20220523_allsky_std_node_theta_68.068_az_208.633__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_208.633_/irf_20220523_allsky_std_node_theta_68.068_az_208.633_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_49.119_/dl2_20220523_allsky_std_node_theta_52.374_az_49.119__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_49.119_/irf_20220523_allsky_std_node_theta_52.374_az_49.119_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_355.158_/dl2_20220523_allsky_std_node_theta_14.984_az_355.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_14.984_az_355.158_/irf_20220523_allsky_std_node_theta_14.984_az_355.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_67.271_/dl2_20220523_allsky_std_node_theta_68.068_az_67.271__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_67.271_/irf_20220523_allsky_std_node_theta_68.068_az_67.271_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_102.217_/dl2_20220523_allsky_std_node_theta_32.059_az_102.217__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_102.217_/irf_20220523_allsky_std_node_theta_32.059_az_102.217_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_143.441_/dl2_20220523_allsky_std_node_theta_43.197_az_143.441__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_143.441_/irf_20220523_allsky_std_node_theta_43.197_az_143.441_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_355.158_/dl2_20220523_allsky_std_node_theta_32.059_az_355.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_355.158_/irf_20220523_allsky_std_node_theta_32.059_az_355.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_175.158_/dl2_20220523_allsky_std_node_theta_68.068_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_175.158_/irf_20220523_allsky_std_node_theta_68.068_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_120.311_/dl2_20220523_allsky_std_node_theta_43.197_az_120.311__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_43.197_az_120.311_/irf_20220523_allsky_std_node_theta_43.197_az_120.311_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_136.053_/dl2_20220523_allsky_std_node_theta_32.059_az_136.053__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_136.053_/irf_20220523_allsky_std_node_theta_32.059_az_136.053_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_175.158_/dl2_20220523_allsky_std_node_theta_52.374_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_175.158_/irf_20220523_allsky_std_node_theta_52.374_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_240.004_/dl2_20220523_allsky_std_node_theta_52.374_az_240.004__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_240.004_/irf_20220523_allsky_std_node_theta_52.374_az_240.004_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_141.683_/dl2_20220523_allsky_std_node_theta_68.068_az_141.683__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_141.683_/irf_20220523_allsky_std_node_theta_68.068_az_141.683_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_119.073_/dl2_20220523_allsky_std_node_theta_68.068_az_119.073__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_68.068_az_119.073_/irf_20220523_allsky_std_node_theta_68.068_az_119.073_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_152.343_/dl2_20220523_allsky_std_node_theta_52.374_az_152.343__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_52.374_az_152.343_/irf_20220523_allsky_std_node_theta_52.374_az_152.343_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_175.158_/dl2_20220523_allsky_std_node_theta_32.059_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_6676/node_theta_32.059_az_175.158_/irf_20220523_allsky_std_node_theta_32.059_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_87.604_/dl2_20220523_allsky_std_node_theta_43.197_az_87.604__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_87.604_/irf_20220523_allsky_std_node_theta_43.197_az_87.604_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_283.075_/dl2_20220523_allsky_std_node_theta_68.068_az_283.075__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_283.075_/irf_20220523_allsky_std_node_theta_68.068_az_283.075_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_216.698_/dl2_20220523_allsky_std_node_theta_52.374_az_216.698__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_216.698_/irf_20220523_allsky_std_node_theta_52.374_az_216.698_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_175.158_/dl2_20220523_allsky_std_node_theta_60.528_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_175.158_/irf_20220523_allsky_std_node_theta_60.528_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_197.973_/dl2_20220523_allsky_std_node_theta_52.374_az_197.973__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_197.973_/irf_20220523_allsky_std_node_theta_52.374_az_197.973_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_110.312_/dl2_20220523_allsky_std_node_theta_52.374_az_110.312__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_110.312_/irf_20220523_allsky_std_node_theta_52.374_az_110.312_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_175.158_/dl2_20220523_allsky_std_node_theta_14.984_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_175.158_/irf_20220523_allsky_std_node_theta_14.984_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_230.005_/dl2_20220523_allsky_std_node_theta_43.197_az_230.005__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_230.005_/irf_20220523_allsky_std_node_theta_43.197_az_230.005_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_175.158_/dl2_20220523_allsky_std_node_theta_43.197_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_175.158_/irf_20220523_allsky_std_node_theta_43.197_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_248.117_/dl2_20220523_allsky_std_node_theta_10.0_az_248.117__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_248.117_/irf_20220523_allsky_std_node_theta_10.0_az_248.117_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_231.243_/dl2_20220523_allsky_std_node_theta_68.068_az_231.243__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_231.243_/irf_20220523_allsky_std_node_theta_68.068_az_231.243_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_99.126_/dl2_20220523_allsky_std_node_theta_60.528_az_99.126__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_99.126_/irf_20220523_allsky_std_node_theta_60.528_az_99.126_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_251.19_/dl2_20220523_allsky_std_node_theta_60.528_az_251.19__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_251.19_/irf_20220523_allsky_std_node_theta_60.528_az_251.19_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_248.099_/dl2_20220523_allsky_std_node_theta_32.059_az_248.099__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_248.099_/irf_20220523_allsky_std_node_theta_32.059_az_248.099_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_126.498_/dl2_20220523_allsky_std_node_theta_60.528_az_126.498__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_126.498_/irf_20220523_allsky_std_node_theta_60.528_az_126.498_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_206.875_/dl2_20220523_allsky_std_node_theta_43.197_az_206.875__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_206.875_/irf_20220523_allsky_std_node_theta_43.197_az_206.875_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_133.619_/dl2_20220523_allsky_std_node_theta_52.374_az_133.619__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_133.619_/irf_20220523_allsky_std_node_theta_52.374_az_133.619_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_203.916_/dl2_20220523_allsky_std_node_theta_60.528_az_203.916__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_203.916_/irf_20220523_allsky_std_node_theta_60.528_az_203.916_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_214.263_/dl2_20220523_allsky_std_node_theta_32.059_az_214.263__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_214.263_/irf_20220523_allsky_std_node_theta_32.059_az_214.263_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_146.4_/dl2_20220523_allsky_std_node_theta_60.528_az_146.4__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_146.4_/irf_20220523_allsky_std_node_theta_60.528_az_146.4_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_301.217_/dl2_20220523_allsky_std_node_theta_52.374_az_301.217__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_301.217_/irf_20220523_allsky_std_node_theta_52.374_az_301.217_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_102.199_/dl2_20220523_allsky_std_node_theta_10.0_az_102.199__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_10.0_az_102.199_/irf_20220523_allsky_std_node_theta_10.0_az_102.199_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_223.818_/dl2_20220523_allsky_std_node_theta_60.528_az_223.818__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_60.528_az_223.818_/irf_20220523_allsky_std_node_theta_60.528_az_223.818_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_262.712_/dl2_20220523_allsky_std_node_theta_43.197_az_262.712__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_262.712_/irf_20220523_allsky_std_node_theta_43.197_az_262.712_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_208.633_/dl2_20220523_allsky_std_node_theta_68.068_az_208.633__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_208.633_/irf_20220523_allsky_std_node_theta_68.068_az_208.633_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_49.119_/dl2_20220523_allsky_std_node_theta_52.374_az_49.119__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_49.119_/irf_20220523_allsky_std_node_theta_52.374_az_49.119_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_355.158_/dl2_20220523_allsky_std_node_theta_14.984_az_355.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_14.984_az_355.158_/irf_20220523_allsky_std_node_theta_14.984_az_355.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_67.271_/dl2_20220523_allsky_std_node_theta_68.068_az_67.271__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_67.271_/irf_20220523_allsky_std_node_theta_68.068_az_67.271_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_102.217_/dl2_20220523_allsky_std_node_theta_32.059_az_102.217__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_102.217_/irf_20220523_allsky_std_node_theta_32.059_az_102.217_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_143.441_/dl2_20220523_allsky_std_node_theta_43.197_az_143.441__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_143.441_/irf_20220523_allsky_std_node_theta_43.197_az_143.441_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_355.158_/dl2_20220523_allsky_std_node_theta_32.059_az_355.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_355.158_/irf_20220523_allsky_std_node_theta_32.059_az_355.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_175.158_/dl2_20220523_allsky_std_node_theta_68.068_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_175.158_/irf_20220523_allsky_std_node_theta_68.068_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_120.311_/dl2_20220523_allsky_std_node_theta_43.197_az_120.311__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_43.197_az_120.311_/irf_20220523_allsky_std_node_theta_43.197_az_120.311_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_136.053_/dl2_20220523_allsky_std_node_theta_32.059_az_136.053__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_136.053_/irf_20220523_allsky_std_node_theta_32.059_az_136.053_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_175.158_/dl2_20220523_allsky_std_node_theta_52.374_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_175.158_/irf_20220523_allsky_std_node_theta_52.374_az_175.158_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_240.004_/dl2_20220523_allsky_std_node_theta_52.374_az_240.004__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_240.004_/irf_20220523_allsky_std_node_theta_52.374_az_240.004_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_141.683_/dl2_20220523_allsky_std_node_theta_68.068_az_141.683__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_141.683_/irf_20220523_allsky_std_node_theta_68.068_az_141.683_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_119.073_/dl2_20220523_allsky_std_node_theta_68.068_az_119.073__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_68.068_az_119.073_/irf_20220523_allsky_std_node_theta_68.068_az_119.073_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_152.343_/dl2_20220523_allsky_std_node_theta_52.374_az_152.343__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_52.374_az_152.343_/irf_20220523_allsky_std_node_theta_52.374_az_152.343_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_175.158_/dl2_20220523_allsky_std_node_theta_32.059_az_175.158__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220523_allsky_std/TestingDataset/dec_min_2924/node_theta_32.059_az_175.158_/irf_20220523_allsky_std_node_theta_32.059_az_175.158_.fits.gz
+    options: --point-like
