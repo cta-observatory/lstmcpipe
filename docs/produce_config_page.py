@@ -45,7 +45,7 @@ def add_prod_table(
 
         prod_list.append(
             [
-                commit.authored_datetime.ctime(),
+                commit.authored_datetime.date(),
                 f"`{prod_dir.name} <{lstmcpipe_repo_prod_config_url+prod_dir.name}>`_",
                 prod_id,
             ]
