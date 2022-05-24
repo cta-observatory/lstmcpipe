@@ -32,7 +32,7 @@ def add_prod_table(
     for prod_dir in [d for d in Path(production_dir).iterdir() if d.is_dir()]:
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir, max_count=1))[0]
 
-        yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml')]
+        yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml') or f.name.endswith('.yaml')]
         if yml_list:
             try:
                 conf = load_config(yml_list[0])
