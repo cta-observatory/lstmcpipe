@@ -13,7 +13,6 @@ slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
   user_account: dpps
 
-
 # If the image modifier settings should be calculated on the fly
 # set paths to an observed dl1 file and a simtel mc file
 # dl1_noise_tune_data_run: /fefs/aswg/data/real/DL1/20201121/v0.9.1/tailcut84/dl1_LST-1.Run02988.0000.h5
