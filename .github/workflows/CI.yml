@@ -65,6 +65,7 @@ jobs:
           files: |
             production_configs/*/*.yml
             production_configs/*/*.yaml
+            production_configs/*/*.json
       - name: Validate added configs.
         if: steps.verify-changed-files.outputs.any_changed == 'true'
         run: |
