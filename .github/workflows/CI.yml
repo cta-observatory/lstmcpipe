@@ -64,6 +64,7 @@ jobs:
         with:
           files: |
             production_configs/*/*.yml
+            production_configs/*/*.yaml
       - name: Validate added configs.
         if: steps.verify-changed-files.outputs.any_changed == 'true'
         run: |
