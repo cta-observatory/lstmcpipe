@@ -770,7 +770,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
-                    'slurm_options': '--mem=80GB' if self.dec == _crab_dec else '--mem=50GB'
+                    'slurm_options': '--mem=80GB' if self.dec == _crab_dec else '--mem=60GB'
                 }
             )
         return paths
