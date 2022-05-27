@@ -46,3 +46,4 @@ stages:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/node_corsika_theta_52.374_az_301.217_
     output: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/dl1_20220527_src2_diffgamma_node_theta_52.374_az_301.217__merged.h5
     options: --no-image
+    
