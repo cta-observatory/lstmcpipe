@@ -793,6 +793,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
                     'options': '--point-like',
+                    'slurm_options': '--mem=4GB'
                 }
             )
 
