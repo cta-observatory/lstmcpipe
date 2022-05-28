@@ -10,6 +10,7 @@ dependencies:
   - pre-commit
   - ctapipe~=0.12
   - ruamel.yaml>=0.17
+  - protobuf=3.20
   - pip:
       - ctaplot~=0.5.5
       - ctapipe_io_lst~=0.15.1
