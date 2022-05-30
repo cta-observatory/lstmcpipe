@@ -8,7 +8,7 @@ from pathlib import Path
 
 yaml = YAML()
 
-filename = sys.argv[1]
+filename = Path(sys.argv[1])
 
 cfg = yaml.load(open(filename).read())
 
@@ -22,13 +22,15 @@ to_rerun = []
 for p in cfg['stages']['dl2_to_irfs']:
     if not Path(p['output']).is_file():
         print(p['output'])
-        p['slurm_options'] = '--mem=4GB'
+        p['slurm_options'] = '--mem=6GB'
         to_rerun.append(p)
 
 cfg['stages']['dl2_to_irfs'] = to_rerun
 print(f"{len(to_rerun)} irfs to re-produce")
 
-output_filename = filename.replace('.yaml', '_rerun.yaml')
+
+output_filename = filename.parent.joinpath(filename.stem + '_rerun.yaml')
+
 if to_rerun and not Path(output_filename).exists():
     print(f"Run lstmcpipe -c {output_filename}")
     yaml.dump(cfg, open(output_filename, 'w'))
