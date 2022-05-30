@@ -13,10 +13,10 @@ filename = sys.argv[1]
 cfg = yaml.load(open(filename).read())
 
 cfg['stages_to_run'] = ['dl2_to_irfs']
-cfg['stages'].pop('r0_to_dl1')
-cfg['stages'].pop('merge_dl1')
-cfg['stages'].pop('train_pipe')
-cfg['stages'].pop('dl1_to_dl2')
+cfg['stages'].pop('r0_to_dl1', None)
+cfg['stages'].pop('merge_dl1', None)
+cfg['stages'].pop('train_pipe', None)
+cfg['stages'].pop('dl1_to_dl2', None)
 
 to_rerun = []
 for p in cfg['stages']['dl2_to_irfs']:
