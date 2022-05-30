@@ -85,7 +85,7 @@ To do so, please:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file
-* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_.
+* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
 
 
 
