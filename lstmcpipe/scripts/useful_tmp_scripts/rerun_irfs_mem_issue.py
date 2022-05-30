@@ -28,6 +28,7 @@ for p in cfg['stages']['dl2_to_irfs']:
 cfg['stages']['dl2_to_irfs'] = to_rerun
 print(f"{len(to_rerun)} irfs to re-produce")
 
+
 output_filename = filename.parent.joinpath(filename.stem + '_rerun.yaml')
 
 if to_rerun and not Path(output_filename).exists():
