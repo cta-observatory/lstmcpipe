@@ -55,8 +55,7 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     cfg = {'LocalPeakWindowSum': {}, 'GlobalPeakWindowSum': {}, 'source_config': {'EventSource': {}},
            'random_forest_energy_regressor_args': {}, 'random_forest_disp_regressor_args': {},
            'random_forest_disp_classifier_args': {}, 'random_forest_particle_classifier_args': {},
-           'energy_regression_features': {}, 'disp_regression_features': {}, 'disp_classification_features': {},
-           'particle_classification_features': {}}
+           }
 
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
     cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
@@ -72,6 +71,7 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     if allsky:
         for rf_feature in ['energy_regression_features', 'disp_regression_features',
                            'disp_classification_features', 'particle_classification_features']:
+            cfg[rf_feature] = std_cfg[rf_feature]
             if 'alt_tel' not in cfg[rf_feature]:
                 cfg[rf_feature].append('alt_tel')
             if 'az_tel' not in cfg[rf_feature]:

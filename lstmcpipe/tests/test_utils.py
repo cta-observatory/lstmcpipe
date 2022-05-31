@@ -1,4 +1,4 @@
-from lstmcpipe.utils import rerun_cmd
+from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config
 import tempfile
 from pathlib import Path
 
@@ -33,3 +33,9 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1():
         ntry = rerun_cmd(cmd, outfile, max_ntry=3, subdir_failures='failed_outputs')
         assert ntry == 2
         assert Path(tmp_dir, 'failed_outputs', 'dl1_gamma_test_large.h5').exists()
+
+
+def test_dump_lstchain_std_config():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        dump_lstchain_std_config(tmpdir / 'cfg.json', allsky=False)
+        dump_lstchain_std_config(tmpdir / 'cfg.json', allsky=True, overwrite=True)
