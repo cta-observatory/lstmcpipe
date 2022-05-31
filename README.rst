@@ -30,32 +30,6 @@ Cite us
 If you use lstMCpipe, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
 
 
-Requesting a MC analysis
-------------------------
-You may find the list of already run productions in the documentation.
-Please check in this list that the request you are about to make does not exist already!
-
-As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
-
-To do so, please:
-
-#. `Open a pull request from your fork <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork>`_ into lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
-#. You may have a look at the ``production_configs/template_prod`` as an example.
-#. Add a descriptive production ID (e.g. ``src***_psf_tuned``) to you directory and configuration.
-#. The requested config must contain:
-
-* a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
-* a lstmcpipe config file
-* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_.
-
-
-
-The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
-
-Depending on the number of requests, we may give priorities.
-
-
-
 Install
 -------
 
@@ -63,15 +37,15 @@ As as user:
 
 .. code-block::
 
-    git clone https://github.com/cta-observatory/lstmcpipe.git
-    cd lstmcpipe
-    conda env create -n lstmcpipe -f environment.yml
+    wget https://raw.githubusercontent.com/cta-observatory/lstmcpipe/master/environment.yml
+    conda env create -f environment.yml
     conda activate lstmcpipe
-    pip install .
+    pip install lstmcpipe
 
 This will setup a new enviroment with lstchain and other needed tools available in supported versions.
-At this point in time, this fixes `ctapipe` to the version, that `lstchain` depends on.
-Splitting the requirements and supporting different pipelines independently is a work in progress.
+If you already have your lstchain conda environment, you may simply activate it and install lstmcpipe there using `pip install lstmcpipe`.
+
+
 HIPERTA (referred to as rta in the following) support is builtin, but no installation instructions can be provided as of now.
 
 Alternatively, you can install `lstmcpipe` in your own enviroment to use different versions of the
@@ -93,6 +67,32 @@ As as developer:
 This will setup a pre-commit hook: Given that you are in the right enviroment, it will run and format files you are about
 to commit with `black`. (You need to stage the changes again after that). This ensures the formatting of the
 code follows our guidelines and there is less work dealing with the code checker in the CI.
+
+
+Requesting a MC analysis
+------------------------
+You may find the list of already run productions in the documentation.
+Please check in this list that the request you are about to make does not exist already!
+
+As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
+
+To do so, please:
+
+#. `Open a pull request from your fork <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork>`_ into lstMCpipe, adding the desired configuration in a new directory named `date_ProdID` in `production_configs`.
+#. You may have a look at the ``production_configs/template_prod`` as an example.
+#. Add a descriptive production ID (e.g. ``src***_psf_tuned``) to you directory and configuration.
+#. The requested config must contain:
+
+* a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
+* a lstmcpipe config file
+* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
+
+
+
+The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
+
+Depending on the number of requests, we may give priorities.
+
 
 
 Quickstart
