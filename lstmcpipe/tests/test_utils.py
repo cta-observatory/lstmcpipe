@@ -1,6 +1,7 @@
-from lstmcpipe.utils import rerun_cmd
+from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config
 import tempfile
 from pathlib import Path
+import json
 
 
 def test_rerun_cmd():
@@ -33,3 +34,12 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1():
         ntry = rerun_cmd(cmd, outfile, max_ntry=3, subdir_failures='failed_outputs')
         assert ntry == 2
         assert Path(tmp_dir, 'failed_outputs', 'dl1_gamma_test_large.h5').exists()
+
+
+def test_dump_lstchain_std_config():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outfile = Path(tmpdir).joinpath('cfg.json')
+        dump_lstchain_std_config(filename=outfile, allsky=False)
+        assert json.load(outfile.open())['GlobalPeakWindowSum']['apply_integration_correction']
+        dump_lstchain_std_config(filename=outfile, allsky=True, overwrite=True)
+        assert 'alt_tel' in json.load(outfile.open())['energy_regression_features']
