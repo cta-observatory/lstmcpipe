@@ -3,6 +3,8 @@ import shutil
 import subprocess
 import json
 from pprint import pprint
+from copy import deepcopy
+from deepdiff import DeepDiff
 
 
 def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_kwargs):
@@ -52,10 +54,7 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
         raise FileExistsError(f"{filename} exists already")
 
     std_cfg = get_standard_config()
-    cfg = {'LocalPeakWindowSum': {}, 'GlobalPeakWindowSum': {}, 'source_config': {'EventSource': {}},
-           'random_forest_energy_regressor_args': {}, 'random_forest_disp_regressor_args': {},
-           'random_forest_disp_classifier_args': {}, 'random_forest_particle_classifier_args': {},
-           }
+    cfg = deepcopy(std_cfg)
 
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
     cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
@@ -78,11 +77,10 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
                 cfg[rf_feature].append('az_tel')
 
     extra_msg = "for AllSky prod" if allsky else ""
-    print(f"Updating std lstchain config {extra_msg} with:")
-    pprint(cfg)
-
-    std_cfg.update(cfg)
+    print(f"Updating std lstchain config {extra_msg} with")
+    diff = DeepDiff(std_cfg, cfg)
+    pprint(diff)
     
     with open(filename, 'w') as file:
-        json.dump(std_cfg, file, indent=4)
+        json.dump(cfg, file, indent=4)
     print(f"\nModified lstchain config dumped in {filename}. Check full config thoroughly.")
