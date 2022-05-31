@@ -1,6 +1,7 @@
 from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config
 import tempfile
 from pathlib import Path
+import json
 
 
 def test_rerun_cmd():
@@ -37,5 +38,8 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1():
 
 def test_dump_lstchain_std_config():
     with tempfile.TemporaryDirectory() as tmpdir:
-        dump_lstchain_std_config(filename=Path(tmpdir).joinpath('cfg.json'), allsky=False)
-        dump_lstchain_std_config(filename=Path(tmpdir).joinpath('cfg.json'), allsky=True, overwrite=True)
+        outfile = Path(tmpdir).joinpath('cfg.json')
+        dump_lstchain_std_config(filename=outfile, allsky=False)
+        assert json.load(outfile.open())['GlobalPeakWindowSum']['apply_integration_correction']
+        dump_lstchain_std_config(filename=outfile, allsky=True, overwrite=True)
+        assert 'alt_tel' in json.load(outfile.open())['energy_regression_features']
