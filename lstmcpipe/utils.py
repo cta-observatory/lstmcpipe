@@ -84,5 +84,5 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     std_cfg.update(cfg)
     
     with open(filename, 'w') as file:
-        json.dump(cfg, file, indent=4)
+        json.dump(std_cfg, file, indent=4)
     print(f"\nModified lstchain config dumped in {filename}. Check full config thoroughly.")
