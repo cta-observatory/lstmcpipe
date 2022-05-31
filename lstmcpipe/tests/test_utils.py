@@ -37,5 +37,5 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1():
 
 def test_dump_lstchain_std_config():
     with tempfile.TemporaryDirectory() as tmpdir:
-        dump_lstchain_std_config(tmpdir.join('/cfg.json'), allsky=False)
-        dump_lstchain_std_config(tmpdir.join('/cfg.json'), allsky=True, overwrite=True)
+        dump_lstchain_std_config(filename=Path(tmpdir).joinpath('cfg.json'), allsky=False)
+        dump_lstchain_std_config(filename=Path(tmpdir).joinpath('cfg.json'), allsky=True, overwrite=True)
