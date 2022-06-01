@@ -8,6 +8,9 @@ import warnings
 import subprocess as sp
 from pathlib import Path
 from ruamel.yaml import YAML
+from pprint import pprint
+from copy import deepcopy
+from deepdiff import DeepDiff
 
 
 log = logging.getLogger(__name__)
@@ -143,7 +146,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
     return ntry - 1
 
 
-def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
+def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, overwrite=False):
     from lstchain.io.config import get_standard_config
 
     filename = Path(filename)
@@ -151,7 +154,9 @@ def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
     if filename.exists() and not overwrite:
         raise FileExistsError(f"{filename} exists already")
 
-    cfg = get_standard_config()
+    std_cfg = get_standard_config()
+    cfg = deepcopy(std_cfg)
+
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
     cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
     cfg['source_config']['EventSource']['allowed_tels'] = [1]
@@ -164,9 +169,23 @@ def dump_lstchain_std_config(filename='lstchain_config.json', overwrite=False):
     cfg['random_forest_disp_classifier_args']['n_jobs'] = -1
     cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
 
+    if allsky:
+        for rf_feature in ['energy_regression_features', 'disp_regression_features',
+                           'disp_classification_features', 'particle_classification_features']:
+            cfg[rf_feature] = std_cfg[rf_feature]
+            if 'alt_tel' not in cfg[rf_feature]:
+                cfg[rf_feature].append('alt_tel')
+            if 'az_tel' not in cfg[rf_feature]:
+                cfg[rf_feature].append('az_tel')
+
+    extra_msg = "for AllSky prod" if allsky else ""
+    print(f"Updating std lstchain config {extra_msg} with")
+    diff = DeepDiff(std_cfg, cfg)
+    pprint(diff)
+
     with open(filename, 'w') as file:
         json.dump(cfg, file, indent=4)
-    print(f"Modified lstchain config dumped in {filename}")
+    print(f"\nModified lstchain config dumped in {filename}. Check full config thoroughly.")
 
 
 def run_command(*args):

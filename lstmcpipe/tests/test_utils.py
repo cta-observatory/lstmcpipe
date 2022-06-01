@@ -1,10 +1,9 @@
+import json
 import pytest
 import tempfile
 from pathlib import Path
 from ruamel.yaml import YAML
-from lstmcpipe.utils import rerun_cmd
-
-from ..utils import SbatchLstMCStage, run_command
+from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config, SbatchLstMCStage, run_command
 
 
 def test_save_log_to_file():
@@ -131,3 +130,13 @@ def test_sbatch_lst_mc_stage():
         sbatch.stage_default_options(stage)
         assert "--job-name=" in sbatch.job_name
         assert "--partition=" in sbatch.slurm_command
+
+
+def test_dump_lstchain_std_config():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outfile = Path(tmpdir).joinpath('cfg.json')
+        dump_lstchain_std_config(filename=outfile, allsky=False)
+        assert json.load(outfile.open())['GlobalPeakWindowSum']['apply_integration_correction']
+        dump_lstchain_std_config(filename=outfile, allsky=True, overwrite=True)
+        assert 'alt_tel' in json.load(outfile.open())['energy_regression_features']
+

@@ -57,6 +57,7 @@ setup(
         "pytest",
         "ruamel.yaml>=0.17",
         "setuptools_scm",
+        "deepdiff"
     ],
     packages=find_packages(exclude="lstmcpipe._dev_version"),
     tests_require=["pytest"],
