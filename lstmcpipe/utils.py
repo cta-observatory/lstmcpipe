@@ -170,8 +170,12 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
 
     if allsky:
-        for rf_feature in ['energy_regression_features', 'disp_regression_features',
-                           'disp_classification_features', 'particle_classification_features']:
+        for rf_feature in [
+            'energy_regression_features',
+            'disp_regression_features',
+            'disp_classification_features',
+            'particle_classification_features',
+        ]:
             cfg[rf_feature] = std_cfg[rf_feature]
             if 'alt_tel' not in cfg[rf_feature]:
                 cfg[rf_feature].append('alt_tel')
@@ -261,8 +265,8 @@ class SbatchLstMCStage:
             "train_test_splitting",
             "train_pipe",
             "RF_importance",
-            "dl1_dl2",
-            "dl2_IRFs",
+            "dl1_to_dl2",
+            "dl2_to_irfs",
             "dl2_sens",
             "dl2_sens_plot",
         ]
