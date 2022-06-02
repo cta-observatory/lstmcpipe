@@ -315,8 +315,8 @@ class SbatchLstMCStage:
             "train_test_splitting": getattr(self, "train_test_splitting_default_options"),
             "train_pipe": getattr(self, "trainpipe_default_options"),
             "RF_importance": getattr(self, "train_plot_rf_feat_default_options"),
-            "dl1_dl2": getattr(self, "dl1_dl2_default_options"),
-            "dl2_IRFs": getattr(self, "dl2_irfs_default_options"),
+            "dl1_to_dl2": getattr(self, "dl1_dl2_default_options"),
+            "dl2_to_irfs": getattr(self, "dl2_irfs_default_options"),
             "dl2_sens": getattr(self, "dl2_sens_default_options"),
             "dl2_sens_plot": getattr(self, "dl2_sens_plot_default_options"),
         }
