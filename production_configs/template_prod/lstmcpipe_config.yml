@@ -15,7 +15,7 @@ source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
   conda_env: lstchain-v0.9.3
 
-stages_to_be_run:
+stages_to_run:
   - r0_to_dl1
   - merge_and_copy_dl1
   - train_pipe
