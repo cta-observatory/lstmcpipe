@@ -17,15 +17,14 @@ source_environment:
 
 stages_to_run:
   - r0_to_dl1
-  - merge_and_copy_dl1
   - train_pipe
-  - dl1_to_dl2
-  - dl2_to_irfs
-  - dl2_to_sensitivity
 
 stages:
   r0_to_dl1:
     - input:
       ouput:
+  train_pipe:
+    - input:
+      output:
 
 
