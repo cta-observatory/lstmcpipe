@@ -517,17 +517,22 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
     def load_pointings(self, join_type='inner'):
         """
-        Find pointings that exist for all training particles
+        Load and find pointings that exist for all training particles.
         This is overly complicated because pointings directory names are not consistent particle-wise
         see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
         see testing pointings for a simpler implementation if this get solved
         
         Use join_type to keep only the pointings existing for all training particles or all of them
+        Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
         
         Parameters
         ----------
         join_type: string
             See `astropy.table.join`: (‘inner’ | ‘outer’ | ‘left’ | ‘right’ | ‘cartesian’), default is ‘inner’
+
+        Returns
+        -------
+        'astropy.table.QTable`
         """
         tabs = {}
 
@@ -554,7 +559,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     @property
     def pointings(self):
         """
-        All pointings in rad
+        All pointings in rad. Azimuth between -pi and pi. Altitude between pi/2 and -pi/2.
 
         Returns
         -------
@@ -671,7 +676,14 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         ]
 
     def load_pointings(self):
+        """
+        Load pointings.
+        Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
 
+        Returns
+        -------
+        'astropy.table.QTable`
+        """
         data = []
         for d in self._search_pointings():
             pt = self._extract_pointing(d)
@@ -684,7 +696,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     @property
     def pointings(self):
         """
-        All pointings in rad
+        All pointings in rad. Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
 
         Returns
         -------
