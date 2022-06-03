@@ -689,7 +689,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
             alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]) - 180.)*u.deg
             data.append([alt, az, d])
         reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
-        self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', f'dirname'])
+        self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', 'dirname'])
 
 
     @property
