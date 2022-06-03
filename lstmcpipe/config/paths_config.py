@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from ruamel.yaml import YAML
 from datetime import date
-from copy import deepcopy
 import re
 import numpy as np
 import astropy.units as u
