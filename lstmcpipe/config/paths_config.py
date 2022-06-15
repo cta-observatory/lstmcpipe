@@ -8,6 +8,7 @@ import re
 import numpy as np
 import astropy.units as u
 from astropy.table import QTable, join
+from astropy.coordinates import Angle
 
 from . import base_config
 from ..version import __version__
@@ -539,8 +540,8 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
             data = []
             for d in self._search_pointings(particle):
                 pt = self._extract_pointing(d)
-                alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]) - 180.)*u.deg
-                data.append([alt, az, d])
+                alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+                data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
             reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
             tabs[particle] = QTable(data=reshaped_data, names=['alt', 'az', f'dirname_{particle}'])
             
@@ -686,8 +687,8 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         data = []
         for d in self._search_pointings():
             pt = self._extract_pointing(d)
-            alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]) - 180.)*u.deg
-            data.append([alt, az, d])
+            alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+            data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
         reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
         self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', f'dirname'])
 
