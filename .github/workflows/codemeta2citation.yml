@@ -31,4 +31,3 @@ jobs:
         with:
           message: 'Add CITATION.cff for release'
           add: 'CITATION.cff'
-          branch: 'main'
