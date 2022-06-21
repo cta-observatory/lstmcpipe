@@ -17,14 +17,10 @@ source_environment:
 
 stages_to_run:
   - r0_to_dl1
-  - train_pipe
 
 stages:
   r0_to_dl1:
     - input:
       ouput:
-  train_pipe:
-    - input:
-      output:
 
 
