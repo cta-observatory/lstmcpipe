@@ -28,65 +28,65 @@ stages_to_run:
 stages:
   dl1ab:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/node_theta_14.984_az_355.158_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_14.984_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_14.984_az_355.158_
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/node_theta_52.374_az_301.217_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_52.374_az_301.217_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_52.374_az_301.217_
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/node_theta_32.059_az_355.158_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_32.059_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_32.059_az_355.158_
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220527_src2_diffgamma/TestingDataset/GammaDiffuse/node_theta_43.197_az_262.712_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_43.197_az_262.712_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_43.197_az_262.712_
   merge_dl1:
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_14.984_az_355.158_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_14.984_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
     options: --no-image
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_52.374_az_301.217_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_52.374_az_301.217_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
     options: --no-image
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_32.059_az_355.158_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_32.059_az_355.158_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
     options: --no-image
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/node_theta_43.197_az_262.712_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/node_theta_43.197_az_262.712_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
     options: --no-image
   dl1_to_dl2:
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822/dec_4822
-    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/node_theta_14.984_az_355.158_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/node_theta_14.984_az_355.158_
     slurm_options: --mem=50GB
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822/dec_4822
-    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/node_theta_52.374_az_301.217_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/node_theta_52.374_az_301.217_
     slurm_options: --mem=50GB
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822/dec_4822
-    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/node_theta_32.059_az_355.158_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/node_theta_32.059_az_355.158_
     slurm_options: --mem=50GB
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822/dec_4822
-    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/node_theta_43.197_az_262.712_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220524_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/node_theta_43.197_az_262.712_
     slurm_options: --mem=50GB
   dl2_to_irfs:
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_14.984_az_355.158_/dl2_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_14.984_az_355.158_/dl2_24_05_2022_dec_4822_node_theta_14.984_az_355.158__merged.h5
       proton_file:
       electron_file:
-    output:  /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_14.984_az_355.158_/irf_24_05_2022_dec_4822_node_theta_14.984_az_355.158_.fits.gz
+    output:  /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_14.984_az_355.158_/irf_24_05_2022_dec_4822_node_theta_14.984_az_355.158_.fits.gz
     slurm_options: --mem=6GB
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_52.374_az_301.217_/dl2_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_52.374_az_301.217_/dl2_24_05_2022_dec_4822_node_theta_52.374_az_301.217__merged.h5
       proton_file:
       electron_file:
-    output: /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_52.374_az_301.217_/irf_24_05_2022_dec_4822_node_theta_52.374_az_301.217_.fits.gz
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_52.374_az_301.217_/irf_24_05_2022_dec_4822_node_theta_52.374_az_301.217_.fits.gz
     slurm_options: --mem=6GB
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_32.059_az_355.158_/dl2_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_32.059_az_355.158_/dl2_24_05_2022_dec_4822_node_theta_32.059_az_355.158__merged.h5
       proton_file:
       electron_file:
-    output: /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_32.059_az_355.158_/irf_24_05_2022_dec_4822_node_theta_32.059_az_355.158_.fits.gz
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_32.059_az_355.158_/irf_24_05_2022_dec_4822_node_theta_32.059_az_355.158_.fits.gz
     slurm_options: --mem=6GB
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_43.197_az_262.712_/dl2_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_43.197_az_262.712_/dl2_24_05_2022_dec_4822_node_theta_43.197_az_262.712__merged.h5
       proton_file:
       electron_file:
-    output:  /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822/TestingDataset/dec_4822/GammaDiffuse/node_theta_43.197_az_262.712_/irf_24_05_2022_dec_4822_node_theta_43.197_az_262.712_.fits.gz
+    output:  /fefs/aswg/data/mc/IRF/AllSky/20220524_dec_4822_tuned/TestingDataset/dec_4822/GammaDiffuse/node_theta_43.197_az_262.712_/irf_24_05_2022_dec_4822_node_theta_43.197_az_262.712_.fits.gz
     slurm_options: --mem=6GB
