@@ -6,7 +6,9 @@ Config files:
 
 The command used for generating the config files is:
 
-"lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --prod_id 24_05_2022_dec_4822 --kwargs source_prod_id=20220511_allsky_std --dec_list dec_4822 --overwrite"
+```
+lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --prod_id 24_05_2022_dec_4822 --kwargs source_prod_id=20220511_allsky_std --dec_list dec_4822 --overwrite
+```
 
 And then I changed it by hand.
 
