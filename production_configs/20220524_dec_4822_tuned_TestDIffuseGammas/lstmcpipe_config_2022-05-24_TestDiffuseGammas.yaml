@@ -3,7 +3,7 @@
 workflow_kind: lstchain
 
 # prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
-prod_id: 20220524_dec_4822
+prod_id: 20220524_dec_4822_tuned
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
