@@ -53,12 +53,12 @@ def batch_dl2_to_irfs(
     for paths in dict_paths:
 
         job_logs, jobid = dl2_to_irfs(
-            paths["input"]["gamma_file"],
-            paths["input"]["electron_file"],
-            paths["input"]["proton_file"],
+            paths["input"]["gamma_file"],  # gamma_file must always be provided
+            paths["input"].get("electron_file", None),  # electron_file might be missing in case of point-like IRFs
+            paths["input"].get("proton_file", None),   # proton_file might be missing in case of point-like IRFs
             paths["output"],
             config_file=config_file,
-            irf_point_like=paths["options"],
+            irf_point_like=paths.get("irf_point_like", False),
             batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             slurm_options=paths.get("slurm_options", None),
