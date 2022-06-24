@@ -32,6 +32,7 @@ def plot_pointings(pointings, ax=None, projection='polar', add_grid3d=False, **k
     if ax is None:
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection=projection)
+    
     elif isinstance(ax, mpl_toolkits.mplot3d.axes3d.Axes3D):
         projection = '3d'
     elif isinstance(ax, matplotlib.projections.polar.PolarAxes):
@@ -62,7 +63,10 @@ def plot_pointings(pointings, ax=None, projection='polar', add_grid3d=False, **k
     elif projection == 'polar':
         ax.scatter(pointings[:, 0], np.pi/2.*u.rad - pointings[:, 1], **kwargs)
         ax.set_xlabel('Azimuth')
-        ax.set_ylabel('Zenith')
+        rticks_deg = [10, 30, 50, 70, 90]
+        ax.set_rticks(np.deg2rad(rticks_deg), labels=[f'{r}°' for r in rticks_deg])
+        ax.set_rmax(np.pi/2.)
+        ax.set_rlabel_position(20)
         
         
     else:
@@ -73,6 +77,7 @@ def plot_pointings(pointings, ax=None, projection='polar', add_grid3d=False, **k
         
     ax.legend()
     ax.grid(True)
+    ax.set_axisbelow(True)
 
     return ax
 
