@@ -4,10 +4,11 @@ import os
 from pathlib import Path
 from ruamel.yaml import YAML
 from datetime import date
-from copy import deepcopy
 import re
 import numpy as np
 import astropy.units as u
+from astropy.table import QTable, join
+from astropy.coordinates import Angle
 
 from . import base_config
 from ..version import __version__
@@ -511,57 +512,66 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         ]
 
     def pointing_dirs(self, particle):
-        if not hasattr(self, '_training_pointings'):
-            try:
-                self.load_pointings()
-            except FileNotFoundError as e:
-                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
-        return self._training_pointings[particle]
+        return self.pointings[f'dirname_{particle}']
 
-    def _get_training_pointings(self):
+
+    def load_pointings(self, join_type='inner'):
         """
-        Find pointings that exist for all training particles
+        Load and find pointings that exist for all training particles.
         This is overly complicated because pointings directory names are not consistent particle-wise
         see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
         see testing pointings for a simpler implementation if this get solved
+        
+        Use join_type to keep only the pointings existing for all training particles or all of them
+        Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
+        
+        Parameters
+        ----------
+        join_type: string
+            See `astropy.table.join`: (‘inner’ | ‘outer’ | ‘left’ | ‘right’ | ‘cartesian’), default is ‘inner’
+
+        Returns
+        -------
+        'astropy.table.QTable`
         """
-        all_pointings = {particle: self._search_pointings(particle) for particle in self.training_particles}
+        tabs = {}
 
-        intersected_pointings = deepcopy(all_pointings)
-
-        for particle, pointings_text in all_pointings.items():
-            for pointing_text in pointings_text:
-                pointing_tuple = self._extract_pointing(pointing_text)
-                for other_particles, other_pointings_text in all_pointings.items():
-                    other_pointings_tuples = [self._extract_pointing(pt) for pt in other_pointings_text]
-                    if pointing_tuple not in other_pointings_tuples and pointing_text in intersected_pointings:
-                        intersected_pointings[particle].remove(pointing_text)
-
-        return intersected_pointings
-
-    def load_pointings(self):
-        self._training_pointings = self._get_training_pointings()
+        for particle in self.training_particles:
+            data = []
+            for d in self._search_pointings(particle):
+                pt = self._extract_pointing(d)
+                alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+                data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
+            reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
+            tabs[particle] = QTable(data=reshaped_data, names=['alt', 'az', f'dirname_{particle}'])
+            
+        tab = join(tabs[self.training_particles[0]], tabs[self.training_particles[1]],
+           keys=['alt', 'az'],
+           table_names=[self.training_particles[0], self.training_particles[1]],
+           join_type=join_type)
+        
+        # useful only of there are more than 2 training particles in the future
+        for part in self.training_particles[2:]:
+            tab = join(tab, tabs[part], keys=['alt', 'az'], join_type=join_type)
+        
+        self._training_pointings = tab
 
     @property
     def pointings(self):
         """
-        All pointings in rad
+        All pointings in rad. Azimuth between -pi and pi. Altitude between pi/2 and -pi/2.
 
         Returns
         -------
         `astropy.quantity`
         """
-        training_pointings = []
-        for p in self.training_particles:
-            for pp in self.pointing_dirs(p):
-                training_pointings.append(list(self._extract_pointing(pp).groups()))
-        training_pointings = np.array(training_pointings).astype(float)[:, [1, 0]]
-        # these are in degrees between 
+        if not hasattr(self, '_training_pointings'):
+            try:
+                self.load_pointings()
+            except FileNotFoundError as e:
+                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
+        return self._training_pointings
 
-        pointings = np.deg2rad(training_pointings)
-        pointings[:,0] -= np.pi
-        pointings[:,1] = np.pi/2. - pointings[:,1]
-        return pointings * u.rad
 
     def plot_pointings(self, ax=None, projection='polar', add_grid3d=True, **kwargs):
         """
@@ -584,7 +594,11 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         """
 
         kwargs.setdefault('label', f'Training {self.dec}')
-        ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
+        ax = plot_pointings(np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)])*u.rad,
+                            ax=ax, 
+                            projection=projection,
+                            add_grid3d=add_grid3d,
+                            **kwargs)
         return ax
 
     def dl1_dir(self, particle, pointing):
@@ -645,12 +659,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
 
     def pointing_dirs(self):
-        if not hasattr(self, '_testing_pointings'):
-            try:
-                self.load_pointings()
-            except FileNotFoundError as e:
-                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
-        return self._testing_pointings
+        return self.pointings['dirname']
 
     def r0_dir(self, pointing):
         return self.testing_dir.format(pointing=pointing)
@@ -667,28 +676,38 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         ]
 
     def load_pointings(self):
-        self._testing_pointings = self._get_testing_pointings()
+        """
+        Load pointings.
+        Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
 
-    def _get_testing_pointings(self):
-        return self._search_pointings()
+        Returns
+        -------
+        'astropy.table.QTable`
+        """
+        data = []
+        for d in self._search_pointings():
+            pt = self._extract_pointing(d)
+            alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+            data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
+        reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
+        self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', 'dirname'])
+
 
     @property
     def pointings(self):
         """
-        All pointings in rad
+        All pointings in rad. Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
 
         Returns
         -------
-        `astropy.quantity`
+        `astropy.table.QTable`
         """
-        pointings = []
-        for pp in self.pointing_dirs():
-            pointings.append(list(self._extract_pointing(pp).groups()))
-        pointings = np.array(pointings).astype(float)[:, [1,0]]
-        pointings = np.deg2rad(pointings)
-        pointings[:, 0] -= np.pi
-        pointings[:, 1] = np.pi/2. - pointings[:, 1]
-        return pointings * u.rad
+        if not hasattr(self, '_testing_pointings'):
+            try:
+                self.load_pointings()
+            except FileNotFoundError as e:
+                raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
+        return self._testing_pointings
 
     def plot_pointings(self, ax=None, projection='polar', add_grid3d=False, **kwargs):
         """
@@ -710,7 +729,11 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         ax: `matplotlib.pyplot.axis`
         """
         kwargs.setdefault('label', 'Testing')
-        ax = plot_pointings(self.pointings, ax=ax, projection=projection, add_grid3d=add_grid3d, **kwargs)
+        ax = plot_pointings(np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)])*u.rad,
+                            ax=ax,
+                            projection=projection,
+                            add_grid3d=add_grid3d,
+                            **kwargs)
         return ax
 
     def dl1_dir(self, pointing):
