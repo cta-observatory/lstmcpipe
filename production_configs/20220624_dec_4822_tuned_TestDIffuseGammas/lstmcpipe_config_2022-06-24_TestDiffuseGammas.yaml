@@ -50,19 +50,19 @@ stages:
     options: --no-image
   dl1_to_dl2:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220624_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_20220624_dec_4822_node_corsika_theta_14.984_az_355.158__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220624_dec_4822_tuned/dec_4822
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
     output: /fefs/aswg/data/mc/DL2/AllSky/20220624_dec_4822_tuned/TestingDataset/dec_4822/node_corsika_theta_14.984_az_355.158_
     slurm_options: --mem=50GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220624_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_20220624_dec_4822_node_corsika_theta_52.374_az_301.217__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220624_dec_4822_tuned/dec_4822
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
     output: /fefs/aswg/data/mc/DL2/AllSky/20220624_dec_4822_tuned/TestingDataset/dec_4822/node_corsika_theta_52.374_az_301.217_
     slurm_options: --mem=50GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220624_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_20220624_dec_4822_node_corsika_theta_32.059_az_355.158__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220624_dec_4822_tuned/dec_4822
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
     output: /fefs/aswg/data/mc/DL2/AllSky/20220624_dec_4822_tuned/TestingDataset/dec_4822/node_corsika_theta_32.059_az_355.158_
     slurm_options: --mem=50GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20220624_dec_4822_tuned/TestingDataset/GammaDiffuse/dl1_20220624_dec_4822_node_corsika_theta_43.197_az_262.712__merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20220624_dec_4822_tuned/dec_4822
+    path_model: /fefs/aswg/data/models/AllSky/20220524_dec_4822_tuned/dec_4822
     output: /fefs/aswg/data/mc/DL2/AllSky/20220624_dec_4822_tuned/TestingDataset/dec_4822/node_corsika_theta_43.197_az_262.712_
     slurm_options: --mem=50GB
   dl2_to_irfs:
