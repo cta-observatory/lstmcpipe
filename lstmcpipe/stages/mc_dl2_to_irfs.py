@@ -51,14 +51,13 @@ def batch_dl2_to_irfs(
     debug_log = {}
 
     for paths in dict_paths:
-
         job_logs, jobid = dl2_to_irfs(
-            paths["input"]["gamma_file"],
-            paths["input"]["electron_file"],
-            paths["input"]["proton_file"],
+            paths["input"]["gamma_file"],  # gamma_file must always be provided
+            paths["input"].get("electron_file", None),  # electron_file might be missing in case of point-like IRFs
+            paths["input"].get("proton_file", None),   # proton_file might be missing in case of point-like IRFs
             paths["output"],
             config_file=config_file,
-            irf_point_like=paths["options"],
+            options=paths.get("options", None),
             batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
             slurm_options=paths.get("slurm_options", None),
@@ -86,7 +85,7 @@ def dl2_to_irfs(
     proton_file,
     outfile,
     config_file,
-    irf_point_like,
+    options,
     batch_configuration,
     wait_jobs_dl1dl2,
     slurm_options=None,
@@ -102,8 +101,9 @@ def dl2_to_irfs(
     outfile: str
     config_file: str
         Path to a configuration file. If none is given, a standard configuration is applied
-    irf_point_like: str
-        MC prod configuration argument to create IRFs: {True: gamma, False: gamma-diffuse}.
+    options: str  | None
+        options to pass to lstchain_create_irf_files as a string
+        Most common: --irf-point-like
     batch_configuration : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
         sbatch commands
@@ -129,7 +129,8 @@ def dl2_to_irfs(
 
     check_and_make_dir_without_verification(output_dir)
 
-    cmd = f"lstchain_create_irf_files {irf_point_like} -g {gamma_file} -o {outfile} "
+    options = '' if options is None else options
+    cmd = f"lstchain_create_irf_files {options} -g {gamma_file} -o {outfile} "
     if proton_file is not None:
         cmd += f" -p {proton_file}"
     if electron_file is not None:
