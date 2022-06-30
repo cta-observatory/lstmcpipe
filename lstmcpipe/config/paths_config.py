@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from ruamel.yaml import YAML
 from datetime import date
+from abc import abstractmethod
 import re
 import numpy as np
 import astropy.units as u
@@ -430,8 +431,15 @@ class PathConfigAllSkyBase(PathConfig):
             )
         )
 
+    @abstractmethod
     def r0_dir(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Path to R0 directory
+
+        Returns
+        -------
+        Path
+        """
 
     def dl1_dir(self, particle, pointing, dataset_type, dec):
         return self._data_level_dir(
@@ -443,9 +451,11 @@ class PathConfigAllSkyBase(PathConfig):
             dec=dec,
         )
 
+    @abstractmethod
     def dl2_dir(self, particle, pointing, dataset_type):
         raise NotImplementedError("Should be implemented in child class if necessary")
 
+    @abstractmethod
     def irf_dir(self, pointing, dataset_type):
         raise NotImplementedError("Should be implemented in child class if necessary")
 
@@ -456,24 +466,59 @@ class PathConfigAllSkyBase(PathConfig):
         return os.path.realpath(p)
 
     @property
+    @abstractmethod
     def r0_to_dl1(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Resolves paths for the stage r0_to_dl1
+        Returns
+        -------
+        dict
+            dictionnary with the key 'r0_to_dl1' and a list of input/output paths for this stage
+        """
 
     @property
+    @abstractmethod
     def merge_dl1(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Resolves paths for the stage merge_dl1
+        Returns
+        -------
+        dict
+            dictionnary with the key 'merge_dl1' and a list of input/output paths for this stage
+        """
 
     @property
+    @abstractmethod
     def train_pipe(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Resolves paths for the stage train_pipe
+        Returns
+        -------
+        dict
+            dictionnary with the key 'train_pipe' and a list of input/output paths for this stage
+        """
 
     @property
+    @abstractmethod
     def dl1_to_dl2(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Resolves paths for the stage dl1_to_dl2
+        Returns
+        -------
+        dict
+            dictionnary with the key 'dl1_to_dl2' and a list of input/output paths for this stage
+        """
 
     @property
+    @abstractmethod
     def dl2_to_irfs(self):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Resolves paths for the stage dl2_to_irfs
+        Returns
+        -------
+        dict
+            dictionnary with the key 'dl2_to_irfs' and a list of input/output paths for this stage
+        """
 
 
 class PathConfigAllSkyTraining(PathConfigAllSkyBase):
