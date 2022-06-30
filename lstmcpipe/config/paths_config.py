@@ -435,7 +435,6 @@ class PathConfigAllSkyBase(PathConfig):
     def r0_dir(self):
         """
         Path to R0 directory
-
         Returns
         -------
         Path
@@ -453,11 +452,21 @@ class PathConfigAllSkyBase(PathConfig):
 
     @abstractmethod
     def dl2_dir(self, particle, pointing, dataset_type):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Path to DL2 directory
+        Returns
+        -------
+        Path
+        """
 
     @abstractmethod
     def irf_dir(self, pointing, dataset_type):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+        """
+        Path to IRF directory
+        Returns
+        -------
+        Path
+        """
 
     def models_dir(self):
         p = self.base_dir.format(
