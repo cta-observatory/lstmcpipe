@@ -370,8 +370,8 @@ def submit_dl1_jobs(
     sbatch_process_dl1 = SbatchLstMCStage(
         dl1_processing_type,
         wrap_command=cmd,
-        slurm_error=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
-        slurm_output=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
+        slurm_error=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
+        slurm_output=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
         slurm_account=batch_config["slurm_account"],
         source_environment=batch_config["source_environment"],
     )

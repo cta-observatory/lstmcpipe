@@ -117,7 +117,7 @@ def batch_plot_rf_features(
         cmd = f"lstmcpipe_plot_models_importance {models_dir} -cf {config_file}"
 
         sbatch_rf_feat = SbatchLstMCStage(
-            "sbatch_merge_dl1",
+            "RF_importance",
             wrap_command=cmd,
             slurm_error=Path(models_dir).joinpath("job_plot_rf_feat_importance.e").resolve().as_posix(),
             slurm_output=Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance.o").resolve().as_posix(),
