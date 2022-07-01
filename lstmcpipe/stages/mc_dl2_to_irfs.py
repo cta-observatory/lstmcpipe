@@ -135,7 +135,7 @@ def dl2_to_irfs(
     log.info(f"Output dir IRF of {gamma_file}: {output_dir}")
 
     sbatch_dl2_irfs = SbatchLstMCStage(
-        "dl2_IRFs",
+        "dl2_to_irfs",
         wrap_command=cmd,
         slurm_error=Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix(),
         slurm_output=Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix(),

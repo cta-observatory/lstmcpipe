@@ -130,7 +130,7 @@ def dl2_to_sensitivity(
     cmd_plot_sens = f'lstmcpipe_plot_irfs -f {output} -o {output.replace(".fits.gz", ".png")}'
 
     sbatch_plot_sens = SbatchLstMCStage(
-        "cmd_plot_sens",  # --partition=short
+        "dl2_sens_plot",  # --partition=short
         wrap_command=cmd_plot_sens,
         slurm_error=Path(output).parent.joinpath("job_plot_sensitivity-%j.e"),
         slurm_output=Path(output).parent.joinpath("job_plot_sensitivity-%j.o"),

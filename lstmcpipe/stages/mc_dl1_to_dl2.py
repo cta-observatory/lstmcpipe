@@ -129,7 +129,7 @@ def dl1_to_dl2(
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
 
     sbatch_dl1_dl2 = SbatchLstMCStage(
-        "dl1_dl2",  # default: -p short --mem=32G
+        "dl1_to_dl2",  # default: -p short --mem=32G
         wrap_command=cmd,
         slurm_error=Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix(),
         slurm_output=Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix(),
