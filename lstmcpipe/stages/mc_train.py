@@ -127,7 +127,7 @@ def batch_plot_rf_features(
             backend="export MPLBACKEND=Agg;",
         )
 
-        jobid = sbatch_rf_feat.submit
+        jobid = sbatch_rf_feat.submit()
 
         log_rf_feat.update({jobid: sbatch_rf_feat.slurm_command})
         log_debug[jobid] = "Single job_id to plot RF feature s importance"
@@ -206,7 +206,7 @@ def train_pipe(
         source_environment=batch_configuration["source_environment"],
     )
 
-    jobid_train = sbatch_train_pipe.submit
+    jobid_train = sbatch_train_pipe.submit()
     log_train.update({jobid_train: sbatch_train_pipe.slurm_command})
 
     log.info(f"Submitted batch job {jobid_train}")

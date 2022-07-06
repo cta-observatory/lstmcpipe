@@ -194,7 +194,7 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
 
 def run_command(*args):
     """
-    Runs the command passed through args, as a subprocess.run() call.
+    Runs the command passed through args, as a subprocess.Popen() call.
 
     Based on:
     https://github.com/cta-observatory/cta-lstchain/blob/master/lstchain/scripts/tests/test_lstchain_scripts.py#L43
@@ -311,18 +311,17 @@ class SbatchLstMCStage:
         _default_options = {
             "r0_to_dl1": getattr(self, "r0_dl1_options"),
             "dl1ab": getattr(self, "dl1ab_options"),
-            "merge_dl1": getattr(self, "merge_dl1_default_options"),
-            "train_test_splitting": getattr(self, "train_test_splitting_default_options"),
-            "train_pipe": getattr(self, "trainpipe_default_options"),
-            "RF_importance": getattr(self, "train_plot_rf_feat_default_options"),
-            "dl1_to_dl2": getattr(self, "dl1_dl2_default_options"),
-            "dl2_to_irfs": getattr(self, "dl2_irfs_default_options"),
-            "dl2_sens": getattr(self, "dl2_sens_default_options"),
-            "dl2_sens_plot": getattr(self, "dl2_sens_plot_default_options"),
+            "merge_dl1": getattr(self, "set_merge_dl1_default_options"),
+            "train_test_splitting": getattr(self, "set_train_test_splitting_default_options"),
+            "train_pipe": getattr(self, "set_trainpipe_default_options"),
+            "RF_importance": getattr(self, "set_train_plot_rf_feat_default_options"),
+            "dl1_to_dl2": getattr(self, "set_dl1_dl2_default_options"),
+            "dl2_to_irfs": getattr(self, "set_dl2_irfs_default_options"),
+            "dl2_sens": getattr(self, "set_dl2_sens_default_options"),
+            "dl2_sens_plot": getattr(self, "set_dl2_sens_plot_default_options"),
         }
         _default_options[stage]()
 
-    @property
     def submit(self):
         if self.wrap_cmd is None or self.wrap_cmd == "":
             raise ValueError(
@@ -340,40 +339,40 @@ class SbatchLstMCStage:
         self.job_name = f"--job-name={process_dl1ab_job_name}"
         self.slurm_options = f"--partition={partition} --array={array} {extra_slurm_options}"
 
-    def merge_dl1_default_options(self):
+    def set_merge_dl1_default_options(self):
         self.job_name = "--job-name=merge"
         self.slurm_partition = "--partition=long"
 
-    def train_test_splitting_default_options(self):
+    def set_train_test_splitting_default_options(self):
         self.job_name = "--job-name=train_test_splitting"
         self.slurm_partition = "--partition=short"
 
-    def trainpipe_default_options(self):
+    def set_trainpipe_default_options(self):
         self.job_name = "--job-name=train_pipe"
         # self.slurm_options = " --partition=long --mem=32G"
         self.slurm_options = "--partition=xxl --mem=100G --cpus-per-task=16"
 
-    def train_plot_rf_feat_default_options(self):
+    def set_train_plot_rf_feat_default_options(self):
         self.job_name = "--job-name=RF_importance"
         self.slurm_options = "--partition=short --mem=16G"
 
-    def dl1_dl2_default_options(self):
+    def set_dl1_dl2_default_options(self):
         self.job_name = "--job-name=dl1_2"
         self.slurm_options = "--partition=short --mem=32G"
 
-    def dl2_irfs_default_options(self):
+    def set_dl2_irfs_default_options(self):
         self.job_name = "--job-name=dl2_IRFs"
         self.slurm_partition = "--partition=short"
 
-    def dl2_sens_default_options(self):
+    def set_dl2_sens_default_options(self):
         self.job_name = "--job-name=dl2_sens"
         self.slurm_options = "--partition=short --mem=32G"
 
-    def dl2_sens_plot_default_options(self):
+    def set_dl2_sens_plot_default_options(self):
         self.job_name = "--job-name=dl2_sens_plot"
         self.slurm_partition = "--partition=short"
 
     # def load_from_log(self, jobid):
+    #     # TODO
     #     jobid = ''
     #     NotImplementedError("Sorry, we are working on it")
-    #     # TODO

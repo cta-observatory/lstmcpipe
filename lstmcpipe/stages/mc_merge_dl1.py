@@ -128,7 +128,7 @@ def merge_dl1(
         source_environment=batch_configuration["source_environment"],
     )
 
-    jobid_merge = sbatch_merge_dl1.submit
+    jobid_merge = sbatch_merge_dl1.submit()
     log_merge.update({jobid_merge: sbatch_merge_dl1.slurm_command})
 
     log.info(f"\nMerging DL1 file from {input_dir} dir into {output_file} file.")

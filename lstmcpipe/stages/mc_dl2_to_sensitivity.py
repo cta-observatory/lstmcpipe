@@ -119,7 +119,7 @@ def dl2_to_sensitivity(
         source_environment=batch_configuration["source_environment"],
     )
 
-    job_id_dl2_sens = sbatch_dl2_sens.submit
+    job_id_dl2_sens = sbatch_dl2_sens.submit()
     log_dl2_to_sensitivity.update({job_id_dl2_sens: job_id_dl2_sens.slurm_command})
     jobids_dl2_to_sensitivity.append(job_id_dl2_sens)
 
@@ -141,7 +141,7 @@ def dl2_to_sensitivity(
         backend="export MPLBACKEND=Agg; ",
     )
 
-    job_id_plot_sens = sbatch_plot_sens.submit
+    job_id_plot_sens = sbatch_plot_sens.submit()
     log_dl2_to_sensitivity.update({job_id_plot_sens: sbatch_plot_sens.slurm_command})
     jobids_dl2_to_sensitivity.append(job_id_plot_sens)
 

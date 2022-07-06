@@ -329,15 +329,28 @@ def submit_dl1_jobs(
     Parameters
     ----------
     input_dir: str
+        path to the files directory to analyse
     output_dir: str
+        Output path to store files
     base_cmd: str
+        command choosing the lstmcpipe core script type (script_batch_filelist_*)
     file_list: list
+        list of r0_dl1 or dl1ab filelist to be passed to the core script
     job_type_id: str
+        String for job naming depending on the workflow
     dl1_files_per_batched_job: int
+        Number of dl1 files to be processed per job array that was batched.
     job_logs_dir: Path
+        Directory for the logs of the core script output.
+        Should be Path(output_dir).joinpath("job_logs_*")
     batch_config: dict
+        Dictionary containing the full (source + env) source_environment and the slurm_account strings.
+        ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     n_jobs_parallel: int
+        Number of array jobs to be processed in parallel.
+        Default = 100
     dl1_processing_type: str
+        String for job and filelist naming
     slurm_options: str
         Extra slurm options to be passed
 
@@ -390,7 +403,7 @@ def submit_dl1_jobs(
             extra_slurm_options="",
         )
 
-    jobid = sbatch_process_dl1.submit
+    jobid = sbatch_process_dl1.submit()
     log.debug(f"Submitted batch job {jobid}")
 
     jobid2log.update({jobid: sbatch_process_dl1.slurm_command})

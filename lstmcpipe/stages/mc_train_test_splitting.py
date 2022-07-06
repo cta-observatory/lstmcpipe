@@ -118,7 +118,7 @@ def train_test_split(
         source_environment=batch_configuration["source_environment"],
     )
 
-    jobid_split = sbatch_tt_splitting.submit
+    jobid_split = sbatch_tt_splitting.submit()
     log_splitting.update({jobid_split: sbatch_tt_splitting.slurm_command})
 
     log.info(f"\nSplitting files from {input_dir} dir into testing {test_dir} dir and training {train_dir} dir.")

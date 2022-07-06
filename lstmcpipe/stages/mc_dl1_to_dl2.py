@@ -139,7 +139,7 @@ def dl1_to_dl2(
         source_environment=batch_configuration["source_environment"],
     )
 
-    jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit
+    jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit()
     log_dl1_to_dl2.update({jobid_dl1_to_dl2: sbatch_dl1_dl2.slurm_command})
 
     log.info(f"Submitted batch job {jobid_dl1_to_dl2}")

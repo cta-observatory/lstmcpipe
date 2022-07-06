@@ -145,7 +145,7 @@ def dl2_to_irfs(
         source_environment=batch_configuration["source_environment"],
     )
 
-    job_id_dl2_irfs = sbatch_dl2_irfs.submit
+    job_id_dl2_irfs = sbatch_dl2_irfs.submit()
     log_dl2_to_irfs.update({job_id_dl2_irfs: sbatch_dl2_irfs.slurm_command})
 
     log.info(f"Submitted batch job {job_id_dl2_irfs}")
