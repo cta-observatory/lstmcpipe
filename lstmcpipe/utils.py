@@ -371,8 +371,3 @@ class SbatchLstMCStage:
     def set_dl2_sens_plot_default_options(self):
         self.job_name = "--job-name=dl2_sens_plot"
         self.slurm_partition = "--partition=short"
-
-    # def load_from_log(self, jobid):
-    #     # TODO
-    #     jobid = ''
-    #     NotImplementedError("Sorry, we are working on it")

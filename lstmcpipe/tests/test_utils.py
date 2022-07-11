@@ -24,32 +24,6 @@ def test_save_log_to_file():
     assert dummy_log["dummy_jobid"] == log["NoKEY"]["dummy_jobid"]
 
 
-@pytest.fixture()
-def create_fake_dl1_structure(tmp_path):
-    fake_dl1_dir = tmp_path.joinpath("DL1", "{}")
-
-    gamma_off = ["off0.0deg", "off0.4deg"]
-    dataset = ["training", "testing"]
-
-    for particle in ["electron", "gamma-diffuse", "proton", "gamma"]:
-        if particle == "gamma":
-            for off in gamma_off:
-                _particle = particle + "_" + off
-                _subdir = Path(str(fake_dl1_dir).format(particle), off)
-                _subdir.mkdir(parents=True)
-                for i_set in dataset:
-                    with open(_subdir.joinpath(f"dl1_{_particle}_dummy_{i_set}.h5"), "w"):
-                        pass
-        else:
-            _subdir = Path(str(fake_dl1_dir).format(particle))
-            _subdir.mkdir(parents=True)
-            for i_set in dataset:
-                with open(_subdir.joinpath(f"dl1_{particle}_dummy_{i_set}.h5"), "w"):
-                    pass
-
-    return fake_dl1_dir.as_posix()
-
-
 def test_rerun_cmd():
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -139,4 +113,3 @@ def test_dump_lstchain_std_config():
         assert json.load(outfile.open())['GlobalPeakWindowSum']['apply_integration_correction']
         dump_lstchain_std_config(filename=outfile, allsky=True, overwrite=True)
         assert 'alt_tel' in json.load(outfile.open())['energy_regression_features']
-
