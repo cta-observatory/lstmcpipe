@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import os
 import shutil
 import logging
 from pathlib import Path
-from lstmcpipe.workflow_management import save_log_to_file
-from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from ..utils import save_log_to_file, SbatchLstMCStage
+from ..io.data_management import check_and_make_dir_without_verification
 
 
 log = logging.getLogger(__name__)
@@ -118,39 +117,30 @@ def dl1_to_dl2(
         batched job_id to be passed to later stages
 
     """
-    source_environment = batch_configuration["source_environment"]
-    slurm_account = batch_configuration["slurm_account"]
-
-    log.info("\nStartinng DL1-Dl2 processing for file files in {}".format(Path(input_file).parent.as_posix()))
+    log.info("Working on DL1 files in {}".format(Path(input_file).parent.as_posix()))
 
     check_and_make_dir_without_verification(output_dir)
     log.info("Output dir: {}".format(output_dir))
 
     log_dl1_to_dl2 = {}
 
-    cmd = f"{source_environment} lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" f" -o {output_dir}"
-
+    cmd = f"lstchain_dl1_to_dl2 -f {input_file} -p {path_models}" f" -o {output_dir}"
     if config_file is not None:
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
 
-    jobe = Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix()
-    jobo = Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix()
+    sbatch_dl1_dl2 = SbatchLstMCStage(
+        "dl1_to_dl2",  # default: -p short --mem=32G
+        wrap_command=cmd,
+        slurm_error=Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix(),
+        slurm_output=Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix(),
+        slurm_deps=wait_jobid_train_pipe,
+        slurm_options=slurm_options,
+        slurm_account=batch_configuration["slurm_account"],
+        source_environment=batch_configuration["source_environment"],
+    )
 
-    # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
-    batch_cmd = "sbatch --parsable"
-    if slurm_options is not None:
-        batch_cmd += f" {slurm_options}"
-    else:
-        batch_cmd += "  -p short --mem=32G"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
-    if wait_jobid_train_pipe is not None:
-        batch_cmd += f" --dependency=afterok:{wait_jobid_train_pipe}"
-    batch_cmd += f' -J dl1_2 -e {jobe} -o {jobo} --wrap="{cmd}"'
-
-    # Batch the job at La Palma
-    jobid_dl1_to_dl2 = os.popen(batch_cmd).read().strip("\n")
-    log_dl1_to_dl2.update({jobid_dl1_to_dl2: batch_cmd})
+    jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit()
+    log_dl1_to_dl2.update({jobid_dl1_to_dl2: sbatch_dl1_dl2.slurm_command})
 
     log.info(f"Submitted batch job {jobid_dl1_to_dl2}")
 

@@ -3,12 +3,11 @@
 # DL2 to IRFs stage for the R0 to IRFs full MC production workflow.
 # As all the previous stages, this script make use of the lstchain entry points to batch each workflow stage.
 
-import os
 import shutil
 import logging
 from pathlib import Path
-from lstmcpipe.workflow_management import save_log_to_file
-from lstmcpipe.io.data_management import check_and_make_dir_without_verification
+from ..utils import save_log_to_file, SbatchLstMCStage
+from ..io.data_management import check_and_make_dir_without_verification
 
 
 log = logging.getLogger(__name__)
@@ -120,11 +119,7 @@ def dl2_to_irfs(
     job_id_dl2_irfs: str
         Job-id of the batched job to be passed to the last (MC prod check) stage of the workflow.
     """
-    source_env = batch_configuration["source_environment"]
-    slurm_account = batch_configuration["slurm_account"]
-
     output_dir = Path(outfile).parent
-
     log_dl2_to_irfs = {}
 
     check_and_make_dir_without_verification(output_dir)
@@ -135,28 +130,24 @@ def dl2_to_irfs(
         cmd += f" -p {proton_file}"
     if electron_file is not None:
         cmd += f" -e {electron_file}"
-
     if config_file:
         cmd += f" --config={config_file}"
 
     log.info(f"Output dir IRF of {gamma_file}: {output_dir}")
 
-    jobe = Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix()
-    jobo = Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix()
+    sbatch_dl2_irfs = SbatchLstMCStage(
+        "dl2_to_irfs",
+        wrap_command=cmd,
+        slurm_error=Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix(),
+        slurm_output=Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix(),
+        slurm_deps=wait_jobs_dl1dl2,
+        slurm_options=slurm_options,
+        slurm_account=batch_configuration["slurm_account"],
+        source_environment=batch_configuration["source_environment"],
+    )
 
-    batch_cmd = "sbatch --parsable"
-    if slurm_options is not None:
-        batch_cmd += f" {slurm_options}"
-    else:
-        batch_cmd += " -p short"
-    if slurm_account != "":
-        batch_cmd += f" -A {slurm_account}"
-    if wait_jobs_dl1dl2 is not None:
-        batch_cmd += f" --dependency=afterok:{wait_jobs_dl1dl2}"
-    batch_cmd += f" -J dl2_IRF" f' -e {jobe} -o {jobo} --wrap="{source_env} {cmd}"'
-
-    job_id_dl2_irfs = os.popen(batch_cmd).read().strip("\n")
-    log_dl2_to_irfs.update({job_id_dl2_irfs: batch_cmd})
+    job_id_dl2_irfs = sbatch_dl2_irfs.submit()
+    log_dl2_to_irfs.update({job_id_dl2_irfs: sbatch_dl2_irfs.slurm_command})
 
     log.info(f"Submitted batch job {job_id_dl2_irfs}")
 
