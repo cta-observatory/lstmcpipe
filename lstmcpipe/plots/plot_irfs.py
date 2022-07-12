@@ -16,16 +16,27 @@ from astropy.visualization import quantity_support
 def plot_summary_from_file(filename, axes=None, **kwargs):
 
     if axes is None:
-        fig, axes = plt.subplots(2, 2, figsize=(15, 15))
+        fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+
+    kwargs.setdefault('ls', '-')
+    kwargs.setdefault('elinewidth', 0.75)
+    kwargs.setdefault('label', Path(filename).stem)
+
 
     sens_table = read_sensitivity_table(filename)
     plot_sensitivity_from_table(sens_table, ax=axes.ravel()[0], **kwargs)
+    kwargs.pop("label")
+    axes.ravel()[0].legend()
 
     plot_angular_resolution_from_file(filename, ax=axes.ravel()[1], **kwargs)
 
     plot_energy_resolution_from_file(filename, ax=axes.ravel()[2], **kwargs)
 
     plot_effective_area_from_file(filename, ax=axes.ravel()[3], **kwargs)
+
+    plot_energy_bias_from_file(filename, ax=axes.ravel()[5], **kwargs)
+
+    plot_background_rate_from_file(filename, ax=axes.ravel()[4], **kwargs)
 
     axes.ravel()[0].get_figure().tight_layout()
 
@@ -52,10 +63,10 @@ def plot_gh_cut_per_energy(filename, ax=None, **kwargs):
         **kwargs,
     )
 
-    ax.legend()
     ax.set_ylabel("G/H-cut")
     ax.set_xlabel(r"$E_\mathrm{reco} / \mathrm{TeV}$")
     ax.set_xscale("log")
+    ax.grid(True)
 
     return ax
 
@@ -70,9 +81,10 @@ def plot_sensitivity_from_table(sens_table, ax=None, **kwargs):
     e = sens_table["reco_energy_center"]
     s = e**2 * sens_table["flux_sensitivity"]
     w = sens_table["reco_energy_high"] - sens_table["reco_energy_low"]
+    energy_unit = u.TeV
 
     ax.errorbar(
-        e.to_value(u.TeV),
+        e.to_value(energy_unit),
         s.to_value(sens_unit),
         xerr=w.to_value(u.TeV) / 2,
         **kwargs,
@@ -84,8 +96,7 @@ def plot_sensitivity_from_table(sens_table, ax=None, **kwargs):
 
     # Style settings
     ax.set_title("Minimal Flux Needed for 5σ Detection in 50 hours")
-    ax.set_xscale("log")
-    ax.set_yscale("log")
+    ax.set_xlabel(r'$E_{Reco}$ / TeV')
     ax.set_ylabel(rf"$(E^2 \cdot \mathrm{{Flux Sensitivity}}) /$ ({sens_unit.to_string('latex')})")
 
     return ax
@@ -145,10 +156,9 @@ def plot_effective_area_from_file(file, all_cuts=False, ax=None, **kwargs):
         # Style settings
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.set_xlabel("True energy / TeV")
+        ax.set_xlabel(r"$E_\mathrm{True}$ / TeV")
         ax.set_ylabel("Effective collection area / m²")
         ax.grid(which="both")
-        ax.legend()
         ax.grid(True, which="both")
 
     return ax
@@ -200,7 +210,6 @@ def plot_theta_cut_from_file(filename, ax=None, **kwargs):
         **kwargs,
     )
 
-    ax.legend()
     ax.set_ylabel("θ-cut / deg²")
     ax.set_xlabel(r"$E_\mathrm{reco} / \mathrm{TeV}$")
     ax.set_xscale("log")
@@ -226,10 +235,9 @@ def plot_angular_resolution_from_file(filename, ax=None, **kwargs):
     #     ax.set_xlim(1.e-2, 2.e2)
     #     ax.set_ylim(2.e-2, 1)
     ax.set_xscale("log")
-    ax.set_xlabel("True energy / TeV")
+    ax.set_xlabel(r"$E_\mathrm{True}$ / TeV")
     ax.set_ylabel("Angular Resolution / deg")
     ax.grid(True, which="both")
-    ax.legend(loc="best")
 
     return ax
 
@@ -280,7 +288,6 @@ def plot_energy_resolution_from_file(filename, ax=None, **kwargs):
     ax.set_xlabel(r"$E_\mathrm{True} / \mathrm{TeV}$")
     ax.set_ylabel("Energy resolution")
     ax.grid(True, which="both")
-    ax.legend()
 
     return ax
 
@@ -319,10 +326,9 @@ def plot_background_rate_from_file(filename, ax=None, **kwargs):
 
     # Style settings
     ax.set_xscale("log")
-    ax.set_xlabel(r"$E_\mathrm{Reco} [\mathrm{TeV}]$")
+    ax.set_xlabel(r"$E_\mathrm{Reco}$ / $\mathrm{TeV}$")
     ax.set_ylabel("Background rate [Hz]")
     ax.grid(True, which="both")
-    ax.legend()
     ax.set_yscale("log")
 
     return ax
@@ -355,7 +361,6 @@ def plot_magic_bkg_rate(ax=None, **kwargs):
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.grid(True, which="both")
-    ax.legend()
 
     return ax
 
@@ -378,10 +383,9 @@ def plot_energy_bias_from_file(filename, ax=None, **kwargs):
     ax.set_xscale("log")
 
     # Style settings
-    ax.set_xlabel(r"$E_\mathrm{True} / \mathrm{TeV}$")
+    ax.set_xlabel(r"$E_\mathrm{True}$ / $\mathrm{TeV}$")
     ax.set_ylabel("Energy bias")
     ax.grid(True, which="both")
-    ax.legend()
 
     return ax
 
