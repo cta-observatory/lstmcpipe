@@ -1,5 +1,4 @@
 # #!/usr/bin/env python
-import os
 import logging
 import argparse
 from pathlib import Path
@@ -29,11 +28,11 @@ def plot_comparison(filelist, outfile=None, cta_north=False):
 
     log.info("Starting lstmcpipe compare irfs script")
 
-    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
 
     for file in filelist:
         log.info(f"Plotting IRFs from file {file}")
-        label = os.path.basename(file)
+        label = Path(file).stem
         plot_summary_from_file(file, axes=axes, label=label)
 
     if cta_north:

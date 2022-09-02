@@ -26,7 +26,7 @@ from lstmcpipe.io.lstmcpipe_tree_path import (
     create_log_files,
     update_scancel_file,
 )
-from lstmcpipe.workflow_management import (
+from lstmcpipe.utils import (
     batch_mc_production_check,
 )
 from lstmcpipe.stages import (
