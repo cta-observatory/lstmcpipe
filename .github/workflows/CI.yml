@@ -72,9 +72,9 @@ jobs:
           source $CONDA/etc/profile.d/conda.sh
           conda activate ci
           export filelist="${{ steps.verify-changed-files.outputs.all_changed_files }}"
-          export filelist=`grep -E '\.yaml$|\.yml$' <<< ${filelist[*]}`
-          echo "Added yaml files: $filelist"
-          for file in $filelist; do
+          export yamlfilelist=`grep -E '\.yaml$|\.yml$' <<< ${filelist[*]}`
+          echo "Added yaml files: $yamlfilelist"
+          for file in $yamlfilelist; do
             echo "Checking $file...";
             lstmcpipe_validate_config $file -lc `dirname $file`/*lstchain*.json ;
             echo "Valid!";
