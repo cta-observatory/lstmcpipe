@@ -67,14 +67,16 @@ jobs:
             production_configs/*/*.yaml
 #            production_configs/*/*.json
 # TODO: solve issue in github actions extracting sublist of yaml files, see below
+
+#          export filelist=`grep -P '\.yaml$|\.yml$' <<< ${filelist[*]}`
+# the above line works on ubuntu but fails on github action, not following the given pattern
+
       - name: Validate added configs.
         if: steps.verify-changed-files.outputs.any_changed == 'true'
         run: |
           source $CONDA/etc/profile.d/conda.sh
           conda activate ci
           export filelist="${{ steps.verify-changed-files.outputs.all_changed_files }}"
-#          export filelist=`grep -P '\.yaml$|\.yml$' <<< ${filelist[*]}`
-# the above line works on ubuntu but fails on github action, not following the given pattern
           echo "Added yaml files: filelist"
           for file in filelist; do
             echo "Checking $file";
