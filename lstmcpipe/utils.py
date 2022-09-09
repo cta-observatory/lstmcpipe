@@ -237,6 +237,7 @@ class SbatchLstMCStage:
         backend="",
     ):
         self.base_slurm_command = "sbatch --parsable"
+        self.stage_default_options(stage)
 
         self.slurm_output = f"--output={slurm_output}" if slurm_output is not None else "--output=./slurm-%j.o"
         self.slurm_error = f"--error={slurm_error}" if slurm_error is not None else "--error=./slurm-%j.e"
@@ -246,7 +247,6 @@ class SbatchLstMCStage:
         self.slurm_partition = f"--partition={slurm_account}" if slurm_partition is not None else "--partition=short"
         self.slurm_options = f"{slurm_options}" if slurm_options is not None else None
 
-        self.stage_default_options(stage)
         self.slurm_dependencies = None
         self.check_slurm_dependencies(slurm_deps)
         self.wrap_cmd = wrap_command
