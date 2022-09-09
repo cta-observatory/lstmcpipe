@@ -244,7 +244,7 @@ class SbatchLstMCStage:
         self.job_name = f"--job-name={job_name}" if job_name is not None else ""
         self.slurm_account = f"--account={slurm_account}" if slurm_account is not None else ""
 
-        self.slurm_partition = f"--partition={slurm_account}" if slurm_partition is not None else "--partition=short"
+        self.slurm_partition = f"--partition={slurm_partition}" if slurm_partition is not None else "--partition=short"
         self.slurm_options = f"{slurm_options}" if slurm_options is not None else None
 
         self.slurm_dependencies = None
@@ -358,6 +358,7 @@ class SbatchLstMCStage:
 
     def set_dl1_dl2_default_options(self):
         self.job_name = "--job-name=dl1_2"
+        self.slurm_partition = "--partition=short"
         self.slurm_options = "--partition=short --mem=32G"
 
     def set_dl2_irfs_default_options(self):
