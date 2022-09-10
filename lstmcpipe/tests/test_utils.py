@@ -81,7 +81,7 @@ def test_sbatch_lst_mc_stage():
     assert (
         sbatch.slurm_command == 'sbatch --parsable --partition=xxl --job-name=r0_dl1 --array=0-0%100 '
                                 '--error=./slurm-%j.e --output=./slurm-%j.o --account=lstrta --mem=160G '
-                                '--cpus-per-task=32   --wrap="command to be batched" '
+                                '--cpus-per-task=32   --wrap="command to be batched"'
     )
 
     sbatch.set_slurm_options = (sbatch.stage, None)
