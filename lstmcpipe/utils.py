@@ -79,7 +79,7 @@ def batch_mc_production_check(
 
     for stage, jobids in dict_jobids_all_stages.items():
         all_pipeline_jobs.append(jobids)
-        debug_log.update({f"SUMMARY_{stage}": jobids})
+        debug_log[f"SUMMARY_{stage}"]=jobids
 
     all_pipeline_jobs = ",".join(all_pipeline_jobs)
 
@@ -103,7 +103,7 @@ def batch_mc_production_check(
 
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
-    debug_log.update({f"prod_check_{jobid}": batch_cmd})
+    debug_log[f"prod_check_{jobid}"] = batch_cmd
 
     save_log_to_file(debug_log, logs_files["debug_file"], workflow_step="check_full_workflow")
 
@@ -235,20 +235,22 @@ class SbatchLstMCStage:
         source_environment="",
         backend="",
     ):
-        self.slurm_options = {}
         self.base_slurm_command = "sbatch --parsable"
         self.stage = stage
+        self.wrap_cmd = wrap_command
 
-        self.slurm_output = f"--output={slurm_output}" if slurm_output is not None else "--output=./slurm-%j.o"
-        self.slurm_error = f"--error={slurm_error}" if slurm_error is not None else "--error=./slurm-%j.e"
-        self.job_name = f"--job-name={job_name}" if job_name is not None else ""
-        self.slurm_account = f"--account={slurm_account}" if slurm_account is not None else ""
+        self.slurm_output = "./slurm-%j.o" if slurm_output is None else slurm_output
+        self.slurm_error = "./slurm-%j.e" if slurm_error is None else slurm_error
+        # self.slurm_output =  if slurm_output is not None else "--output=./slurm-%j.o"
+        # self.slurm_error = f"--error={slurm_error}" if slurm_error is not None else "--error=./slurm-%j.e"
+        # self.job_name = f"--job-name={job_name}" if job_name is not None else ""
+        self.job_name = job_name
+        self.slurm_account = slurm_account
+        self.slurm_options = slurm_options
 
         self.set_slurm_options(stage, slurm_options)
+        self.set_slurm_dependencies(slurm_deps)
 
-        self.slurm_dependencies = None
-        self.check_slurm_dependencies(slurm_deps)
-        self.wrap_cmd = wrap_command
         self.compose_wrap_command(wrap_command, source_environment, backend)
 
     def __str__(self):
@@ -274,9 +276,9 @@ class SbatchLstMCStage:
         if wrap_command is None or wrap_command == "":
             warnings.warn("You must pass a command to be batched! ")
         if source_env != "" and not source_env.strip().endswith(";"):
-            source_env = source_env.strip() + "; "
+            source_env = f"{source_env.strip()}; "
         if backend != "" and not backend.strip().endswith(";"):
-            backend = backend.strip() + "; "
+            backend = f"{backend.strip()}; "
         self.wrap_cmd = f'--wrap="{backend}{source_env}{wrap_command}"'
 
     @property
@@ -286,19 +288,17 @@ class SbatchLstMCStage:
             for opt_key, opt_value in self.slurm_options.items():
                 options += f"--{opt_key}={opt_value} "
         return (
-            f"{self.base_slurm_command} {self.job_name} {options}"
-            f" {self.slurm_error} {self.slurm_output} {self.slurm_dependencies}"
-            f" {self.slurm_account} {self.wrap_cmd}"
+            f"{self.base_slurm_command} {options} {self.slurm_dependencies} {self.wrap_cmd}"
         )
 
-    def check_slurm_dependencies(self, slurm_deps, dependency="afterok"):
+    def set_slurm_dependencies(self, slurm_deps, dependency="afterok"):
+        self.slurm_dependencies = None
         if slurm_deps is None:
             self.slurm_dependencies = ""
+        elif all(items != "" for items in slurm_deps.split(",")):
+            self.slurm_dependencies = f"--dependency={dependency}:{slurm_deps}"
         else:
-            if all(items != "" for items in slurm_deps.split(",")):
-                self.slurm_dependencies = f"--dependency={dependency}:{slurm_deps}"
-            else:
-                raise ValueError("Slurm dependencies contain an empty value between commas, i.e.; ,'', ")
+            raise ValueError("Slurm dependencies contain an empty value between commas, i.e.; ,'', ")
 
     def stage_default_options(self, stage):
         if self.stage not in self._valid_stages:
@@ -322,17 +322,29 @@ class SbatchLstMCStage:
         default_options.update(stage_options_dict[self.stage])
         return default_options
 
+    @property
     def submit(self):
-        if self.wrap_cmd is None or self.wrap_cmd == "":
+        if self.wrap_cmd is not None and self.wrap_cmd != "":
+            return run_command(self.slurm_command)
+        else:
             raise ValueError(
                 "You must first define the command to be batched: " "SbatchLstMCStage().wrap_command('COMMAND')"
             )
-        else:
-            jobid = run_command(self.slurm_command)
-            return jobid
 
     def set_slurm_options(self, stage, slurm_options):
+        # set all the slurm options with the following priority order: default, batch, slurm_options
+        self.slurm_options = {}
         self.slurm_options.update(self.stage_default_options(stage))
+
+        if self.job_name is not None:
+            self.slurm_options['job-name'] = self.job_name
+        if self.slurm_account is not None:
+            self.slurm_options['account'] = self.slurm_account
+        if self.slurm_error is not None:
+            self.slurm_options['error'] = self.slurm_error
+        if self.slurm_output is not None:
+            self.slurm_options['output'] = self.slurm_output
+
         self.slurm_options.update(slurm_options)
 
     @property
