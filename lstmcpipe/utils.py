@@ -319,7 +319,7 @@ class SbatchLstMCStage:
             "dl2_sens_plot": getattr(self, "set_dl2_sens_plot_default_options"),
         }
 
-        default_options.update(stage_options_dict[self.stage])
+        default_options.update(stage_options_dict[stage])
         return default_options
 
     @property
@@ -345,7 +345,8 @@ class SbatchLstMCStage:
         if self.slurm_output is not None:
             self.slurm_options['output'] = self.slurm_output
 
-        self.slurm_options.update(slurm_options)
+        if slurm_options is not None:
+            self.slurm_options.update(slurm_options)
 
     @property
     def r0_dl1_options(self):
