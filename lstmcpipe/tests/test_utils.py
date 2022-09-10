@@ -84,7 +84,7 @@ def test_sbatch_lst_mc_stage():
     )
 
     sbatch.slurm_options = None
-    sbatch.check_slurm_dependencies("123,243,345,456")
+    sbatch.set_slurm_dependencies("123,243,345,456")
     assert sbatch.slurm_dependencies == "--dependency=afterok:123,243,345,456"
 
     sbatch.compose_wrap_command(
@@ -96,13 +96,13 @@ def test_sbatch_lst_mc_stage():
 
     with pytest.raises(ValueError):
         sbatch.submit()  # slurm not installed
-        sbatch.stage_default_options("invented_stage")
-        sbatch.check_slurm_dependencies(slurm_deps="123,,234")
+        sbatch.set_stage_default_options("invented_stage")
+        sbatch.set_slurm_dependencies(slurm_deps="123,,234")
 
     stages = sbatch._valid_stages
     for stage in stages:
-        sbatch.stage_default_options(stage)
-        assert "--job-name=" in sbatch.job_name
+        sbatch.set_stage_default_options(stage)
+        assert "--job-name=" in sbatch.slurm_command
         assert "--partition=" in sbatch.slurm_command
 
 
