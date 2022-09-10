@@ -241,13 +241,9 @@ class SbatchLstMCStage:
 
         self.slurm_output = "./slurm-%j.o" if slurm_output is None else slurm_output
         self.slurm_error = "./slurm-%j.e" if slurm_error is None else slurm_error
-        # self.slurm_output =  if slurm_output is not None else "--output=./slurm-%j.o"
-        # self.slurm_error = f"--error={slurm_error}" if slurm_error is not None else "--error=./slurm-%j.e"
-        # self.job_name = f"--job-name={job_name}" if job_name is not None else ""
         self.job_name = job_name
         self.slurm_account = slurm_account
-        self.slurm_options = slurm_options
-
+        self._slurm_options = None
         self.set_slurm_options(stage, slurm_options)
         self.set_slurm_dependencies(slurm_deps)
 
@@ -284,8 +280,8 @@ class SbatchLstMCStage:
     @property
     def slurm_command(self):
         options = ""
-        if self.slurm_options is not None:
-            for opt_key, opt_value in self.slurm_options.items():
+        if self._slurm_options is not None:
+            for opt_key, opt_value in self._slurm_options.items():
                 options += f"--{opt_key}={opt_value} "
         return (
             f"{self.base_slurm_command} {options} {self.slurm_dependencies} {self.wrap_cmd}"
@@ -331,22 +327,28 @@ class SbatchLstMCStage:
                 "You must first define the command to be batched: " "SbatchLstMCStage().wrap_command('COMMAND')"
             )
 
+    @property
+    def slurm_options(self):
+        return self._slurm_options
+
     def set_slurm_options(self, stage, slurm_options):
-        # set all the slurm options with the following priority order: default, batch, slurm_options
-        self.slurm_options = {}
-        self.slurm_options.update(self.stage_default_options(stage))
+        # set all the slurm options with the following priority order: default, batch, _slurm_options
+        self._slurm_options = {}
+        self._slurm_options.update(self.stage_default_options(stage))
 
         if self.job_name is not None:
-            self.slurm_options['job-name'] = self.job_name
+            self._slurm_options['job-name'] = self.job_name
         if self.slurm_account is not None:
-            self.slurm_options['account'] = self.slurm_account
+            self._slurm_options['account'] = self.slurm_account
         if self.slurm_error is not None:
-            self.slurm_options['error'] = self.slurm_error
+            self._slurm_options['error'] = self.slurm_error
         if self.slurm_output is not None:
-            self.slurm_options['output'] = self.slurm_output
+            self._slurm_options['output'] = self.slurm_output
 
         if slurm_options is not None:
-            self.slurm_options.update(slurm_options)
+            self._slurm_options.update(slurm_options)
+
+
 
     @property
     def r0_dl1_options(self):

@@ -73,17 +73,18 @@ def test_sbatch_lst_mc_stage():
 
     sbatch = SbatchLstMCStage(stage="r0_to_dl1", wrap_command="command to be batched")
     assert (
-        sbatch.slurm_command == 'sbatch --parsable --job-name=r0_dl1 --partition=long --array=0-0%100  '
+        sbatch.slurm_command == 'sbatch --parsable --partition=long --job-name=r0_dl1 --array=0-0%100  '
         '--error=./slurm-%j.e --output=./slurm-%j.o   --wrap="command to be batched"'
     )
 
-    sbatch.slurm_options = "-A lstrta -p xxl --mem 160G --cpus-per-task=32"
+    sbatch.set_slurm_options(sbatch.stage, {'account':'lstrta', 'partition': 'xxl', 'mem': '160G', 'cpus-per-task': 32})
     assert (
-        sbatch.slurm_command == 'sbatch --parsable --job-name=r0_dl1 -A lstrta -p xxl --mem 160G --cpus-per-task=32 '
-        '--error=./slurm-%j.e --output=./slurm-%j.o   --wrap="command to be batched"'
+        sbatch.slurm_command == 'sbatch --parsable --partition=xxl --job-name=r0_dl1 --array=0-0%100 '
+                                '--error=./slurm-%j.e --output=./slurm-%j.o --account=lstrta --mem=160G '
+                                '--cpus-per-task=32   --wrap="command to be batched" '
     )
 
-    sbatch.slurm_options = None
+    sbatch.set_slurm_options = (sbatch.stage, None)
     sbatch.set_slurm_dependencies("123,243,345,456")
     assert sbatch.slurm_dependencies == "--dependency=afterok:123,243,345,456"
 
