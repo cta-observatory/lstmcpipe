@@ -65,7 +65,7 @@ def batch_process_dl1(
                 config_file=conf_file,
                 batch_config=batch_config,
                 workflow_kind=workflow_kind,
-                slurm_options=paths.get("slurm_options", None),
+                extra_slurm_options=paths.get("extra_slurm_options", None),
             )
             log_process_dl1.update(job_logs)
             jobids_dl1_processing_stage.append(jobid)
@@ -80,7 +80,7 @@ def batch_process_dl1(
                 config_file=conf_file,
                 batch_config=batch_config,
                 workflow_kind=workflow_kind,
-                slurm_options=paths.get("slurm_options", None),
+                extra_slurm_options=paths.get("extra_slurm_options", None),
             )
 
             log_process_dl1.update(job_logs)
@@ -106,7 +106,7 @@ def r0_to_dl1(
     batch_config=None,
     debug_mode=False,
     keep_rta_file=False,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     R0 to DL1 MC onsite conversion.
@@ -126,7 +126,7 @@ def r0_to_dl1(
         ! NOTE : train_pipe AND dl1_to_dl2 **MUST** be run with the same environment.
     workflow_kind: str
         One of the supported pipelines. Defines the command to be run on r0 files
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed
 
     # HIPERTA ARGUMENTS
@@ -202,7 +202,7 @@ def r0_to_dl1(
         job_logs_dir=job_logs_dir,
         batch_config=batch_config,
         dl1_processing_type="r0_to_dl1",
-        slurm_options=slurm_options,
+        extra_slurm_options=extra_slurm_options,
     )
 
     # copy config into working dir
@@ -223,7 +223,7 @@ def reprocess_dl1(
     config_file=None,
     batch_config=None,
     dl1_files_per_job=50,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Reprocessing of existing dl1 files.
@@ -246,7 +246,7 @@ def reprocess_dl1(
         One of the supported pipelines. Defines the command to be run on r0 files
     dl1_files_per_job: int
         Number of dl1 files to be processed per job array that was batched.
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -296,7 +296,7 @@ def reprocess_dl1(
         job_logs_dir=job_logs_dir,
         batch_config=batch_config,
         dl1_processing_type="dl1ab",
-        slurm_options=slurm_options,
+        extra_slurm_options=extra_slurm_options,
     )
 
     # copy config into working dir
@@ -321,7 +321,7 @@ def submit_dl1_jobs(
     batch_config,
     n_jobs_parallel=100,
     dl1_processing_type="r0_to_dl1",
-    slurm_options="",
+    extra_slurm_options=None,
 ):
     """
     Compose sbatch command and batches it
@@ -351,7 +351,7 @@ def submit_dl1_jobs(
         Default = 100
     dl1_processing_type: str
         String for job and filelist naming
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed
 
     Returns
@@ -380,28 +380,22 @@ def submit_dl1_jobs(
     # start 1 jobarray with all files included. The job selects its file based on its task id
     cmd = f'{base_cmd} -f {" ".join(sublist_names)} --output_dir {output_dir}'
 
+    extra_slurm_default_options = {'partition': 'long',
+                                   'array': f"0-{len(sublist_names) - 1}%{n_jobs_parallel}",
+                                   }
+    if extra_slurm_options is not None:
+        extra_slurm_default_options.update(extra_slurm_options)
+
     sbatch_process_dl1 = SbatchLstMCStage(
         dl1_processing_type,
         wrap_command=cmd,
+        job_name=f"{job_type_id}-{dl1_processing_type}",
         slurm_error=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
         slurm_output=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
         slurm_account=batch_config["slurm_account"],
         source_environment=batch_config["source_environment"],
+        extra_slurm_options=extra_slurm_default_options,
     )
-    if dl1_processing_type == "r0_to_dl1":
-        sbatch_process_dl1.r0_dl1_options(
-            process_dl1_job_name=f"{job_type_id}-{dl1_processing_type}",
-            array=f"0-{len(sublist_names) - 1}%{n_jobs_parallel}",
-            partition="long",
-            extra_slurm_options="",
-        )
-    elif dl1_processing_type == "dl1ab":
-        sbatch_process_dl1.dl1ab_options(
-            process_dl1ab_job_name=f"{job_type_id}-{dl1_processing_type}",
-            array=f"0-{len(sublist_names) - 1}%{n_jobs_parallel}",
-            partition="long",
-            extra_slurm_options="",
-        )
 
     jobid = sbatch_process_dl1.submit()
     log.debug(f"Submitted batch job {jobid}")

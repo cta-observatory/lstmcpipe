@@ -23,7 +23,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
         Path to a configuration file. If none is given, a standard configuration is applied
     jobids_from_merge : str
         string containing the jobids (***ONLY from proton and gamma-diffuse***) from the jobs batched in the
-         merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency)
+         merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency_type)
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         the `train_pipe` function.
@@ -33,7 +33,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
     Returns
     -------
     jobid_4_dl1_to_dl2 : str
-        string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
+        string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency_type).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
     """
     log_train = {}
@@ -55,7 +55,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
             config_file=config_file,
             batch_configuration=batch_config,
             wait_jobs_dl1=jobids_from_merge,
-            slurm_options=paths.get("slurm_options", None),
+            slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_train.update(job_logs)
@@ -121,7 +121,7 @@ def batch_plot_rf_features(
             wrap_command=cmd,
             slurm_error=Path(models_dir).joinpath("job_plot_rf_feat_importance.e").resolve().as_posix(),
             slurm_output=Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance.o").resolve().as_posix(),
-            slurm_deps=train_jobid,
+            slurm_dependencies=train_jobid,
             slurm_account=batch_configuration["slurm_account"],
             source_environment=batch_configuration["source_environment"],
             backend="export MPLBACKEND=Agg;",
@@ -151,7 +151,7 @@ def train_pipe(
     config_file=None,
     batch_configuration='',
     wait_jobs_dl1=None,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Train RF from MC DL1 data (onsite LaPalma cluster)
@@ -173,7 +173,7 @@ def train_pipe(
     wait_jobs_dl1 : str
         A string (of chained job_ids separated by ',' and without spaces between each element), containing
         all the job_ids of the merging stage
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -200,8 +200,8 @@ def train_pipe(
         wrap_command=cmd,
         slurm_error=Path(models_dir).joinpath("train_job.e").resolve().as_posix(),
         slurm_output=Path(models_dir).joinpath("train_job.o").resolve().as_posix(),
-        slurm_deps=wait_jobs_dl1,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobs_dl1,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )

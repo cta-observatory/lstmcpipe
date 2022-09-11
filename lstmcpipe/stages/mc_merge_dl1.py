@@ -37,7 +37,7 @@ def batch_merge_dl1(
     -------
     jobids_for_train : str
          Comma-separated str with all the job-ids to be passed to the next
-         stage of the workflow (as a slurm dependency)
+         stage of the workflow (as a slurm dependency_type)
 
     """
     log_merge = {}
@@ -61,7 +61,7 @@ def batch_merge_dl1(
             batch_configuration=batch_config,
             wait_jobs_split=jobid_from_splitting,
             workflow_kind=workflow_kind,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_merge.update(job_logs)
@@ -84,7 +84,7 @@ def merge_dl1(
     wait_jobs_split="",
     merging_options=None,
     workflow_kind="lstchain",
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
 
@@ -96,7 +96,7 @@ def merge_dl1(
     wait_jobs_split: str
     merging_options: dict
     workflow_kind: str
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -122,8 +122,8 @@ def merge_dl1(
         wrap_command=cmd,
         slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
         slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
-        slurm_deps=wait_jobs_split,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobs_split,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )

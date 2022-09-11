@@ -23,7 +23,7 @@ def batch_dl2_to_sensitivity(
     dict_paths : dict
         Core dictionary with {stage: PATHS} information
     job_ids_from_dl1_dl2: str
-        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency_type
         to schedule the current stage
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
@@ -48,7 +48,7 @@ def batch_dl2_to_sensitivity(
             paths["output"],
             batch_configuration=batch_config,
             wait_jobs_dl1_dl2=job_ids_from_dl1_dl2,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
         jobid_for_check.append(jobid)
         log_dl2_to_sensitivity.update(job_logs)
@@ -72,7 +72,7 @@ def dl2_to_sensitivity(
     output,
     batch_configuration,
     wait_jobs_dl1_dl2,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Function to run the `script_dl2_to_sensitivity` for the gamma (and the different gamma offsets) and gamma-diffuse
@@ -87,8 +87,8 @@ def dl2_to_sensitivity(
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
         sbatch commands
     wait_jobs_dl1_dl2: str
-        Comma-separated string with the jobs (dependency) to wait for before launching the cmd
-    slurm_options: str
+        Comma-separated string with the jobs (dependency_type) to wait for before launching the cmd
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -113,8 +113,8 @@ def dl2_to_sensitivity(
         wrap_command=cmd_sens,
         slurm_error=Path(output).parent.joinpath("job_dl2_to_sensitivity.e"),
         slurm_output=Path(output).parent.joinpath("job_dl2_to_sensitivity.o"),
-        slurm_deps=wait_jobs_dl1_dl2,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobs_dl1_dl2,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )
@@ -134,8 +134,8 @@ def dl2_to_sensitivity(
         wrap_command=cmd_plot_sens,
         slurm_error=Path(output).parent.joinpath("job_plot_sensitivity-%j.e"),
         slurm_output=Path(output).parent.joinpath("job_plot_sensitivity-%j.o"),
-        slurm_deps=job_id_dl2_sens,
-        slurm_options=slurm_options,
+        slurm_dependencies=job_id_dl2_sens,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
         backend="export MPLBACKEND=Agg; ",

@@ -28,7 +28,7 @@ def batch_dl1_to_dl2(
         Path to a configuration file. If none is given, a standard configuration is applied
     jobid_from_training : str
         string containing the jobid from the jobs batched in the train_pipe stage, to be passed to the
-        dl1_to_dl2 function (as a slurm dependency)
+        dl1_to_dl2 function (as a slurm dependency_type)
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         dl1_dl2 function
@@ -38,7 +38,7 @@ def batch_dl1_to_dl2(
     Returns
     -------
     jobid_for_dl2_to_dl3 : str
-        string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
+        string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency_type)
 
     """
 
@@ -57,7 +57,7 @@ def batch_dl1_to_dl2(
             config_file=config_file,
             wait_jobid_train_pipe=jobid_from_training,
             batch_configuration=batch_config,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_dl1_to_dl2.update(job_logs)
@@ -83,7 +83,7 @@ def dl1_to_dl2(
     config_file,
     wait_jobid_train_pipe=None,
     batch_configuration='',
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Convert onsite files from dl1 to dl2
@@ -105,7 +105,7 @@ def dl1_to_dl2(
         Dictionary containing the (full) source_environment and the slurm_account strings
         to be passed to the sbatch commands
         ! NOTE : train_pipe AND dl1_to_dl2 MUST BE RUN WITH THE SAME ENVIRONMENT
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -133,8 +133,8 @@ def dl1_to_dl2(
         wrap_command=cmd,
         slurm_error=Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix(),
         slurm_output=Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix(),
-        slurm_deps=wait_jobid_train_pipe,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobid_train_pipe,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )

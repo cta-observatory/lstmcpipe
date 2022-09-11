@@ -30,7 +30,7 @@ def batch_dl2_to_irfs(
     config_file: str
         Path to lstchain-like config file
     job_ids_from_dl1_dl2: str
-        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency_type
         to schedule the current stage
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
@@ -59,7 +59,7 @@ def batch_dl2_to_irfs(
             options=paths.get("options", None),
             batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_dl2_to_irfs.update(log_dl2_to_irfs)
@@ -87,7 +87,7 @@ def dl2_to_irfs(
     options,
     batch_configuration,
     wait_jobs_dl1dl2,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Batches interactively the lstchain `lstchain_create_irf_files` entry point.
@@ -109,7 +109,7 @@ def dl2_to_irfs(
     wait_jobs_dl1dl2: str
         Comma separated string with the job ids of previous stages (dl1_to_dl2 stage) to be passed as dependencies to
         the create_irfs_files job to be batched.
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -140,8 +140,8 @@ def dl2_to_irfs(
         wrap_command=cmd,
         slurm_error=Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix(),
         slurm_output=Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix(),
-        slurm_deps=wait_jobs_dl1dl2,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobs_dl1dl2,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )

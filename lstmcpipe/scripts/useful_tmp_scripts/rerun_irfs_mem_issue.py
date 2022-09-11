@@ -22,7 +22,7 @@ to_rerun = []
 for p in cfg['stages']['dl2_to_irfs']:
     if not Path(p['output']).is_file():
         print(p['output'])
-        p['slurm_options'] = '--mem=6GB'
+        p['extra_slurm_options'] = {'mem':'6GB'}
         to_rerun.append(p)
 
 cfg['stages']['dl2_to_irfs'] = to_rerun

@@ -42,7 +42,7 @@ def batch_train_test_splitting(
             paths["output"],
             wait_jobid_r0_dl1=jobids_from_r0dl1,
             batch_configuration=batch_config,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_splitting.update(job_logs)
@@ -64,7 +64,7 @@ def train_test_split(
     output_dirs,
     batch_configuration,
     wait_jobid_r0_dl1=None,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
 
@@ -74,7 +74,7 @@ def train_test_split(
     output_dirs: dict
     batch_configuration: dict
     wait_jobid_r0_dl1: str
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -112,8 +112,8 @@ def train_test_split(
         wrap_command=cmd,
         slurm_error=Path(input_dir).joinpath(input_dir, "split_tt_%j.e"),
         slurm_output=Path(input_dir).joinpath(input_dir, "split_tt_%j.o"),
-        slurm_deps=wait_jobid_r0_dl1,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobid_r0_dl1,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )
