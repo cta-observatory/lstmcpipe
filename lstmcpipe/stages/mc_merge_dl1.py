@@ -31,7 +31,7 @@ def batch_merge_dl1(dict_paths, batch_config, logs, jobid_from_splitting, workfl
     -------
     jobids_for_train : str
          Comma-separated str with all the job-ids to be passed to the next
-         stage of the workflow (as a slurm dependency_type)
+         stage of the workflow (as a slurm dependency)
 
     """
     log_merge = {}

@@ -21,7 +21,7 @@ def batch_dl1_to_dl2(dict_paths, config_file, jobid_from_training, batch_config,
         Path to a configuration file. If none is given, a standard configuration is applied
     jobid_from_training : str
         string containing the jobid from the jobs batched in the train_pipe stage, to be passed to the
-        dl1_to_dl2 function (as a slurm dependency_type)
+        dl1_to_dl2 function (as a slurm dependency)
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         dl1_dl2 function
@@ -31,7 +31,7 @@ def batch_dl1_to_dl2(dict_paths, config_file, jobid_from_training, batch_config,
     Returns
     -------
     jobid_for_dl2_to_dl3 : str
-        string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency_type)
+        string containing the jobids to be passed to the next stage of the workflow (as a slurm dependency)
 
     """
     log_dl1_to_dl2 = {}

@@ -23,7 +23,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
         Path to a configuration file. If none is given, a standard configuration is applied
     jobids_from_merge : str
         string containing the jobids (***ONLY from proton and gamma-diffuse***) from the jobs batched in the
-         merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency_type)
+         merge_and_copy_dl1 stage, to be passed to the train_pipe function (as a slurm dependency)
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
         the `train_pipe` function.
@@ -33,7 +33,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
     Returns
     -------
     jobid_4_dl1_to_dl2 : str
-        string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency_type).
+        string containing the jobid to be passed to the next stage of the workflow (as a slurm dependency).
         For the next stage, however, it will be needed TRAIN + MERGED jobs
     """
     log_train = {}

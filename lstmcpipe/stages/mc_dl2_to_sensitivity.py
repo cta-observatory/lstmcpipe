@@ -17,7 +17,7 @@ def batch_dl2_to_sensitivity(dict_paths, job_ids_from_dl1_dl2, batch_config, log
     dict_paths : dict
         Core dictionary with {stage: PATHS} information
     job_ids_from_dl1_dl2: str
-        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency_type
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
         to schedule the current stage
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
@@ -68,7 +68,7 @@ def dl2_to_sensitivity(input_paths, output, batch_configuration, wait_jobs_dl1_d
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to the
         sbatch commands
     wait_jobs_dl1_dl2: str
-        Comma-separated string with the jobs (dependency_type) to wait for before launching the cmd
+        Comma-separated string with the jobs (dependency) to wait for before launching the cmd
     extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 

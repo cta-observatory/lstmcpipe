@@ -30,7 +30,7 @@ def batch_dl2_to_irfs(
     config_file: str
         Path to lstchain-like config file
     job_ids_from_dl1_dl2: str
-        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency_type
+        Comma-separated string with the job ids from the dl1_to_dl2 stage to be used as a slurm dependency
         to schedule the current stage
     batch_config : dict
         Dictionary containing the (full) source_environment and the slurm_account strings to be passed to
