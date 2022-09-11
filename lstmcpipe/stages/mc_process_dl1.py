@@ -277,7 +277,7 @@ def submit_dl1_jobs(input_dir, output_dir, base_cmd, file_list, job_type_id, dl1
     extra_slurm_default_options = {'partition': 'long', 'array': f"0-{len(sublist_names) - 1}%{n_jobs_parallel}"}
 
     if extra_slurm_options is not None:
-        extra_slurm_default_options |= extra_slurm_options
+        extra_slurm_default_options.update(extra_slurm_options)
     sbatch_process_dl1 = SbatchLstMCStage(dl1_processing_type,
                                           wrap_command=cmd,
                                           job_name=f"{job_type_id}-{dl1_processing_type}",
