@@ -97,7 +97,7 @@ def test_sbatch_lst_mc_stage():
 
     with pytest.raises(ValueError):
         sbatch.submit()  # slurm not installed
-        sbatch.set_stage_default_options("invented_stage")
+        sbatch.stage_default_options("dummy_stage")
         sbatch.set_slurm_dependencies(slurm_deps="123,,234")
 
     stages = sbatch._valid_stages
