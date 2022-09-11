@@ -43,7 +43,7 @@ def batch_dl2_to_irfs(
     jobs_from_dl2_irf: str
         Comma-separated jobids batched in the current stage
     """
-    log.info("==== START {} ====".format("batch mc_dl2_to_irfs"))
+    log.info("==== START batch mc_dl2_to_irfs ====")
 
     log_dl2_to_irfs = {}
     jobid_for_check = []
@@ -73,7 +73,7 @@ def batch_dl2_to_irfs(
     save_log_to_file(log_dl2_to_irfs, logs["log_file"], workflow_step="dl2_to_irfs")
     save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl2_to_irfs")
 
-    log.info("==== END {} ====".format("batch mc_dl2_to_irfs"))
+    log.info("==== END batch mc_dl2_to_irfs ====")
 
     return jobid_for_check
 

@@ -7,13 +7,7 @@ from ..utils import save_log_to_file, SbatchLstMCStage
 log = logging.getLogger(__name__)
 
 
-def batch_merge_dl1(
-    dict_paths,
-    batch_config,
-    logs,
-    jobid_from_splitting,
-    workflow_kind="lstchain",
-):
+def batch_merge_dl1(dict_paths, batch_config, logs, jobid_from_splitting, workflow_kind="lstchain"):
     """
     Function to batch the onsite_mc_merge_and_copy function once the all the r0_to_dl1 jobs (batched by particle type)
     have finished.
@@ -43,49 +37,23 @@ def batch_merge_dl1(
     log_merge = {}
     all_jobs_merge_stage = []
     debug_log = {}
-
-    log.info("==== START {} ====".format("batch merge_and_copy_dl1_workflow"))
-    # TODO Lukas: merging option will come inside the
-    #  dict_paths["merge_dl1"]["merging_options"]
-    #    if isinstance(smart_merge, str):
-    #        merge_flag = "lst" in smart_merge
-    #    else:
-    #        merge_flag = smart_merge
-    #    log.debug("Merge flag set: {}".format(merge_flag))
-
+    log.info('==== START batch merge_and_copy_dl1_workflow ====')
     for paths in dict_paths:
-        job_logs, jobid_debug = merge_dl1(
-            paths["input"],
-            paths["output"],
-            merging_options=paths.get('options', None),
-            batch_configuration=batch_config,
-            wait_jobs_split=jobid_from_splitting,
-            workflow_kind=workflow_kind,
-            extra_slurm_options=paths.get("extra_slurm_options", None),
-        )
+        job_logs, jobid_debug = merge_dl1(paths["input"], paths["output"], merging_options=paths.get('options', None),
+                                          batch_configuration=batch_config, wait_jobs_split=jobid_from_splitting,
+                                          workflow_kind=workflow_kind,
+                                          extra_slurm_options=paths.get("extra_slurm_options", None))
 
         log_merge.update(job_logs)
         all_jobs_merge_stage.append(jobid_debug)
-
-    jobids_for_train = ','.join(all_jobs_merge_stage)
-
     save_log_to_file(log_merge, logs["log_file"], "merge_dl1")
     save_log_to_file(debug_log, logs["debug_file"], workflow_step="merge_dl1")
-
-    log.info("==== END {} ====".format("batch merge_and_copy_dl1_workflow"))
-
-    return jobids_for_train
+    log.info('==== END batch merge_and_copy_dl1_workflow ====')
+    return ','.join(all_jobs_merge_stage)
 
 
-def merge_dl1(
-    input_dir,
-    output_file,
-    batch_configuration,
-    wait_jobs_split="",
-    merging_options=None,
-    workflow_kind="lstchain",
-    extra_slurm_options=None,
-):
+def merge_dl1(input_dir, output_file, batch_configuration, wait_jobs_split="", merging_options=None,
+              workflow_kind="lstchain", extra_slurm_options=None):
     """
 
     Parameters
@@ -106,32 +74,21 @@ def merge_dl1(
 
     """
     merging_options = "" if merging_options is None else merging_options
-    log_merge = {}
+    if workflow_kind in ["lstchain", "hiperta"]:
+        cmd = f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} {merging_options}'
 
-    # command passed changes depending on the workflow_kind
-    if workflow_kind == "lstchain":
-        cmd = f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} {merging_options}'
-    elif workflow_kind == "hiperta":
-        # HiPeRTA workflow still uses --smart flag (lstchain v0.6.3)
-        cmd = f'lstchain_merge_hdf5_files -d {input_dir} -o {output_file} {merging_options}'
-    else:  # ctapipe case
+    else:
         cmd = f'ctapipe-merge --input-dir {input_dir} --output {output_file} {merging_options}'
 
-    sbatch_merge_dl1 = SbatchLstMCStage(
-        "merge_dl1",
-        wrap_command=cmd,
-        slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
-        slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
-        slurm_dependencies=wait_jobs_split,
-        extra_slurm_options=extra_slurm_options,
-        slurm_account=batch_configuration["slurm_account"],
-        source_environment=batch_configuration["source_environment"],
-    )
+    sbatch_merge_dl1 = SbatchLstMCStage("merge_dl1", wrap_command=cmd,
+                                        slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
+                                        slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
+                                        slurm_dependencies=wait_jobs_split, extra_slurm_options=extra_slurm_options,
+                                        slurm_account=batch_configuration["slurm_account"],
+                                        source_environment=batch_configuration["source_environment"])
 
     jobid_merge = sbatch_merge_dl1.submit()
-    log_merge.update({jobid_merge: sbatch_merge_dl1.slurm_command})
-
+    log_merge = {jobid_merge: sbatch_merge_dl1.slurm_command}
     log.info(f"\nMerging DL1 file from {input_dir} dir into {output_file} file.")
     log.info(f"Submitted batch job {jobid_merge}")
-
     return log_merge, jobid_merge

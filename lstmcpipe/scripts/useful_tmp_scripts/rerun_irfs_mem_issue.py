@@ -1,6 +1,7 @@
 """
 Run python rerun_irfs_mem_issue.py lstmcpipe_config.yaml
 """
+
 from ruamel.yaml import YAML
 import sys
 from pathlib import Path
@@ -29,7 +30,7 @@ cfg['stages']['dl2_to_irfs'] = to_rerun
 print(f"{len(to_rerun)} irfs to re-produce")
 
 
-output_filename = filename.parent.joinpath(filename.stem + '_rerun.yaml')
+output_filename = filename.parent.joinpath(f'{filename.stem}_rerun.yaml')
 
 if to_rerun and not Path(output_filename).exists():
     print(f"Run lstmcpipe -c {output_filename}")
