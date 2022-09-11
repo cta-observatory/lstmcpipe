@@ -37,7 +37,7 @@ def batch_dl1_to_dl2(dict_paths, config_file, jobid_from_training, batch_config,
     log_dl1_to_dl2 = {}
     jobid_for_dl2_to_dl3 = []
     debug_log = {}
-    log.info(f"==== START batch dl1_to_dl2_workflow ==== \n")
+    log.info("==== START batch dl1_to_dl2_workflow ==== \n")
     for paths in dict_paths:
         job_logs, jobid = dl1_to_dl2(paths["input"], paths["output"],
                                      path_models=paths["path_model"],
