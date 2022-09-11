@@ -239,53 +239,17 @@ class SbatchLstMCStage:
         self.wrap_cmd = wrap_command
 
         self.slurm_output = "./slurm-%j.o" if slurm_output is None else slurm_output
-        self.slurm_error =  "./slurm-%j.e" if slurm_error is None else slurm_error
+        self.slurm_error = "./slurm-%j.e" if slurm_error is None else slurm_error
         self.job_name = job_name
         self.slurm_account = slurm_account
         self.slurm_dependencies = slurm_dependencies
         self.extra_slurm_options = extra_slurm_options
-
-        # self.set_slurm_dependencies(slurm_dependencies)
 
         self.compose_wrap_command(wrap_command, source_environment, backend)
 
     def __str__(self):
         # return full string
         return self.slurm_command
-
-    # @property
-    # def slurm_account(self):
-    #     return self._slurm_account
-    #
-    # @slurm_account.setter
-    # def job_name(self, slurm_account):
-    #     self._slurm_account = f"--account={slurm_account}"
-    #
-    # @property
-    # def job_name(self):
-    #     return self._job_name
-    #
-    # @job_name.setter
-    # def job_name(self, job_name):
-    #     self._job_name = f"--job-name={job_name}"
-    #
-    # @property
-    # def slurm_error(self):
-    #     return self._slurm_error
-    #
-    # @slurm_error.setter
-    # def slurm_error(self, slurm_error):
-    #     error = "./slurm-%j.e" if slurm_error is None else slurm_error
-    #     self._slurm_error = f"--error={error}"
-    #
-    # @property
-    # def slurm_output(self):
-    #     return self._slurm_output
-    #
-    # @slurm_output.setter
-    # def slurm_output(self, slurm_output):
-    #     output = "./slurm-%j.o" if slurm_output is None else slurm_output
-    #     self._slurm_output = f"--output={output}"
 
     @property
     def _valid_stages(self):
@@ -319,10 +283,8 @@ class SbatchLstMCStage:
                 slurm_options_string += f"--job-name={value} "
             elif key == "dependencies":
                 slurm_options_string += f"{self._construct_slurm_dependencies()} "
-            else:
-                if value is not None or value != "":
-                    slurm_options_string += f"--{key}={value} "
-
+            elif value is not None or value != "":
+                slurm_options_string += f"--{key}={value} "
         return f"{self.base_slurm_command} {slurm_options_string} {self.wrap_cmd}"
 
     def _construct_slurm_dependencies(self):
