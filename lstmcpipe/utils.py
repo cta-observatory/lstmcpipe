@@ -321,7 +321,8 @@ class SbatchLstMCStage:
 
     def submit(self):
         if self.wrap_cmd is not None and self.wrap_cmd != "":
-            return run_command(self.slurm_command)
+            jobid = run_command(self.slurm_command)
+            return jobid
         else:
             raise ValueError(
                 "You must first define the command to be batched: " "SbatchLstMCStage().wrap_command('COMMAND')"
