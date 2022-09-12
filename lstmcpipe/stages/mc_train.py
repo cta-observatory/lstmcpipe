@@ -55,7 +55,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
             config_file=config_file,
             batch_configuration=batch_config,
             wait_jobs_dl1=jobids_from_merge,
-            slurm_options=paths.get("extra_slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_train.update(job_logs)
@@ -70,7 +70,7 @@ def batch_train_pipe(dict_paths, jobids_from_merge, config_file, batch_config, l
     save_log_to_file(log_train, logs["log_file"], workflow_step="train_pipe")
     save_log_to_file(debug_train, logs["debug_file"], workflow_step="train_pipe")
 
-    log.info("==== END {} ====".format("batch mc_train_workflow"))
+    log.info("==== END batch mc_train_workflow ====")
 
     return jobid_for_dl1_to_dl2
 

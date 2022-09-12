@@ -319,7 +319,6 @@ class SbatchLstMCStage:
         default_options.update(stage_options_dict[stage])
         return default_options
 
-    @property
     def submit(self):
         if self.wrap_cmd is not None and self.wrap_cmd != "":
             return run_command(self.slurm_command)
