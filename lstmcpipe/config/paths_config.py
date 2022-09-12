@@ -630,7 +630,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'input': dl1,
                     'output': merged_dl1,
                     'options': '--pattern */*.h5 --no-image',
-                    'slurm_options': '-p long',
+                    'extra_slurm_options': {'partition': 'long'},
                 }
             )
         return paths
@@ -644,8 +644,12 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'proton': self.training_merged_dl1('Protons'),
                 },
                 'output': self.models_dir(),
-                'slurm_options': '-p xxl --mem=160G --cpus-per-task=16' if self.dec == _crab_dec
-                else '-p xxl --mem=100G --cpus-per-task=16',
+                'extra_slurm_options': {'partition': 'xxl',
+                                        'mem': '160G',
+                                        'cpus-per-task': 16} if self.dec == _crab_dec
+                else {'partition': 'xxl',
+                      'mem': '100G',
+                      'cpus-per-task': 16}
             }
         ]
         return paths
@@ -793,7 +797,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
-                    'slurm_options': '--mem=80GB' if self.dec == _crab_dec else '--mem=60GB'
+                    'extra_slurm_options': {'mem': '80GB' if self.dec == _crab_dec else '60GB'}
                 }
             )
         return paths
@@ -816,7 +820,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
                     'options': '--point-like',
-                    'slurm_options': '--mem=6GB'
+                    'extra_slurm_options': {'mem':'6GB'}
                 }
             )
 
