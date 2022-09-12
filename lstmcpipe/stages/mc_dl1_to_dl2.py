@@ -39,12 +39,15 @@ def batch_dl1_to_dl2(dict_paths, config_file, jobid_from_training, batch_config,
     debug_log = {}
     log.info("==== START batch dl1_to_dl2_workflow ==== \n")
     for paths in dict_paths:
-        job_logs, jobid = dl1_to_dl2(paths["input"], paths["output"],
-                                     path_models=paths["path_model"],
-                                     config_file=config_file,
-                                     wait_jobid_train_pipe=jobid_from_training,
-                                     batch_configuration=batch_config,
-                                     extra_slurm_options=paths.get("extra_slurm_options", None))
+        job_logs, jobid = dl1_to_dl2(
+            paths["input"],
+            paths["output"],
+            path_models=paths["path_model"],
+            config_file=config_file,
+            wait_jobid_train_pipe=jobid_from_training,
+            batch_configuration=batch_config,
+            extra_slurm_options=paths.get("extra_slurm_options", None),
+        )
 
         log_dl1_to_dl2.update(job_logs)
         jobid_for_dl2_to_dl3.append(jobid)
@@ -57,8 +60,15 @@ def batch_dl1_to_dl2(dict_paths, config_file, jobid_from_training, batch_config,
     return jobid_for_dl2_to_dl3
 
 
-def dl1_to_dl2(input_file, output_dir, path_models, config_file, wait_jobid_train_pipe=None, batch_configuration='',
-               extra_slurm_options=None):
+def dl1_to_dl2(
+    input_file,
+    output_dir,
+    path_models,
+    config_file,
+    wait_jobid_train_pipe=None,
+    batch_configuration='',
+    extra_slurm_options=None,
+):
     """
     Convert onsite files from dl1 to dl2
 
@@ -97,14 +107,16 @@ def dl1_to_dl2(input_file, output_dir, path_models, config_file, wait_jobid_trai
     cmd = f"lstchain_dl1_to_dl2 -f {input_file} -p {path_models} -o {output_dir}"
     if config_file is not None:
         cmd += f" -c {Path(config_file).resolve().as_posix()}"
-    sbatch_dl1_dl2 = SbatchLstMCStage("dl1_to_dl2",
-                                      wrap_command=cmd,
-                                      slurm_error=Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix(),
-                                      slurm_output=Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix(),
-                                      slurm_dependencies=wait_jobid_train_pipe,
-                                      extra_slurm_options=extra_slurm_options,
-                                      slurm_account=batch_configuration["slurm_account"],
-                                      source_environment=batch_configuration["source_environment"])
+    sbatch_dl1_dl2 = SbatchLstMCStage(
+        "dl1_to_dl2",
+        wrap_command=cmd,
+        slurm_error=Path(output_dir).joinpath("dl1_dl2-%j.e").resolve().as_posix(),
+        slurm_output=Path(output_dir).joinpath("dl1_dl2-%j.o").resolve().as_posix(),
+        slurm_dependencies=wait_jobid_train_pipe,
+        extra_slurm_options=extra_slurm_options,
+        slurm_account=batch_configuration["slurm_account"],
+        source_environment=batch_configuration["source_environment"],
+    )
 
     jobid_dl1_to_dl2 = sbatch_dl1_dl2.submit()
     log_dl1_to_dl2 = {jobid_dl1_to_dl2: sbatch_dl1_dl2.slurm_command}

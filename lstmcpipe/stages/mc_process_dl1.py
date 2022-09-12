@@ -48,18 +48,28 @@ def batch_process_dl1(dict_paths, conf_file, batch_config, logs, workflow_kind="
                 debug_log["**EMPTY_R0_DIR**"] = f'{paths["input"]} directory does not contain any simtel.gz file'
 
                 continue
-            job_logs, jobid = r0_to_dl1(paths["input"], paths["output"], config_file=conf_file,
-                                        batch_config=batch_config, workflow_kind=workflow_kind,
-                                        extra_slurm_options=paths.get("extra_slurm_options", None))
+            job_logs, jobid = r0_to_dl1(
+                paths["input"],
+                paths["output"],
+                config_file=conf_file,
+                batch_config=batch_config,
+                workflow_kind=workflow_kind,
+                extra_slurm_options=paths.get("extra_slurm_options", None),
+            )
 
             log_process_dl1.update(job_logs)
             jobids_dl1_processing_stage.append(jobid)
             debug_log[jobid] = f'r0_dl1 job from input dir: {paths["input"]}'
     else:
         for paths in dict_paths["dl1ab"]:
-            job_logs, jobid = reprocess_dl1(paths["input"], paths["output"], config_file=conf_file,
-                                            batch_config=batch_config, workflow_kind=workflow_kind,
-                                            extra_slurm_options=paths.get("extra_slurm_options", None))
+            job_logs, jobid = reprocess_dl1(
+                paths["input"],
+                paths["output"],
+                config_file=conf_file,
+                batch_config=batch_config,
+                workflow_kind=workflow_kind,
+                extra_slurm_options=paths.get("extra_slurm_options", None),
+            )
 
             log_process_dl1.update(job_logs)
             jobids_dl1_processing_stage.append(jobid)
@@ -71,8 +81,16 @@ def batch_process_dl1(dict_paths, conf_file, batch_config, logs, workflow_kind="
     return jobids_dl1_processing_stage
 
 
-def r0_to_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=None, batch_config=None, debug_mode=False,
-              keep_rta_file=False, extra_slurm_options=None):
+def r0_to_dl1(
+    input_dir,
+    output_dir,
+    workflow_kind="lstchain",
+    config_file=None,
+    batch_config=None,
+    debug_mode=False,
+    keep_rta_file=False,
+    extra_slurm_options=None,
+):
     """
     R0 to DL1 MC onsite conversion.
     Organizes files and launches slurm jobs in two slurm arrays.
@@ -142,10 +160,18 @@ def r0_to_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=None,
     job_logs_dir = output_dir.joinpath("job_logs_r0dl1")
     Path(job_logs_dir).mkdir(exist_ok=True, parents=True)
     log.info(f"DL1 DATA DIR: {output_dir}")
-    jobid2log, jobids_r0_dl1 = submit_dl1_jobs(input_dir, output_dir, base_cmd=base_cmd, file_list=raw_files_list,
-                                               job_type_id=jobtype_id, dl1_files_per_batched_job=dl1_files_per_job,
-                                               job_logs_dir=job_logs_dir, batch_config=batch_config,
-                                               dl1_processing_type="r0_to_dl1", extra_slurm_options=extra_slurm_options)
+    jobid2log, jobids_r0_dl1 = submit_dl1_jobs(
+        input_dir,
+        output_dir,
+        base_cmd=base_cmd,
+        file_list=raw_files_list,
+        job_type_id=jobtype_id,
+        dl1_files_per_batched_job=dl1_files_per_job,
+        job_logs_dir=job_logs_dir,
+        batch_config=batch_config,
+        dl1_processing_type="r0_to_dl1",
+        extra_slurm_options=extra_slurm_options,
+    )
 
     if config_file is not None:
         shutil.copyfile(config_file, job_logs_dir.joinpath(Path(config_file).name))
@@ -153,8 +179,15 @@ def r0_to_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=None,
     return jobid2log, jobids_r0_dl1
 
 
-def reprocess_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=None, batch_config=None,
-                  dl1_files_per_job=50, extra_slurm_options=None):
+def reprocess_dl1(
+    input_dir,
+    output_dir,
+    workflow_kind="lstchain",
+    config_file=None,
+    batch_config=None,
+    dl1_files_per_job=50,
+    extra_slurm_options=None,
+):
     """
     Reprocessing of existing dl1 files.
     Organizes files and launches slurm jobs in two slurm arrays.
@@ -210,10 +243,18 @@ def reprocess_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=N
     job_logs_dir = Path(output_dir).joinpath("job_logs_dl1ab")
     Path(job_logs_dir).mkdir(exist_ok=True)
     log.info(f"DL1ab destination DATA DIR: {output_dir}")
-    jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(input_dir, output_dir, base_cmd=base_cmd, file_list=dl1ab_filelist,
-                                                job_type_id=jobtype_id, dl1_files_per_batched_job=dl1_files_per_job,
-                                                job_logs_dir=job_logs_dir, batch_config=batch_config,
-                                                dl1_processing_type="dl1ab", extra_slurm_options=extra_slurm_options)
+    jobid2log, jobids_dl1_dl1 = submit_dl1_jobs(
+        input_dir,
+        output_dir,
+        base_cmd=base_cmd,
+        file_list=dl1ab_filelist,
+        job_type_id=jobtype_id,
+        dl1_files_per_batched_job=dl1_files_per_job,
+        job_logs_dir=job_logs_dir,
+        batch_config=batch_config,
+        dl1_processing_type="dl1ab",
+        extra_slurm_options=extra_slurm_options,
+    )
 
     if config_file is not None:
         shutil.copyfile(config_file, job_logs_dir.joinpath(Path(config_file).name))
@@ -221,8 +262,19 @@ def reprocess_dl1(input_dir, output_dir, workflow_kind="lstchain", config_file=N
     return jobid2log, jobids_dl1_dl1
 
 
-def submit_dl1_jobs(input_dir, output_dir, base_cmd, file_list, job_type_id, dl1_files_per_batched_job, job_logs_dir,
-                    batch_config, n_jobs_parallel=100, dl1_processing_type="r0_to_dl1", extra_slurm_options=None):
+def submit_dl1_jobs(
+    input_dir,
+    output_dir,
+    base_cmd,
+    file_list,
+    job_type_id,
+    dl1_files_per_batched_job,
+    job_logs_dir,
+    batch_config,
+    n_jobs_parallel=100,
+    dl1_processing_type="r0_to_dl1",
+    extra_slurm_options=None,
+):
     """
     Compose sbatch command and batches it
 
@@ -261,7 +313,8 @@ def submit_dl1_jobs(input_dir, output_dir, base_cmd, file_list, job_type_id, dl1
 
     """
     number_of_sublists = len(file_list) // dl1_files_per_batched_job + int(
-        len(file_list) % dl1_files_per_batched_job > 0)
+        len(file_list) % dl1_files_per_batched_job > 0
+    )
 
     for i in range(number_of_sublists):
         output_file = job_logs_dir.joinpath(f"{dl1_processing_type}_{i}.sublist").resolve().as_posix()
@@ -278,14 +331,16 @@ def submit_dl1_jobs(input_dir, output_dir, base_cmd, file_list, job_type_id, dl1
 
     if extra_slurm_options is not None:
         extra_slurm_default_options.update(extra_slurm_options)
-    sbatch_process_dl1 = SbatchLstMCStage(dl1_processing_type,
-                                          wrap_command=cmd,
-                                          job_name=f"{job_type_id}-{dl1_processing_type}",
-                                          slurm_error=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
-                                          slurm_output=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
-                                          slurm_account=batch_config["slurm_account"],
-                                          source_environment=batch_config["source_environment"],
-                                          extra_slurm_options=extra_slurm_default_options)
+    sbatch_process_dl1 = SbatchLstMCStage(
+        dl1_processing_type,
+        wrap_command=cmd,
+        job_name=f"{job_type_id}-{dl1_processing_type}",
+        slurm_error=job_logs_dir.joinpath("job_%A_%a.e").as_posix(),
+        slurm_output=job_logs_dir.joinpath("job_%A_%a.o").as_posix(),
+        slurm_account=batch_config["slurm_account"],
+        source_environment=batch_config["source_environment"],
+        extra_slurm_options=extra_slurm_default_options,
+    )
 
     jobid = sbatch_process_dl1.submit()
     log.debug(f"Submitted batch job {jobid}")

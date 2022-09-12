@@ -39,10 +39,15 @@ def batch_merge_dl1(dict_paths, batch_config, logs, jobid_from_splitting, workfl
     debug_log = {}
     log.info('==== START batch merge_and_copy_dl1_workflow ====')
     for paths in dict_paths:
-        job_logs, jobid_debug = merge_dl1(paths["input"], paths["output"], merging_options=paths.get('options', None),
-                                          batch_configuration=batch_config, wait_jobs_split=jobid_from_splitting,
-                                          workflow_kind=workflow_kind,
-                                          extra_slurm_options=paths.get("extra_slurm_options", None))
+        job_logs, jobid_debug = merge_dl1(
+            paths["input"],
+            paths["output"],
+            merging_options=paths.get('options', None),
+            batch_configuration=batch_config,
+            wait_jobs_split=jobid_from_splitting,
+            workflow_kind=workflow_kind,
+            extra_slurm_options=paths.get("extra_slurm_options", None),
+        )
 
         log_merge.update(job_logs)
         all_jobs_merge_stage.append(jobid_debug)
@@ -52,8 +57,15 @@ def batch_merge_dl1(dict_paths, batch_config, logs, jobid_from_splitting, workfl
     return ','.join(all_jobs_merge_stage)
 
 
-def merge_dl1(input_dir, output_file, batch_configuration, wait_jobs_split="", merging_options=None,
-              workflow_kind="lstchain", extra_slurm_options=None):
+def merge_dl1(
+    input_dir,
+    output_file,
+    batch_configuration,
+    wait_jobs_split="",
+    merging_options=None,
+    workflow_kind="lstchain",
+    extra_slurm_options=None,
+):
     """
 
     Parameters
@@ -80,12 +92,16 @@ def merge_dl1(input_dir, output_file, batch_configuration, wait_jobs_split="", m
     else:
         cmd = f'ctapipe-merge --input-dir {input_dir} --output {output_file} {merging_options}'
 
-    sbatch_merge_dl1 = SbatchLstMCStage("merge_dl1", wrap_command=cmd,
-                                        slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
-                                        slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
-                                        slurm_dependencies=wait_jobs_split, extra_slurm_options=extra_slurm_options,
-                                        slurm_account=batch_configuration["slurm_account"],
-                                        source_environment=batch_configuration["source_environment"])
+    sbatch_merge_dl1 = SbatchLstMCStage(
+        "merge_dl1",
+        wrap_command=cmd,
+        slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
+        slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
+        slurm_dependencies=wait_jobs_split,
+        extra_slurm_options=extra_slurm_options,
+        slurm_account=batch_configuration["slurm_account"],
+        source_environment=batch_configuration["source_environment"],
+    )
 
     jobid_merge = sbatch_merge_dl1.submit()
     log_merge = {jobid_merge: sbatch_merge_dl1.slurm_command}

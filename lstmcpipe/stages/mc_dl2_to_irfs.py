@@ -13,13 +13,7 @@ from ..io.data_management import check_and_make_dir_without_verification
 log = logging.getLogger(__name__)
 
 
-def batch_dl2_to_irfs(
-    dict_paths,
-    config_file,
-    job_ids_from_dl1_dl2,
-    batch_config,
-    logs,
-):
+def batch_dl2_to_irfs(dict_paths, config_file, job_ids_from_dl1_dl2, batch_config, logs):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -53,7 +47,7 @@ def batch_dl2_to_irfs(
         job_logs, jobid = dl2_to_irfs(
             paths["input"]["gamma_file"],  # gamma_file must always be provided
             paths["input"].get("electron_file", None),  # electron_file might be missing in case of point-like IRFs
-            paths["input"].get("proton_file", None),   # proton_file might be missing in case of point-like IRFs
+            paths["input"].get("proton_file", None),  # proton_file might be missing in case of point-like IRFs
             paths["output"],
             config_file=config_file,
             options=paths.get("options", None),
