@@ -1,0 +1,58 @@
+# lstmcpipe config - 2022-09-13
+
+workflow_kind: lstchain
+
+# prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: 20220913_crab_theta23_tuned
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.6
+
+slurm_config:
+# dpps is the default account for lstanalyzer - other users should use aswg
+  user_account: dpps
+
+
+lstmcpipe_version: 0.8.1
+prod_type: PathConfigAllSkyFullDL1ab
+stages_to_run:
+- dl1ab
+- merge_dl1
+- dl1_to_dl2
+- dl2_to_irfs
+stages:
+  dl1ab:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220902_crab_test_nodes/TestingDataset/node_theta_23.630_az_100.758_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/node_theta_23.630_az_100.758_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220902_crab_test_nodes/TestingDataset/node_theta_23.630_az_259.265_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/node_theta_23.630_az_259.265_
+  merge_dl1:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/node_theta_23.630_az_100.758_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/dl1_crab_theta23_node_theta_23.630_az_100.758__merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/node_theta_23.630_az_259.265_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/dl1_crab_theta23_node_theta_23.630_az_259.265__merged.h5
+    options: --no-image
+  dl1_to_dl2:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/dl1_crab_theta23_node_theta_23.630_az_100.758__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220518_allsky_dec2276_tuned/dec_2276
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_
+    slurm_options: --mem=80GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20220913_crab_theta23_tuned/TestingDataset/dl1_crab_theta23_node_theta_23.630_az_259.265__merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20220518_allsky_dec2276_tuned/dec_2276
+    output: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_
+    slurm_options: --mem=80GB
+  dl2_to_irfs:
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/dl2_20220913_crab_theta23_tuned_node_theta_23.630_az_100.758__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/irf_20220913_crab_theta23_tuned_node_theta_23.630_az_100.758_.fits.gz
+    options: --point-like
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/dl2_20220913_crab_theta23_tuned_node_theta_23.630_az_259.265__merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/irf_20220913_crab_theta23_tuned_node_theta_23.630_az_259.265_.fits.gz
+    options: --point-like
