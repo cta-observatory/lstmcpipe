@@ -992,7 +992,7 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
         for pointing in self.pointing_dirs():
             source_dl1 = Path(self.source_config.dl1_dir(pointing))
             if not source_dl1.exists():
-                warnings.warn(f"{source_dl1} does not exist but MC file for {particle} - {pointing} does. "
+                warnings.warn(f"{source_dl1} does not exist but MC file for {pointing} does. "
                               f"This node will be removed from production.")
                 marked_for_removal.append(pointing)
         for pointing in marked_for_removal:
