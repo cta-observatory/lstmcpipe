@@ -105,13 +105,13 @@ def generate_test_allsky(
     pc.generate()
     for stage_name, stage_steps in pc.paths.items():
         for step in stage_steps:
-            step['slurm_options'] = '-p short'
+            step['extra_slurm_options'] = {'partition': 'short'}
     pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
     
     pcdl1ab.generate()
     for stage_name, stage_steps in pcdl1ab.paths.items():
         for step in stage_steps:
-            step['slurm_options'] = '-p short'
+            step['extra_slurm_options'] = {'partition': 'short'}
     pcdl1ab.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}_dl1ab.yaml'), overwrite=overwrite)
 
 

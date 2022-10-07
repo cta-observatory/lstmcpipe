@@ -12,7 +12,6 @@ from pprint import pprint
 from copy import deepcopy
 from deepdiff import DeepDiff
 
-
 log = logging.getLogger(__name__)
 
 
@@ -43,12 +42,12 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
 
 
 def batch_mc_production_check(
-    dict_jobids_all_stages,
-    log_directory,
-    prod_id,
-    prod_config_file,
-    batch_config,
-    logs_files,
+        dict_jobids_all_stages,
+        log_directory,
+        prod_id,
+        prod_config_file,
+        batch_config,
+        logs_files,
 ):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
@@ -79,7 +78,7 @@ def batch_mc_production_check(
 
     for stage, jobids in dict_jobids_all_stages.items():
         all_pipeline_jobs.append(jobids)
-        debug_log.update({f"SUMMARY_{stage}": jobids})
+        debug_log[f"SUMMARY_{stage}"] = jobids
 
     all_pipeline_jobs = ",".join(all_pipeline_jobs)
 
@@ -103,7 +102,7 @@ def batch_mc_production_check(
 
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
-    debug_log.update({f"prod_check_{jobid}": batch_cmd})
+    debug_log[f"prod_check_{jobid}"] = batch_cmd
 
     save_log_to_file(debug_log, logs_files["debug_file"], workflow_step="check_full_workflow")
 
@@ -223,33 +222,29 @@ class SbatchLstMCStage:
     """
 
     def __init__(
-        self,
-        stage,
-        wrap_command,
-        slurm_output=None,
-        slurm_error=None,
-        job_name=None,
-        slurm_account=None,
-        slurm_partition=None,
-        slurm_deps=None,
-        slurm_options=None,
-        source_environment="",
-        backend="",
+            self,
+            stage,
+            wrap_command,
+            slurm_output=None,
+            slurm_error=None,
+            job_name=None,
+            slurm_account=None,
+            slurm_dependencies=None,
+            extra_slurm_options=None,
+            source_environment="",
+            backend="",
     ):
         self.base_slurm_command = "sbatch --parsable"
-
-        self.slurm_output = f"--output={slurm_output}" if slurm_output is not None else "--output=./slurm-%j.o"
-        self.slurm_error = f"--error={slurm_error}" if slurm_error is not None else "--error=./slurm-%j.e"
-        self.job_name = f"--job-name={job_name}" if job_name is not None else ""
-        self.slurm_account = f"--account={slurm_account}" if slurm_account is not None else ""
-
-        self.slurm_partition = f"--partition={slurm_account}" if slurm_partition is not None else "--partition=short"
-        self.slurm_options = f"{slurm_options}" if slurm_options is not None else None
-
-        self.stage_default_options(stage)
-        self.slurm_dependencies = None
-        self.check_slurm_dependencies(slurm_deps)
+        self.stage = stage
         self.wrap_cmd = wrap_command
+
+        self.slurm_output = "./slurm-%j.o" if slurm_output is None else slurm_output
+        self.slurm_error = "./slurm-%j.e" if slurm_error is None else slurm_error
+        self.job_name = job_name
+        self.slurm_account = slurm_account
+        self.slurm_dependencies = slurm_dependencies
+        self.extra_slurm_options = extra_slurm_options
+
         self.compose_wrap_command(wrap_command, source_environment, backend)
 
     def __str__(self):
@@ -275,99 +270,129 @@ class SbatchLstMCStage:
         if wrap_command is None or wrap_command == "":
             warnings.warn("You must pass a command to be batched! ")
         if source_env != "" and not source_env.strip().endswith(";"):
-            source_env = source_env.strip() + "; "
+            source_env = f"{source_env.strip()}; "
         if backend != "" and not backend.strip().endswith(";"):
-            backend = backend.strip() + "; "
+            backend = f"{backend.strip()}; "
         self.wrap_cmd = f'--wrap="{backend}{source_env}{wrap_command}"'
 
     @property
     def slurm_command(self):
-        if self.slurm_options is not None:
-            return (
-                f"{self.base_slurm_command} {self.job_name} {self.slurm_options}"
-                f" {self.slurm_error} {self.slurm_output} {self.slurm_dependencies}"
-                f" {self.slurm_account} {self.wrap_cmd}"
-            )
-        else:
-            return (
-                f"{self.base_slurm_command} {self.job_name} {self.slurm_partition}"
-                f" {self.slurm_error} {self.slurm_output} {self.slurm_dependencies}"
-                f" {self.slurm_account} {self.wrap_cmd}"
-            )
+        slurm_options_string = ""
+        for key, value in self.slurm_options.items():
+            if key == "job_name":
+                slurm_options_string += f"--job-name={value} "
+            elif key == "dependencies":
+                slurm_options_string += f"{self._construct_slurm_dependencies()} "
+            elif value is not None or value != "":
+                slurm_options_string += f"--{key}={value} "
+        return f"{self.base_slurm_command} {slurm_options_string} {self.wrap_cmd}"
 
-    def check_slurm_dependencies(self, slurm_deps, dependency="afterok"):
-        if slurm_deps is None:
-            self.slurm_dependencies = ""
+    def _construct_slurm_dependencies(self):
+        dependency_type = "afterok"
+        slurm_deps = self.slurm_options.get('dependencies', None)
+        if slurm_deps is None or slurm_deps == "":
+            return ""
+        elif all(items != "" for items in slurm_deps.split(",")):
+            return f"--dependency={dependency_type}:{slurm_deps}"
         else:
-            if all(items != "" for items in slurm_deps.split(",")):
-                self.slurm_dependencies = f"--dependency={dependency}:{slurm_deps}"
-            else:
-                raise ValueError("Slurm dependencies contain an empty value between commas, i.e.; ,'', ")
+            raise ValueError("Slurm dependencies contain an empty value between commas, i.e.; ,'', ")
 
     def stage_default_options(self, stage):
-        if stage not in self._valid_stages or stage is None:
+        if self.stage not in self._valid_stages:
             raise ValueError(f"Please select a valid stage: \n{', '.join(self._valid_stages)}")
 
-        _default_options = {
-            "r0_to_dl1": getattr(self, "r0_dl1_options"),
-            "dl1ab": getattr(self, "dl1ab_options"),
-            "merge_dl1": getattr(self, "set_merge_dl1_default_options"),
-            "train_test_splitting": getattr(self, "set_train_test_splitting_default_options"),
-            "train_pipe": getattr(self, "set_trainpipe_default_options"),
-            "RF_importance": getattr(self, "set_train_plot_rf_feat_default_options"),
-            "dl1_to_dl2": getattr(self, "set_dl1_dl2_default_options"),
-            "dl2_to_irfs": getattr(self, "set_dl2_irfs_default_options"),
-            "dl2_sens": getattr(self, "set_dl2_sens_default_options"),
-            "dl2_sens_plot": getattr(self, "set_dl2_sens_plot_default_options"),
+        default_options = {'partition': 'short'}
+
+        stage_options_dict = {
+            "r0_to_dl1": getattr(self, "r0_dl1_default_options"),
+            "dl1ab": getattr(self, "dl1ab_default_options"),
+            "merge_dl1": getattr(self, "merge_dl1_default_options"),
+            "train_test_splitting": getattr(self, "train_test_splitting_default_options"),
+            "train_pipe": getattr(self, "trainpipe_default_options"),
+            "RF_importance": getattr(self, "train_plot_rf_feat_default_options"),
+            "dl1_to_dl2": getattr(self, "dl1_dl2_default_options"),
+            "dl2_to_irfs": getattr(self, "dl2_irfs_default_options"),
+            "dl2_sens": getattr(self, "dl2_sens_default_options"),
+            "dl2_sens_plot": getattr(self, "dl2_sens_plot_default_options"),
         }
-        _default_options[stage]()
+
+        default_options.update(stage_options_dict[stage])
+        return default_options
 
     def submit(self):
-        if self.wrap_cmd is None or self.wrap_cmd == "":
+        if self.wrap_cmd is not None and self.wrap_cmd != "":
+            jobid = run_command(self.slurm_command)
+            return jobid
+        else:
             raise ValueError(
                 "You must first define the command to be batched: " "SbatchLstMCStage().wrap_command('COMMAND')"
             )
-        else:
-            jobid = run_command(self.slurm_command)
-            return jobid
 
-    def r0_dl1_options(self, process_dl1_job_name="r0_dl1", array="0-0%100", partition="long", extra_slurm_options=""):
-        self.job_name = f"--job-name={process_dl1_job_name}"
-        self.slurm_options = f"--partition={partition} --array={array} {extra_slurm_options}"
+    @property
+    def slurm_options(self):
+        self._construct_slurm_options_dict()
+        return self._slurm_options
 
-    def dl1ab_options(self, process_dl1ab_job_name="dl1ab", array="0-0%100", partition="long", extra_slurm_options=""):
-        self.job_name = f"--job-name={process_dl1ab_job_name}"
-        self.slurm_options = f"--partition={partition} --array={array} {extra_slurm_options}"
+    def _construct_slurm_options_dict(self):
+        """
+        Construct the complet set of slurm options with the following priority order:
+        - default ones for the stage
+        - the general ones (job_name, error, output, account)
+        - extra_slurm_options
+        """
+        # set all the slurm options with the following priority order: default, general, extra_slurm_options
+        self._slurm_options = {}
+        self._slurm_options.update(self.stage_default_options(self.stage))
 
-    def set_merge_dl1_default_options(self):
-        self.job_name = "--job-name=merge"
-        self.slurm_partition = "--partition=long"
+        if self.job_name is not None:
+            self._slurm_options['job-name'] = self.job_name
+        if self.slurm_account is not None:
+            self._slurm_options['account'] = self.slurm_account
+        if self.slurm_error is not None:
+            self._slurm_options['error'] = self.slurm_error
+        if self.slurm_output is not None:
+            self._slurm_options['output'] = self.slurm_output
+        if self.slurm_dependencies is not None:
+            self._slurm_options['dependencies'] = self.slurm_dependencies
+        if self.extra_slurm_options is not None:
+            self._slurm_options.update(self.extra_slurm_options)
 
-    def set_train_test_splitting_default_options(self):
-        self.job_name = "--job-name=train_test_splitting"
-        self.slurm_partition = "--partition=short"
+    @property
+    def r0_dl1_default_options(self):
+        return {'job-name': 'r0_dl1', 'partition': 'long', 'array': '0-0%100'}
 
-    def set_trainpipe_default_options(self):
-        self.job_name = "--job-name=train_pipe"
-        # self.slurm_options = " --partition=long --mem=32G"
-        self.slurm_options = "--partition=xxl --mem=100G --cpus-per-task=16"
+    @property
+    def dl1ab_default_options(self):
+        return {'job-name': 'dl1ab', 'array': '0-0%100', 'partition': 'long'}
 
-    def set_train_plot_rf_feat_default_options(self):
-        self.job_name = "--job-name=RF_importance"
-        self.slurm_options = "--partition=short --mem=16G"
+    @property
+    def merge_dl1_default_options(self):
+        return {'job-name': 'merge', 'partition': 'long'}
 
-    def set_dl1_dl2_default_options(self):
-        self.job_name = "--job-name=dl1_2"
-        self.slurm_options = "--partition=short --mem=32G"
+    @property
+    def train_test_splitting_default_options(self):
+        return {'job-name': 'train_test_split', 'partition': 'short'}
 
-    def set_dl2_irfs_default_options(self):
-        self.job_name = "--job-name=dl2_IRFs"
-        self.slurm_partition = "--partition=short"
+    @property
+    def trainpipe_default_options(self):
+        return {'job-name': 'train_pipe', 'partition': 'xxl', 'mem': '100GB', 'cpus-per-task': 16}
 
-    def set_dl2_sens_default_options(self):
-        self.job_name = "--job-name=dl2_sens"
-        self.slurm_options = "--partition=short --mem=32G"
+    @property
+    def train_plot_rf_feat_default_options(self):
+        return {'job-name': 'RF_importance', 'partition': 'short', 'mem': '16GB'}
 
-    def set_dl2_sens_plot_default_options(self):
-        self.job_name = "--job-name=dl2_sens_plot"
-        self.slurm_partition = "--partition=short"
+    @property
+    def dl1_dl2_default_options(self):
+        return {'job-name': 'dl1_dl2', 'partition': 'short', 'mem': '32GB'}
+
+    @property
+    def dl2_irfs_default_options(self):
+        return {'job-name': 'dl2_irfs', 'partition': 'short'}
+
+    @property
+    def dl2_sens_default_options(self):
+        return {'job-name': 'dl2_sens', 'mem': '32GB'}
+
+    @property
+    def dl2_sens_plot_default_options(self):
+        return {'job-name': 'dl2_sens_plot', 'partition': 'short'}
