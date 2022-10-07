@@ -13,13 +13,7 @@ from ..io.data_management import check_and_make_dir_without_verification
 log = logging.getLogger(__name__)
 
 
-def batch_dl2_to_irfs(
-    dict_paths,
-    config_file,
-    job_ids_from_dl1_dl2,
-    batch_config,
-    logs,
-):
+def batch_dl2_to_irfs(dict_paths, config_file, job_ids_from_dl1_dl2, batch_config, logs):
     """
     Batches the dl2_to_irfs stage (lstchain lstchain_create_irf_files script) once the dl1_to_dl2 stage had finished.
 
@@ -43,7 +37,7 @@ def batch_dl2_to_irfs(
     jobs_from_dl2_irf: str
         Comma-separated jobids batched in the current stage
     """
-    log.info("==== START {} ====".format("batch mc_dl2_to_irfs"))
+    log.info("==== START batch mc_dl2_to_irfs ====")
 
     log_dl2_to_irfs = {}
     jobid_for_check = []
@@ -53,13 +47,13 @@ def batch_dl2_to_irfs(
         job_logs, jobid = dl2_to_irfs(
             paths["input"]["gamma_file"],  # gamma_file must always be provided
             paths["input"].get("electron_file", None),  # electron_file might be missing in case of point-like IRFs
-            paths["input"].get("proton_file", None),   # proton_file might be missing in case of point-like IRFs
+            paths["input"].get("proton_file", None),  # proton_file might be missing in case of point-like IRFs
             paths["output"],
             config_file=config_file,
             options=paths.get("options", None),
             batch_configuration=batch_config,
             wait_jobs_dl1dl2=job_ids_from_dl1_dl2,
-            slurm_options=paths.get("slurm_options", None),
+            extra_slurm_options=paths.get("extra_slurm_options", None),
         )
 
         log_dl2_to_irfs.update(log_dl2_to_irfs)
@@ -73,7 +67,7 @@ def batch_dl2_to_irfs(
     save_log_to_file(log_dl2_to_irfs, logs["log_file"], workflow_step="dl2_to_irfs")
     save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl2_to_irfs")
 
-    log.info("==== END {} ====".format("batch mc_dl2_to_irfs"))
+    log.info("==== END batch mc_dl2_to_irfs ====")
 
     return jobid_for_check
 
@@ -87,7 +81,7 @@ def dl2_to_irfs(
     options,
     batch_configuration,
     wait_jobs_dl1dl2,
-    slurm_options=None,
+    extra_slurm_options=None,
 ):
     """
     Batches interactively the lstchain `lstchain_create_irf_files` entry point.
@@ -109,7 +103,7 @@ def dl2_to_irfs(
     wait_jobs_dl1dl2: str
         Comma separated string with the job ids of previous stages (dl1_to_dl2 stage) to be passed as dependencies to
         the create_irfs_files job to be batched.
-    slurm_options: str
+    extra_slurm_options: dict
         Extra slurm options to be passed to the sbatch command
 
     Returns
@@ -140,8 +134,8 @@ def dl2_to_irfs(
         wrap_command=cmd,
         slurm_error=Path(output_dir).joinpath("job_dl2_to_irfs-%j.e").resolve().as_posix(),
         slurm_output=Path(output_dir).joinpath("job_dl2_to_irfs-%j.o").resolve().as_posix(),
-        slurm_deps=wait_jobs_dl1dl2,
-        slurm_options=slurm_options,
+        slurm_dependencies=wait_jobs_dl1dl2,
+        extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],
         source_environment=batch_configuration["source_environment"],
     )
