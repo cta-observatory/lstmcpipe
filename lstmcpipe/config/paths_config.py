@@ -989,6 +989,7 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
             self.check_source_prod()
         
     def check_source_prod(self):
+        marked_for_removal = []
         for pointing in self.pointing_dirs():
             source_dl1 = Path(self.source_config.dl1_dir(pointing))
             if not source_dl1.exists():
