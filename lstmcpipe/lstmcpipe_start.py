@@ -250,7 +250,7 @@ def main():
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
             lstmcpipe_config['stages']['dl1_to_dl2'],
             Path(args.config_file_lst).resolve().as_posix(),
-            jobs_dependency_for_dl1_dl2,  # Single jobid from train
+            jobs_dependency_for_dl1_dl2,
             batch_config=batch_config,
             logs=logs_files,
         )
