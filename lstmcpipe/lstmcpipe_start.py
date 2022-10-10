@@ -40,7 +40,6 @@ from lstmcpipe.stages import (
     batch_plot_rf_features,
 )
 
-
 parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
 
 parser.add_argument(
@@ -71,7 +70,7 @@ parser.add_argument(
     type=str,
     dest="config_file_ctapipe",
     help="Path to a ctapipe-like configuration file."
-    'Only to be declared if WORKFLOW_KIND = "ctapipe" and only used up to dl1.',
+         'Only to be declared if WORKFLOW_KIND = "ctapipe" and only used up to dl1.',
     default=None,
 )
 
@@ -82,7 +81,7 @@ parser.add_argument(
     type=str,
     dest="config_file_rta",
     help="Path to a HiPeRTA-like configuration file."
-    'Only to be declared if WORKFLOW_KIND = "hiperta" and only used up to dl1.',
+         'Only to be declared if WORKFLOW_KIND = "hiperta" and only used up to dl1.',
     default=None,
 )
 
@@ -97,6 +96,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
 
 #######################################################################################################################
 
@@ -241,11 +241,16 @@ def main():
 
     # 4 STAGE --> DL1 to DL2 stage
     if "dl1_to_dl2" in stages_to_run:
+        jobs_dependency_for_dl1_dl2 = jobs_from_merge
+        if job_from_train_pipe is not None:
+            jobs_dependency_for_dl1_dl2 = ','.join([jobs_dependency_for_dl1_dl2,
+                                                    job_from_train_pipe]) if jobs_dependency_for_dl1_dl2 is not None \
+                else job_from_train_pipe
 
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
             lstmcpipe_config['stages']['dl1_to_dl2'],
             Path(args.config_file_lst).resolve().as_posix(),
-            job_from_train_pipe,  # Single jobid from train
+            jobs_dependency_for_dl1_dl2,
             batch_config=batch_config,
             logs=logs_files,
         )
