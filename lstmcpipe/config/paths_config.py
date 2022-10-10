@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import warnings
 from pathlib import Path
 from ruamel.yaml import YAML
 from datetime import date
@@ -939,11 +940,15 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
             self.check_source_prod()
         
     def check_source_prod(self):
+        marked_for_removal = []
         for particle in self.training_particles:
-            for pointing in self.pointing_dirs(particle):
+            for pidx, pointing in enumerate(self.pointing_dirs(particle)):
                 source_dl1 = Path(self.source_config.dl1_dir(particle, pointing))
                 if not source_dl1.exists():
-                    raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
+                    warnings.warn(f"{source_dl1} does not exist but MC file for {particle} - {pointing} does. "
+                                  f"This node will be removed from production.")
+                    marked_for_removal.append(pidx)
+        self._training_pointings.remove_rows(pidx)
 
     @property
     def dl1ab(self):
@@ -980,10 +985,14 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
             self.check_source_prod()
         
     def check_source_prod(self):
-        for pointing in self.pointing_dirs():
+        marked_for_removal = []
+        for pidx, pointing in enumerate(self.pointing_dirs()):
             source_dl1 = Path(self.source_config.dl1_dir(pointing))
             if not source_dl1.exists():
-                raise FileNotFoundError(f"{source_dl1} should exist to run this DL1ab")
+                warnings.warn(f"{source_dl1} does not exist but MC file for {pointing} does. "
+                              f"This node will be removed from production.")
+                marked_for_removal.append(pidx)
+        self._testing_pointings.remove_rows(marked_for_removal)
 
     @property
     def dl1ab(self):
