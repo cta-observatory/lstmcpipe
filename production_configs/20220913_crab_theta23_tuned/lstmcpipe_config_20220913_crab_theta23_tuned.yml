@@ -45,14 +45,14 @@ stages:
     slurm_options: --mem=80GB
   dl2_to_irfs:
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/dl2_20220913_crab_theta23_tuned_node_theta_23.630_az_100.758__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/dl2_crab_theta23_node_theta_23.630_az_100.758__merged.h5
       proton_file:
       electron_file:
-    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/irf_20220913_crab_theta23_tuned_node_theta_23.630_az_100.758_.fits.gz
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_100.758_/irf_crab_theta23_node_theta_23.630_az_100.758_.fits.gz
     options: --point-like
   - input:
-      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/dl2_20220913_crab_theta23_tuned_node_theta_23.630_az_259.265__merged.h5
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/dl2_crab_theta23_node_theta_23.630_az_259.265__merged.h5
       proton_file:
       electron_file:
-    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/irf_20220913_crab_theta23_tuned_node_theta_23.630_az_259.265_.fits.gz
+    output: /fefs/aswg/data/mc/IRF/AllSky/20220913_crab_theta23_tuned/TestingDataset/dec_2276/node_theta_23.630_az_259.265_/irf_crab_theta23_node_theta_23.630_az_259.265_.fits.gz
     options: --point-like
