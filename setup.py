@@ -48,7 +48,7 @@ setup(
     version=version,
     description=description,
     install_requires=[
-        "lstchain",
+        "lstchain>=0.9.7",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
