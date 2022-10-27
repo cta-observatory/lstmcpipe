@@ -193,6 +193,4 @@ You typically want to run **on the cluster**:
 
 .. code-block::
 
-    lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --source_prod_id whatagreatprod --target_prod_id anothergreatprod
-
-
+    lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --prod_id anothergreatprod --kwargs source_prod_id=whatagreatprod
