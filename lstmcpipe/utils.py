@@ -145,7 +145,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
     return ntry - 1
 
 
-def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, overwrite=False):
+def dump_lstchain_std_config(filename='lstchain_config.json', allsky=True, overwrite=False):
     from lstchain.io.config import get_standard_config
 
     filename = Path(filename)
@@ -159,16 +159,12 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
     cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
     cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
     cfg['source_config']['EventSource']['allowed_tels'] = [1]
-    cfg['random_forest_energy_regressor_args']['min_samples_leaf'] = 10
-    cfg['random_forest_disp_regressor_args']['min_samples_leaf'] = 10
-    cfg['random_forest_disp_classifier_args']['min_samples_leaf'] = 10
-    cfg['random_forest_particle_classifier_args']['min_samples_leaf'] = 10
     cfg['random_forest_energy_regressor_args']['n_jobs'] = -1
     cfg['random_forest_disp_regressor_args']['n_jobs'] = -1
     cfg['random_forest_disp_classifier_args']['n_jobs'] = -1
     cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
 
-    if allsky:
+    if not allsky:
         for rf_feature in [
             'energy_regression_features',
             'disp_regression_features',
@@ -176,10 +172,9 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=False, over
             'particle_classification_features',
         ]:
             cfg[rf_feature] = std_cfg[rf_feature]
-            if 'alt_tel' not in cfg[rf_feature]:
-                cfg[rf_feature].append('alt_tel')
-            if 'az_tel' not in cfg[rf_feature]:
-                cfg[rf_feature].append('az_tel')
+            for feature in ['alt_tel', 'az_tel', 'sin_az_tel']:
+                if feature in cfg[rf_feature]:
+                    cfg[rf_feature].remove(feature)
 
     extra_msg = "for AllSky prod" if allsky else ""
     print(f"Updating std lstchain config {extra_msg} with")
