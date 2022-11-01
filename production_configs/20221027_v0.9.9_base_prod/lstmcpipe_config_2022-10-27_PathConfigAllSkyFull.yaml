@@ -7,7 +7,7 @@ prod_id: 20221027_v0.9.9_base_prod
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.9.6
+  conda_env: lstchain-v0.9.9
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
@@ -23,9 +23,10 @@ prod_type: PathConfigAllSkyFull
 stages_to_run:
 - r0_to_dl1
 - merge_dl1
-- train_pipe
-- dl1_to_dl2
-- dl2_to_irfs
+# - train_pipe
+# - dl1_to_dl2
+# - dl2_to_irfs
+
 stages:
   r0_to_dl1:
   - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/GammaDiffuse/dec_2276/sim_telarray/node_corsika_theta_66.446_az_75.983_/output_v1.4/
