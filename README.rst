@@ -27,7 +27,9 @@ Cite us
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
   :target: https://doi.org/10.5281/zenodo.6460727
   
-If you use lstMCpipe, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
+If you use lstMCpipe or if it has been used for your analysis, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
+
+You may also want to include the config file with your published code for reproducibility.
 
 
 Install
