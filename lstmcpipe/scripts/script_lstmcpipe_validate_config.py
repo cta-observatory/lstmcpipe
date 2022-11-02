@@ -33,13 +33,12 @@ def test_dl1ab(config_file):
 
 
 def validate_lstchain(config_file, stage):
+    read_configuration_file(config_file)
+
     if stage == 'r0_to_dl1':
         test_r0_dl1(config_file)
     elif stage == 'dl1ab':
         test_dl1ab(config_file)
-    else:
-        # else we simply validate that reading the config is ok
-        read_configuration_file(config_file)
 
 
 def main():
