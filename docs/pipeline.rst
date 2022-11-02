@@ -141,16 +141,16 @@ Standard AllSky production pipeline **for one training declination**
 
         R0-Protons[R0 Protons \n - node a\n - node b\n - node c]
         R0-GammaDiffuse[R0 GammaDiffuse \n - node a\n - node b\n - node c]
-        R0-GammaCrab[R0 Gamma Crab \n - node a\n - node b\n - node c]
+        R0-GammaTest[R0 Gamma Test \n - node a\n - node b\n - node c]
 
         DL1-Protons[DL1 Protons \n - node a\n - node b\n - node c]
         DL1-GammaDiffuse[DL1 GammaDiffuse \n - node a\n - node b\n - node c]
-        DL1-GammaCrab[DL1 Gamma Crab \n - node a\n - node b\n - node c]
+        DL1-GammaTest[DL1 Gamma Test \n - node a\n - node b\n - node c]
 
 
         R0-GammaDiffuse --> |r0_to_dl1| DL1-GammaDiffuse
         R0-Protons --> |r0_to_dl1| DL1-Protons
-        R0-GammaCrab --> |r0_to_dl1| DL1-GammaCrab
+        R0-GammaTest --> |r0_to_dl1| DL1-GammaTest
 
 
         DL1-GammaDiffuse --> |merge_dl1| DL1-GammaDiffuse-merged[DL1 Gamma Diffuse\nall nodes]
@@ -160,14 +160,14 @@ Standard AllSky production pipeline **for one training declination**
 
         train_pipe --> models
 
-        models --> DL2-GammaCrab
+        models --> DL2-GammaTest
 
-        DL1-GammaCrab --> |merge_dl1| DL1-GammaCrab-merged[DL1 Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
-        DL1-GammaCrab-merged ----> DL2-GammaCrab
-        DL2-GammaCrab[DL2 Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
+        DL1-GammaTest --> |merge_dl1| DL1-GammaTest-merged[DL1 Gamma Test \n - node a merged\n - node b merged\n - node c merged]
+        DL1-GammaTest-merged ----> DL2-GammaTest
+        DL2-GammaTest[DL2 Gamma Test \n - node a merged\n - node b merged\n - node c merged]
 
-        DL2-GammaCrab --> |dl2_to_irf| IRF-GammaCrab
-        IRF-GammaCrab[IRF Gamma Crab \n - node a merged\n - node b merged\n - node c merged]
+        DL2-GammaTest --> |dl2_to_irf| IRF-GammaTest
+        IRF-GammaTest[IRF Gamma Test \n - node a merged\n - node b merged\n - node c merged]
 
 
 To produce a config to run such a pipeline, typically run **on the cluster**:
@@ -188,6 +188,41 @@ DL1ab
 =====
 
 The DL1ab workflow is very similar, only starting from an existing DL1 dataset.
+
+.. mermaid::
+
+    flowchart LR
+
+        DL1-Protons[DL1 Protons \n - node a\n - node b\n - node c]
+        DL1-Protonsb[DL1 Protons tuned \n - node a\n - node b\n - node c]
+        DL1-GammaDiffuse[DL1 GammaDiffuse \n - node a\n - node b\n - node c]
+        DL1-GammaDiffuseb[DL1 GammaDiffuse tuned \n - node a\n - node b\n - node c]
+        DL1-GammaTest[DL1 Gamma Test \n - node a\n - node b\n - node c]
+        DL1-GammaTestb[DL1 Gamma Test tuned \n - node a\n - node b\n - node c]
+
+        DL1-GammaDiffuse --> |dl1ab| DL1-GammaDiffuseb
+        DL1-Protons --> |dl1ab| DL1-Protonsb
+        DL1-GammaTest --> |r0_to_dl1| DL1-GammaTestb
+
+
+        DL1-GammaDiffuseb --> |merge_dl1| DL1-GammaDiffuse-merged[DL1 Gamma Diffuse tuned\nall nodes]
+        DL1-Protonsb --> |merge_dl1| DL1-Protons-merged[DL1 Protons tuned\nall nodes]
+
+        DL1-GammaDiffuse-merged & DL1-Protons-merged --> train_pipe((train_pipe))
+
+        train_pipe --> models.-> real-data
+
+        models --> DL2-GammaTest
+
+        DL1-GammaTestb --> |merge_dl1| DL1-GammaTest-merged[DL1 Gamma Test tuned \n - node a merged\n - node b merged\n - node c merged]
+        DL1-GammaTest-merged ----> DL2-GammaTest
+        DL2-GammaTest[DL2 Gamma Test \n - node a merged\n - node b merged\n - node c merged]
+
+        DL2-GammaTest --> |dl2_to_irf| IRF-GammaTest
+        IRF-GammaTest[IRF Gamma Test \n - node a merged\n - node b merged\n - node c merged]
+
+
+
 
 You typically want to run **on the cluster**:
 
