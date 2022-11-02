@@ -48,6 +48,7 @@ Here is the typical MC pipeline for the prod3 and prod5 productions
         train_test_split --> gamma_dl1_test & proton_dl1_test
         DL1-train --> train_pipe((train_pipe))
         train_pipe --> models
+        models .-> real-data
 
         electron_dl1 --> electron_dl1_test
 
@@ -108,6 +109,7 @@ One can also start back from DL1, applying the dl1ab stage:
         train_test_split --> gamma_dl1_test & proton_dl1_test
         DL1-train --> train_pipe((train_pipe))
         train_pipe --> models
+        models .-> real-data
 
         electron_dl1 --> electron_dl1_test
 
@@ -158,7 +160,7 @@ Standard AllSky production pipeline **for one training declination**
 
         DL1-GammaDiffuse-merged & DL1-Protons-merged --> train_pipe((train_pipe))
 
-        train_pipe --> models
+        train_pipe --> models .-> real_data[Real Data]
 
         models --> DL2-GammaTest
 
@@ -210,7 +212,7 @@ The DL1ab workflow is very similar, only starting from an existing DL1 dataset.
 
         DL1-GammaDiffuse-merged & DL1-Protons-merged --> train_pipe((train_pipe))
 
-        train_pipe --> models.-> real-data
+        train_pipe --> models .-> real-data
 
         models --> DL2-GammaTest
 
