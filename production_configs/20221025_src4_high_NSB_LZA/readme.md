@@ -17,3 +17,8 @@ Config for a source src4 with dec 6166 and NSB tuning corresponding or pedestal 
   "extra_noise_in_bright_pixels": 2.766
 }
 
+
+Config generated with:
+```
+lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_6166 --prod_id 20221025_src4_high_NSB_LZA --kwargs source_prod_id=20221027_v0.9.9_base_prod
+```
