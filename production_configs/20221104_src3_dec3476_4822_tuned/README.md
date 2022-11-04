@@ -1,6 +1,6 @@
 # 20221104_src3_dec3476_4822_tuned
 
-full DL1ab production (dec3476 and dec4822 with NSB tuning for src3)
+full DL1ab production (dec3476 and dec4822 with NSB tuning for src3) with lstchain v0.9.9
 
 ## command-line:
 ```
