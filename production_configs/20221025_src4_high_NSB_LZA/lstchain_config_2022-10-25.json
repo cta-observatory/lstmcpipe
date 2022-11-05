@@ -309,6 +309,8 @@
     "extra_noise_in_dim_pixels": 2.124,
     "extra_bias_in_dim_pixels": 0.738,
     "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 2.766
+    "extra_noise_in_bright_pixels": 2.766,
+    "increase_psf": false,
+    "smeared_light_fraction": 0
     }
 }
