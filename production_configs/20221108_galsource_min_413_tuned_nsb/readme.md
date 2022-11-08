@@ -6,7 +6,7 @@
 
 ## Short description of the config
 
-dec_min_413 with NSB tuning to galactic source.
+dec_min_413 with NSB tuning to galactic source (src1).
 
 ## Why this config is needed
 
