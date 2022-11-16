@@ -1,6 +1,6 @@
-===================
-lstmcpipe pipelines
-===================
+==============================
+Pipelines & configs generation
+==============================
 
 -----------------------
 Prod3 & Prod5 pipelines
@@ -65,6 +65,13 @@ Here is the typical MC pipeline for the prod3 and prod5 productions
         DL2-test --> |dl2_to_irf| IRF[IRFs]
         DL2-test --> |dl2_to_sensitivity| SENS[Sensitivity]
         SENS --> plot[png plots]
+
+To generate a config for that pipeline, you may run:
+
+.. code-block::
+
+    lstmcpipe_generate_config PathConfigProd5Trans80 --prod_id whatagreatprod 
+
 
 
 One can also start back from DL1, applying the dl1ab stage:
