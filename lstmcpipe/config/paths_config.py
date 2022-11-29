@@ -485,9 +485,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-            "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/"
-            + dec
-            + "/sim_telarray/{pointing}/output_v1.4/"
+            "/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/{particle}/{dec}/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
@@ -658,7 +656,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
+        self.testing_dir = "/fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/sim_telarray/{pointing}/output_v1.4/"
         self.dataset_type = 'TestingDataset'
         self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
 
