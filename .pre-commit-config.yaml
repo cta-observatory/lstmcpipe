@@ -22,7 +22,7 @@ repos:
         build"""
 
 - repo: https://github.com/pycqa/flake8
-  rev: 3.9.2
+  rev: 5.0.0
   hooks:
   - id: flake8
     language_version: python3
