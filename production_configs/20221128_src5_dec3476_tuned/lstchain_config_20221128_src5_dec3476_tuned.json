@@ -304,7 +304,9 @@
     "extra_noise_in_dim_pixels": 1.964,
     "extra_bias_in_dim_pixels": 0.713,
     "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 2.512
+    "extra_noise_in_bright_pixels": 2.512,
+    "increase_psf": false,
+    "smeared_light_fraction": 0
   },
 
   "observation_mode": "wobble",
