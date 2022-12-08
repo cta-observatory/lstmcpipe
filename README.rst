@@ -24,10 +24,27 @@ Lukas Nickel, lukas.nickel [at] tu-dortmund.de
 
 Cite us
 -------
+
+If lstMCpipe was used for your analysis, please cite:
+
+.. code-block::
+
+  @misc{garcia2022lstmcpipe,
+        title={The lstMCpipe library}, 
+        author={Enrique Garcia and Thomas Vuillaume and Lukas Nickel},
+        year={2022},
+        eprint={2212.00120},
+        archivePrefix={arXiv},
+        primaryClass={astro-ph.IM}
+  }
+
+in addition to the exact lstMCpipe version used from https://doi.org/10.5281/zenodo.6460727:
+
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
   :target: https://doi.org/10.5281/zenodo.6460727
   
-If you use lstMCpipe, please cite it using Zenodo from the following URL: https://doi.org/10.5281/zenodo.6460727
+  
+You may also want to include the config file with your published code for reproducibility.
 
 
 Install
@@ -84,7 +101,7 @@ To do so, please:
 #. The requested config must contain:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
-* a lstmcpipe config file
+* a lstmcpipe config file (to generate it, please refer to the documentation)
 * a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
 
 

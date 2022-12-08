@@ -98,7 +98,7 @@ def config_valid(loaded_config):
         raise KeyError("Please specify a simtel monte carlo file to compare observed noise against.")
     if dl1_noise_tune_mc_run and not dl1_noise_tune_data_run:
         raise KeyError("Please specify an observed dl1 file to tune the images.")
-    
+
     log.debug("Configuration deemed valid")
 
     return True

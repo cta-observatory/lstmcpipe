@@ -18,6 +18,7 @@ from ..plots.pointings import plot_pointings
 
 _crab_dec = 'dec_2276'
 
+
 class PathConfig:
     """
     Base class to generate a Path configuration for a production
@@ -335,7 +336,6 @@ class PathConfigProd5Trans80(PathConfig):
                     paths.append(path_dict(offset))
         return paths
 
-    
 
 class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
     def __init__(self, prod_id, source_prod_id, zenith='zenith_20deg', run_checker=True):
@@ -347,7 +347,7 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
         self.stages.insert(0, 'dl1ab')
         if run_checker:
             self.check_source_prod()
-        
+
     def check_source_prod(self):
         for step in ['train', 'test']:
             for particle in self.particles:
@@ -358,7 +358,6 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
                     dl1_input = self.starting_dl1(particle=particle, step=step, gamma_src_offset='')
                 if not Path(dl1_input).exists():
                     raise FileNotFoundError(f"file {dl1_input} should exist")
-                    
 
     def starting_dl1(self, particle, step, gamma_src_offset='off0.4deg'):
         former_merged_dl1 = self.merge_output_file(particle=particle, step=step, gamma_src_offset=gamma_src_offset)
@@ -486,9 +485,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.training_dir = (
-                "/home/georgios.voutsinas/ws/AllSky/TrainingDataset/{particle}/"
-                + dec
-                + "/sim_telarray/{pointing}/output_v1.4/"
+            "/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/{particle}/{dec}/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
@@ -515,17 +512,16 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
     def pointing_dirs(self, particle):
         return self.pointings[f'dirname_{particle}']
 
-
     def load_pointings(self, join_type='inner'):
         """
         Load and find pointings that exist for all training particles.
         This is overly complicated because pointings directory names are not consistent particle-wise
         see node_theta_16.087_az_108.090_ vs node_corsika_theta_16.087_az_108.090_
         see testing pointings for a simpler implementation if this get solved
-        
+
         Use join_type to keep only the pointings existing for all training particles or all of them
         Azimuth between -pi and pi. Altitude between pi/2 and -pi/2
-        
+
         Parameters
         ----------
         join_type: string
@@ -541,20 +537,23 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
             data = []
             for d in self._search_pointings(particle):
                 pt = self._extract_pointing(d)
-                alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+                alt, az = (90.0 - float(pt.groups()[0])) * u.deg, (float(pt.groups()[1])) * u.deg
                 data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
             reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
             tabs[particle] = QTable(data=reshaped_data, names=['alt', 'az', f'dirname_{particle}'])
-            
-        tab = join(tabs[self.training_particles[0]], tabs[self.training_particles[1]],
-           keys=['alt', 'az'],
-           table_names=[self.training_particles[0], self.training_particles[1]],
-           join_type=join_type)
-        
+
+        tab = join(
+            tabs[self.training_particles[0]],
+            tabs[self.training_particles[1]],
+            keys=['alt', 'az'],
+            table_names=[self.training_particles[0], self.training_particles[1]],
+            join_type=join_type,
+        )
+
         # useful only of there are more than 2 training particles in the future
         for part in self.training_particles[2:]:
             tab = join(tab, tabs[part], keys=['alt', 'az'], join_type=join_type)
-        
+
         self._training_pointings = tab
 
     @property
@@ -572,7 +571,6 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
             except FileNotFoundError as e:
                 raise FileNotFoundError("The class must be run on the cluster to load available pointing nodes") from e
         return self._training_pointings
-
 
     def plot_pointings(self, ax=None, projection='polar', add_grid3d=True, **kwargs):
         """
@@ -595,11 +593,13 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         """
 
         kwargs.setdefault('label', f'Training {self.dec}')
-        ax = plot_pointings(np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)])*u.rad,
-                            ax=ax, 
-                            projection=projection,
-                            add_grid3d=add_grid3d,
-                            **kwargs)
+        ax = plot_pointings(
+            np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)]) * u.rad,
+            ax=ax,
+            projection=projection,
+            add_grid3d=add_grid3d,
+            **kwargs,
+        )
         return ax
 
     def dl1_dir(self, particle, pointing):
@@ -645,12 +645,9 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'proton': self.training_merged_dl1('Protons'),
                 },
                 'output': self.models_dir(),
-                'extra_slurm_options': {'partition': 'xxl',
-                                        'mem': '160G',
-                                        'cpus-per-task': 16} if self.dec == _crab_dec
-                else {'partition': 'xxl',
-                      'mem': '100G',
-                      'cpus-per-task': 16}
+                'extra_slurm_options': {'partition': 'xxl', 'mem': '160G', 'cpus-per-task': 16}
+                if self.dec == _crab_dec
+                else {'partition': 'xxl', 'mem': '100G', 'cpus-per-task': 16},
             }
         ]
         return paths
@@ -659,7 +656,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
-        self.testing_dir = "/home/georgios.voutsinas/ws/AllSky/TestDataset/sim_telarray/{pointing}/output_v1.4/"
+        self.testing_dir = "/fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/sim_telarray/{pointing}/output_v1.4/"
         self.dataset_type = 'TestingDataset'
         self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
 
@@ -692,11 +689,10 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         data = []
         for d in self._search_pointings():
             pt = self._extract_pointing(d)
-            alt, az = (90. - float(pt.groups()[0]))*u.deg, (float(pt.groups()[1]))*u.deg
+            alt, az = (90.0 - float(pt.groups()[0])) * u.deg, (float(pt.groups()[1])) * u.deg
             data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
         reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
         self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', 'dirname'])
-
 
     @property
     def pointings(self):
@@ -734,11 +730,13 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         ax: `matplotlib.pyplot.axis`
         """
         kwargs.setdefault('label', 'Testing')
-        ax = plot_pointings(np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)])*u.rad,
-                            ax=ax,
-                            projection=projection,
-                            add_grid3d=add_grid3d,
-                            **kwargs)
+        ax = plot_pointings(
+            np.transpose([self.pointings['az'].to(u.rad), self.pointings['alt'].to(u.rad)]) * u.rad,
+            ax=ax,
+            projection=projection,
+            add_grid3d=add_grid3d,
+            **kwargs,
+        )
         return ax
 
     def dl1_dir(self, pointing):
@@ -798,7 +796,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     'input': self.testing_merged_dl1(pointing),
                     'path_model': self.models_dir(),
                     'output': self.dl2_dir(pointing),
-                    'extra_slurm_options': {'mem': '80GB' if self.dec == _crab_dec else '60GB'}
+                    'extra_slurm_options': {'mem': '80GB' if self.dec == _crab_dec else '60GB'},
                 }
             )
         return paths
@@ -821,7 +819,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                     },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
                     'options': '--point-like',
-                    'extra_slurm_options': {'mem':'6GB'}
+                    'extra_slurm_options': {'mem': '6GB'},
                 }
             )
 
@@ -907,18 +905,19 @@ class PathConfigAllSkyFull(PathConfig):
         test_kwargs = {} if test_kwargs is None else test_kwargs
         test_kwargs.setdefault('color', 'black')
         test_kwargs.setdefault('marker', '*')
-        
+
         dec = list(self.train_configs)[0]
         ax = self.train_configs[dec].plot_pointings(ax=ax, projection=projection, add_grid3d=add_grid3d, **train_kwargs)
         for dec, tr in list(self.train_configs.items())[1:]:
             ax = tr.plot_pointings(ax=ax, projection=projection, add_grid3d=False, **train_kwargs)
 
-        ax = list(self.test_configs.values())[0].plot_pointings(ax=ax, projection=projection, add_grid3d=False, **test_kwargs)
+        ax = list(self.test_configs.values())[0].plot_pointings(
+            ax=ax, projection=projection, add_grid3d=False, **test_kwargs
+        )
         return ax
 
 
 class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
-
     def __init__(self, prod_id, source_prod_id, dec, run_checker=True):
         """
         Parameters
@@ -938,15 +937,17 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
         self.source_config = PathConfigAllSkyTraining(source_prod_id, dec)
         if run_checker:
             self.check_source_prod()
-        
+
     def check_source_prod(self):
         marked_for_removal = []
         for particle in self.training_particles:
             for pidx, pointing in enumerate(self.pointing_dirs(particle)):
                 source_dl1 = Path(self.source_config.dl1_dir(particle, pointing))
                 if not source_dl1.exists():
-                    warnings.warn(f"{source_dl1} does not exist but MC file for {particle} - {pointing} does. "
-                                  f"This node will be removed from production.")
+                    warnings.warn(
+                        f"{source_dl1} does not exist but MC file for {particle} - {pointing} does. "
+                        f"This node will be removed from production."
+                    )
                     marked_for_removal.append(pidx)
         self._training_pointings.remove_rows(pidx)
 
@@ -963,7 +964,6 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
 
 
 class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
-
     def __init__(self, prod_id, source_prod_id, dec, run_checker=True):
         """
         Parameters
@@ -983,14 +983,16 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
         self.source_config = PathConfigAllSkyTesting(source_prod_id, dec)
         if run_checker:
             self.check_source_prod()
-        
+
     def check_source_prod(self):
         marked_for_removal = []
         for pidx, pointing in enumerate(self.pointing_dirs()):
             source_dl1 = Path(self.source_config.dl1_dir(pointing))
             if not source_dl1.exists():
-                warnings.warn(f"{source_dl1} does not exist but MC file for {pointing} does. "
-                              f"This node will be removed from production.")
+                warnings.warn(
+                    f"{source_dl1} does not exist but MC file for {pointing} does. "
+                    f"This node will be removed from production."
+                )
                 marked_for_removal.append(pidx)
         self._testing_pointings.remove_rows(marked_for_removal)
 
@@ -1006,7 +1008,6 @@ class PathConfigAllSkyTestingDL1ab(PathConfigAllSkyTesting):
 
 
 class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
-
     def __init__(self, prod_id, source_prod_id, dec_list, run_checker=True):
         """
         Parameters
@@ -1023,8 +1024,13 @@ class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
         super().__init__(prod_id, dec_list)
         self.source_prod_id = source_prod_id
         self.stages = ['dl1ab', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
-        self.train_configs = {dec: PathConfigAllSkyTrainingDL1ab(prod_id, source_prod_id, dec, run_checker=run_checker) for dec in dec_list}
-        self.test_configs = {dec: PathConfigAllSkyTestingDL1ab(prod_id, source_prod_id, dec, run_checker=run_checker) for dec in dec_list}
+        self.train_configs = {
+            dec: PathConfigAllSkyTrainingDL1ab(prod_id, source_prod_id, dec, run_checker=run_checker)
+            for dec in dec_list
+        }
+        self.test_configs = {
+            dec: PathConfigAllSkyTestingDL1ab(prod_id, source_prod_id, dec, run_checker=run_checker) for dec in dec_list
+        }
 
     @property
     def dl1ab(self):

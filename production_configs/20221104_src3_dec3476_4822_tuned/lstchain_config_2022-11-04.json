@@ -165,7 +165,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -179,7 +178,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -192,7 +190,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -210,7 +207,6 @@
         "log_reco_energy",
         "reco_disp_norm",
         "reco_disp_sign",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -304,13 +300,14 @@
         "nsb_tuning_ratio": 0.52,
         "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
     },
+
     "image_modifier": {
-    "increase_nsb": true,
-    "extra_noise_in_dim_pixels": 2.124,
-    "extra_bias_in_dim_pixels": 0.738,
-    "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 2.766,
-    "increase_psf": false,
-    "smeared_light_fraction": 0
+        "increase_nsb": true,
+        "extra_noise_in_dim_pixels": 0.955,
+        "extra_bias_in_dim_pixels": 0.388,
+        "transition_charge": 8,
+        "extra_noise_in_bright_pixels": 1.197,
+        "increase_psf": false,
+        "smeared_light_fraction": 0
     }
 }
