@@ -82,9 +82,7 @@ def batch_r0_to_dl1(
                 )
                 full_log["log_all_job_ids"].update(job_logs)
                 full_log[_particle] = ",".join(jobids_by_particle)
-                all_jobids_from_r0_dl1_stage.append(
-                    full_log[_particle]
-                )  # Create a list with particles elements
+                all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
                 for jid in jobids_by_particle:
                     debug_log[jid] = f"{_particle} job from r0_to_dl1"
@@ -101,15 +99,11 @@ def batch_r0_to_dl1(
             )
             full_log["log_all_job_ids"].update(job_logs)
             full_log[_particle] = ",".join(jobids_by_particle)
-            all_jobids_from_r0_dl1_stage.append(
-                full_log[_particle]
-            )  # Create a list with particles elements
+            all_jobids_from_r0_dl1_stage.append(full_log[_particle])  # Create a list with particles elements
 
             for jid in jobids_by_particle:
                 debug_log[jid] = f"{_particle} job from r0_to_dl1"
-    all_jobids_from_r0_dl1_stage = ",".join(
-        all_jobids_from_r0_dl1_stage
-    )  # Create a string to be directly passed
+    all_jobids_from_r0_dl1_stage = ",".join(all_jobids_from_r0_dl1_stage)  # Create a string to be directly passed
 
     log.info("==== END {} r0 to dl1 processing ====".format(workflow_kind))
 
@@ -206,12 +200,11 @@ def r0_to_dl1(
         base_cmd = f"{source_environment} lstmcpipe_cta_core_r0_dl1 -c {config_file} "
         jobtype_id = "CTA"
     elif workflow_kind == "hiperta":
-        rta_source_env = (
-            "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
-        )
-        base_cmd = (
-            f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
-        )
+        # rta_source_env = (
+        #     "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
+        # )
+        rta_source_env = source_environment
+        base_cmd = f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
         jobtype_id = "RTA"
     else:
         log.critical("Please, selected an allowed workflow kind.")
@@ -282,17 +275,13 @@ def r0_to_dl1(
     if "off" in particle:
         DL0_DATA_DIR = DL0_DATA_DIR.split(offset)[0]  # Take out /off0.Xdeg
         RUNNING_DIR = os.path.join(
-            DL0_DATA_DIR.replace(
-                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
-            ),
+            DL0_DATA_DIR.replace("R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"),
             PROD_ID,
             offset,
         )
     else:
         RUNNING_DIR = os.path.join(
-            DL0_DATA_DIR.replace(
-                "R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"
-            ),
+            DL0_DATA_DIR.replace("R0" if workflow_kind == "hiperta" else "DL0", "running_analysis"),
             PROD_ID,
         )
 
@@ -328,15 +317,11 @@ def r0_to_dl1(
 
         log.info("output dir: {}".format(output_dir))
 
-        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(
-            len(list_type) % n_r0_per_dl1_job > 0
-        )
+        number_of_sublists = len(list_type) // n_r0_per_dl1_job + int(len(list_type) % n_r0_per_dl1_job > 0)
         for i in range(number_of_sublists):
             output_file = os.path.join(dir_lists, "{}_{}.list".format(set_type, i))
             with open(output_file, "w+") as out:
-                for line in list_type[
-                    i * n_r0_per_dl1_job : n_r0_per_dl1_job * (i + 1)
-                ]:
+                for line in list_type[i * n_r0_per_dl1_job : n_r0_per_dl1_job * (i + 1)]:
                     out.write(line)
                     out.write("\n")
         log.info(f"{number_of_sublists} files generated for {set_type} list")
@@ -382,9 +367,7 @@ def r0_to_dl1(
 
     # copy config into working dir
     if config_file is not None:
-        shutil.copyfile(
-            config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file))
-        )
+        shutil.copyfile(config_file, os.path.join(RUNNING_DIR, os.path.basename(config_file)))
 
     # save file lists into logs
     shutil.move("testing.list", os.path.join(RUNNING_DIR, "testing.list"))
