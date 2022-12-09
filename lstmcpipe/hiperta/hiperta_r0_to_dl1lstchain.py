@@ -18,12 +18,7 @@ def main():
     )
 
     parser.add_argument(
-        "--infile",
-        "-i",
-        type=str,
-        dest="infile",
-        help="mc r0 file to be run with hiperta_r0_dl1",
-        required=True
+        "--infile", "-i", type=str, dest="infile", help="mc r0 file to be run with hiperta_r0_dl1", required=True
     )
 
     parser.add_argument(
@@ -48,19 +43,17 @@ def main():
     parser.add_argument(
         "--keep_file",
         "-k",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="keep_file",
         help="Keep output of hiperta. Set by default to False",
-        default=False,
     )
 
     parser.add_argument(
         "--debug_mode",
         "-d",
-        type=lambda x: bool(strtobool(x)),
+        action='store_true',
         dest="debug_mode",
         help="Activate debug mode (add cleaned mask in the output hdf5). Set by default to False",
-        default=False,
     )
     args = parser.parse_args()
 
@@ -74,9 +67,7 @@ def main():
 
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
-    output_reorganized_filename = os.path.join(
-        args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile)
-    )
+    output_reorganized_filename = os.path.join(args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile))
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?
