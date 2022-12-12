@@ -56,7 +56,7 @@ def generate_test_allsky(
     allsky_train_base_dir = '/fefs/aswg/data/mc/DL0/LSTProd2/'
     allsky_test_base_dir = '/fefs/aswg/data/mc/DL0/LSTProd2/'
 
-    generate_tree(allsky_train_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
+    generate_tree(allsky_train_base_dir, working_dir, nfiles)
 
     pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
     pcdl1ab = paths_config.PathConfigAllSkyFullDL1ab(
@@ -66,60 +66,60 @@ def generate_test_allsky(
     # config training dir are replaced with local ones
     for dec in decs:
         pc.train_configs[dec].base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pc.test_configs[dec].base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pc.train_configs[dec].training_dir = os.path.join(
-            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/LSTProd2/')
         )
         pc.test_configs[dec].testing_dir = os.path.join(
-            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/LSTProd2/')
         )
         pcdl1ab.train_configs[dec].base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pcdl1ab.train_configs[dec].source_config.base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pcdl1ab.test_configs[dec].base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pcdl1ab.test_configs[dec].source_config.base_dir = os.path.join(
-            working_dir, '{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
+            working_dir, '{data_level}/LSTProd2/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/'
         )
         pcdl1ab.train_configs[dec].training_dir = os.path.join(
-            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/LSTProd2/')
         )
         pcdl1ab.train_configs[dec].source_config.training_dir = os.path.join(
-            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/AllSky/')
+            working_dir, pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, 'DL0/LSTProd2/')
         )
         pcdl1ab.test_configs[dec].testing_dir = os.path.join(
-            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/LSTProd2/')
         )
         pcdl1ab.test_configs[dec].source_config.testing_dir = os.path.join(
-            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/AllSky/')
+            working_dir, pc.test_configs[dec].testing_dir.replace(allsky_test_base_dir, 'DL0/LSTProd2/')
         )
 
     pc.generate()
     for stage_name, stage_steps in pc.paths.items():
         for step in stage_steps:
             step['extra_slurm_options'] = {'partition': 'short'}
-    pc.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}.yaml'), overwrite=overwrite)
+    pc.save_yml(os.path.join(path_to_config_file, f'test_LSTProd2_{date.today()}.yaml'), overwrite=overwrite)
 
     pcdl1ab.generate()
     for stage_name, stage_steps in pcdl1ab.paths.items():
         for step in stage_steps:
             step['extra_slurm_options'] = {'partition': 'short'}
-    pcdl1ab.save_yml(os.path.join(path_to_config_file, f'test_AllSky_{date.today()}_dl1ab.yaml'), overwrite=overwrite)
+    pcdl1ab.save_yml(os.path.join(path_to_config_file, f'test_LSTProd2_{date.today()}_dl1ab.yaml'), overwrite=overwrite)
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Generate test tree')
 
-    parser.add_argument('prod_type', type=str, help='prod5trans80 or allsky')
+    parser.add_argument('prod_type', type=str, help='prod5trans80 or lstprod2')
     parser.add_argument('--nfiles', type=int, default=2, help='Number of files')
     parser.add_argument('--path_config_file', type=Path, default='.', help='Path to save the corresponding config file')
     parser.add_argument(
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     if args.prod_type == 'prod5trans80':
         generate_test_prod5trans80(working_dir, args.nfiles, args.path_config_file)
-    elif args.prod_type == 'allsky':
+    elif args.prod_type == 'lstprod2':
         generate_test_allsky(working_dir, args.nfiles, args.path_config_file)
     else:
         raise NotImplementedError("Unknown prod type")
