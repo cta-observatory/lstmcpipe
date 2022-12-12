@@ -484,8 +484,11 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
+        # dec must be read here and not later as a f-string, hence the + dec +
         self.training_dir = (
-            "/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/{particle}/{dec}/sim_telarray/{pointing}/output_v1.4/"
+            "/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/{particle}/"
+            + dec
+            + "/sim_telarray/{pointing}/output_v1.4/"
         )
         self.training_particles = ['GammaDiffuse', 'Protons']
         self.dataset_type = 'TrainingDataset'
