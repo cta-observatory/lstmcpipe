@@ -165,7 +165,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -179,7 +178,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -192,7 +190,6 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
@@ -210,7 +207,6 @@
         "log_reco_energy",
         "reco_disp_norm",
         "reco_disp_sign",
-        "sin_az_tel",
         "alt_tel",
         "az_tel"
     ],
