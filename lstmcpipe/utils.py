@@ -42,12 +42,12 @@ def save_log_to_file(dictionary, output_file, workflow_step=None):
 
 
 def batch_mc_production_check(
-        dict_jobids_all_stages,
-        log_directory,
-        prod_id,
-        prod_config_file,
-        batch_config,
-        logs_files,
+    dict_jobids_all_stages,
+    log_directory,
+    prod_id,
+    prod_config_file,
+    batch_config,
+    logs_files,
 ):
     """
     Check that the dl1_to_dl2 stage, and therefore, the whole workflow has ended correctly.
@@ -146,23 +146,15 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
 
 
 def dump_lstchain_std_config(filename='lstchain_config.json', allsky=True, overwrite=False):
-    from lstchain.io.config import get_standard_config
+    from lstchain.io.config import get_mc_config
 
     filename = Path(filename)
 
     if filename.exists() and not overwrite:
         raise FileExistsError(f"{filename} exists already")
 
-    std_cfg = get_standard_config()
+    std_cfg = get_mc_config()
     cfg = deepcopy(std_cfg)
-
-    cfg['LocalPeakWindowSum']['apply_integration_correction'] = True
-    cfg['GlobalPeakWindowSum']['apply_integration_correction'] = True
-    cfg['source_config']['EventSource']['allowed_tels'] = [1]
-    cfg['random_forest_energy_regressor_args']['n_jobs'] = -1
-    cfg['random_forest_disp_regressor_args']['n_jobs'] = -1
-    cfg['random_forest_disp_classifier_args']['n_jobs'] = -1
-    cfg['random_forest_particle_classifier_args']['n_jobs'] = -1
 
     if not allsky:
         for rf_feature in [
@@ -217,17 +209,17 @@ class SbatchLstMCStage:
     """
 
     def __init__(
-            self,
-            stage,
-            wrap_command,
-            slurm_output=None,
-            slurm_error=None,
-            job_name=None,
-            slurm_account=None,
-            slurm_dependencies=None,
-            extra_slurm_options=None,
-            source_environment="",
-            backend="",
+        self,
+        stage,
+        wrap_command,
+        slurm_output=None,
+        slurm_error=None,
+        job_name=None,
+        slurm_account=None,
+        slurm_dependencies=None,
+        extra_slurm_options=None,
+        source_environment="",
+        backend="",
     ):
         self.base_slurm_command = "sbatch --parsable"
         self.stage = stage
