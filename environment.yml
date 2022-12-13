@@ -17,3 +17,4 @@ dependencies:
       - ctapipe_io_lst
       - lstchain>=0.9.7
       - pyirf~=0.6.0
+      - eventio<1.11.0
