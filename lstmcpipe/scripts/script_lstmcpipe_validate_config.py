@@ -23,6 +23,15 @@ def test_r0_dl1(config_file):
     run_lstchain_mc_r0_dl1(mc_r0_path(), tmpdir, config_file)
 
 
+def mc_requirements(config):
+    image_extractor = config['image_extractor']
+    if not config[image_extractor]['apply_integration_correction']:
+        raise ValueError(
+            f"Integration correction must be applied to MC for the image extractor:\n"
+            f"config['{image_extractor}']['apply_integration_correction'] = True"
+        )
+
+
 def test_dl1ab(config_file):
     tmpdir = tempfile.mkdtemp()
     dl1file = Path(tmpdir, 'dl1_gamma_test_large.h5')
@@ -33,7 +42,8 @@ def test_dl1ab(config_file):
 
 
 def validate_lstchain(config_file, stage):
-    read_configuration_file(config_file)
+    config = read_configuration_file(config_file)
+    mc_requirements(config)
 
     if stage == 'r0_to_dl1':
         test_r0_dl1(config_file)
@@ -73,4 +83,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
