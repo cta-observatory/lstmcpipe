@@ -23,7 +23,7 @@ Config generated with:
 from lstmcpipe.config import paths_config
 import astropy.units as u
 
-config = paths_config.PathConfigAllSkyFullDL1ab('20221025_src4_high_NSB_LZA', '20221027_v0.9.9_base_prod', ['dec_6166'])
+config = paths_config.PathConfigAllSkyFullDL1ab('20221212_v0.9.6_src4_high_NSB_LZA', '20221027_v0.9.9_base_prod', ['dec_6166'])
 
 mask_train = config.train_configs['dec_6166']._training_pointings['alt'] < 38 *u.deg
 mask_test = config.test_configs['dec_6166']._testing_pointings['alt'] < 38 *u.deg
