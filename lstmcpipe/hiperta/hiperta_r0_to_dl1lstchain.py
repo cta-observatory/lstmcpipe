@@ -61,6 +61,7 @@ def main():
 
     # TODO. Hardcoded. Change `--selectedtel 1` when various tels available
     cmd_hiperta = f"hiperta_r0_dl1 -i {args.infile} -c {args.config} -o {args.outdir} --selectedtel 1"
+    print("args outdir hiperta",args.outdir)
     if args.debug_mode:  # in HiPeRTA
         cmd_hiperta += " -g"
     os.system(cmd_hiperta)
@@ -68,6 +69,10 @@ def main():
     # We know in advance the name of the output
     output_hiperta_filename = os.path.join(args.outdir, "dl1_" + os.path.basename(args.infile))
     output_reorganized_filename = os.path.join(args.outdir, "dl1v06_reorganized_" + os.path.basename(args.infile))
+    output_hiperta_filename = str(output_hiperta_filename)[1:]
+    output_reorganized_filename = str(output_reorganized_filename)[1:]
+    print("reorganize ", output_hiperta_filename)
+    print("reorganize out ", output_reorganized_filename)
     reorganize_dl1(output_hiperta_filename, output_reorganized_filename)
 
     # Erase the hiperta dl1 file created ?

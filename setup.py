@@ -52,12 +52,12 @@ setup(
     version=version,
     description=description,
     install_requires=[
-        "lstchain>=0.6",
+        "lstchain==0.6.3+rtav4.2.2",
         "pyyaml",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
-        "pyirf>=0.4",
+        #"pyirf>=0.4",
         "matplotlib",
         "pytest"
     ],

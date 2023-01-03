@@ -204,7 +204,7 @@ def r0_to_dl1(
         #     "source /home/enrique.garcia/.bashrc; conda activate rta_2night"
         # )
         rta_source_env = source_environment
-        base_cmd = f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -k {keep_rta_file} -d False "
+        base_cmd = f"{rta_source_env} lstmcpipe_rta_core_r0_dl1 -c {config_file} -k {keep_rta_file} -d False "
         jobtype_id = "RTA"
     else:
         log.critical("Please, selected an allowed workflow kind.")

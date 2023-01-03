@@ -225,7 +225,7 @@ def dl1_to_dl2(
 
         # sbatch --parsable --dependency=afterok:{wait_ids_proton_and_gammas} --wrap="{cmd}"
         batch_cmd = (
-            f"sbatch --parsable -p short --dependency=afterok:{wait_jobs} -J {job_name[particle]}"
+            f"sbatch --parsable --mem=100g -p short --dependency=afterok:{wait_jobs} -J {job_name[particle]}"
             f' -e {jobe} -o {jobo} --wrap="{cmd}"'
         )
 

@@ -309,6 +309,7 @@ def main(input_filename, output_filename):
     input_filename : [str] Input filename
     output_filename : [str] Output filename
     """
+    print(" input filename is ",input_filename)
     hfile = tables.open_file(input_filename, "r")
 
     # dl1 v0.8 Pointers

@@ -337,7 +337,7 @@ def merge_dl1(
         if workflow_kind == "lstchain":
             cmd += '"'  # Close " of wrap
         elif workflow_kind == "hiperta":
-            cmd += f'--smart {flag_merge}"'  # HiPeRTA workflow still uses --smart flag
+            cmd += f' --smart {flag_merge}"'  # HiPeRTA workflow still uses --smart flag
         else:
             cmd += (
                 f" -J {job_name[particle]} -e slurm-{job_name[particle]}-{set_type}.o "
