@@ -1,3 +1,4 @@
+cff-version: 1.2.0
 title: lstmcpipe
 type: software
 authors:
@@ -13,5 +14,18 @@ authors:
   given-names: Lukas
   orcid: https://orcid.org/0000-0001-7110-0533
   email: lukas.nickel@tu-dortmund.de
-message: If you use this software, please cite it using Zenodo from https://doi.org/10.5281/zenodo.6460727
+preferred-citation:
+  type: proceedings
+  authors:
+  - given-names: Enrique
+    family-names: Garcia
+  - given-names: Thomas
+    family-names: Vuillaume
+  - given-names: Lukas
+    family-names: Nickel
+  doi: "10.48550/arXiv.2212.00120"
+  journal: "ADASS XXXII conference series"
+  title: "The lstMCpipe library"
+  year: 2022
+message: If you use this software, please cite the version used from Zenodo (https://doi.org/10.5281/zenodo.6460727) as well as the paper describing the software (https://arxiv.org/abs/2212.00120).
 license: MIT
