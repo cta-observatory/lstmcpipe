@@ -15,8 +15,9 @@ lstmcpipe API documentation
 
    productions
    pipeline
+   examples/configs_pointings
    api/lstmcpipe
-
+   
 
 
 Indices and tables

@@ -6,3 +6,4 @@ sphinxcontrib-napoleon
 GitPython
 tabulate
 sphinxcontrib-mermaid
+nbsphinx

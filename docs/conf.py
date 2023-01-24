@@ -46,6 +46,7 @@ extensions = [
     "sphinxarg.ext",
     "sphinx.ext.napoleon",
     "sphinxcontrib.mermaid",
+    "nbsphinx",
 ]
 
 autosummary_generate = True
