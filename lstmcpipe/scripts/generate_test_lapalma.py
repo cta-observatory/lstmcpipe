@@ -55,8 +55,10 @@ def generate_test_allsky(
     decs=['dec_4822', 'dec_931'],
     overwrite=True,
 ):
-    allsky_train_base_dir = '/home/georgios.voutsinas/ws/AllSky'
-    allsky_test_base_dir = '/home/georgios.voutsinas/ws/AllSky'
+    # allsky_train_base_dir = '/home/georgios.voutsinas/ws/AllSky'
+    # allsky_test_base_dir = '/home/georgios.voutsinas/ws/AllSky'
+    allsky_train_base_dir = '/fefs/aswg/data/mc/DL0/LSTProd2/'
+    allsky_test_base_dir = '/fefs/aswg/data/mc/DL0/LSTProd2/'
 
     generate_tree(allsky_train_base_dir, os.path.join(working_dir, 'DL0/AllSky'), nfiles)
 
