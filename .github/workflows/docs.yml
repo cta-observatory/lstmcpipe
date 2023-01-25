@@ -4,7 +4,7 @@ on:
 
 jobs:
   docs:
-    runs-on: ubuntu-latest
+    runs-on: gitlab-registry.in2p3.fr/gammalearn/gammalearn/mamba:latest
     steps:
     - uses: actions/checkout@v2
       with:
