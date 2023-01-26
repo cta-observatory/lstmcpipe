@@ -5,10 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ctapipe.visualization import CameraDisplay
 from ctapipe.image import tailcuts_clean
+from ctapipe.instrument import SubarrayDescription
 from lstchain.io.io import (
     dl1_images_lstcam_key,
     dl1_params_lstcam_key,
-    read_camera_geometries,
 )
 from astropy.table import Table, join
 from ctapipe.containers import HillasParametersContainer
@@ -48,7 +48,8 @@ def get_cleaning_config(config_file=None):
 
 def main(filename, config_file=None):
 
-    geom = read_camera_geometries(filename)["LSTCam"]
+    sub = SubarrayDescription.from_hdf(filename)
+    geom = sub.tel[1].camera.geometry
 
     dl1_parameters_table = Table.read(filename, path=dl1_params_lstcam_key)
     images_table = Table.read(filename, path=dl1_images_lstcam_key)
@@ -57,8 +58,7 @@ def main(filename, config_file=None):
 
     params_cleaning = get_cleaning_config(config_file)
 
-    selected_table = dl1_table[np.isfinite(dl1_table["intensity"])]
-    selected_table = dl1_table[dl1_table["intensity"] > 500]
+    selected_table = dl1_table[(dl1_table["intensity"] > 500) & np.isfinite(dl1_table["intensity"])]
 
     with PdfPages("images_examples.pdf") as pp:
 
