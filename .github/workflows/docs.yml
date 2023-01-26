@@ -7,22 +7,6 @@ defaults:
     shell: bash -l {0}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Conda environment from environment.yml
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          cache-env: true
-
-      # Linux and macOS
-      - name: Run Python
-        shell: bash -l {0}
-        run: |
-          python -c "import numpy"
-
-
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +17,7 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           cache-env: true
+          environment-file: environment.yml
 
       - name: Install doc dep
         run: |
