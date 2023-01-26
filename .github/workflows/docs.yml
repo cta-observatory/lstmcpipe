@@ -5,7 +5,7 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    container: gitlab-registry.in2p3.fr/gammalearn/gammalearn/mamba:latest
+    container: ghcr.io/cta-observatory/lstmcpipe/lstmcpipe:docs
     steps:
     - uses: actions/checkout@v2
       with:
