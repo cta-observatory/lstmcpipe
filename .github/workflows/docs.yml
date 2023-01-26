@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Install Conda environment from environment.yml
         uses: mamba-org/provision-with-micromamba@main
         with:
@@ -27,36 +26,35 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
-    - name: Install Conda env from environment.yml
-      uses: mamba-org/provision-with-micromamba@main
-      with:
-        cache-env: true
-        environment-name: base
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Install Conda env from environment.yml
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          cache-env: true
 
-    - name: Install doc dep
-      run: |
-        git config --global --add safe.directory '*'
-        conda install make pandoc
+      - name: Install doc dep
+        run: |
+          git config --global --add safe.directory '*'
+          conda install make pandoc
 
-    - name: Build docs
-      run: |
-        cd docs
-        make html
-        cd ..
-    - uses: actions/upload-artifact@v1
-      with:
-        name: DocumentationHTML
-        path: docs/_build/html/
-    - name: Deploy to github pages
-      # only run on push to master
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: docs/_build/html
-        CLEAN: true
-        SINGLE_COMMIT: true
+      - name: Build docs
+        run: |
+          cd docs
+          make html
+          cd ..
+      - uses: actions/upload-artifact@v1
+        with:
+          name: DocumentationHTML
+          path: docs/_build/html/
+      - name: Deploy to github pages
+        # only run on push to master
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/_build/html
+          CLEAN: true
+          SINGLE_COMMIT: true
