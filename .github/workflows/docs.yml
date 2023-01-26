@@ -8,11 +8,7 @@ defaults:
 
 jobs:
   docs:
-    defaults:
-      run:
-        shell: bash -l {0}
     runs-on: ubuntu-latest
-    container: ghcr.io/cta-observatory/lstmcpipe/lstmcpipe:docs
     steps:
     - uses: actions/checkout@v3
       with:
