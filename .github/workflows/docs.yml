@@ -13,7 +13,7 @@ jobs:
     - run: |
         . /opt/conda/etc/profile.d/conda.sh
         conda config --set always_yes yes --set changeps1 no
-        git config --global --add safe.directory .
+        git config --global --add safe.directory '*'
         conda env update -n base -f environment.yml
         conda activate base
         conda install make
