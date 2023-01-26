@@ -16,7 +16,7 @@ jobs:
         git config --global --add safe.directory '*'
         conda env update -n base -f environment.yml
         conda activate base
-        conda install make
+        conda install make pandoc
         cd docs
         make html
         cd ..
