@@ -2,32 +2,48 @@ name: "Pull Request Docs Check"
 on:
 - push
 
+defaults:
+  run:
+    shell: bash -l {0}
+
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - run: |
-        . $CONDA/etc/profile.d/conda.sh
-        conda config --set always_yes yes --set changeps1 no
-        conda env update -n base -f environment.yml
-        conda activate base
-        cd docs
-        make html
-        cd ..
-    - uses: actions/upload-artifact@v1
-      with:
-        name: DocumentationHTML
-        path: docs/_build/html/
-    - name: Deploy to github pages
-      # only run on push to master
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: docs/_build/html
-        CLEAN: true
-        SINGLE_COMMIT: true
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Setup env
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: lstmcpipe
+          use-mamba: true
+
+      - name: Update environment
+        run: |
+          mamba env update -n lstmcpipe -f environment.yml
+          mamba install -n lstmcpipe -c conda-forge make pandoc
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Build docs
+        run: |
+          git config --global --add safe.directory '*'
+          cd docs
+          make html
+          cd ..
+      - uses: actions/upload-artifact@v1
+        with:
+          name: DocumentationHTML
+          path: docs/_build/html/
+      - name: Deploy to github pages
+        # only run on push to master
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/_build/html
+          CLEAN: true
+          SINGLE_COMMIT: true
