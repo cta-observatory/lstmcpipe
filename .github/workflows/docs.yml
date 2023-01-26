@@ -2,21 +2,31 @@ name: "Pull Request Docs Check"
 on:
 - push
 
+defaults:
+  run:
+    shell: bash -l {0}
+
 jobs:
   docs:
     runs-on: ubuntu-latest
     container: ghcr.io/cta-observatory/lstmcpipe/lstmcpipe:docs
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: '0'
-    - run: |
-        . /opt/conda/etc/profile.d/conda.sh
-        conda config --set always_yes yes --set changeps1 no
+    - name: Install Conda env from environment.yml
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        cache-env: true
+        environment-name: base
+
+    - name: Install doc dep
+      run: |
         git config --global --add safe.directory '*'
-        conda env update -n base -f environment.yml
-        conda activate base
         conda install make pandoc
+
+    - name: Build docs
+      run: |
         cd docs
         make html
         cd ..
