@@ -22,4 +22,9 @@ dec_min_413
 
 Command to produce this request:
 
->> lstmcpipe_generate_config PathConfigAllSkyFull --prod_id 20221215_v0.9.12_base_prod_az --output lstmcpipe_config.yml --overwrite --lstchain_conf lstchain_config.json --dec_list dec_2276 dec_3476 dec_4822 dec_6676 dec_931 dec_min_413 
+```
+lstmcpipe_generate_config PathConfigAllSkyFull --prod_id 20230127_v0.9.12_base_prod_az_tel --output lstmcpipe_config.yml --overwrite --lstchain_conf lstchain_config.json --dec_list dec_2276 dec_3476 dec_4822 dec_6676 dec_931 dec_min_413
+```
+
+and then replace `sin_az_tel` with `az_tel` in lstchain config
+
