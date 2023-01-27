@@ -165,7 +165,7 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "az_tel",
+        "sin_az_tel",
         "alt_tel"
     ],
     "disp_method": "disp_norm_sign",
@@ -178,7 +178,7 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "az_tel",
+        "sin_az_tel",
         "alt_tel"
     ],
     "disp_classification_features": [
@@ -190,7 +190,7 @@
         "kurtosis",
         "time_gradient",
         "leakage_intensity_width_2",
-        "az_tel",
+        "sin_az_tel",
         "alt_tel"
     ],
     "particle_classification_features": [
@@ -207,7 +207,7 @@
         "log_reco_energy",
         "reco_disp_norm",
         "reco_disp_sign",
-        "az_tel",
+        "sin_az_tel",
         "alt_tel"
     ],
     "allowed_tels": [
