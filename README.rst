@@ -1,7 +1,7 @@
 lstMCpipe
 =========
 
-|code| |documentation| |CI| |coverage|
+|code| |documentation| |CI| |coverage| |pypi| |zenodo| |fair|
 
 .. |code| image:: https://img.shields.io/badge/lstmcpipe-code-green
   :target: https://github.com/cta-observatory/lstmcpipe/
@@ -11,6 +11,10 @@ lstMCpipe
   :target: https://codecov.io/gh/cta-observatory/lstmcpipe
 .. |documentation| image:: https://img.shields.io/badge/lstmcpipe-documentation-orange
   :target: https://cta-observatory.github.io/lstmcpipe/
+.. |pypi| image:: https://badge.fury.io/py/lstmcpipe.svg
+  :target: https://badge.fury.io/py/lstmcpipe
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
+  :target: https://doi.org/10.5281/zenodo.6460727
 
    
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
@@ -38,11 +42,8 @@ If lstMCpipe was used for your analysis, please cite:
         primaryClass={astro-ph.IM}
   }
 
-in addition to the exact lstMCpipe version used from https://doi.org/10.5281/zenodo.6460727:
+in addition to the exact lstMCpipe version used from https://doi.org/10.5281/zenodo.6460727
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
-  :target: https://doi.org/10.5281/zenodo.6460727
-  
   
 You may also want to include the config file with your published code for reproducibility.
 
