@@ -15,6 +15,8 @@ lstMCpipe
   :target: https://badge.fury.io/py/lstmcpipe
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
   :target: https://doi.org/10.5281/zenodo.6460727
+.. |fair| image:: https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow
+   :target: https://fair-software.eu
 
    
 Scripts to ease the reduction of MC data on the LST cluster at La Palma.   
