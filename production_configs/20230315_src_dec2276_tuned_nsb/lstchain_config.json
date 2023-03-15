@@ -10,6 +10,7 @@
       "min_flatfield_adc": 3000,
       "min_flatfield_pixel_fraction": 0.8,
       "calibrate_flatfields_and_pedestals": false,
+      "use_flatfield_heuristic": false,
       "EventTimeCalculator": {
         "dragon_reference_counter": null,
         "dragon_reference_time": null
@@ -45,8 +46,8 @@
     "delta_time": 2
   },
   "tailcuts_clean_with_pedestal_threshold": {
-    "picture_thresh":6,
-    "boundary_thresh":3,
+    "picture_thresh":8,
+    "boundary_thresh":4,
     "sigma":2.5,
     "keep_isolated_pixels":false,
     "min_number_picture_neighbors":2,
@@ -187,7 +188,7 @@
     "reco_disp_sign"
   ],
 
-  "allowed_tels": [1],
+  "allowed_tels": [1, 2, 3, 4],
   "write_pe_image": false,
   "mc_image_scaling_factor": 1,
   "image_extractor": "LocalPeakWindowSum",
@@ -199,7 +200,7 @@
   "LocalPeakWindowSum":{
     "window_shift": 4,
     "window_width": 8,
-    "apply_integration_correction": true
+    "apply_integration_correction": false
   },
   "GlobalPeakWindowSum":{
     "window_shift": 4,
