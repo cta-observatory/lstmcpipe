@@ -13,7 +13,16 @@ Config for a galactic source with dec 22.47 and NSB tuning:
         "transition_charge": 8,
         "extra_noise_in_bright_pixels": 1.79
     }
-The configuration file for lstchain included in this directory is the same used to compute the NSB, i.e. `lstchain_config_v0.9.4_from2022onwards.json`, with lstchain script `lstchain_tune_nsb`.
+The NSB parameters have been computed by using lstchain script `lstchain_tune_nsb` with configuration file `lstchain_config_v0.9.4_from2022onwards.json`.
+
+The configuration file for lstchain and lstmcpipe included in this directory have been produced by running
+```
+source /fefs/aswg/software/conda/etc/profile.d/conda.sh
+
+conda activate lstchain-v0.9.13
+
+lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --prod_id 20230315_src_dec2276_tuned_nsb --kwargs source_prod_id=20230315_src_dec2276_tuned_nsb
+```
 
 ## Why this config is needed 
 

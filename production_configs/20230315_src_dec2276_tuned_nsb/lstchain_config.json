@@ -10,7 +10,6 @@
       "min_flatfield_adc": 3000,
       "min_flatfield_pixel_fraction": 0.8,
       "calibrate_flatfields_and_pedestals": false,
-      "use_flatfield_heuristic": false,
       "EventTimeCalculator": {
         "dragon_reference_counter": null,
         "dragon_reference_time": null
@@ -36,6 +35,12 @@
     "r": [0, Infinity],
     "leakage_intensity_width_2": [0, Infinity]
   },
+"n_training_events": {
+    "gamma_regressors": 1.0,
+    "gamma_tmp_regressors": 0.8,
+    "gamma_classifier": 0.2,
+    "proton_classifier": 1.0
+},
 
   "tailcut": {
     "picture_thresh":8,
@@ -61,16 +66,16 @@
   },
 
   "random_forest_energy_regressor_args": {
-    "max_depth": 50,
-    "min_samples_leaf": 2,
-    "n_jobs": 4,
+    "max_depth": 30,
+    "min_samples_leaf": 10,
+    "n_jobs": -1,
     "n_estimators": 150,
     "bootstrap": true,
     "criterion": "squared_error",
     "max_features": "auto",
     "max_leaf_nodes": null,
     "min_impurity_decrease": 0.0,
-    "min_samples_split": 2,
+    "min_samples_split": 10,
     "min_weight_fraction_leaf": 0.0,
     "oob_score": false,
     "random_state": 42,
@@ -79,16 +84,16 @@
   },
 
   "random_forest_disp_regressor_args": {
-    "max_depth": 50,
-    "min_samples_leaf": 2,
-    "n_jobs": 4,
+    "max_depth": 30,
+    "min_samples_leaf": 10,
+    "n_jobs": -1,
     "n_estimators": 150,
     "bootstrap": true,
     "criterion": "squared_error",
     "max_features": "auto",
     "max_leaf_nodes": null,
     "min_impurity_decrease": 0.0,
-    "min_samples_split": 2,
+    "min_samples_split": 10,
     "min_weight_fraction_leaf": 0.0,
     "oob_score": false,
     "random_state": 42,
@@ -97,12 +102,12 @@
   },
 
   "random_forest_disp_classifier_args": {
-    "max_depth": 100,
-    "min_samples_leaf": 2,
-    "n_jobs": 4,
+    "max_depth": 30,
+    "min_samples_leaf": 10,
+    "n_jobs": -1,
     "n_estimators": 100,
     "criterion": "gini",
-    "min_samples_split": 2,
+    "min_samples_split": 10,
     "min_weight_fraction_leaf": 0.0,
     "max_features": "auto",
     "max_leaf_nodes": null,
@@ -116,12 +121,12 @@
   },
 
   "random_forest_particle_classifier_args": {
-    "max_depth": 100,
-    "min_samples_leaf": 2,
-    "n_jobs": 4,
+    "max_depth": 30,
+    "min_samples_leaf": 10,
+    "n_jobs": -1,
     "n_estimators": 100,
     "criterion": "gini",
-    "min_samples_split": 2,
+    "min_samples_split": 10,
     "min_weight_fraction_leaf": 0.0,
     "max_features": "auto",
     "max_leaf_nodes": null,
@@ -145,7 +150,9 @@
     "skewness",
     "kurtosis",
     "time_gradient",
-    "leakage_intensity_width_2"
+    "leakage_intensity_width_2",
+    "sin_az_tel",
+    "alt_tel"
   ],
 
   "disp_method": "disp_norm_sign",
@@ -158,7 +165,9 @@
     "skewness",
     "kurtosis",
     "time_gradient",
-    "leakage_intensity_width_2"
+    "leakage_intensity_width_2",
+    "sin_az_tel",
+    "alt_tel"
   ],
 
   "disp_classification_features": [
@@ -169,7 +178,9 @@
     "skewness",
     "kurtosis",
     "time_gradient",
-    "leakage_intensity_width_2"
+    "leakage_intensity_width_2",
+    "sin_az_tel",
+    "alt_tel"
   ],
 
   "particle_classification_features": [
@@ -179,16 +190,18 @@
     "x",
     "y",
     "wl",
-    "skewness",
+    "signed_skewness",
     "kurtosis",
-    "time_gradient",
+    "signed_time_gradient",
     "leakage_intensity_width_2",
     "log_reco_energy",
     "reco_disp_norm",
-    "reco_disp_sign"
+    "reco_disp_sign",
+    "sin_az_tel",
+    "alt_tel"
   ],
 
-  "allowed_tels": [1, 2, 3, 4],
+  "allowed_tels": [1],
   "write_pe_image": false,
   "mc_image_scaling_factor": 1,
   "image_extractor": "LocalPeakWindowSum",
@@ -200,12 +213,12 @@
   "LocalPeakWindowSum":{
     "window_shift": 4,
     "window_width": 8,
-    "apply_integration_correction": false
+    "apply_integration_correction": true
   },
   "GlobalPeakWindowSum":{
     "window_shift": 4,
     "window_width": 8,
-    "apply_integration_correction": false
+    "apply_integration_correction": true
   },
   "timestamps_pointing":"ucts",
 
@@ -262,12 +275,5 @@
     "nsb_tuning": false,
     "nsb_tuning_ratio": 0.52,
     "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
-  },
-  "image_modifier": {
-    "increase_nsb": true,
-    "extra_noise_in_dim_pixels": 1.309,
-    "extra_bias_in_dim_pixels": 0.54,
-    "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 1.79
   }
 }
