@@ -275,5 +275,12 @@
     "nsb_tuning": false,
     "nsb_tuning_ratio": 0.52,
     "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
+  },
+  "image_modifier": {
+    "increase_nsb": true,
+    "extra_noise_in_dim_pixels": 1.309,
+    "extra_bias_in_dim_pixels": 0.54,
+    "transition_charge": 8,
+    "extra_noise_in_bright_pixels": 1.79
   }
 }
