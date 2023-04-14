@@ -260,7 +260,7 @@ class SbatchLstMCStage:
             # Remove trailing semicolon and any extra spaces
             wrap_command = wrap_command.rstrip(";").strip()
             # exit if any command fails
-            wrap_command = f"{wrap_command} {r'|| exit $?'}"
+            wrap_command = wrap_command + ' || exit ' + r'\$?'
         if source_env != "" and not source_env.strip().endswith(";"):
             source_env = f"{source_env.strip()}; "
         if backend != "" and not backend.strip().endswith(";"):
