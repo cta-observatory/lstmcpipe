@@ -256,6 +256,11 @@ class SbatchLstMCStage:
     def compose_wrap_command(self, wrap_command=None, source_env="", backend=""):
         if wrap_command is None or wrap_command == "":
             warnings.warn("You must pass a command to be batched! ")
+        else:
+            # Remove trailing semicolon and any extra spaces
+            wrap_command = wrap_command.rstrip(";").strip()
+            # exit if any command fails
+            wrap_command = wrap_command + ' || exit ' + r'\$?'
         if source_env != "" and not source_env.strip().endswith(";"):
             source_env = f"{source_env.strip()}; "
         if backend != "" and not backend.strip().endswith(";"):
