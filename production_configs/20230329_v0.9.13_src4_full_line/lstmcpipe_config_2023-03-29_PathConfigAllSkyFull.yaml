@@ -444,222 +444,222 @@ stages:
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_73.142_az_331.979_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_70.732_az_330.659__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_70.732_az_330.659_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_43.113_az_28.023__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_43.113_az_28.023_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_60.66_az_327.483__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_60.66_az_327.483_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_57.995_az_327.238__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_57.995_az_327.238_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_35.904_az_17.462__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_35.904_az_17.462_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_69.512_az_29.92__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_69.512_az_29.92_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_67.045_az_30.92__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_67.045_az_30.92_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_55.25_az_32.736__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_55.25_az_32.736_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_74.336_az_27.273__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_74.336_az_27.273_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_70.732_az_29.341__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_70.732_az_29.341_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_65.976_az_328.656__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_65.976_az_328.656_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_63.255_az_32.039__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_63.255_az_32.039_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_65.976_az_31.344__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_65.976_az_31.344_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_39.646_az_24.333__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_39.646_az_24.333_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_57.995_az_32.762__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_57.995_az_32.762_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_52.41_az_327.619__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_52.41_az_327.619_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_75.522_az_333.538__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_75.522_az_333.538_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_55.25_az_327.264__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_55.25_az_327.264_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_59.336_az_32.671__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_59.336_az_32.671_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_61.965_az_327.694__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_61.965_az_327.694_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_46.37_az_30.246__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_46.37_az_30.246_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_49.458_az_31.603__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_49.458_az_31.603_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_52.41_az_32.381__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_52.41_az_32.381_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_68.284_az_30.445__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_68.284_az_30.445_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_35.904_az_342.538__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_35.904_az_342.538_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_49.458_az_328.397__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_49.458_az_328.397_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_73.142_az_28.021__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_73.142_az_28.021_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_64.533_az_328.283__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_64.533_az_328.283_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_75.522_az_26.462__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_75.522_az_26.462_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_39.646_az_335.667__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_39.646_az_335.667_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_61.965_az_32.306__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_61.965_az_32.306_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_63.255_az_327.961__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_63.255_az_327.961_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_67.045_az_329.08__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_67.045_az_329.08_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_43.113_az_331.977__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_43.113_az_331.977_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_64.533_az_31.717__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_64.533_az_31.717_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_68.284_az_329.555__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_68.284_az_329.555_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_46.37_az_329.754__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_46.37_az_329.754_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_71.94_az_331.291__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_71.94_az_331.291_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_69.512_az_330.08__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_69.512_az_330.08_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_59.336_az_327.329__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_59.336_az_327.329_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_74.336_az_332.727__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_74.336_az_332.727_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_60.66_az_32.517__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_60.66_az_32.517_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   - input: /fefs/aswg/data/mc/DL1/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dl1_20230329_v0.9.13_src4_full_line_node_theta_71.94_az_28.709__merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20230329_v0.9.13_src4_full_line/dec_6166
     output: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_71.94_az_28.709_
     extra_slurm_options:
-      mem: 60GB
+      mem: 100GB
   dl2_to_irfs:
   - input:
       gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20230329_v0.9.13_src4_full_line/TestingDataset/dec_6166/node_theta_73.142_az_331.979_/dl2_20230329_v0.9.13_src4_full_line_node_theta_73.142_az_331.979__merged.h5
