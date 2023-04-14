@@ -74,14 +74,14 @@ def test_sbatch_lst_mc_stage():
     sbatch = SbatchLstMCStage(stage="r0_to_dl1", wrap_command="command to be batched")
     assert (
         sbatch.slurm_command == 'sbatch --parsable --partition=long --job-name=r0_dl1 --array=0-0%100 '
-        '--error=./slurm-%j.e --output=./slurm-%j.o  --wrap="command to be batched' + ' || exit ' + r'\$?'
+        '--error=./slurm-%j.e --output=./slurm-%j.o  --wrap="command to be batched' + ' || exit ' + r'\$?"'
     )
 
     sbatch.extra_slurm_options = {'account': 'lstrta', 'partition': 'xxl', 'mem': '160G', 'cpus-per-task': 32}
     assert (
         sbatch.slurm_command == 'sbatch --parsable --partition=xxl --job-name=r0_dl1 --array=0-0%100 '
         '--error=./slurm-%j.e --output=./slurm-%j.o --account=lstrta --mem=160G '
-        '--cpus-per-task=32  --wrap="command to be batched' + ' || exit ' + r'\$?'
+        '--cpus-per-task=32  --wrap="command to be batched' + ' || exit ' + r'\$?"'
     )
 
     sbatch.extra_slurm_options = None
@@ -95,7 +95,7 @@ def test_sbatch_lst_mc_stage():
     )
     assert (
         sbatch.wrap_cmd
-        == '--wrap="export MPLBACKEND=Agg; source .bashrc_file; conda activate; python args' + ' || exit ' + r'\$?'
+        == '--wrap="export MPLBACKEND=Agg; source .bashrc_file; conda activate; python args' + ' || exit ' + r'\$?"'
     )
 
     with pytest.raises(ValueError):
