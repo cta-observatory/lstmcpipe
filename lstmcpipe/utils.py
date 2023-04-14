@@ -254,13 +254,14 @@ class SbatchLstMCStage:
         ]
 
     def compose_wrap_command(self, wrap_command=None, source_env="", backend=""):
+        exit = "exit_code=$?; if [ $exit_code -ne 0 ]; then exit $exit_code; fi"
         if wrap_command is None or wrap_command == "":
             warnings.warn("You must pass a command to be batched! ")
         if source_env != "" and not source_env.strip().endswith(";"):
             source_env = f"{source_env.strip()}; "
         if backend != "" and not backend.strip().endswith(";"):
             backend = f"{backend.strip()}; "
-        self.wrap_cmd = f'--wrap="{backend}{source_env}{wrap_command}"'
+        self.wrap_cmd = f'--wrap="{backend}{source_env}{wrap_command}; {exit}"'
 
     @property
     def slurm_command(self):
