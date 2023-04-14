@@ -6,10 +6,10 @@ from ruamel.yaml import YAML
 from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config, SbatchLstMCStage, run_command
 
 
-def test_save_log_to_file():
+def test_save_log_to_file(tmp_path):
     from ..utils import save_log_to_file
 
-    outfile_yml = Path('dummy_log.yml')
+    outfile_yml = Path(tmp_path, 'dummy_log.yml')
 
     dummy_log = {'dummy_jobid': 'sbatch --parsable --wrap="sleep 10"'}
     save_log_to_file(dummy_log, outfile_yml)
