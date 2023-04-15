@@ -285,7 +285,7 @@ class SbatchLstMCStage:
         if slurm_deps is None or slurm_deps == "":
             return ""
         elif all(items != "" for items in slurm_deps.split(",")):
-            return f"--dependency={dependency_type}:{slurm_deps}"
+            return f"--dependency={dependency_type}:{slurm_deps.replace(',',':')}"
         else:
             raise ValueError("Slurm dependencies contain an empty value between commas, i.e.; ,'', ")
 
