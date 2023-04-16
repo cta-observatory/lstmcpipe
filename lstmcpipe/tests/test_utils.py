@@ -86,7 +86,7 @@ def test_sbatch_lst_mc_stage():
 
     sbatch.extra_slurm_options = None
     sbatch.slurm_dependencies = "123,243,345,456"
-    assert sbatch._construct_slurm_dependencies() == "--dependency=afterok:123,243,345,456"
+    assert sbatch._construct_slurm_dependencies() == "--dependency=afterok:123:243:345:456"
 
     sbatch.compose_wrap_command(
         wrap_command="python args",
