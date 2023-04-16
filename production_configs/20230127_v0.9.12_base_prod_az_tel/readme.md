@@ -1,15 +1,15 @@
-# New Prod Config 
+# New Prod Config
 
 ## template_prod
 
 ## Short description of the config
 
-Full MC / model dataset with lstchain v0.9.12 standard settings / az instead of sin(az) in training features. 
+Full MC / model dataset with lstchain v0.9.12 standard settings / az instead of sin(az) in training features.
 
-## Why this config is needed 
+## Why this config is needed
 
-Processing standard AGN data (+Crab) with recent lstchain (after the discussion in slack). Last full production with Models date from May 2022. 
-For now requesting a standard 'un-tuned' production to evaluate blind reconstruction and to test how a 'bad NSB setting' can spoil the SED. 
+Processing standard AGN data (+Crab) with recent lstchain (after the discussion in slack). Last full production with Models date from May 2022.
+For now requesting a standard 'un-tuned' production to evaluate blind reconstruction and to test how a 'bad NSB setting' can spoil the SED.
 
 Declination tracks needed:
 
@@ -28,3 +28,8 @@ lstmcpipe_generate_config PathConfigAllSkyFull --prod_id 20230127_v0.9.12_base_p
 
 and then replace `sin_az_tel` with `az_tel` in lstchain config
 
+## Note on dec_931
+16/04/2023, T. Vuillaume.
+
+dec_931 from this prod is faulty and thus should not be used!
+Please use prod `20230414_v0.9.13_dec_931_az_tel` instead.
