@@ -209,6 +209,11 @@ DL1ab
 
 The DL1ab workflow is very similar, only starting from an existing DL1 dataset.
 
+This workflow is typically used when a tuned production is needed for a given dataset.
+For example, a production specifically tuned to match the Crab FoV NSB level and analyse Crab data.
+In this case, you should produce your own lstchain config file using lstchain tools (see lstchain documentation).
+
+
 ..
     .. mermaid::
 
@@ -246,7 +251,9 @@ The DL1ab workflow is very similar, only starting from an existing DL1 dataset.
 .. image:: https://mermaid.ink/img/pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw?type=png)](https://mermaid.live/edit#pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw
 
 
-You typically want to run **on the cluster**:
+The workflow then starts from a base production (the `source_prod_id`), produces new tuned DL1 (dl1ab steps) and trains a new set of models.
+
+To prepare the lstmcpipe config, you typically want to run **on the cluster**:
 
 .. code-block::
 
