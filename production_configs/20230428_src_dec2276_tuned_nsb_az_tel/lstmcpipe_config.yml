@@ -1,9 +1,8 @@
-# lstmcpipe generated config from PathConfigAllSkyFullDL1ab - 2023-04-17
 
 workflow_kind: lstchain
 
 # prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
-prod_id: 20230315_src_dec2276_tuned_nsb
+prod_id: 20230428_src_dec2276_tuned_nsb_az_tel
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
