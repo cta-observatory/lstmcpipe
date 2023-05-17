@@ -14,11 +14,9 @@ stages_to_run:
 - merge_dl1
 stages:
   dl1ab:
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestingDataset/GammaDiffuse/node_theta_52.374_az_240.004_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestingDataset/GammaDiffuse/node_theta_52.374_az_240.004_
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
   merge_dl1:
-  - input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestingDataset/GammaDiffuse/node_theta_52.374_az_240.004_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestingDataset/GammaDiffuse/dl1_20230517_v0.9.13_large_offset_crab_tuned_node_theta_52.374_az_240.004_merged.h5
-    options: --pattern */*.h5 --no-image
-    extra_slurm_options:
-      partition: long
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestDataset/Crab_large_offset/node_theta_52.374_az_240.004_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset_crab_tuned/TestDataset/Crab_large_offset/dl1_20230517_v0.9.13_large_offset_crab_tuned_node_theta_52.374_az_240.004_merged.h5
+    options: --no-image
