@@ -1,0 +1,22 @@
+workflow_kind: lstchain
+
+prod_id: 20230517_v0.9.13_large_offset
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.9.13
+
+slurm_config:
+  user_account: dpps
+
+stages_to_run:
+- r0_to_dl1
+- merge_dl1
+stages:
+  r0_to_dl1:
+  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/Crab_large_offset/sim_telarray/node_corsika_theta_52.374_az_240.004_/output_v1.4
+    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
+  merge_dl1:
+    input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/dl1_20230517_v0.9.13_large_offset_node_theta_52.374_az_240.004_merged.h5
+    options: --no-image
