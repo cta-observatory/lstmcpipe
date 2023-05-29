@@ -19,6 +19,40 @@ Config for a source src4 with dec 6166 and NSB tuning corresponding or pedestal 
 
 Only test nodes on the declination line are included
 
+The config is produced as following:
+
+{
+
+    config = paths_config.PathConfigAllSkyFull('20230529_v0.9.13_src4_full_line', ['dec_6166'])
+    config.generate()
+    # mask test outside the line
+    n_test_points=len(config.test_configs['dec_6166']._testing_pointings)
+    mask_test=np.zeros(n_test_points,dtype=bool)
+    for point in np.arange(n_test_points):
+        zd=90*u.deg-config.test_configs['dec_6166']._testing_pointings['alt'][point]
+        az=config.test_configs['dec_6166']._testing_pointings['az'][point]
+    
+        for test in np.arange(len(test_zd)):
+            dist=angular_separation(az,zd,test_az[test]*u.deg,test_zd[test]*u.deg)
+        
+            if dist < 1.*u.deg:
+                mask_test[point]=True
+       
+    # select only the on line tests   
+    config.test_configs['dec_6166']._testing_pointings=config.test_configs['dec_6166']._testing_pointings = config.test_configs['dec_6166']._testing_pointings[mask_test]
+    # generate again
+    config.generate()
+
+    config.save_yml('lstmcpipe_config_2023-05-29_PathConfigAllSkyFull.yaml', overwrite=True)
+
+
+
+}
+
+ 
+
+
+
 ```
 
 Plot:
