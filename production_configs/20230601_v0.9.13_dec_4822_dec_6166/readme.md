@@ -1,0 +1,13 @@
+# New Prod Config
+
+## Prod_ID
+
+20230601_v0.9.13_dec_4822_dec_6166
+
+## Short description of the config
+
+Create a production with lstchain-v0.9.13 with all testing nodes for dec_4822 and dec_6166. The stage r0_to_dl1 is the only stage used because this production will be used as the base prod. to latter tune the NSB.
+
+## Why this config is needed
+
+Processing of source 7 with MC processed with lstchain-v0.9.13 for dec. bands dec_4822 and dec_6166 with all available testing nodes.
