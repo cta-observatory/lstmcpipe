@@ -63,6 +63,17 @@
                 "@type": "Organization",
                 "name": "TU Dortmund University, Department of Physics"
             }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0001-8816-4920",
+            "givenName": "Arnau",
+            "familyName": "Aguasca-Cabot",
+            "email": "arnau.aguasca@fqa.ub.edu",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Departament de F\u00edsica Qu\u00e0ntica i Astrof\u00edsica, Institut de Ci\u00e8ncies del Cosmos (ICCUB), Universitat de Barcelona (IEEC-UB)"
+            }
         }
     ],
     "maintainer": {

@@ -75,8 +75,12 @@ def batch_process_dl1(dict_paths, conf_file, batch_config, logs, workflow_kind="
             jobids_dl1_processing_stage.append(jobid)
             debug_log[jobid] = f'dl1ab job from input dir: {paths["input"]}'
     jobids_dl1_processing_stage = ",".join(jobids_dl1_processing_stage)
-    save_log_to_file(log_process_dl1, logs["log_file"], "r0_to_dl1")
-    save_log_to_file(debug_log, logs["debug_file"], workflow_step="r0_to_dl1")
+    if new_production:
+        save_log_to_file(log_process_dl1, logs["log_file"], "r0_to_dl1")
+        save_log_to_file(debug_log, logs["debug_file"], workflow_step="r0_to_dl1")
+    else:
+        save_log_to_file(log_process_dl1, logs["log_file"], "dl1ab")
+        save_log_to_file(debug_log, logs["debug_file"], workflow_step="dl1ab")
     log.info(f"==== END {workflow_kind} dl1 processing ====")
     return jobids_dl1_processing_stage
 
