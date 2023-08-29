@@ -4,7 +4,7 @@ channels:
   - cta-observatory
   - conda-forge
 dependencies:
-  - python=3.7
+  - python>=3.7
   - astropy~=4.2
   - pip
   - pre-commit
@@ -16,5 +16,5 @@ dependencies:
       - ctaplot
       - ctapipe_io_lst
       - lstchain>=0.9.7
-      - pyirf~=0.6.0
+      - pyirf>=0.6.0
       - eventio<1.11.0
