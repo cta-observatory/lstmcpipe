@@ -313,7 +313,7 @@
             "waveform_offset": 400,
             "waveform_scale": 80
         }
-    }
+    },
 
     "image_modifier": {
         "increase_nsb": true,
