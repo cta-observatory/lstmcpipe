@@ -61,7 +61,6 @@ jobs:
         run: |
             source $CONDA/etc/profile.d/conda.sh
             conda activate ci
-            ./download_test_data.sh
             pytest --cov=lstmcpipe --cov-report=xml lstmcpipe
 
       - uses: codecov/codecov-action@v1
