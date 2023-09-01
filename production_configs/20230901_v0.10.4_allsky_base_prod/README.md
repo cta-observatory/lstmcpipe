@@ -18,3 +18,13 @@ For the same reason all processing steps are included.
 That should make it possible to directly compare the performance to the older `20230127_v0.9.12_base_prod_az_tel` production.
 
 For Crab or other high-NSB sources, a `dl1ab` reprocessing or another podcution will thus be needed.
+
+## Command to produce
+```
+lstmcpipe_generate_config PathConfigAllSkyFull --prod_id 20230901_v0.10.4_allsky_base_prod --dec_list dec_2276 dec_931 dec_min_413 dec_6676 dec_4822 dec_3476
+```
+to produce the list of steps.
+Then change `lstchain` version in the `mcpipe` config.
+For the lstchain config, use the standard config of that version from here:
+https://github.com/cta-observatory/cta-lstchain/blob/v0.10.4/lstchain/data/lstchain_standard_config.json
+and set `apply_integration_correction` to `true`
