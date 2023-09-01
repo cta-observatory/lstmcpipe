@@ -50,8 +50,7 @@ def test_rerun_cmd():
 
 
 def test_rerun_cmd_lstchain_mc_r0_to_dl1(mc_gamma_testfile):
-    # with tempfile.TemporaryDirectory() as tmp_dir:
-    with Path('tmp_dir') as tmp_dir:
+    with tempfile.TemporaryDirectory() as tmp_dir:
         cmd = ['lstchain_mc_r0_to_dl1', '-o', tmp_dir, '-f', mc_gamma_testfile]
         outfilename = 'dl1_' + mc_gamma_testfile.replace('.simtel.gz', '.h5')
         outfile = Path(tmp_dir, 'dl1_' + outfilename)
