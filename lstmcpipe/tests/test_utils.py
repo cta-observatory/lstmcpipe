@@ -6,6 +6,12 @@ from ruamel.yaml import YAML
 from lstmcpipe.utils import rerun_cmd, dump_lstchain_std_config, SbatchLstMCStage, run_command
 
 
+@pytest.fixture(scope="session")
+def mc_gamma_testfile():
+    """Get a simulated test file."""
+    return "test_data/mc/simtel_theta_20_az_180_gdiffuse_10evts.simtel.gz"
+
+
 def test_save_log_to_file(tmp_path):
     from ..utils import save_log_to_file
 
@@ -43,17 +49,18 @@ def test_rerun_cmd():
         assert filename.exists()
 
 
-def test_rerun_cmd_lstchain_mc_r0_to_dl1():
+def test_rerun_cmd_lstchain_mc_r0_to_dl1(mc_gamma_testfile):
     with tempfile.TemporaryDirectory() as tmp_dir:
-        cmd = ['lstchain_mc_r0_to_dl1', '-o', tmp_dir]
-        outfile = Path(tmp_dir, 'dl1_gamma_test_large.h5')
+        cmd = ['lstchain_mc_r0_to_dl1', '-o', tmp_dir, '-f', mc_gamma_testfile]
+        outfilename = 'dl1_' + Path(mc_gamma_testfile).name.replace('.simtel.gz', '.h5')
+        outfile = Path(tmp_dir, outfilename)
         # first try should succeed
         ntry = rerun_cmd(cmd, outfile, max_ntry=3)
         assert ntry == 1
         # second try should fail because the outfile already exists
         ntry = rerun_cmd(cmd, outfile, max_ntry=3, subdir_failures='failed_outputs')
         assert ntry == 2
-        assert Path(tmp_dir, 'failed_outputs', 'dl1_gamma_test_large.h5').exists()
+        assert Path(tmp_dir, 'failed_outputs', outfilename).exists()
 
 
 def test_run_command():

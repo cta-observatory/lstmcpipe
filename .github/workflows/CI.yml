@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # lstchain dependency
-        python-version: [3.7, 3.8, 3.9, '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
       - uses: actions/checkout@v3
@@ -49,6 +49,13 @@ jobs:
             source $CONDA/etc/profile.d/conda.sh
             conda activate ci
             pyflakes lstmcpipe
+
+      - name: Download test data
+        env:
+          TEST_DATA_USER: ${{ secrets.TEST_DATA_USER }}
+          TEST_DATA_PASSWORD: ${{ secrets.TEST_DATA_PASSWORD }}
+        run: |
+          ./download_test_data.sh
 
       - name: Tests
         run: |
