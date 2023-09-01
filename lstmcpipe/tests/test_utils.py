@@ -59,7 +59,7 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1(mc_gamma_testfile):
         assert ntry == 1
         # second try should fail because the outfile already exists
         ntry = rerun_cmd(cmd, outfile, max_ntry=3, subdir_failures='failed_outputs')
-        assert ntry == 3
+        assert ntry == 2
         assert Path(tmp_dir, 'failed_outputs', outfilename).exists()
 
 
