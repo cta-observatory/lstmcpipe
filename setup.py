@@ -48,7 +48,7 @@ setup(
     version=version,
     description=description,
     install_requires=[
-        "lstchain>=0.9.7",
+        "lstchain>=0.10.0",
         "numpy",
         "astropy",
         "ctaplot>=0.5",
@@ -57,10 +57,13 @@ setup(
         "pytest",
         "ruamel.yaml>=0.17",
         "setuptools_scm",
-        "deepdiff"
+        "deepdiff",
     ],
     packages=find_packages(exclude="lstmcpipe._dev_version"),
-    tests_require=["pytest"],
+    tests_require=[
+        "pytest",
+        "lstchain>=0.10.0",
+    ],
     author=author_names,
     author_email="thomas.vuillaume@lapp.in2p3.fr",
     url="https://github.com/cta-observatory/lstmcpipe",
