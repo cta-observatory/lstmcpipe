@@ -4,7 +4,7 @@
 
 ## Short description of the config
 
-Full MC / model dataset with lstchain v0.10.4 standard settings (https://github.com/cta-observatory/cta-lstchain/blob/v0.10.4/lstchain/data/lstchain_standard_config.json)
+Full allsky production with lstchain v0.10.4 standard settings (https://github.com/cta-observatory/cta-lstchain/blob/v0.10.4/lstchain/data/lstchain_standard_config.json)
 Only change to the config is the added `integration_correction`, that is needed for
 simulations.
 
