@@ -50,10 +50,18 @@ jobs:
             conda activate ci
             pyflakes lstmcpipe
 
+      - name: Download test data
+        env:
+          TEST_DATA_USER: ${{ secrets.TEST_DATA_USER }}
+          TEST_DATA_PASSWORD: ${{ secrets.TEST_DATA_PASSWORD }}
+        run: |
+          ./download_test_data.sh
+
       - name: Tests
         run: |
             source $CONDA/etc/profile.d/conda.sh
             conda activate ci
+            ./download_test_data.sh
             pytest --cov=lstmcpipe --cov-report=xml lstmcpipe
 
       - uses: codecov/codecov-action@v1
