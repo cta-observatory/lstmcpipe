@@ -18,7 +18,10 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install dependencies
+    - name: Publish to pypi
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         . $CONDA/etc/profile.d/conda.sh
         conda config --set always_yes yes --set changeps1 no
@@ -29,12 +32,5 @@ jobs:
         conda activate ci
         pip install build
         pip install twine
-
-    - name: Build package
-      run: python setup.py sdist
-
-    - name: Publish to PyPI
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: twine upload dist/*
+        python setup.py sdist
+        twine upload dist/*
