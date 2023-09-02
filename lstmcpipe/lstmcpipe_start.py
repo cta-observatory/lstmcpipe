@@ -95,10 +95,17 @@ parser.add_argument(
     default=None,
 )
 
+parser.add_argument(
+    '--dry-run',
+    action='store_true',
+    help='Dry run the pipeline without executing any commands. \
+                        The command will just be printed to stdout.',
+)
+
 args = parser.parse_args()
 
 
-#######################################################################################################################
+############################################################################################
 
 
 def main():
@@ -193,7 +200,10 @@ def main():
 
     # 2.2 STAGE --> Merge DL1 files
     if jobs_from_splitting != "":
-        merge_wait_jobs = ','.join([jobs_from_dl1_processing, jobs_from_splitting])
+        if jobs_from_dl1_processing != "" and jobs_from_dl1_processing is not None:
+            merge_wait_jobs = ','.join([jobs_from_dl1_processing, jobs_from_splitting])
+        else:
+            merge_wait_jobs = jobs_from_splitting
     else:
         merge_wait_jobs = jobs_from_dl1_processing
 
