@@ -47,6 +47,7 @@ setup(
     name=project_name,
     version=version,
     description=description,
+    setup_requires=["setuptools_scm<8.0"],
     install_requires=[
         "lstchain>=0.9.0",
         "numpy",
