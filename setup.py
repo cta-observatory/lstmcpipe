@@ -47,7 +47,6 @@ setup(
     name=project_name,
     version=version,
     description=description,
-    setup_requires=["setuptools_scm<8.0"],
     install_requires=[
         "lstchain>=0.9.0",
         "numpy",
@@ -57,6 +56,7 @@ setup(
         "matplotlib",
         "pytest",
         "ruamel.yaml>=0.17",
+        "setuptools_scm<8.0",
         "deepdiff",
     ],
     packages=find_packages(exclude="lstmcpipe._dev_version"),
