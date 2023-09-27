@@ -1,7 +1,7 @@
 lstMCpipe
 =========
 
-|code| |documentation| |CI| |coverage| |pypi| |zenodo| |fair|
+|code| |documentation| |CI| |coverage| |conda| |pypi| |zenodo| |fair|
 
 .. |code| image:: https://img.shields.io/badge/lstmcpipe-code-green
   :target: https://github.com/cta-observatory/lstmcpipe/
@@ -11,6 +11,8 @@ lstMCpipe
   :target: https://codecov.io/gh/cta-observatory/lstmcpipe
 .. |documentation| image:: https://img.shields.io/badge/lstmcpipe-documentation-orange
   :target: https://cta-observatory.github.io/lstmcpipe/
+.. |conda| image:: https://img.shields.io/conda/v/conda-forge/lstmcpipe
+   :alt: Conda
 .. |pypi| image:: https://badge.fury.io/py/lstmcpipe.svg
   :target: https://badge.fury.io/py/lstmcpipe
 .. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg
