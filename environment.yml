@@ -5,6 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.7
+  - setuptools_scm<8.0
   - astropy>=4.2
   - pip
   - pre-commit
