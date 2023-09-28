@@ -10,7 +10,12 @@ from ctapipe.utils import get_dataset_path
 
 
 def mc_r0_path():
-    return get_dataset_path("gamma_test_large.simtel.gz")
+    testfile_private_data = Path("test_data/mc/simtel_theta_20_az_180_gdiffuse_10evts.simtel.gz")
+    if testfile_private_data.exists():
+        return testfile_private_data.absolute()
+    else:
+        print("Using public test file")
+        return get_dataset_path("gamma_test_large.simtel.gz")
 
 
 def run_lstchain_mc_r0_dl1(simtel_file, outdir, config_file):
@@ -33,10 +38,12 @@ def mc_requirements(config):
 
 
 def test_dl1ab(config_file):
+    r0_path = mc_r0_path()
+    dl1_filename = 'dl1_' + Path(r0_path).name.replace('.simtel.gz', '.h5')
     tmpdir = tempfile.mkdtemp()
-    dl1file = Path(tmpdir, 'dl1_gamma_test_large.h5')
+    dl1file = Path(tmpdir, dl1_filename)
     dl1fileout = Path(tmpdir, 'dl1ab.h5')
-    run_lstchain_mc_r0_dl1(mc_r0_path(), tmpdir, config_file)
+    run_lstchain_mc_r0_dl1(r0_path, tmpdir, config_file)
     cmd = ['lstchain_dl1ab', '-f', dl1file, '-o', dl1fileout, '-c', config_file]
     subprocess.run(cmd)
 
