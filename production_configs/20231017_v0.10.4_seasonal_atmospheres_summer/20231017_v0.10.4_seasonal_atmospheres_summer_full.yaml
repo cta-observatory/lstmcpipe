@@ -1,0 +1,51 @@
+workflow_kind: lstchain
+
+prod_id: 20231017_v0.10.4_seasonal_atmospheres_summer
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.10.4
+
+slurm_config:
+  user_account: georgios.voutsinas
+
+stages_to_run:
+- r0_to_dl1
+- merge_dl1
+- train_pipe
+- dl1_to_dl2
+- dl2_to_irfs
+stages:
+  r0_to_dl1:
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/sim_telarray/summer/node_theta_23.63_az_100.758_/output_v1.4
+    output: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL1/summer/node_theta_23.63_az_100.758_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/sim_telarray/output_v1.4
+    output: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/DL1
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/sim_telarray/output_v1.4
+    output: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/DL1
+  merge_dl1:
+  - input:  /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL1/summer/node_theta_23.63_az_100.758_
+    output: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL1/summer/node_theta_23.63_az_100.758_/dl1_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+    options: --no-image
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/DL1
+    output: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/DL1/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/DL1
+    output: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/DL1/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image    
+  train_pipe:
+  - input:
+      gamma: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/DL1/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+      proton: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/DL1/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    output: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/models
+    slurm_options: -p xxl --mem=32G --cpus-per-task=16
+  dl1_to_dl2:
+  - input: home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL1/summer/node_theta_23.63_az_100.758_/dl1_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+    path_model: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/models
+    output: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL2/summer/node_theta_23.63_az_100.758_
+    slurm_options: --mem=50GB
+  dl2_to_irfs:
+  - input:
+      gamma_file: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/DL2/summer/node_theta_23.63_az_100.758_/dl2_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+      proton_file:
+      electron_file:
