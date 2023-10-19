@@ -8,6 +8,8 @@ Reconstructed with
 The goal is to estimate the systematics introduced by using the same average winter atmospheric profile 
 in order to analyse all LST data.
 
+The config file was created manually, inspired by the configurations of the production 20230927_v0.10.4_crab_tuned.
+
 Contact : Georgios Voutsinas
 
 
