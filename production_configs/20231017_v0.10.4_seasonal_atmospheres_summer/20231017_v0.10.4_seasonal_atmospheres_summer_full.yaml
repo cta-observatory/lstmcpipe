@@ -49,7 +49,7 @@ stages:
       proton: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
     output: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer
     slurm_options: -p xxl --mem=100G --cpus-per-task=16
-  - input:	      
+  - input:      
       gamma: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
       proton: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
     output: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/winter
