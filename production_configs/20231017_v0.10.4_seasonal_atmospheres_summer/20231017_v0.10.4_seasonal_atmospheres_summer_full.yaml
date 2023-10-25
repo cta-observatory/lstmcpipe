@@ -63,7 +63,6 @@ stages:
     path_model: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/winter
     output: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/winter_models/node_theta_23.63_az_100.758_
     slurm_options: --mem=50GB
-
   dl2_to_irfs:
   - input:
       gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/summer_models/node_theta_23.63_az_100.758_/dl2_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
