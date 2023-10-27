@@ -1,0 +1,82 @@
+workflow_kind: lstchain
+
+prod_id: 20231017_v0.10.4_seasonal_atmospheres_summer
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.10.4
+
+slurm_config:
+  user_account: dpps
+
+stages_to_run:
+- r0_to_dl1
+- merge_dl1
+- train_pipe
+- dl1_to_dl2
+- dl2_to_irfs
+stages:
+  r0_to_dl1:
+  - input: /home/georgios.voutsinas/ws/AllSky/TestDataset/atmosphere/sim_telarray/summer/node_theta_23.63_az_100.758_/output_v1.4
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer/node_theta_23.63_az_100.758_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/Protons/node_corsika_theta_23.161_az_99.261_/sim_telarray/output_v1.4
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/Protons/node_corsika_theta_23.161_az_99.261_
+  - input: /home/georgios.voutsinas/ws/AllSky/TrainingDataset/atmosphere/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/sim_telarray/output_v1.4
+    output:  /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_
+  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/Protons/dec_2276/sim_telarray/node_theta_23.161_az_99.261_/output_v1.4
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/Protons/node_corsika_theta_23.161_az_99.261_
+  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_2276/sim_telarray/node_corsika_theta_23.161_az_99.261_/output_v1.4
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/GammaDiffuse/node_corsika_theta_23.161_az_99.261_
+  merge_dl1:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer/node_theta_23.63_az_100.758_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer/node_theta_23.63_az_100.758_/dl1_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/Protons/node_corsika_theta_23.161_az_99.261_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image    
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/Protons/node_corsika_theta_23.161_az_99.261_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/GammaDiffuse/node_corsika_theta_23.161_az_99.261_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
+    options: --no-image
+  train_pipe:
+  - input:
+      gamma: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+      proton: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/summer/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_summer_node_corsika_theta_23.161_az_99.261_merged.h5
+    output: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer
+    slurm_options: -p xxl --mem=100G --cpus-per-task=16
+  - input:      
+      gamma: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/GammaDiffuse/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
+      proton: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TrainingDataset/winter/Protons/node_corsika_theta_23.161_az_99.261_/dl1_20231017_v.0.10.4_winter_node_corsika_theta_23.161_az_99.261_merged.h5
+    output: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/winter
+    slurm_options: -p xxl --mem=100G --cpus-per-task=16
+  dl1_to_dl2:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer/node_theta_23.63_az_100.758_/dl1_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer
+    output: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/summer_models/node_theta_23.63_az_100.758_
+    slurm_options: --mem=50GB
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer/node_theta_23.63_az_100.758_/dl1_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20231017_v0.10.4_seasonal_atmospheres/winter
+    output: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/winter_models/node_theta_23.63_az_100.758_
+    slurm_options: --mem=50GB
+  dl2_to_irfs:
+  - input:
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/summer_models/node_theta_23.63_az_100.758_/dl2_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer_summer_models/node_theta_23.63_az_100.758_/irf_20231017_v0.10.4_seasonal_atmospheres_node_theta_23.63_az_100.758_.fits.gz
+    options: --point-like
+    extra_slurm_options:
+      mem: 6GB
+  - input: 
+      gamma_file: /fefs/aswg/data/mc/DL2/AllSky/20231017_v0.10.4_seasonal_atmospheres/summer/winter_models/node_theta_23.63_az_100.758_/dl2_20231017_v.0.10.4_summer_node_theta_23.63_az_100.758_merged.h5
+      proton_file:
+      electron_file:
+    output: /fefs/aswg/data/mc/IRF/AllSky/20231017_v0.10.4_seasonal_atmospheres/TestingDataset/summer_winter_models/node_theta_23.63_az_100.758_/irf_20231017_v0.10.4_seasonal_atmospheres_node_theta_23.63_az_100.758_.fits.gz
+    options: --point-like
+    extra_slurm_options:
+      mem: 6GB
