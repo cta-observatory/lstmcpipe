@@ -66,7 +66,7 @@ jobs:
       - uses: codecov/codecov-action@v1
 
       - name: Detect added configs
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v41
         id: verify-changed-files
         with:
           files: |
