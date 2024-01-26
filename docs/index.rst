@@ -4,7 +4,6 @@
    contain the root `toctree` directive.
 
 
-
 .. include:: ../README.rst
 
 lstmcpipe API documentation
@@ -15,10 +14,10 @@ lstmcpipe API documentation
 
    productions
    pipeline
+   lstmcpipe_user_doc.md
    examples/configs_pointings
-   api/lstmcpipe
    cli
-
+   api/lstmcpipe
 
 
 Indices and tables
