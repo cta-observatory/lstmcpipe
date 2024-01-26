@@ -1,4 +1,5 @@
 GitPython
+myst_parser
 nbsphinx
 sphinx
 sphinx-argparse
