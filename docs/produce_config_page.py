@@ -58,6 +58,8 @@ def add_prod_table(
     sorted_lists = sorted(zip(commit_times, prod_list))
     prod_list = [prod for _, prod in sorted_lists]
 
+    prod_list.reverse()  # Reverse the ordering to have the most recent first
+
     prod_txt += tabulate(prod_list, ['Request date', 'Directory name', 'Prod ID', 'readme'], tablefmt='rst')
 
     with open(prod_file, 'a') as f:

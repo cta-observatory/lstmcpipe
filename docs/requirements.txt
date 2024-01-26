@@ -1,9 +1,11 @@
+GitPython
+nbsphinx
 sphinx
+sphinx-argparse
 sphinx-autopackagesummary
 sphinx-automodapi
-sphinx-argparse
+sphinx-book-theme
+sphinxcontrib-autoprogram
 sphinxcontrib-napoleon
-GitPython
-tabulate
 sphinxcontrib-mermaid
-nbsphinx
+tabulate

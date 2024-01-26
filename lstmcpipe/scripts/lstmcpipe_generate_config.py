@@ -15,7 +15,7 @@ class ParseKwargs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, dict())
         for value in values:
-            key, value = value.split('=')
+            key, value = value.split("=")
             getattr(namespace, self.dest)[key] = value
 
 
@@ -38,62 +38,61 @@ def list_config_classes():
     return all_attrs
 
 
-
-def main():
+def build_argparser():
     parser = argparse.ArgumentParser(description="Generate a lstmcpipe config.")
 
     # Required arguments
     parser.add_argument(
-        dest='config_class',
+        dest="config_class",
         type=str,
-        help=f'Config class name to use. ' f'List of implemented classes: {list_config_classes()}',
+        help=f"Config class name to use. " f"List of implemented classes: {list_config_classes()}",
     )
 
-    parser.add_argument('--prod_id', type=str, help='production ID')
+    parser.add_argument("--prod_id", type=str, help="production ID")
 
     parser.add_argument(
-        '--output',
-        '-o',
+        "--output",
+        "-o",
         type=Path,
-        help='Path to the output file to dump the generated lstmcpipe config. '
-        'Optional, if not provided, the file is dumped locally',
+        help="Path to the output file to dump the generated lstmcpipe config. "
+        "Optional, if not provided, the file is dumped locally",
         default=None,
     )
 
-    parser.add_argument(
-        '--overwrite',
-        action='store_true',
-        help='Overwrite config file'
-    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite config file")
 
     parser.add_argument(
-        '--lstchain_conf',
+        "--lstchain_conf",
         type=Path,
-        help='Path to the lstchain config to dump. '
-             'Optional, if not provided, the file is dumped locally',
+        help="Path to the lstchain config to dump. " "Optional, if not provided, the file is dumped locally",
         default=None,
     )
 
-    parser.add_argument('--dec_list', nargs='+', help='Use only with AllSkyFull prods', default=None)
+    parser.add_argument("--dec_list", nargs="+", help="Use only with AllSkyFull prods", default=None)
 
     parser.add_argument(
-        '--kwargs',
-        nargs='*',
+        "--kwargs",
+        nargs="*",
         action=ParseKwargs,
         help="optional kwargs for the requested config class. Use as: --kwargs option1=foo option2=bar",
     )
 
+    return parser
+
+
+def main():
+    parser = build_argparser()
     args = parser.parse_args()
 
     if not hasattr(paths_config, args.config_class):
         raise NotImplementedError(f"Config class {args.config_class} not implemented in lstmcpipe.config.paths_config")
 
-    output = f'lstmcpipe_config_{date.today()}_{args.config_class}.yaml' if args.output is None else args.output
-    prod_id = 'prod_00' if args.prod_id is None else args.prod_id
+    output = f"lstmcpipe_config_{date.today()}_{args.config_class}.yaml" if args.output is None else args.output
+    prod_id = "prod_00" if args.prod_id is None else args.prod_id
 
     kwargs = {}
     if args.dec_list:
-        kwargs.update({'dec_list': args.dec_list})
+        kwargs.update({"dec_list": args.dec_list})
     if args.kwargs:
         kwargs.update(args.kwargs)
 
@@ -104,9 +103,9 @@ def main():
 
     print(f"lstmcpipe config saved in {output}")
 
-    lstchain_file = f'lstchain_config_{date.today()}.json' if args.lstchain_conf is None else args.lstchain_conf
+    lstchain_file = f"lstchain_config_{date.today()}.json" if args.lstchain_conf is None else args.lstchain_conf
 
-    if 'AllSky' in args.config_class:
+    if "AllSky" in args.config_class:
         allsky = True
     else:
         allsky = False
@@ -114,5 +113,5 @@ def main():
     print(f"To start the process with dumped configs, run:\n\nlstmcpipe -c {output} -conf_lst {lstchain_file}\n\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

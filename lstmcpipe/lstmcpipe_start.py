@@ -40,65 +40,68 @@ from lstmcpipe.stages import (
     batch_plot_rf_features,
 )
 
-parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
 
-parser.add_argument(
-    "--config_mc_prod",
-    "-c",
-    action="store",
-    type=str,
-    dest="config_mc_prod",
-    help="Path to the MC_production configuration file. ",
-    default="./config_MC_prod.yml",
-    required=True,
-)
+def build_argparser():
+    """
+    Build argument parser and return it
+    """
+    parser = argparse.ArgumentParser(description="MC R0 to DL3 full pipeline")
 
-parser.add_argument(
-    "--config_file_lst",
-    "-conf_lst",
-    action="store",
-    type=str,
-    dest="config_file_lst",
-    help="Path to a lstchain-like configuration file. " "RF classifier and regressor arguments must be declared here !",
-    required=True,
-)
+    parser.add_argument(
+        "--config_mc_prod",
+        "-c",
+        action="store",
+        type=str,
+        dest="config_mc_prod",
+        help="Path to the MC_production configuration file. ",
+        default="./config_MC_prod.yml",
+        required=True,
+    )
 
-parser.add_argument(
-    "--config_file_ctapipe",
-    "-conf_cta",
-    action="store",
-    type=str,
-    dest="config_file_ctapipe",
-    help="Path to a ctapipe-like configuration file."
-    'Only to be declared if WORKFLOW_KIND = "ctapipe" and only used up to dl1.',
-    default=None,
-)
+    parser.add_argument(
+        "--config_file_lst",
+        "-conf_lst",
+        action="store",
+        type=str,
+        dest="config_file_lst",
+        help="Path to a lstchain-like configuration file. "
+        "RF classifier and regressor arguments must be declared here !",
+        required=True,
+    )
 
-parser.add_argument(
-    "--config_file_rta",
-    "-conf_rta",
-    action="store",
-    type=str,
-    dest="config_file_rta",
-    help="Path to a HiPeRTA-like configuration file."
-    'Only to be declared if WORKFLOW_KIND = "hiperta" and only used up to dl1.',
-    default=None,
-)
+    parser.add_argument(
+        "--config_file_ctapipe",
+        "-conf_cta",
+        action="store",
+        type=str,
+        dest="config_file_ctapipe",
+        help="Path to a ctapipe-like configuration file."
+        'Only to be declared if WORKFLOW_KIND = "ctapipe" and only used up to dl1.',
+        default=None,
+    )
 
-parser.add_argument("--debug", action="store_true", help="print debug messages to stderr")
-parser.add_argument(
-    "--log-file",
-    action="store",
-    type=str,
-    dest="log_file",
-    help="Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging",
-    default=None,
-)
+    parser.add_argument(
+        "--config_file_rta",
+        "-conf_rta",
+        action="store",
+        type=str,
+        dest="config_file_rta",
+        help="Path to a HiPeRTA-like configuration file."
+        'Only to be declared if WORKFLOW_KIND = "hiperta" and only used up to dl1.',
+        default=None,
+    )
 
-args = parser.parse_args()
+    parser.add_argument("--debug", action="store_true", help="print debug messages to stderr")
+    parser.add_argument(
+        "--log-file",
+        action="store",
+        type=str,
+        dest="log_file",
+        help="Optional log file. This is independent of the slurm job logs and only handles lstmcpipe logging",
+        default=None,
+    )
 
-
-#######################################################################################################################
+    return parser
 
 
 def main():
@@ -124,6 +127,9 @@ def main():
     --debug
         Toggle to enable debug print messages.
     """
+    parser = build_argparser()
+    args = parser.parse_args()
+
     log = setup_logging(verbose=args.debug, logfile=args.log_file)
     log.info("Starting lstmcpipe processing script")
     # Read MC production configuration file
@@ -145,7 +151,6 @@ def main():
     dl1ab = "dl1ab" in stages_to_run
 
     if r0_to_dl1 or dl1ab:
-
         if workflow_kind == "lstchain":
             dl1_config = Path(args.config_file_lst).resolve().as_posix()
             if lstmcpipe_config.get("dl1_noise_tune_data_run"):
@@ -161,7 +166,7 @@ def main():
             dl1_config = Path(args.config_file_ctapipe).resolve().as_posix()
 
         jobs_from_dl1_processing = batch_process_dl1(
-            lstmcpipe_config['stages'],
+            lstmcpipe_config["stages"],
             conf_file=dl1_config,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -180,7 +185,7 @@ def main():
     # 2.1 STAGE --> Train, test splitting
     if "train_test_split" in stages_to_run:
         jobs_from_splitting = batch_train_test_splitting(
-            lstmcpipe_config['stages']['train_test_split'],
+            lstmcpipe_config["stages"]["train_test_split"],
             jobids_from_r0dl1=jobs_from_dl1_processing,
             batch_config=batch_config,
             logs=logs_files,
@@ -193,13 +198,13 @@ def main():
 
     # 2.2 STAGE --> Merge DL1 files
     if jobs_from_splitting != "":
-        merge_wait_jobs = ','.join([jobs_from_dl1_processing, jobs_from_splitting])
+        merge_wait_jobs = ",".join([jobs_from_dl1_processing, jobs_from_splitting])
     else:
         merge_wait_jobs = jobs_from_dl1_processing
 
     if "merge_dl1" in stages_to_run:
         jobs_from_merge = batch_merge_dl1(
-            lstmcpipe_config['stages']["merge_dl1"],
+            lstmcpipe_config["stages"]["merge_dl1"],
             jobid_from_splitting=merge_wait_jobs,
             batch_config=batch_config,
             workflow_kind=workflow_kind,
@@ -213,9 +218,8 @@ def main():
 
     # 3 STAGE --> Train pipe
     if "train_pipe" in stages_to_run:
-
         job_from_train_pipe = batch_train_pipe(
-            lstmcpipe_config['stages']['train_pipe'],
+            lstmcpipe_config["stages"]["train_pipe"],
             jobs_from_merge,
             config_file=Path(args.config_file_lst).resolve().as_posix(),
             batch_config=batch_config,
@@ -227,7 +231,7 @@ def main():
 
         # Plot the RF feature's importance
         job_from_plot_rf_feat = batch_plot_rf_features(
-            lstmcpipe_config['stages']['train_pipe'],
+            lstmcpipe_config["stages"]["train_pipe"],
             Path(args.config_file_lst).resolve().as_posix(),
             batch_config,
             job_from_train_pipe,
@@ -244,13 +248,13 @@ def main():
         jobs_dependency_for_dl1_dl2 = jobs_from_merge
         if job_from_train_pipe is not None:
             jobs_dependency_for_dl1_dl2 = (
-                ','.join([jobs_dependency_for_dl1_dl2, job_from_train_pipe])
+                ",".join([jobs_dependency_for_dl1_dl2, job_from_train_pipe])
                 if jobs_dependency_for_dl1_dl2 is not None
                 else job_from_train_pipe
             )
 
         jobs_from_dl1_dl2 = batch_dl1_to_dl2(
-            lstmcpipe_config['stages']['dl1_to_dl2'],
+            lstmcpipe_config["stages"]["dl1_to_dl2"],
             Path(args.config_file_lst).resolve().as_posix(),
             jobs_dependency_for_dl1_dl2,
             batch_config=batch_config,
@@ -265,7 +269,7 @@ def main():
     # 5 STAGE --> DL2 to IRFs stage
     if "dl2_to_irfs" in stages_to_run:
         jobs_from_dl2_irf = batch_dl2_to_irfs(
-            lstmcpipe_config['stages']['dl2_to_irfs'],
+            lstmcpipe_config["stages"]["dl2_to_irfs"],
             Path(args.config_file_lst).resolve().as_posix(),
             jobs_from_dl1_dl2,
             batch_config=batch_config,
@@ -278,7 +282,7 @@ def main():
     # 6 STAGE --> DL2 to sensitivity curves
     if "dl2_to_sensitivity" in stages_to_run:
         jobs_from_dl2_sensitivity = batch_dl2_to_sensitivity(
-            lstmcpipe_config['stages']['dl2_to_sensitivity'],
+            lstmcpipe_config["stages"]["dl2_to_sensitivity"],
             jobs_from_dl1_dl2,
             batch_config=batch_config,
             logs=logs_files,
