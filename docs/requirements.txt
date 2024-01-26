@@ -5,6 +5,6 @@ sphinx-argparse
 sphinx-autopackagesummary
 sphinx-automodapi
 sphinx-book-theme
-sphinx-contrib-napoleon
-sphinx-contrib-mermaid
+sphinxcontrib-napoleon
+sphinxcontrib-mermaid
 tabulate
