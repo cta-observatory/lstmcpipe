@@ -10,7 +10,7 @@ An example of workflow:
 
 Each step of the analysis is implemented in lstchain as a script.
 For example, if you want to train a model, you may run `lstchain_mc_train_pipe`.
-See https://cta-observatory.github.io/cta-lstchain/introduction.html#analysis-steps
+See [https://cta-observatory.github.io/cta-lstchain/introduction.html#analysis-steps](https://cta-observatory.github.io/cta-lstchain/introduction.html#analysis-steps)
 
 <!-- vertical slide -->
 
