@@ -320,5 +320,5 @@
         "extra_noise_in_bright_pixels": 2.512,
         "increase_psf": false,
         "smeared_light_fraction": 0
-      },
+      }
 }
