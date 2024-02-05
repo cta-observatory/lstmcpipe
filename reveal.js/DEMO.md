@@ -1,6 +1,6 @@
 # DEMO
 
-But first, questions ? 
+But first, questions ?
 
 <!-- vertical slide -->
 
