@@ -105,15 +105,15 @@ code follows our guidelines and there is less work dealing with the code checker
 
 Requesting a MC analysis 📊
 ---------------------------
+
+You may find a longer, more detailed, version of these steps in our documentation.
+
 You may find the list of already run productions in the documentation.
 Please check in this list that the request you are about to make does not exist already!
-
-As a LST member, you may require a MC analysis with a specific configuration, for example to later analyse a specific source with tuned MC parameters.
 
 To do so, please:
 
 #. Make sure to be part of the `github cta-observatory/lst-dev team <https://github.com/orgs/cta-observatory/teams/lst-dev>`__. If not, ask one of the admins.
-    > note that you can also fork the repository and open the pull request from your fork, but the tests will fail because they need the private LST test data
 #. Clone the repository in the cluster at La Palma.
 #. Create a new branch named with you ``prodID``
 #. Make a new directory named ``date_ProdID`` in the `production_configs` dir (have a look at the ``production_configs/template_prod`` as an example)
@@ -155,9 +155,12 @@ which is passed via the options ``-conf_lst/-conf_cta/-conf_rta``.
 Note: You can always launch this command without fear; there is an intermediate step that verifies and
 shows the configuration that you are passing to the pipeline.
 
-The use of slurms jobarrays in the r0_to_dl1 stage in combination with a limited amount of maximum jobs running at the same time
-reduces the load on the cluster compared to previous versions,
-but **please note** that it still requires a lot of resources to process a full MC
-production. Think about other LP-IT cluster users.
+Note that a complete pipeline still requires quite a lot of resources. Think about other LP-IT cluster users.
 
 
+Contributing 🤝
+---------------
+
+We welcome contributions from the community.
+
+.. include:: CONTRIBUTING
