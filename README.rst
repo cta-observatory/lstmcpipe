@@ -58,7 +58,7 @@ You may also want to include the config file with your published code for reprod
 Install 💻
 ----------
 
-**As as user:**
+**As an user:**
 
 For lstmcpipe >= 0.10.3, the preferred installation should be conda:
 
@@ -78,7 +78,7 @@ Former versions:
     pip install lstmcpipe==$VERSION
 
 
-**As as developer:**
+**As a developer:**
 
 .. code-block::
 
