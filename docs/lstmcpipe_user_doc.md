@@ -1,4 +1,4 @@
-# analyzers documentation
+# Analyzers documentation
 
 <!-- new slide -->
 
