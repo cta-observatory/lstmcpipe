@@ -6,8 +6,7 @@
 
 .. include:: ../README.rst
 
-lstmcpipe API documentation
-===========================
+.. include:: ../CONTRIBUTING.rst
 
 .. toctree::
    :maxdepth: 3
@@ -20,9 +19,3 @@ lstmcpipe API documentation
    api/lstmcpipe
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -157,10 +157,3 @@ shows the configuration that you are passing to the pipeline.
 
 Note that a complete pipeline still requires quite a lot of resources. Think about other LP-IT cluster users.
 
-
-Contributing 🤝
----------------
-
-We welcome contributions from the community.
-
-.. include:: CONTRIBUTING
