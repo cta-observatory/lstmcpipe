@@ -58,7 +58,7 @@ You may also want to include the config file with your published code for reprod
 Install 💻
 ----------
 
-As as user:
+**As as user:**
 
 For lstmcpipe >= 0.10.3, the preferred installation should be conda:
 
@@ -78,16 +78,7 @@ Former versions:
     pip install lstmcpipe==$VERSION
 
 
-This will setup a new enviroment with lstchain and other needed tools available in supported versions.
-If you already have your lstchain conda environment, you may simply activate it and install lstmcpipe there using `pip install lstmcpipe`.
-
-
-Alternatively, you can install `lstmcpipe` in your own enviroment to use different versions of the
-analysis pipelines.
-WARNING: Due to changing APIs and data models, we cannot support other versions than the ones specified in
-the enviroment.
-
-As as developer:
+**As as developer:**
 
 .. code-block::
 

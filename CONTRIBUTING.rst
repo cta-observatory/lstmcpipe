@@ -25,6 +25,7 @@ Code contributions
 If you are unsure about the contribution you want to make, please open an issue first to discuss it with the maintainers.
 
 Clone the repository and create a new branch.
+Install lstmcpipe following the instructions for developers in the README file.
 
 Commit Your Changes: Commit your changes in your branch. Make sure to follow good practices for commit messages.
 
