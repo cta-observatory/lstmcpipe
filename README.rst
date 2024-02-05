@@ -132,8 +132,8 @@ Depending on the number of requests, we may give priorities.
 **Need help?**
 Join the CTA North slack and ask for help in the |slack|
 
-Quickstart 🚀
--------------
+Launch jobs 🚀
+--------------
 
 To generate your lstmcpipe configuration file, use `lstmcpipe_generate_config` command.
 If the type of production you want is not listed in the existing ones, you may create your own `PathConfig` class
@@ -145,8 +145,8 @@ Once you have your configuration file, you way launch the pipeline with the desc
 
     lstmcpipe -c config_MC_prod.yml -conf_lst lstchain_*.json [-conf_cta CONFIG_FILE_CTA] [-conf_rta CONFIG_FILE_RTA] [--debug] [--log-file LOG_FILE]
 
-The ``lstmcpipe_start.py`` script is the **orchestrator** of the pipeline, it schedules the stages specified in the
-``onsite_MC_prod.yml`` file. All the configuration related with the MC pipe must be declared in this file (stages,
+`lstmcpipe` is the **orchestrator** of the pipeline, it schedules the stages specified in the
+``config_MC_prod.yml`` file. All the configuration related with the MC pipe must be declared in this file (stages,
 particles to be analysed, zenith, pointing, type of MC production...).
 
 Pipeline-specific configuration options (such as cleaning or model parameters) are declared in a different configuration file,
