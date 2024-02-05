@@ -4,6 +4,23 @@ But first, questions ?
 
 <!-- vertical slide -->
 
+# Connect to the La Palma cluster
+
+```bash
+ssh cp02
+```
+
+And activate the conda environment:
+
+```bash
+source /fefs/aswg/software/conda/etc/profile.d/conda.sh
+conda activate lstchain-v0.10.5
+```
+
+
+<!-- vertical slide -->
+
+
 ## Tune NSB config
 
 Example:
