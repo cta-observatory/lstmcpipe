@@ -22,7 +22,7 @@ See [https://cta-observatory.github.io/cta-lstchain/introduction.html#analysis-s
     - MC are tuned from DL1 level to match real data to be analyzed
     - therefore, the analysis of MC data models productions of models/IRFs are in the hands of analyzers
 - job handling can be harder than it seems (logic between them, directory organization, jobs requirements for different configs...)  <!-- .element: class="fragment" -->
-- everybody makes mistakes, even Abelardo (yes I know, hard to believe) <!-- .element: class="fragment" -->
+- everybody makes mistakes, except Abelardo <!-- .element: class="fragment" -->
 
 <!-- vertical slide -->
 
@@ -139,7 +139,7 @@ stages:
 
 <!-- vertical slide -->
 
-### Generate a config file
+### Generating a config file
 
 The config file can be **created or modified manually**.
 So you can define your own pipeline quite easily, use your own conda environment and target your own directories...
@@ -153,7 +153,7 @@ But <!-- .element: class="fragment" --> can be more convienently **generated** f
 
 <span style="font-size:smaller;">
 
-- When generating a config, it builds the directory structure for you.
+- When generating a config, lstmcpipe builds the directory structure for you.
   - For example, it knows that `R0` data for the allsky prod are stored in `/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/Protons/dec_*` and will create the subsequent directory structure, producing DL1 data in `/fefs/aswg/data/mc/DL1/AllSky/$PROD_ID/TrainingDataset/dec_*`
 
 - That knowledge is implemented in the `lstmcpipe.config.paths_config.PathConfig` child classes (one child class per pipeline).
@@ -161,7 +161,7 @@ But <!-- .element: class="fragment" --> can be more convienently **generated** f
   - You can implement your own if you have specific use cases.
 
 - The class name is passed to the `lstmcpipe-generate-config` command line tool, along with options specific to that class.
-  - e.g. ``lstmcpipe_generate_config PathConfigAllSkyFull --prod_id whatagreatprod --dec_list dec_2276```
+  - e.g. `lstmcpipe_generate_config PathConfigAllSkyFull --prod_id whatagreatprod --dec_list dec_2276`
   - you may find the supported pipelines and their generation command-line in the [lstmcpipe documentation](https://cta-observatory.github.io/lstmcpipe/pipeline)
 
 </span>
@@ -178,7 +178,7 @@ It <!-- .element: class="fragment" -->  actually uses `lstchain_dump_config --mc
 
 You <!-- .element: class="fragment" -->  should modify it to your needs, e.g. adding the parameters provided by `lstchain_tune_nsb`.
 
-Even though lstchain does strictly require an exhaustive config, please provide one. It will help others and provide a more explicit provenance information. <!-- .element: class="fragment" -->
+Even though lstchain does not strictly require an exhaustive config, please provide one. It will help others and provide a more explicit provenance information. <!-- .element: class="fragment" -->
 
 <!-- new slide -->
 
@@ -197,7 +197,9 @@ Please check in this list that a request similar to the one you are about to mak
 
 Depending on the real data you want to analyse.
 
-=> determine the corresponding MC data (e.g. which declination line).
+=> determine the corresponding MC data (e.g. which training declination line ).
+
+<img src="https://cta-observatory.github.io/lstmcpipe/_images/examples_configs_pointings_19_1.png" width="600">
 
 => determine if you need a tuned MC production.
 
@@ -205,7 +207,7 @@ Depending on the real data you want to analyse.
 
 ### Generate your config
 
-For most analyzers, the easiest way is to use a conda environment on the cluster and run the `lstmcpipe-generate-config` command line tool.
+For most analyzers, the easiest way is to use an official conda environment on the cluster and run the `lstmcpipe_generate_config` command line tool.
 
 For the allsky prod, you may use the following command line:
 
@@ -214,7 +216,7 @@ lstmcpipe_generate_config PathConfigAllSkyFull --prod_id whatagreatprod --dec_li
 ```
 
 - your prod_id should be unique and explicit. It will be used to name the directories and files of your production. Add the date and the lstchain version to it, e.g. `20240101_v0.10.4_dec_123_crab_tuned`
-- then edit the lstmcpipe config file, especially for the conda environment that you want to use for the analysis.
+- then edit the lstmcpipe config file, **especially for the conda environment that you want to use for the analysis**.
 - check that the rest of the config is ok for you (stages, directories...)
 - edit the lstchain config file, especially to add any NSB tuning parameters. Please provide an exhaustive config that will help others and provide a more explicit provenance information.
   - see `lstchain_tune_nsb` for more information
@@ -257,7 +259,7 @@ git push origin my_new_branch
 
 ### And then?
 
-We will run the production on the cluster using
+We will run the production on the cluster using the lstanalyzer account with:
 
 ```
 lstmcpipe -c lstmcpipe_config.yml -conf_lst lstchain_config.json
@@ -265,12 +267,14 @@ lstmcpipe -c lstmcpipe_config.yml -conf_lst lstchain_config.json
 
 And will notify you in the github pull-request when it is done.
 
+NB: standard users do not have the writing rights on `/fefs/aswg/data/` so you will not be able to run the production yourself.
+
 <!-- new slide -->
 
 
 ## 🚀 TL;DR - Summary for analyzers in a hurry
 
-<span style="font-size:smaller;">
+<span style="font-size:66%;">
 
 1. Search the production library for an existing one that suits your needs
 2. If you find one, you can use it directly (models and DL2 paths are in the config file)
@@ -330,12 +334,6 @@ in addition to the exact lstmcpipe version used from
 [![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.6460727.svg)](https://doi.org/10.5281/zenodo.6460727)
 
 You may also want to include the config file with your published code for reproducibility 🔄
-
-<!-- new slide -->
-
-## DEMO
-
-(and questions ?)
 
 
 <!-- new slide -->
