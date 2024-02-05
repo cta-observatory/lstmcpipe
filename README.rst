@@ -102,7 +102,7 @@ You may find a longer, more detailed, version of these steps in our documentatio
 You may find the list of already run productions in the documentation.
 Please check in this list that the request you are about to make does not exist already!
 
-To do so, please:
+To request a MC analysis:
 
 #. Make sure to be part of the `github cta-observatory/lst-dev team <https://github.com/orgs/cta-observatory/teams/lst-dev>`__. If not, ask one of the admins.
 #. Clone the repository in the cluster at La Palma.
@@ -116,7 +116,7 @@ To do so, please:
 * a lstmcpipe config file (to generate it, please refer to the documentation)
 * a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
 
-The proposed configuration will be tested for validity by continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
+The proposed configuration will be tested for validity by the continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
 
 Depending on the number of requests, we may give priorities.
 
