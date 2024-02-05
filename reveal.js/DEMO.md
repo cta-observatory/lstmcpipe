@@ -2,9 +2,23 @@
 
 But first, questions ?
 
+
 <!-- vertical slide -->
 
-# Connect to the La Palma cluster
+
+## Example use case
+
+Here we will suppose that you want to adapt an existing production to tune the NSB level in DL1 MC data to match the NSB level in real data you want to analyze.
+
+[This is a DL1ab production](https://cta-observatory.github.io/lstmcpipe/pipeline.html#dl1ab).
+
+[![](https://mermaid.ink/img/pako:eNpFkMFugzAQRH_F8qmVEpRw5NBDRW6hrcgxjpBhl2DJ2JFZlFSIf-8CCfXFq5m3o9UMsvKAMpG19feq0YHEMVdOOcGv68tr0LdGHB6mI-Ou4if_ThcPTMCKjHczPyn57pzvLmK7_RDpcb9o6OAVxhp7GkB8nT6fULlaJXsUtHGTk721fJTt3p9h8YoV4TzlBNT2IqIoYhvsHmw8DLYjvt-4goWCPH_xOC6LmfgH55Ej56R4SVJObmSLodUGuIph2lKSGmxRyYRHwFr3lpRUbmS0v4EmPIAhH2RSa9vhRuqe_OnXVTKh0OMLSo3mCtuVwnkpWzqfqx__ADyYeAs?type=png)](https://mermaid.live/edit#pako:eNpFkMFugzAQRH_F8qmVEpRw5NBDRW6hrcgxjpBhl2DJ2JFZlFSIf-8CCfXFq5m3o9UMsvKAMpG19feq0YHEMVdOOcGv68tr0LdGHB6mI-Ou4if_ThcPTMCKjHczPyn57pzvLmK7_RDpcb9o6OAVxhp7GkB8nT6fULlaJXsUtHGTk721fJTt3p9h8YoV4TzlBNT2IqIoYhvsHmw8DLYjvt-4goWCPH_xOC6LmfgH55Ej56R4SVJObmSLodUGuIph2lKSGmxRyYRHwFr3lpRUbmS0v4EmPIAhH2RSa9vhRuqe_OnXVTKh0OMLSo3mCtuVwnkpWzqfqx__ADyYeAs)
+
+
+
+<!-- vertical slide -->
+
+## Connect to the La Palma cluster
 
 ```bash
 ssh cp02
