@@ -7,7 +7,7 @@ prod_id: 20240131_allsky_v0.10.5_all_dec_base
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.9.13
+  conda_env: lstchain-v0.10.5
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
@@ -19,7 +19,7 @@ stages_to_run:
 - merge_dl1
 - train_pipe
 - dl1_to_dl2
-- dl2_to_irfs
+# - dl2_to_irfs
 stages:
   r0_to_dl1:
   - input: 
