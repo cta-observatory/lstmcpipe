@@ -1,4 +1,4 @@
-# lstmcpipe user documentation
+# analyzers documentation
 
 <!-- new slide -->
 

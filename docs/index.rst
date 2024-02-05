@@ -11,9 +11,9 @@
 .. toctree::
    :maxdepth: 3
 
+   lstmcpipe_user_doc.md
    productions
    pipeline
-   lstmcpipe_user_doc.md
    examples/configs_pointings
    cli
    api/lstmcpipe
