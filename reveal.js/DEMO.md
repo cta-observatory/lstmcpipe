@@ -34,6 +34,15 @@ conda activate lstchain-v0.10.5
 
 <!-- vertical slide -->
 
+## Clone lstmcpipe
+
+If you don't have it already, clone the lstmcpipe repository in your workspace:
+
+```bash
+
+
+
+<!-- vertical slide -->
 
 ## Tune NSB config
 
@@ -91,6 +100,8 @@ lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 \
 
 ## Prepare the pull-request
 
+- git clone the lstmcpipe repository if you haven't already
+- create a directory named after your PROD_ID in the `lstmcpipe/production_configs` directory
 - add and commit changes in a new branch
 - push the branch to the remote repository
 - create a pull-request on GitHub
