@@ -38,6 +38,8 @@ Cite us 📝
 
 If lstMCpipe was used for your analysis, please cite:
 
+https://doi.org/10.48550/arXiv.2212.00120
+
 .. code-block::
 
   @misc{garcia2022lstmcpipe,
