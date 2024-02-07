@@ -39,7 +39,8 @@ conda activate lstchain-v0.10.5
 If you don't have it already, clone the lstmcpipe repository in your workspace:
 
 ```bash
-
+git clone git@github.com:cta-observatory/lstmcpipe.git
+```
 
 
 <!-- vertical slide -->
