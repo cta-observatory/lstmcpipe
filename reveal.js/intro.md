@@ -13,7 +13,7 @@
 [![FAIR](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 
 
-LST analysis school, Feb. 2024, [Thomas Vuillaume](mailto:thomas.vuillaume@lapp.in2p3.fr)
+LST analysis school, Feb. 2024, [Thomas Vuillaume](mailto:thomas.vuillaume@lapp.in2p3.fr) (@vuillaut on github)
 
 <small>These slides are written in markdown and constitute the [lstmcpipe documentation](https://cta-observatory.github.io/lstmcpipe/).
 To visualize as slides:

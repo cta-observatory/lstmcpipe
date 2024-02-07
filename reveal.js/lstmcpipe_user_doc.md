@@ -637,9 +637,13 @@ It is a mere benchmark for the pipeline.
 <span style="font-size:smaller;">
 
 Job logs are stored along with the produced data for each stage.
-E.g. in `$PPROD_ID/TrainingDataset/dec_2276/Protons/node_theta_16.087_az_108.090_/job_logs_r0dl1/`
+E.g. in
+```bash
+$PPROD_ID/TrainingDataset/dec_2276/Protons/node_theta_16.087_az_108.090_/job_logs_r0dl1/
+```
 
 Higher-level, lstmcpipe logs are produced and stored in the `$HOME/LSTMCPIPE_PROD_LOGS/` directory created when installing lstmcpipe.
+
 Every time a full MC production is launched, two files with logging information are created:
 
 - `log_reduced_Prod{3,5}_{PROD_ID}.yml`

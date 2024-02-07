@@ -46,6 +46,8 @@ If you don't have it already, clone the lstmcpipe repository in your workspace:
 
 ## Tune NSB config
 
+**NB: if you followed the hands-on on NSB tuning earlier, you can skip this step.**
+
 Example:
 
 ```bash
