@@ -165,7 +165,7 @@
         "kurtosis",
         "time_gradient_from_source",
         "leakage_intensity_width_2",
-        "dist"
+        "dist",
         "sin_az_tel",
         "alt_tel"
     ],
