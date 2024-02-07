@@ -78,7 +78,7 @@ See [https://cta-observatory.github.io/cta-lstchain/introduction.html#analysis-s
 ### lstmcpipe config file example
 
 
-```yaml [3|5-7|12-15|17-37|38-42]
+```yaml [3|5-7|12-15|17-27|28-35|36-47|48-52]
 workflow_kind: lstchain  # should not be modified for LST analyses
 
 prod_id: 20230517_v0.9.13_large_offset  # you define this !
@@ -98,24 +98,33 @@ stages_to_run:  # list of stages to run
 # all stages have a list of input/output (mandatory), lstchain options and slurm options
 stages:
   r0_to_dl1:
-  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/Crab_large_offset/sim_telarray/node_corsika_theta_52.374_az_240.004_/output_v1.4
-    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
-  merge_dl1:
-    input: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/node_corsika_theta_52.374_az_240.004_
-    output: /fefs/aswg/data/mc/DL1/AllSky/20230517_v0.9.13_large_offset/TestDataset/Crab_large_offset/dl1_20230517_v0.9.13_large_offset_node_theta_52.374_az_240.004_merged.h5
-    options: --no-image
-  train_pipe:
   - input:
-      gamma:
-        /fefs/aswg/data/mc/DL1/AllSky/20231024_v0.10.4_base_dec_min_2924_min_1802_6166/TrainingDataset/dec_min_2924/GammaDiffuse/dl1_20231024_v0.10.4_base_dec_min_2924_min_1802_6166_dec_min_2924_GammaDiffuse_merged.h5
-      proton:
-        /fefs/aswg/data/mc/DL1/AllSky/20231024_v0.10.4_base_dec_min_2924_min_1802_6166/TrainingDataset/dec_min_2924/Protons/dl1_20231024_v0.10.4_base_dec_min_2924_min_1802_6166_dec_min_2924_Protons_merged.h5
+      /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_931/sim_telarray/node_corsika_theta_69.809_az_90.303_/output_v1.4/
     output:
-      /fefs/aswg/data/models/AllSky/20231024_v0.10.4_base_dec_min_2924_min_1802_6166/dec_min_2924
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/dec_931/GammaDiffuse/node_corsika_theta_69.809_az_90.303_
+  - input:
+      /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_931/sim_telarray/node_corsika_theta_69.809_az_269.697_/output_v1.4/
+    output:
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/dec_931/GammaDiffuse/node_corsika_theta_69.809_az_269.697_
+  merge_dl1:
+  - input:
+      /fefs/aswg/data/mc/DL1/AllSky/20230927_v0.10.4_crab_tuned/TrainingDataset/dec_2276/GammaDiffuse
+    output:
+      /fefs/aswg/data/mc/DL1/AllSky/20230927_v0.10.4_crab_tuned/TrainingDataset/dec_2276/GammaDiffuse/dl1_20230927_v0.10.4_crab_tuned_dec_2276_GammaDiffuse_merged.h5
+    options: --pattern */*.h5 --no-image
     extra_slurm_options:
-      partition: xxl
-      mem: 100G
-      cpus-per-task: 16
+      partition: long
+  train_pipe:
+    - input:
+        gamma:
+          /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/dec_931/GammaDiffuse/dl1_20240131_allsky_v0.10.5_all_dec_base_dec_931_GammaDiffuse_merged.h5
+        proton:
+          /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/dec_931/Protons/dl1_20240131_allsky_v0.10.5_all_dec_base_dec_931_Protons_merged.h5
+      output: /fefs/aswg/data/models/AllSky/20240131_allsky_v0.10.5_all_dec_base/dec_931
+      extra_slurm_options:
+        partition: xxl
+        mem: 100G
+        cpus-per-task: 16
 # the following stages, even if defined, will not be run as they are not in stages_to_run
   dl1_to_dl2:
     ...
@@ -199,7 +208,9 @@ Depending on the real data you want to analyse.
 
 => determine the corresponding MC data (e.g. which training declination line ).
 
-<img src="https://cta-observatory.github.io/lstmcpipe/_images/examples_configs_pointings_19_1.png" width="600">
+<img src="https://cta-observatory.github.io/lstmcpipe/_images/examples_configs_pointings_19_1.png" width="500">
+
+You may also check existing ones in `/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/`
 
 => determine if you need a tuned MC production.
 
@@ -351,9 +362,9 @@ After that, the job dependency between stages is done automatically.
 
 <!-- vertical slide -->
 
-Example of default directory structure for a prod5 MC prod:
+#### Example of default directory structure for a prod5 MC prod:
 
-```
+```bash
    /fefs/aswg/data/
     ├── mc/
     |   ├── DL0/20200629_prod5_trans_80/{particle}/zenith_20deg/south_pointing/
@@ -393,6 +404,117 @@ Example of default directory structure for a prod5 MC prod:
                 └── cls_gh.sav
 ```
 
+<!-- vertical slide -->
+
+#### DL0 directory structure for _allsky_ prod
+
+
+```bash
+/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/
+├── GammaDiffuse
+│   ├── dec_2276
+│   ├── dec_3476
+│   ├── dec_4822
+│   ├── dec_5573
+│   ├── dec_6166
+│   ├── dec_6166_high_density
+│   ├── dec_6676
+│   ├── dec_931
+│   ├── dec_min_1802
+│   ├── dec_min_2924
+│   └── dec_min_413
+└── Protons
+    ├── dec_2276
+    ├── dec_3476
+    ├── dec_4822
+    ├── dec_6166
+    ├── dec_6166_high_density
+    ├── dec_6676
+    ├── dec_931
+    ├── dec_min_1802
+    ├── dec_min_2924
+    └── dec_min_413
+```
+
+
+<!-- vertical slide -->
+
+#### Example DL1 directory structure
+
+```
+/fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/
+├── TestingDataset
+│   ├── dl1_20240131_allsky_v0.10.5_all_dec_base_node_theta_10.0_az_102.199__merged.h5
+│   ├── dl1_20240131_allsky_v0.10.5_all_dec_base_node_theta_10.0_az_248.117__merged.h5
+│   ...
+│   ├── dl1_20240131_allsky_v0.10.5_all_dec_base_node_theta_82.155_az_271.199__merged.h5
+│   ├── dl1_20240131_allsky_v0.10.5_all_dec_base_node_theta_82.155_az_79.122__merged.h5
+│   ├── node_theta_10.0_az_102.199_
+│   ├── node_theta_10.0_az_248.117_
+│   ├── node_theta_14.984_az_175.158_
+│   ├── node_theta_14.984_az_355.158_
+│   ...
+│   └── node_theta_82.155_az_79.122_
+└── TrainingDataset
+    ├── dec_2276
+    ├── dec_3476
+    ├── dec_4822
+    ├── dec_6166
+    ├── dec_6676
+    ├── dec_931
+    ├── dec_min_1802
+    ├── dec_min_2924
+    └── dec_min_413
+```
+
+<!-- vertical slide -->
+
+#### Example models directory structure
+
+```bash
+/fefs/aswg/data/models/AllSky/20240131_allsky_v0.10.5_all_dec_base/
+├── dec_2276
+├── dec_3476
+├── dec_4822
+├── dec_6166
+├── dec_6676
+├── dec_931
+├── dec_min_1802
+├── dec_min_2924
+└── dec_min_413
+```
+
+<!-- vertical slide -->
+
+#### Example DL2 directory structure
+
+```bash
+/fefs/aswg/data/mc/DL2/AllSky/20240131_allsky_v0.10.5_all_dec_base/
+└── TestingDataset
+    ├── dec_2276
+    │   ├── node_theta_10.0_az_102.199_
+    │   ...
+    │   └── node_theta_82.155_az_79.122_
+    ├── dec_931
+    │   ├── node_theta_10.0_az_102.199_
+        ...
+    │   └── node_theta_82.155_az_79.122_
+    ├── dec_min_1802
+    │   ├── node_theta_10.0_az_102.199_
+        ...
+    │   └── node_theta_82.155_az_79.122_
+    ├── dec_min_2924
+    │   ├── node_theta_10.0_az_102.199_
+        ...
+    │   ├── node_theta_82.155_az_271.199_
+    │   └── node_theta_82.155_az_79.122_
+    └── dec_min_413
+        ├── node_theta_10.0_az_102.199_
+        ...
+        ├── node_theta_82.155_az_271.199_
+        └── node_theta_82.155_az_79.122_
+```
+
 <!-- new slide -->
 
 ### Real Data analysis 💀
@@ -405,8 +527,8 @@ Real data analysis is not supposed to be supported by these scripts. Use at your
 
 <span style="font-size:smaller;">
 
-So far the reference pipeline is `lstchain` and only with it a full analysis is possible.
-There is however support for `ctapipe` and `hiperta` as well.
+So far the reference pipeline is `lstchain`.
+There is however some support for `ctapipe` and `hiperta` as well (depending on lstmcpipe version).
 The processing up to dl1 is relatively agnostic of the pipeline; working implementations exist for all of them.
 
 In the case of `hiperta` a custom script converts the dl1 output to `lstchain` compatible files and the later stages
@@ -514,9 +636,13 @@ It is a mere benchmark for the pipeline.
 
 <span style="font-size:smaller;">
 
-Output will be written in a stanardized way next to the input data to make sure everyone can access it.
+Job logs are stored along with the produced data for each stage.
+E.g. in
+```bash
+$PPROD_ID/TrainingDataset/dec_2276/Protons/node_theta_16.087_az_108.090_/job_logs_r0dl1/
+```
 
-By default, job logs are stored in `/fefs/aswg/data/mc/running_analysis/.../job_logs` and later moved to `/fefs/aswg/data/mc/analysis_logs/.../`.
+Higher-level, lstmcpipe logs are produced and stored in the `$HOME/LSTMCPIPE_PROD_LOGS/` directory created when installing lstmcpipe.
 
 Every time a full MC production is launched, two files with logging information are created:
 
