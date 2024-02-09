@@ -1074,6 +1074,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
             target_paths = self.target_configs.test_configs[dec].dl1_to_dl2
             new_path = src_paths.copy()
             for ii, p in enumerate(new_path):
+                new_path[ii]['path_model'] = target_paths[ii]['path_model']
                 new_path[ii]['output'] = target_paths[ii]['output']
             paths.extend(new_path)
         return paths
