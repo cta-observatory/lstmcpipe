@@ -258,3 +258,38 @@ To prepare the lstmcpipe config, you typically want to run **on the cluster**:
 .. code-block::
 
     lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --prod_id anothergreatprod --kwargs source_prod_id=whatagreatprod
+
+
+Retrain and apply a model
+=========================
+
+..
+    .. mermaid::
+
+        flowchart LR
+
+        subgraph pa[PROD A]
+            direction TB
+            gamma[DL1b merged gamma training]
+            proton[DL1b merged proton training]
+            gammaps[DL1b gamma testing\n- node 1\n- node  2\n...]
+        end
+
+        gamma & proton --> models
+
+        %% DL1train --> train_pipe((train_pipe))
+
+        models[models B] .-> real-data
+
+        models & gammaps --> DL2-GammaTest[DL2 gamma testing\n- node 1\n- node  2\n...]
+
+
+.. image:: https://mermaid.ink/img/pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA?type=png)](https://mermaid.live/edit#pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA
+
+The workflow starts from an existing PROD A with merged DL1b datasets, trains a new set of models and applies them to create a new set of DL2.
+
+Example of command to generate such a config:
+
+.. code-block::
+    lstmcpipe_generate_config PathConfigAllTrainTestDL1b --dec_list dec_2276 dec_931 --prod_id MY_NEW_PROD --kwargs source_prod_id=PROD-A
+
