@@ -291,5 +291,6 @@ The workflow starts from an existing PROD A with merged DL1b datasets, trains a 
 Example of command to generate such a config:
 
 .. code-block::
+
     lstmcpipe_generate_config PathConfigAllTrainTestDL1b --dec_list dec_2276 dec_931 --prod_id MY_NEW_PROD --kwargs source_prod_id=PROD-A
 
