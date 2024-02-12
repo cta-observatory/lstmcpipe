@@ -287,6 +287,7 @@ Retrain and apply a model
 .. image:: https://mermaid.ink/img/pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA?type=png)](https://mermaid.live/edit#pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA
 
 The workflow starts from an existing PROD A with merged DL1b datasets, trains a new set of models and applies them to create a new set of DL2.
+**Note: In case of source-dependent analysis, the missing parameters are computed on the fly by lstchain, allowing the use of this PathConfig to not recreate DL1 files.**
 
 Example of command to generate such a config:
 
