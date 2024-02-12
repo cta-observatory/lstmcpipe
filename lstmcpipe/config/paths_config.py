@@ -1043,3 +1043,68 @@ class PathConfigAllSkyFullDL1ab(PathConfigAllSkyFull):
         # we do only one DL1 test for one dec (dec does not matter, so we take the first one)
         paths.extend(self.test_configs[self.dec_list[0]].dl1ab)
         return paths
+
+
+class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
+    def __init__(self, prod_id, source_prod_id, dec_list, run_checker=True):
+        """
+        Config for an allsky train-test analysis from an existing source prod.
+        It runs:
+            - train_pipe from existing merged DL1 files (source_prod_id)
+            - dl1_to_dl2 from existing merged DL1 files (source_prod_id)
+        Note that in of source-dependent analysis,
+        missing src-dep parameters are recomputed on the fly during the train stage by lstchain.
+        """
+        super().__init__(prod_id, source_prod_id, dec_list)
+        self.dec_list = dec_list
+        self.source_prod_id = source_prod_id
+        self.source_configs = PathConfigAllSkyFullDL1ab(
+            source_prod_id, source_prod_id, dec_list, run_checker=run_checker
+        )
+        self.target_configs = PathConfigAllSkyFullDL1ab(prod_id, source_prod_id, dec_list, run_checker=run_checker)
+        self.stages = ['train_pipe', 'dl1_to_dl2']
+        if run_checker:
+            self.check_source_prod()
+
+    @property
+    def dl1_to_dl2(self):
+        paths = []
+        for dec in self.dec_list:
+            src_paths = self.source_configs.test_configs[dec].dl1_to_dl2
+            target_paths = self.target_configs.test_configs[dec].dl1_to_dl2
+            new_path = src_paths.copy()
+            for ii, p in enumerate(new_path):
+                new_path[ii]['path_model'] = target_paths[ii]['path_model']
+                new_path[ii]['output'] = target_paths[ii]['output']
+            paths.extend(new_path)
+        return paths
+
+    @property
+    def train_pipe(self):
+        paths = []
+        for dec in self.dec_list:
+            src_paths = self.source_configs.train_configs[dec].train_pipe
+            # print(src_paths)
+            target_paths = self.target_configs.train_configs[dec].train_pipe
+            new_path = src_paths.copy()
+            for ii, _ in enumerate(new_path):
+                new_path[ii]['output'] = target_paths[ii]['output']
+            paths.extend(new_path)
+        return paths
+
+    def check_source_prod(self):
+        """
+        Check that merged dl1 files for training exist in the source prod.
+        Otherwise, remove the dec from the list of decs to be processed and warn the user.
+        """
+
+        dec_to_remove = []
+        for dec in self.dec_list:
+            for path in self.source_configs.train_configs[dec].merge_dl1:
+                # the output from merging must exist to train  the model
+                source_dl1 = Path(path['output'])
+                if not source_dl1.exists():
+                    warnings.warn(f"{source_dl1} does not exist" f"This training will be removed from production.")
+                    dec_to_remove.append(dec)
+
+        self.dec_list = list(set(self.dec_list) - set(dec_to_remove))
