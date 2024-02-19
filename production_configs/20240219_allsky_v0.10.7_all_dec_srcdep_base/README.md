@@ -1,4 +1,4 @@
-# Prod 20240131_allsky_v0.10.5_all_dec_base
+# Prod 20240219_allsky_v0.10.7_all_dec_srcdep_base
 
 Base production for all declinations lines with lstchain v0.10.7 & source-dependent approach
 
