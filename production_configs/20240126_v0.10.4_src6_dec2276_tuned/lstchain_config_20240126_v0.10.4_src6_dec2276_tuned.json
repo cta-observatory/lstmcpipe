@@ -132,7 +132,7 @@
         "bootstrap": true,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0.0,
+        "verbose": 0,
         "warm_start": false,
         "class_weight": null
     },
@@ -150,7 +150,7 @@
         "bootstrap": true,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0.0,
+        "verbose": 0,
         "warm_start": false,
         "class_weight": null
     },
