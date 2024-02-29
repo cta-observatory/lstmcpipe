@@ -310,5 +310,5 @@
 	"extra_bias_in_dim_pixels": 2.4,
 	"transition_charge": 14,
 	"extra_noise_in_bright_pixels": 13.5
-    },
+    }
 }
