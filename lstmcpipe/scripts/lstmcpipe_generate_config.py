@@ -68,7 +68,19 @@ def build_argparser():
         default=None,
     )
 
-    parser.add_argument("--dec_list", nargs="+", help="Use only with AllSkyFull prods", default=None)
+    parser.add_argument(
+        "--dec_list",
+        nargs="+",
+        help="Use only with AllSkyFull prods",
+        default=None,
+    )
+
+    parser.add_argument(
+        "--source_prod_id",
+        type=str,
+        help="Use only with prods starting from an existing source prod",
+        default=None,
+    )
 
     parser.add_argument(
         "--kwargs",
@@ -93,6 +105,8 @@ def main():
     kwargs = {}
     if args.dec_list:
         kwargs.update({"dec_list": args.dec_list})
+    if args.source_prod_id:
+        kwargs.update({"source_prod_id": args.source_prod_id})
     if args.kwargs:
         kwargs.update(args.kwargs)
 
