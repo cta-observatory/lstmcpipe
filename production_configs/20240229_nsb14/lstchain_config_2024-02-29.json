@@ -313,6 +313,7 @@
         }
     }
     "image_modifier":{
+	"increase_psf": false,
 	"increase_nsb": true,
 	"extra_noise_in_dim_pixels": 9.0,
 	"extra_bias_in_dim_pixels": 2.4,
