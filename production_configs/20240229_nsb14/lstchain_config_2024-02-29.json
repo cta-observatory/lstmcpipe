@@ -302,7 +302,7 @@
             "waveform_offset": 400,
             "waveform_scale": 80
         }
-    }
+    },
     "image_modifier":{
 	"increase_psf": false,
 	"increase_nsb": true,
