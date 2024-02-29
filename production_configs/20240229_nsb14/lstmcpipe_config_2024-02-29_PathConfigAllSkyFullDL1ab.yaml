@@ -7,12 +7,12 @@ prod_id: 20240229_dec34_nsb14
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.9.13
+  conda_env: lstchain-v0.10.7
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
   user_account: dpps
-lstmcpipe_version: 0.10.3
+lstmcpipe_version: 0.10.4
 prod_type: PathConfigAllSkyFullDL1ab
 stages_to_run:
 - dl1ab
