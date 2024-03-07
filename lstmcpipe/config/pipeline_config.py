@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from ruamel.yaml import YAML
-import calendar
 import logging
 
 log = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ def load_config(config_path):
 
     log.info(f'************ - lstMCpipe will be launch using the {config["workflow_kind"]} pipeline:- ************')
     log.info(f'\nPROD_ID to be used: {config["prod_id"]}')
-    log.info("\nStages to be run:\n - " + "\n - ".join(config["stages_to_run"]))
+    log.info("\nStages to run:\n - " + "\n - ".join(config["stages_to_run"]))
 
     log.info(
         "Slurm configuration:"
@@ -121,61 +120,19 @@ def complete_lstmcpipe_config(loaded_config):
     """
     config = loaded_config.copy()
 
-    suffix_prod_id = loaded_config.get("prod_id", "v00")
-    workflow_kind = loaded_config["workflow_kind"]
-
-    # TODO ??
-    # # to locate the source dl1 files
-    # dl1_reference_id = loaded_config.get("dl1_reference_id")
-    # # Full path to an observed dl1 file
-    # dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
-    # dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
-
-    # Prod_id syntax
-    t = calendar.datetime.date.today()
-    year, month, day = f"{t.year:04d}", f"{t.month:02d}", f"{t.day:02d}"
-    if workflow_kind == "lstchain":
-
-        import lstchain
-
-        base_prod_id = f"{year}{month}{day}_v{lstchain.__version__}"
-
-    elif workflow_kind == "ctapipe":
-
-        import ctapipe
-
-        base_prod_id = f"{year}{month}{day}_vctapipe{ctapipe.__version__}"
-
-    elif workflow_kind == "hiperta":  # RTA
-
-        # TODO parse version from hiPeRTA module
-        import lstchain
-
-        base_prod_id = f"{year}{month}{day}_vRTA420_v{lstchain.__version__}"
-
     # Create the final config structure to be passed to the pipeline
-    # 1 - Prod_id
-    prod_type = f"_{loaded_config['prod_type']}" if 'prod_type' in loaded_config else ''
-    suffix_id = "{}_{}".format(prod_type, suffix_prod_id)
-    config["prod_id"] = base_prod_id + suffix_id
-
-    # 2 - Parse source environment correctly
+    # Parse source environment correctly
     src_env = (
         f"source {loaded_config['source_environment']['source_file']}; "
         f"conda activate {loaded_config['source_environment']['conda_env']}; "
     )
-    # 2.1 - Parse slurm user config account
+    # 1 - Parse slurm user config account
     slurm_account = loaded_config.get("slurm_config", {}).get("user_account", "")
 
-    # 2.2 - Create a dict for all env configuration and slurm configuration (batch arguments)
+    # 2 - Create a dict for all env configuration and slurm configuration (batch arguments)
     config["batch_config"] = {
         "source_environment": src_env,
         "slurm_account": slurm_account,
     }
-
-    # TODO ??
-    # config["dl1_reference_id"] = dl1_reference_id
-    # config["dl1_noise_tune_data_run"] = dl1_noise_tune_data_run
-    # config["dl1_noise_tune_mc_run"] = dl1_noise_tune_mc_run
 
     return config
