@@ -79,6 +79,17 @@ To generate a config for that pipeline, you may run:
 
     lstmcpipe_generate_config PathConfigProd5Trans80 --prod_id whatagreatprod
 
+**IMPORTANT NOTE:** prod5 MC files need the config to set "focal_length_choice": "EQUIVALENT" to be analyzed with ``lstchain >= v0.9``
+
+In the lstchain config, please set:
+
+.. code-block:: json
+
+    "source_config": {
+        "EventSource": {
+            "focal_length_choice": "EQUIVALENT"
+        }
+    }
 
 
 One can also start back from DL1, applying the dl1ab stage:
