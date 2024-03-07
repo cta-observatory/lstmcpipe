@@ -4,7 +4,8 @@
             "allowed_tels": [
                 1
             ],
-            "max_events": null
+            "max_events": null,
+            "focal_length_choice": "EQUIVALENT"
         },
         "LSTEventSource": {
             "default_trigger_type": "ucts",
