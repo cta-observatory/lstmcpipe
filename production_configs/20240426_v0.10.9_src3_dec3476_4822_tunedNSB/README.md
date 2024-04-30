@@ -1,6 +1,10 @@
 # Source with dec 3476/4822 and NSB tuning for moon data (x3-4 the previous production, which was made to reproduce the specific dark background of the source due to its proximity to the galactic plane). The mean_diffuse_nsb_std for this dataset is approximately 3 p.e.
 
+## Prod_ID
+20240426_v0.10.9_src3_dec3476_4822_tunedNSB
+
 ## 20240426
+lstmcpipe_generate_config PathConfigAllSkyFull --prod_id 20240426_v0.10.9_src3_dec3476_4822_tunedNSB --dec_list dec_3476 dec_4822
 
 ## Short description of the config
 
