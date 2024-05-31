@@ -41,8 +41,8 @@ if __name__ == '__main__':
 
         node = dir_i.split('/')[-1]
 
-        error_file = f'./clean_dir_{prod_id}_{node}.e'
-        output_file = f'./clean_dir_{prod_id}_{node}.o'
+        error_file = f'./clean_dir_{prod_id}_{node}_%j.e'
+        output_file = f'./clean_dir_{prod_id}_{node}_%j.o'
 
         cmd = f'{source_env} python ./cleandir.py {dir_i}'
 
