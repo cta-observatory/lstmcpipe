@@ -1,17 +1,15 @@
 name: lstmcpipe
 channels:
   - default
-  - cta-observatory
   - conda-forge
 dependencies:
-  - python>=3.7
+  - python>=3.9
   - setuptools_scm<8.0
   - astropy>=4.2
   - pip
   - pre-commit
-  - ctapipe~=0.12
+  - ctapipe
   - ruamel.yaml>=0.17
   - lstchain
   - pyirf
   - ctaplot
-  - scipy~=1.11.4 
