@@ -22,7 +22,7 @@ stages_to_run:
 
 stages:
   dl1ab:
-  - input: 
+  - input:
       /fefs/aswg/data/mc/DL1/AllSky/20240430_v0.10.4_src9_dec3476_tuned/Split_TrainingDataset/dec_3476/GammaDiffuse/node_corsika_theta_69.992_az_60.505_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240716_v0.10.7_src10_dec3476_tuned/Split_TrainingDataset/dec_3476/GammaDiffuse/node_corsika_theta_69.992_az_60.505_
@@ -256,7 +256,7 @@ stages:
       /fefs/aswg/data/mc/DL1/AllSky/20240716_v0.10.7_src10_dec3476_tuned/TrainingDataset/dec_3476/Protons/node_corsika_theta_12.829_az_301.263_
   - input: 
       /fefs/aswg/data/mc/DL1/AllSky/20240430_v0.10.4_src9_dec3476_tuned/TrainingDataset/dec_3476/Protons/node_corsika_theta_7.093_az_31.09_
-    output: 
+    output:
       /fefs/aswg/data/mc/DL1/AllSky/20240716_v0.10.7_src10_dec3476_tuned/TrainingDataset/dec_3476/Protons/node_corsika_theta_7.093_az_31.09_ 
   - input: 
       /fefs/aswg/data/mc/DL1/AllSky/20240430_v0.10.4_src9_dec3476_tuned/TrainingDataset/dec_3476/Protons/node_corsika_theta_7.093_az_328.91_
