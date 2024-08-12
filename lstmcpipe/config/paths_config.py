@@ -815,18 +815,17 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         paths = []
 
         for pointing in self.pointing_dirs():
-            paths.append(
-                {
+            pp = {
                     'input': {
                         'gamma_file': self.dl2_output_file(pointing),
                         'proton_file': None,
                         'electron_file': None,
                     },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
-                    'options': '--point-like',
+                    'options': '--point-like --gh-efficiency 0.7 --theta-containment 0.7 ',
                     'extra_slurm_options': {'mem': '6GB'},
                 }
-            )
+            paths.append(pp)
 
         return paths
 
