@@ -58,7 +58,7 @@ def generate_test_allsky(
     allsky_test_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
     working_dir_dl0 = os.path.join(working_dir, 'DL0/LSTProd2/')
 
-    # generate_tree(allsky_train_base_dir, working_dir, nfiles)
+    generate_tree(allsky_train_base_dir, working_dir, nfiles)
 
     pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
     pcdl1ab = paths_config.PathConfigAllSkyFullDL1ab(
