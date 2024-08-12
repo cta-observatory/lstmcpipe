@@ -304,8 +304,10 @@ class PathConfigProd5Trans80(PathConfig):
                     'electron_file': self.dl2_output_file('electron'),
                 },
                 'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
-                'options': '--point-like' if gamma_part == 'gamma' else '',
+                'options': '--gh-efficiency 0.7 --theta-containment 0.7 '
             }
+            if gamma_part == 'gamma':
+                d['options'] += ' --point-like'
             return d
 
         for gamma_part in ['gamma-diffuse', 'gamma']:
