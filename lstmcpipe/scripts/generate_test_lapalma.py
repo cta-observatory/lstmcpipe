@@ -55,8 +55,8 @@ def generate_test_allsky(
 ):
     allsky_base_dir = '/fefs/aswg/data/mc/'
     allsky_train_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
-    allsky_test_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
-    working_dir_dl0 = os.path.join(working_dir, 'DL0/LSTProd2/')
+    # allsky_test_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
+    # working_dir_dl0 = os.path.join(working_dir, 'DL0/LSTProd2/')
 
     generate_tree(allsky_train_base_dir, working_dir, nfiles)
 
