@@ -56,9 +56,9 @@ def generate_test_allsky(
     allsky_base_dir = '/fefs/aswg/data/mc/'
     allsky_train_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
     allsky_test_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
-    working_dir = os.path.join(working_dir, 'DL0/LSTProd2/')
+    working_dir_dl0 = os.path.join(working_dir, 'DL0/LSTProd2/')
 
-    generate_tree(allsky_train_base_dir, working_dir, nfiles)
+    # generate_tree(allsky_train_base_dir, working_dir, nfiles)
 
     pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
     pcdl1ab = paths_config.PathConfigAllSkyFullDL1ab(
@@ -71,8 +71,8 @@ def generate_test_allsky(
         pc.train_configs[dec].base_dir = pc.train_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
         pc.test_configs[dec].base_dir = pc.test_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
         pc.test_configs[dec].base_dir = pc.test_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
-        pc.train_configs[dec].training_dir = pc.train_configs[dec].training_dir.replace(allsky_train_base_dir, working_dir)
-        pc.test_configs[dec].testing_dir = pc.test_configs[dec].testing_dir.replace(allsky_train_base_dir, working_dir)
+        pc.train_configs[dec].training_dir = pc.train_configs[dec].training_dir.replace(allsky_base_dir, working_dir)
+        pc.test_configs[dec].testing_dir = pc.test_configs[dec].testing_dir.replace(allsky_base_dir, working_dir)
 
         pcdl1ab.train_configs[dec].base_dir = pcdl1ab.train_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
         pcdl1ab.train_configs[dec].base_dir = pcdl1ab.train_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
