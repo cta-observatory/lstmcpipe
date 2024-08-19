@@ -136,8 +136,7 @@ def dump_plus_copy_node_to_create_new_table(
     astropy_table_to_copy : astropy table to be copied
     newparent_pointer : newparent copy_node parameter
     newname_pointer : newname copy_node parameter
-    tmp_name : [str] flag to identify the temportal table and make it unique (necessary when simultaneous reorganizers
-                are run in the same dir)
+    tmp_name : [str] flag to identify the temportal table and make it unique (necessary when simultaneous reorganizers are run in the same dir)
     overwrite : overwrite parameter of the copy_node method
     """
     input_filename = input_filename.split("___")[0]

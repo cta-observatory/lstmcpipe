@@ -533,6 +533,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         Returns
         -------
         'astropy.table.QTable`
+    
         """
         tabs = {}
 
