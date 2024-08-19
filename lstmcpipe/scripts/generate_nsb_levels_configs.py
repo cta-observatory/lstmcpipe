@@ -76,7 +76,7 @@ def dump_lstchain_nsb_config(nsb_tuning_ratio):
         new_config["waveform_nsb_tuning"]["nsb_tuning_ratio"] = nsb_tuning_ratio
     json_filename = lstchain_config_name(nsb_tuning_ratio)
     with open(json_filename, 'w') as f:
-        json.dump(new_config, f)
+        json.dump(new_config, f, indent=4)
     logger.info(f"Dumped lstchain configuration file: {json_filename}")
 
 
@@ -124,6 +124,7 @@ def main():
     for nsb_tuning_ratio in nsb_tuning_ratios:
         logger.info(f"Working on ratio {nsb_tuning_ratio}")
         dump_lstchain_nsb_config(nsb_tuning_ratio)
+        tmp_lstchain_config = "tmp_lstchain_config.json"
         command = [
             "lstmcpipe_generate_config",
             "PathConfigAllSkyFull",
@@ -132,9 +133,13 @@ def main():
             "-o",
             lstmcpipe_config_filename(nsb_tuning_ratio),
             "--dec_list",
-            dec_list
+            dec_list,
+            "--lstchain_conf",
+            tmp_lstchain_config
         ]
         subprocess.run(command, check=True)
+        # Delete tmp_lstchain_config (the lstchain configs with nsb tuning are already dumped)
+        subprocess.run(["rm", tmp_lstchain_config], check=True)
         logger.info(f"Generated lstmcpipe configuration file: {lstmcpipe_config_filename(nsb_tuning_ratio)}")
 
 
