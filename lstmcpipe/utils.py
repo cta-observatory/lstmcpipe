@@ -190,9 +190,11 @@ def run_command(*args):
     args: str or iter
         `Shell` is forced to True, thus a single string (shell cmd) is expected.
 
+
     Returns
     -------
     (subprocess.Popen.stdout).strip('\n')
+
     """
     cmd = sp.Popen(args, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT, encoding='utf-8')
     stdout, _ = cmd.communicate()
