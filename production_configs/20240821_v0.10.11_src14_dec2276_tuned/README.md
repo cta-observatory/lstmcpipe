@@ -3,11 +3,11 @@
 
 ## Prod_ID
 
-20240821_v0.10.11_src13_tuned
+20240821_v0.10.11_src14_tuned
 
 ## Description
 
-full DL1ab production (with NSB tuning for src13) with lstchain v0.10.11
+full DL1ab production (with NSB tuning for src14) with lstchain v0.10.11
 
 NSB level was checked in the following way:
 
@@ -23,10 +23,10 @@ lstchain_tune_nsb --config standard_lstchain_config.json --input-mc /fefs/aswg/d
 
 ## Why this config is needed
 
-Analysis of future data taken on src13
+Analysis of future data taken on src14
 
 ## Config file creation
 
 The config file was initially cretaed by using lstmcpipe_generate_config:
 '''
-lstmcpipe_generate_config PathConfigAllSkyFullDL1ab  --dec_list dec_2276 --prod_id 20240821_v0.10.11_src13_dec2276_tuned --kwargs source_prod_id=20240821_v0.10.7_src13_dec2276_tuned
+lstmcpipe_generate_config PathConfigAllSkyFullDL1ab  --dec_list dec_2276 --prod_id 20240821_v0.10.11_src14_dec2276_tuned --kwargs source_prod_id=20240821_v0.10.11_src14_dec2276_tuned
