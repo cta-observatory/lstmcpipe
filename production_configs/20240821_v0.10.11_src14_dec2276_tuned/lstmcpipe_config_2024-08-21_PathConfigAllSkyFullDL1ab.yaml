@@ -7,7 +7,7 @@ prod_id: 20240821_v0.10.11_src14_dec2276_tuned
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.10.7
+  conda_env: lstchain-v0.10.11
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
