@@ -304,7 +304,7 @@ class PathConfigProd5Trans80(PathConfig):
                     'electron_file': self.dl2_output_file('electron'),
                 },
                 'output': os.path.join(self.irf_dir(gamma_src_offset=offset), f'irf_{self.prod_id}_{offset}.fits.gz'),
-                'options': '--gh-efficiency 0.7 --theta-containment 0.7 '
+                'options': '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
             }
             if gamma_part == 'gamma':
                 d['options'] += ' --point-like'
@@ -822,7 +822,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                         'electron_file': None,
                     },
                     'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
-                    'options': '--point-like --gh-efficiency 0.7 --theta-containment 0.7 ',
+                    'options': '--point-like --gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta ',
                     'extra_slurm_options': {'mem': '6GB'},
                 }
             paths.append(pp)
