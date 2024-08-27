@@ -29,4 +29,4 @@ Analysis of future data taken on src14
 
 The config file was initially cretaed by using lstmcpipe_generate_config:
 '''
-lstmcpipe_generate_config PathConfigAllSkyFullDL1ab  --dec_list dec_2276 --prod_id 20240821_v0.10.11_src14_dec2276_tuned --kwargs source_prod_id=20240821_v0.10.11_src14_dec2276_tuned
+lstmcpipe_generate_config PathConfigAllSkyFullDL1ab --dec_list dec_2276 --prod_id 20240821_v0.10.11_src14_dec2276_tuned --kwargs source_prod_id=20240131_allsky_v0.10.5_all_dec_base
