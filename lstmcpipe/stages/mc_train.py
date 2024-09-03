@@ -119,8 +119,8 @@ def batch_plot_rf_features(
         sbatch_rf_feat = SbatchLstMCStage(
             "RF_importance",
             wrap_command=cmd,
-            slurm_error=Path(models_dir).joinpath("job_plot_rf_feat_importance.e").resolve().as_posix(),
-            slurm_output=Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance.o").resolve().as_posix(),
+            slurm_error=Path(models_dir).joinpath("job_plot_rf_feat_importance_%j.e").resolve().as_posix(),
+            slurm_output=Path(models_dir).joinpath(models_dir, "job_plot_rf_feat_importance_%j.o").resolve().as_posix(),
             slurm_dependencies=train_jobid,
             slurm_account=batch_configuration["slurm_account"],
             source_environment=batch_configuration["source_environment"],
@@ -198,8 +198,8 @@ def train_pipe(
     sbatch_train_pipe = SbatchLstMCStage(
         "train_pipe",
         wrap_command=cmd,
-        slurm_error=Path(models_dir).joinpath("train_job.e").resolve().as_posix(),
-        slurm_output=Path(models_dir).joinpath("train_job.o").resolve().as_posix(),
+        slurm_error=Path(models_dir).joinpath("train_job_%j.e").resolve().as_posix(),
+        slurm_output=Path(models_dir).joinpath("train_job_%j.o").resolve().as_posix(),
         slurm_dependencies=wait_jobs_dl1,
         extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],

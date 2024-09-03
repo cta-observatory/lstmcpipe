@@ -95,8 +95,8 @@ def merge_dl1(
     sbatch_merge_dl1 = SbatchLstMCStage(
         "merge_dl1",
         wrap_command=cmd,
-        slurm_error=Path(output_file).parent.joinpath("merging-output.e"),
-        slurm_output=Path(output_file).parent.joinpath("merging-output.o"),
+        slurm_error=Path(output_file).parent.joinpath("merging-output_%j.e"),
+        slurm_output=Path(output_file).parent.joinpath("merging-output_%j.o"),
         slurm_dependencies=wait_jobs_split,
         extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],

@@ -40,6 +40,7 @@ entry_points = {
         "lstmcpipe_compare_irfs = lstmcpipe.scripts.script_compare_irfs:main",
         "lstmcpipe_validate_config = lstmcpipe.scripts.script_lstmcpipe_validate_config:main",
         "lstmcpipe_generate_config = lstmcpipe.scripts.lstmcpipe_generate_config:main",
+        "lstmcpipe_generate_nsb_levels_configs = lstmcpipe.scripts.generate_nsb_levels_configs:main",
     ]
 }
 

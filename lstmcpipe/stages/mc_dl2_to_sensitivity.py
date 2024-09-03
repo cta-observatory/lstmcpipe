@@ -92,8 +92,8 @@ def dl2_to_sensitivity(input_paths, output, batch_configuration, wait_jobs_dl1_d
     sbatch_dl2_sens = SbatchLstMCStage(
         "dl2_sens",
         wrap_command=cmd_sens,
-        slurm_error=Path(output).parent.joinpath("job_dl2_to_sensitivity.e"),
-        slurm_output=Path(output).parent.joinpath("job_dl2_to_sensitivity.o"),
+        slurm_error=Path(output).parent.joinpath("job_dl2_to_sensitivity_%j.e"),
+        slurm_output=Path(output).parent.joinpath("job_dl2_to_sensitivity_%j.o"),
         slurm_dependencies=wait_jobs_dl1_dl2,
         extra_slurm_options=extra_slurm_options,
         slurm_account=batch_configuration["slurm_account"],

@@ -14,12 +14,12 @@ jobs:
         python-version: ['3.9', '3.10', '3.11']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -63,10 +63,10 @@ jobs:
             conda activate ci
             pytest --cov=lstmcpipe --cov-report=xml lstmcpipe
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v4
 
       - name: Detect added configs
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v41
         id: verify-changed-files
         with:
           files: |
