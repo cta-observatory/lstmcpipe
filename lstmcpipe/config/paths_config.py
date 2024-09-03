@@ -623,7 +623,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
         return paths
 
     def training_merged_dl1(self, particle):
-        return os.path.join(self.dl1_dir(particle, ''), f'dl1_{self.prod_id}_{self.dec}_{particle}_merged.h5')
+        return os.path.join(self.dl1_dir(particle, ''), f'dl1_{self.prod_id}_train_{self.dec}_{particle}_merged.h5')
 
     @property
     def merge_dl1(self):
@@ -656,6 +656,29 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                 else {'partition': 'xxl', 'mem': '100G', 'cpus-per-task': 16},
             }
         ]
+        return paths
+
+
+
+class PathConfigAllSkyTrainingWithSplit(PathConfigAllSkyTraining):
+    def __init__(self, prod_id, dec):
+        super().__init__(prod_id, dec)
+        self.stages.insert(1, 'train_test_split')
+
+    def dl1_diffuse_test_dir(self, pointing):
+        return self.dl1_dir('GammaDiffuse', pointing).replace('TrainingDataset', 'TestingDataset') + '/test'
+
+    def dl1_diffuse_train_dir(self, pointing):
+        return self.dl1_dir('GammaDiffuse', pointing) + '/train'
+
+    @property
+    def train_test_split(self):
+        paths = []
+        for pointing in self.pointing_dirs('GammaDiffuse'):
+            dl1 = self.dl1_dir('GammaDiffuse', pointing)
+            train = self.dl1_diffuse_train_dir(pointing)
+            test = self.dl1_diffuse_test_dir(pointing)
+            paths.append({'input': dl1, 'output': {'train': train, 'test': test}, 'options': {'test_size': 0.5}})
         return paths
 
 
@@ -779,7 +802,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return paths
 
     def testing_merged_dl1(self, pointing):
-        return os.path.join(self.dl1_dir(''), f'dl1_{self.prod_id}_{pointing}_merged.h5')
+        return os.path.join(self.dl1_dir(''), f'dl1_{self.prod_id}_test_{pointing}_merged.h5')
 
     @property
     def merge_dl1(self):
@@ -830,6 +853,30 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
         return paths
 
+
+class PathConfigAllSkyTestingWithSplit(PathConfigAllSkyTesting):
+    def __init__(self, prod_id, dec):
+        super().__init__(prod_id, dec)
+        # self.stages.insert(1, 'train_test_split')
+        self.train_config = PathConfigAllSkyTrainingWithSplit(prod_id, dec)
+
+    @property
+    def merge_dl1(self):
+        paths = []
+        for pointing in self.pointing_dirs():
+            dl1 = self.dl1_dir(pointing)
+            merged_dl1 = self.testing_merged_dl1(pointing)
+            paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
+        return paths
+
+    @property
+    def merge_diffuse(self):
+        paths = []
+        for pointing in self.train_config.pointing_dirs('GammaDiffuse'):
+            dl1 = self.train_config.dl1_diffuse_test_dir(pointing)
+            merged_dl1 = self.testing_merged_dl1(pointing)
+            paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
+        return paths
 
 class PathConfigAllSkyFull(PathConfig):
     def __init__(self, prod_id, dec_list):
