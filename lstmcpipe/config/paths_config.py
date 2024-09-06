@@ -1218,7 +1218,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
         self.dec_list = list(set(self.dec_list) - set(dec_to_remove))
 
 
-class PathConfigAllSkyFullDiffuse(PathConfigAllSkyFull):
+class PathConfigAllSkyFullSplitDiffuse(PathConfigAllSkyFull):
     def __init__(self, prod_id, dec_list):
         super().__init__(prod_id, dec_list)
         self.train_configs = {dec: PathConfigAllSkyTrainingWithSplit(prod_id, dec) for dec in dec_list}
