@@ -1221,5 +1221,14 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
 class PathConfigAllSkyFullSplitDiffuse(PathConfigAllSkyFull):
     def __init__(self, prod_id, dec_list):
         super().__init__(prod_id, dec_list)
+        self.stages = ['r0_to_dl1', 'train_test_split', 'merge_dl1', 'train_pipe', 'dl1_to_dl2', 'dl2_to_irfs']
+
         self.train_configs = {dec: PathConfigAllSkyTrainingWithSplit(prod_id, dec) for dec in dec_list}
         self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
+
+    @property
+    def train_test_split(self):
+        paths = []
+        for dec in self.dec_list:
+            paths.extend(self.train_configs[dec].train_test_split)
+        return paths
