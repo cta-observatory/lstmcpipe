@@ -384,7 +384,7 @@ class PathConfigProd5Trans80DL1ab(PathConfigProd5Trans80):
 
 class PathConfigAllSkyBase(PathConfig):
     """
-    Standard paths configuration for a prod5_trans_80 MC production
+    Standard paths configuration for a LSTProd2 MC production
     dataset_type: 'Training' or 'Testing'
     """
 
@@ -392,7 +392,7 @@ class PathConfigAllSkyBase(PathConfig):
         super().__init__(prod_id)
         self.prod_id = prod_id
         self.dec = dec
-        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{dataset_type}/{dec}/{particle}/{pointing}/"
+        self.base_dir = "/fefs/aswg/data/mc/{data_level}/AllSky/{prod_id}/{dataset_type}/{particle}/{dec}/{pointing}/"
 
         self.paths = {}
         self.stages = []
@@ -637,7 +637,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'input': dl1,
                     'output': merged_dl1,
                     'options': '--pattern */*.h5 --no-image',
-                    'extra_slurm_options': {'partition': 'long'},
+                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
                 }
             )
         return paths
@@ -651,9 +651,9 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'proton': self.training_merged_dl1('Protons'),
                 },
                 'output': self.models_dir(),
-                'extra_slurm_options': {'partition': 'xxl', 'mem': '160G', 'cpus-per-task': 16}
+                'extra_slurm_options': {'partition': 'xxl', 'mem': '160G', 'cpus-per-task': 16, 'time': '03-00:00:00'}
                 if self.dec == _crab_dec
-                else {'partition': 'xxl', 'mem': '100G', 'cpus-per-task': 16},
+                else {'partition': 'xxl', 'mem': '100G', 'cpus-per-task': 16, 'time': '03-00:00:00'},
             }
         ]
         return paths
@@ -681,16 +681,35 @@ class PathConfigAllSkyTrainingWithSplit(PathConfigAllSkyTraining):
             paths.append({'input': dl1, 'output': {'train': train, 'test': test}, 'options': {'test_size': 0.5}})
         return paths
 
+    @property
+    def merge_dl1(self):
+        # for the training particles, all the nodes get merged
+        paths = []
+        for particle in self.training_particles:
+            dl1 = self.dl1_dir(particle, '')
+            merged_dl1 = self.training_merged_dl1(particle)
+            pattern = '**/**/*.h5' if particle == 'GammaDiffuse' else '**/*.h5'  # this is needed because search is not recursive in lstchain. can be changed after https://github.com/cta-observatory/cta-lstchain/pull/1286
+            paths.append(
+                {
+                    'input': dl1,
+                    'output': merged_dl1,
+                    'options': f'--pattern {pattern} --no-image',
+                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                }
+            )
+        return paths
+
 
 class PathConfigAllSkyTesting(PathConfigAllSkyBase):
     def __init__(self, prod_id, dec):
         super().__init__(prod_id, dec)
         self.testing_dir = "/fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/sim_telarray/{pointing}/output_v1.4/"
         self.dataset_type = 'TestingDataset'
+        self.particle = 'Gamma'
         self.stages = ['r0_to_dl1', 'merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
 
     def pointing_dirs(self):
-        return self.pointings['dirname']
+        return self.pointings[f'dirname_{self.particle}']
 
     def r0_dir(self, pointing):
         return self.testing_dir.format(pointing=pointing)
@@ -721,7 +740,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
             alt, az = (90.0 - float(pt.groups()[0])) * u.deg, (float(pt.groups()[1])) * u.deg
             data.append([Angle(alt).wrap_at('180d'), Angle(az).wrap_at('360d'), d])
         reshaped_data = [[dd[0] for dd in data], [dd[1] for dd in data], [dd[2] for dd in data]]
-        self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', 'dirname'])
+        self._testing_pointings = QTable(data=reshaped_data, names=['alt', 'az', f'dirname_{self.particle}'])
 
     @property
     def pointings(self):
@@ -768,9 +787,9 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         )
         return ax
 
-    def dl1_dir(self, pointing):
+    def dl1_dir(self, pointing, dec=''):
         # no declination for DL1 for TestingDataset
-        return super().dl1_dir(particle='', pointing=pointing, dataset_type=self.dataset_type, dec='')
+        return super().dl1_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=dec)
 
     def dl2_dir(self, pointing):
         return self._data_level_dir(
@@ -802,7 +821,8 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return paths
 
     def testing_merged_dl1(self, pointing):
-        return os.path.join(self.dl1_dir(''), f'dl1_{self.prod_id}_test_{pointing}_merged.h5')
+        particle = self.particle
+        return os.path.join(self.dl1_dir(''), f'dl1_{self.prod_id}_{particle}_test_{pointing}_merged.h5')
 
     @property
     def merge_dl1(self):
@@ -834,6 +854,10 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         filename = os.path.basename(self.testing_merged_dl1(pointing).replace('dl1_', 'dl2_'))
         return os.path.join(self.dl2_dir(pointing), filename)
 
+    def irf_output_file(self, pointing):
+        filename =  os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{self.particle}_{self.dec}_{pointing}.fits.gz')
+        return os.path.join(self.irf_dir(pointing), filename)
+
     @property
     def dl2_to_irfs(self):
         paths = []
@@ -845,38 +869,73 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
                         'proton_file': None,
                         'electron_file': None,
                     },
-                    'output': os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{pointing}.fits.gz'),
-                    'options': '--point-like --gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta ',
+                    'output': self.irf_output_file(pointing),
+                    'options': '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta ',
                     'extra_slurm_options': {'mem': '6GB'},
                 }
+            if self.particle == 'Gamma':
+                pp['options'] += ' --point-like'
             paths.append(pp)
 
         return paths
 
 
-class PathConfigAllSkyTestingWithSplit(PathConfigAllSkyTesting):
+class PathConfigAllSkyTestingGammaDiffuse(PathConfigAllSkyTesting):
     def __init__(self, prod_id, dec):
+        """
+        This config must be used after a PathConfigAllSkyTrainingWithSplit has been generated and run.
+        It uses the test dataset of GammaDiffuse created by the train_test_split stage of PathConfigAllSkyTrainingWithSplit, 
+        merges the nodes and runs the dl1_to_dl2 and dl2_to_irfs stages.
+        """
         super().__init__(prod_id, dec)
-        # self.stages.insert(1, 'train_test_split')
+        self.stages = ['merge_dl1', 'dl1_to_dl2', 'dl2_to_irfs']
         self.train_config = PathConfigAllSkyTrainingWithSplit(prod_id, dec)
+        # self.pointings = self.train_config.pointings
+        self.particle = 'GammaDiffuse'
+
+    def testing_merged_dl1(self, pointing, dec):
+        particle = self.particle
+        return os.path.join(self.dl1_dir('', dec=dec), f'dl1_{self.prod_id}_{particle}_test_{dec}_{pointing}_merged.h5')
+
+    def load_pointings(self):
+        self.train_config.load_pointings()
+        self._testing_pointings = self.train_config._training_pointings
+
 
     @property
     def merge_dl1(self):
         paths = []
-        for pointing in self.pointing_dirs():
-            dl1 = self.dl1_dir(pointing)
-            merged_dl1 = self.testing_merged_dl1(pointing)
-            paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
+        for pointing in self.train_config.pointing_dirs(self.particle):
+            dl1 = self.dl1_dir(pointing, dec=self.dec)
+            merged_dl1 = self.testing_merged_dl1(pointing, dec=self.dec)
+            paths.append(
+                {
+                    'input': dl1, 
+                    'output': merged_dl1, 
+                    'options': '--pattern **/*.h5 --no-image',
+                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                }
+            )
         return paths
 
     @property
-    def merge_diffuse(self):
+    def dl1_to_dl2(self):
         paths = []
-        for pointing in self.train_config.pointing_dirs('GammaDiffuse'):
-            dl1 = self.train_config.dl1_diffuse_test_dir(pointing)
-            merged_dl1 = self.testing_merged_dl1(pointing)
-            paths.append({'input': dl1, 'output': merged_dl1, 'options': '--no-image'})
+        for pointing in self.pointing_dirs():
+            paths.append(
+                {
+                    'input': self.testing_merged_dl1(pointing, dec=self.dec),
+                    'path_model': self.models_dir(),
+                    'output': self.dl2_dir(pointing),
+                    'extra_slurm_options': {'mem': '80GB' if self.dec == _crab_dec else '60GB'},
+                }
+            )
         return paths
+
+    def dl2_output_file(self, pointing):
+        filename = os.path.basename(self.testing_merged_dl1(pointing, dec=self.dec).replace('dl1_', 'dl2_'))
+        return os.path.join(self.dl2_dir(pointing), filename)
+
 
 class PathConfigAllSkyFull(PathConfig):
     def __init__(self, prod_id, dec_list):
@@ -1157,3 +1216,10 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
                     dec_to_remove.append(dec)
 
         self.dec_list = list(set(self.dec_list) - set(dec_to_remove))
+
+
+class PathConfigAllSkyFullDiffuse(PathConfigAllSkyFull):
+    def __init__(self, prod_id, dec_list):
+        super().__init__(prod_id, dec_list)
+        self.train_configs = {dec: PathConfigAllSkyTrainingWithSplit(prod_id, dec) for dec in dec_list}
+        self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
