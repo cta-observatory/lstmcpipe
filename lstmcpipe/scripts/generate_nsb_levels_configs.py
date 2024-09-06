@@ -24,9 +24,9 @@ def build_argparser():
     parser.add_argument("--config_class", "-c",
                         type=str, default="PathConfigAllSkyFullSplitDiffuse", 
                         help="The class of the configuration to generate.")
-    parser.add_argument("--nsb_ratios", "-nsb",
+    parser.add_argument("--nsb",
                         nargs="+", type=float, default=0, 
-                        help="List of nsb tuning ratios. If not provided, no NSB tuning is applied.")
+                        help="List of nsb tuning values in p.e. If not provided, no NSB tuning is applied.")
 
     parser.add_argument(
         "--dec_list",
@@ -51,7 +51,7 @@ def build_argparser():
     return parser
 
 
-def lstchain_config_name(nsb_tuning_ratio):
+def lstchain_config_name(nsb_tuning):
     """
     Generate the name of the lstchain configuration file based on the given nsb_tuning_ratio.
 
@@ -61,10 +61,10 @@ def lstchain_config_name(nsb_tuning_ratio):
     Returns:
         str: The name of the lstchain configuration file.
     """
-    return f"lstchain_config_nsb{nsb_tuning_ratio}.json"
+    return f"lstchain_config_nsb{nsb_tuning:.2f}.json"
 
 
-def dump_lstchain_nsb_config(nsb_tuning_ratio, outdir="."):
+def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
     """
     Dump the lstchain configuration file with the given nsb_tuning_ratio.
 
@@ -72,18 +72,18 @@ def dump_lstchain_nsb_config(nsb_tuning_ratio, outdir="."):
         nsb_tuning_ratio (float): The nsb tuning ratio.
     """
     new_config = BASE_LSTCHAIN_MC_CONFIG.copy()
-    if nsb_tuning_ratio == 0 or nsb_tuning_ratio is None:
+    if nsb_tuning == 0 or nsb_tuning is None:
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = False
     else:
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = True
-        new_config["waveform_nsb_tuning"]["nsb_tuning_ratio"] = nsb_tuning_ratio
-    json_filename = Path(outdir) / lstchain_config_name(nsb_tuning_ratio)
+        new_config["waveform_nsb_tuning"]["nsb_tuning_ratio"] = nsb_tuning
+    json_filename = Path(outdir) / lstchain_config_name(nsb_tuning)
     with open(json_filename, 'w') as f:
         json.dump(new_config, f, indent=4)
     logger.info(f"Dumped lstchain configuration file: {json_filename}")
 
 
-def prod_id(nsb_tuning_ratio):
+def prod_id(nsb_tuning):
     """
     Generate the prod ID based on the given nsb_tuning_ratio.
 
@@ -93,10 +93,10 @@ def prod_id(nsb_tuning_ratio):
     Returns:
         str: The product ID.
     """
-    return f"{date.today()}_allsky_nsb_tuning_{nsb_tuning_ratio}"
+    return f"{date.today()}_allsky_nsb_tuning_{nsb_tuning:.2f}"
 
 
-def lstmcpipe_config_filename(nsb_tuning_ratio, outdir="."):
+def lstmcpipe_config_filename(nsb_tuning, outdir="."):
     """
     Generate the name of the lstmcpipe configuration file based on the given nsb_tuning_ratio.
 
@@ -106,7 +106,7 @@ def lstmcpipe_config_filename(nsb_tuning_ratio, outdir="."):
     Returns:
         str: The name of the lstmcpipe configuration file.
     """
-    return Path(outdir) / f"lstmcpipe_config_nsb{nsb_tuning_ratio}.yml"
+    return Path(outdir) / f"lstmcpipe_config_nsb{nsb_tuning:.2f}.yml"
 
 
 def main():
@@ -116,24 +116,22 @@ def main():
     parser = build_argparser()
     args = parser.parse_args()
 
-    dec_list = " ".join(args.dec_list)
-    nsb_tuning_ratios = args.nsb_ratios
+    nsb_tuning_values = args.nsb
     config_class = args.config_class
-    if nsb_tuning_ratios is None:
-        nsb_tuning_ratios = [None]
-    for nsb_tuning_ratio in nsb_tuning_ratios:
-        logger.info(f"Working on ratio {nsb_tuning_ratio}")
-        outdir = Path(f"NSB-{nsb_tuning_ratio}")
+    
+    for nsb_tuning in nsb_tuning_values:
+        logger.info(f"Working on NSB {nsb_tuning}")
+        outdir = Path(f"NSB-{nsb_tuning:.2f}")
         outdir.mkdir(parents=True, exist_ok=True)
-        dump_lstchain_nsb_config(nsb_tuning_ratio, outdir)
+        dump_lstchain_nsb_config(nsb_tuning, outdir)
         tmp_lstchain_config = "tmp_lstchain_config.json"
         command = [
             "lstmcpipe_generate_config",
             config_class,
             "--prod_id",
-            prod_id(nsb_tuning_ratio),
+            prod_id(nsb_tuning),
             "-o",
-            lstmcpipe_config_filename(nsb_tuning_ratio, outdir),
+            lstmcpipe_config_filename(nsb_tuning, outdir),
             "--lstchain_conf",
             tmp_lstchain_config,
             "--dec_list",
@@ -144,7 +142,7 @@ def main():
         subprocess.run(command, check=True)
         # Delete tmp_lstchain_config (the lstchain configs with nsb tuning are already dumped)
         subprocess.run(["rm", tmp_lstchain_config], check=True)
-        logger.info(f"Generated lstmcpipe configuration file: {lstmcpipe_config_filename(nsb_tuning_ratio)}")
+        logger.info(f"Generated lstmcpipe configuration file: {lstmcpipe_config_filename(nsb_tuning)}")
 
 
 if __name__ == "__main__":
