@@ -688,7 +688,7 @@ class PathConfigAllSkyTrainingWithSplit(PathConfigAllSkyTraining):
         for particle in self.training_particles:
             dl1 = self.dl1_dir(particle, '')
             merged_dl1 = self.training_merged_dl1(particle)
-            pattern = '**/**/*.h5' if particle == 'GammaDiffuse' else '**/*.h5'  # this is needed because search is not recursive in lstchain. can be changed after https://github.com/cta-observatory/cta-lstchain/pull/1286
+            pattern = '*/*/*.h5' if particle == 'GammaDiffuse' else '*/*.h5'  # this is needed because search is not recursive in lstchain. can be changed after https://github.com/cta-observatory/cta-lstchain/pull/1286
             paths.append(
                 {
                     'input': dl1,
@@ -912,7 +912,7 @@ class PathConfigAllSkyTestingGammaDiffuse(PathConfigAllSkyTesting):
                 {
                     'input': dl1, 
                     'output': merged_dl1, 
-                    'options': '--pattern **/*.h5 --no-image',
+                    'options': '--pattern */*.h5 --no-image',
                     'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
                 }
             )
@@ -1225,10 +1225,32 @@ class PathConfigAllSkyFullSplitDiffuse(PathConfigAllSkyFull):
 
         self.train_configs = {dec: PathConfigAllSkyTrainingWithSplit(prod_id, dec) for dec in dec_list}
         self.test_configs = {dec: PathConfigAllSkyTesting(prod_id, dec) for dec in dec_list}
+        self.test_diffuse_config = {dec: PathConfigAllSkyTestingGammaDiffuse(prod_id, dec) for dec in dec_list}
 
     @property
     def train_test_split(self):
         paths = []
         for dec in self.dec_list:
             paths.extend(self.train_configs[dec].train_test_split)
+        return paths
+
+    @property
+    def merge_dl1(self):
+        paths = super().merge_dl1
+        for dec in self.dec_list:
+            paths.extend(self.test_diffuse_config[dec].merge_dl1)
+        return paths
+
+    @property
+    def dl1_to_dl2(self):
+        paths = super().dl1_to_dl2
+        for dec in self.dec_list:
+            paths.extend(self.test_diffuse_config[dec].dl1_to_dl2)
+        return paths
+
+    @property
+    def dl2_to_irfs(self):
+        paths = super().dl2_to_irfs
+        for dec in self.dec_list:
+            paths.extend(self.test_diffuse_config[dec].dl2_to_irfs)
         return paths
