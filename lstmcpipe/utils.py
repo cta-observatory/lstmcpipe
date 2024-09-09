@@ -111,38 +111,53 @@ def batch_mc_production_check(
 
 def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_kwargs):
     """
-    rerun r0_to_dl1 process given by `cmd` as long as the exit code is 0 and number of try < max_ntry
-    move the failed output file to subdir failed_outputs
+    Rerun the command up to max_ntry times. 
+    If all attempts fail, raise an exception.
 
     Parameters
     ----------
-    cmd: str
-    subdir_failures: str
+    cmd: list
+        Command to run as a list of strings
     outfile: Path
-        path to the cmd output file
+        Path to the cmd output file
     max_ntry: int
-    run_kwargs: kwargs for subprocess.run
+        Maximum number of attempts to run the command
+    subdir_failures: str
+        Subdirectory to move failed output files to
+    run_kwargs: kwargs
+        Additional keyword arguments for subprocess.run
 
-    Returns
-    -------
-    ntry: int
-        number of tries actually run
+    Raises
+    ------
+    RuntimeError
+        If the command fails after all retry attempts
     """
     outfile = Path(outfile)
-    ret = -1
-    ntry = 1
-    while ret != 0 and ntry <= max_ntry:
-        ret = sp.run(cmd, **run_kwargs).returncode
-        if ret != 0:
-            failed_jobs_subdir = outfile.parent.joinpath(subdir_failures)
-            if outfile.exists():
-                failed_jobs_subdir.mkdir(exist_ok=True)
-                outfile_target = failed_jobs_subdir.joinpath(outfile.name)
-                print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
-                shutil.move(outfile, outfile_target)
+    for ntry in range(1, max_ntry + 1):
+        result = sp.run(cmd, **run_kwargs, capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            return ntry  # Success, return the number of tries it took
+        
+        # Command failed, handle the error
+        failed_jobs_subdir = outfile.parent.joinpath(subdir_failures)
+        if outfile.exists():
+            failed_jobs_subdir.mkdir(exist_ok=True)
+            outfile_target = failed_jobs_subdir.joinpath(outfile.name)
+            print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
+            shutil.move(outfile, outfile_target)
+        
+        # If this was the last try, raise an exception
+        if ntry == max_ntry:
+            error_message = f"Command failed after {max_ntry} attempts. Last failure details:\n"
+            error_message += f"Command: {' '.join(cmd)}\n"
+            error_message += f"Return code: {result.returncode}\n"
+            error_message += f"STDOUT: {result.stdout}\n"
+            error_message += f"STDERR: {result.stderr}\n"
+            raise RuntimeError(error_message)
 
-        ntry += 1
-    return ntry - 1
+    # This line should never be reached due to the raise in the loop
+    raise RuntimeError("Unexpected error in rerun_cmd")
 
 
 def dump_lstchain_std_config(filename='lstchain_config.json', allsky=True, overwrite=False):
