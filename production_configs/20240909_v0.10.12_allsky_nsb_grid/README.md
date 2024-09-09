@@ -20,4 +20,8 @@ The GammaDiffuse dataset has been divided into training and test datasets with a
 
 ```
 lstmcpipe_generate_nsb_levels_configs -c PathConfigAllSkyFullSplitDiffuse --nsb 0.0 0.07 0.14 0.22 0.38 0.50 0.81 1.25 1.76 2.34 
+
+find . -name 'lstmcpipe*.yml' -exec sed -i 's/2024-09-09/20240909/g' {} +
+
+python add_slurm_options.py
 ```
