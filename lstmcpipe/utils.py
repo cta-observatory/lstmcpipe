@@ -109,9 +109,9 @@ def batch_mc_production_check(
     return jobid
 
 
-def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_kwargs):
+def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_kwargs):
     """
-    Rerun the command up to max_ntry times. 
+    Rerun the command up to max_ntry times.
     If all attempts fail, raise an exception.
 
     Parameters
@@ -134,11 +134,11 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
     """
     outfile = Path(outfile)
     for ntry in range(1, max_ntry + 1):
-        result = sp.run(cmd, **run_kwargs, capture_output=True, text=True)
-        
+        result = sp.run(cmd, **run_kwargs, capture_output=True, text=True, check=False)
+
         if result.returncode == 0:
             return ntry  # Success, return the number of tries it took
-        
+
         # Command failed, handle the error
         failed_jobs_subdir = outfile.parent.joinpath(subdir_failures)
         if outfile.exists():
@@ -146,7 +146,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures='failed_outputs', **run_
             outfile_target = failed_jobs_subdir.joinpath(outfile.name)
             print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
             shutil.move(outfile, outfile_target)
-        
+
         # If this was the last try, raise an exception
         if ntry == max_ntry:
             error_message = f"Command failed after {max_ntry} attempts. Last failure details:\n"

@@ -31,22 +31,30 @@ def test_save_log_to_file(tmp_path):
 
 
 def test_rerun_cmd():
-
     with tempfile.TemporaryDirectory() as tmp_dir:
         file, filename = tempfile.mkstemp(dir=tmp_dir)
         cmd = f'echo "1" >> {filename}; rm nonexistingfile'
+
         # first test: the cmd fails 3 times but the outfile stays in place
-        subdir_failures = ''
-        rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
-        filename = Path(filename)
-        filename = Path(tmp_dir).joinpath(subdir_failures, filename.name)
-        assert open(filename).read() == "1\n1\n1\n"
+        subdir_failures = ""
+        try:
+            n_tries = rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
+            filename = Path(filename)
+            filename = Path(tmp_dir).joinpath(subdir_failures, filename.name)
+            assert open(filename).read() == "1\n1\n1\n"
+            assert n_tries == 3
+        except Exception as e:
+            assert isinstance(e, RuntimeError)
+
         # 2nd test: the cmd fails and the outfile is moved in subdir
-        subdir_failures = 'fail'
-        rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
-        filename = filename.parent.joinpath(subdir_failures).joinpath(filename.name)
-        assert open(filename).read() == "1\n"
-        assert filename.exists()
+        subdir_failures = "fail"
+        try:
+            rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
+            filename = filename.parent.joinpath(subdir_failures).joinpath(filename.name)
+            assert open(filename).read() == "1\n"
+            assert filename.exists()
+        except Exception as e:
+            assert isinstance(e, RuntimeError)
 
 
 def test_rerun_cmd_lstchain_mc_r0_to_dl1(mc_gamma_testfile):
