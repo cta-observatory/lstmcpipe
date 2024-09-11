@@ -306,3 +306,152 @@ Example of command to generate such a config:
 
     lstmcpipe_generate_config PathConfigAllTrainTestDL1b --dec_list dec_2276 dec_931 --prod_id MY_NEW_PROD --kwargs source_prod_id=PROD-A
 
+
+Using GammaDiffuse to produce full-enclosure IRFs
+=================================================
+
+The configs `PathConfigAllSkyTrainingWithSplit`, `PathConfigAllSkyTestingGammaDiffuse` and `PathConfigAllSkyFullSplitDiffuse` introduce the possibility to divide the GammaDiffuse dataset into training and testing datasets:
+
+.. image:: https://mermaid.ink/img/pako:eNqdV9tq4zAQ_RUhaGkhCZbT5vawD0vYZaGFJZunbUJQbCU1-IassHGa_vsqll3XsseR6ydJ58zozIw0tt-wE7kMz_DOj_45r5QL9LRYhasQySc5bPecxq9oYfV_80hEYdJ3mUMUenlcjzNHeFGIlt_L1VC67POYvmQDuq4hW4Vs64ijECdHWOg2iflJg4DOvd3ukLAOivagoj2oaG-gaP5EvigJVAQKMtXTvV57SuD0EDg_xLxkS5YIIzFHbZ5q81OHYghOvdBoV8kEMiA4VA_Bv3JAhEEiXJ_I8yGN3NxISasrbCY2CG4mflV_P2B8z9zOYSgz82g-802C-szvEpt2OAu3ytFROTquQUaqGCnMOCnGyVTMcxbIS8Pa2jjpufo8KdeDqBDbYqkQtZDUpKlPo37_GzpzayOijfR4bmud2kun0bTe5T63Gng3VetCad6KFT1rF9kB3ySx74nzR28wIgO3VtkCoPR1cZZlVAltvzSacikC6Q4a81rUTIIoA1GOoiyOdcXntpPPiqnT0VQZ6_WsZ0VnVPYunUAboVvIQ6Y3y8Em9mJ2d1eO7-8LfeVaRg9krH6CBnLIGfU3LhX0ZSFHaC5H68Lq5qZgXozmT7bebHL0FrqzKg2ub1fA8ghUzvSFDOa-7B-1vlMKy_O2NHpB2fBRhwnbawQH7o_o1-JHZ50e37XrbCZsrxGctj5um3_x1GsLICmItHwPfWSsU6pqUjQkBZG6FD0-1R3k6qUvS-tzw7bQ3Wj9iNCuSq3JQrs2nAvcw3KLgHqu_Dd6uyytsHhlAVvhmRy6bEcPvljhVfguqfQgoj9p6OCZ4AfWw4dYdgM296gsQYBnO-oncjWm4d8oCgqSnOLZGz7iGSH2YDgcTh6mZPpo2RNCejiVy2MyGFnDkfUwehxJ0H7v4VPmwBqMp9ajPSZkPJ5Mh9PhqIeZ64mIP6u_ueyn7v0_3oNg4Q?type=png
+
+.. 
+    .. mermaid::
+
+        flowchart LR
+
+        subgraph R0-Protons-dec1[R0-$$p^+$$-dec1]
+            direction TB
+            node-rpa[node-a]
+            node-rpb[node-b]
+            node-rpc[node-c]
+        end
+
+        subgraph R0-GammaDiffuse-dec1[R0-$$\gamma$$-diffuse-dec1]
+            direction TB
+            node-rga[node-a]
+            node-rgb[node-b]
+            node-rgc[node-c]
+        end
+
+        subgraph DL1-GammaDiffuse-dec1[DL1-$$\gamma$$-diffuse-dec1]
+            direction TB
+            node-ga[node-a]
+            node-gb[node-b]
+            node-gc[node-c]
+        end
+
+        subgraph DL1-Protons-dec1[DL1-$$p^+$$-dec1]
+            direction TB
+            node-rga1[node-a]
+            node-rgb1[node-b]
+            node-rgc1[node-c]
+        end
+
+        subgraph R0-GammaTest[R0-$$\gamma$$-test]
+            direction TB
+            node-x
+            node-y
+            node-z
+        end
+
+        subgraph DL1-GammaDiffuse-train[DL1-$$\gamma$$-diffuse]
+            direction TB
+            node-tra[node-a]
+            node-trb[node-b]
+            node-trc[node-c]
+        end
+
+        subgraph DL1-GammaDiffuse-test[DL1-$$\gamma$$-diffuse]
+            direction TB
+            dl1-gammadiffuse-node-a[node-a]
+            dl1-gammadiffuse-node-b[node-b]
+            dl1-gammadiffuse-node-c[node-c]
+        end
+
+        subgraph DL1-GammaDiffuse-test-merged[DL1-$$\gamma$$-diffuse-merged]
+            direction TB
+            dl1-gammadiffuse-merged-node-a[node-a]
+            dl1-gammadiffuse-merged-node-b[node-b]
+            dl1-gammadiffuse-merged-node-c[node-c]
+        end
+
+        subgraph DL1-GammaTest[DL1-$$\gamma$$-test]
+            dl1-gamma-node-x[node-x]
+            dl1-gamma-node-y[node-y]
+            dl1-gamma-node-z[node-z]
+        end
+
+        subgraph DL1-GammaTestMerged[DL1-GammaTestMerged]
+            direction TB
+            dl1-gamma-node-x-merged[node-x]
+            dl1-gamma-node-y-merged[node-y]
+            dl1-gamma-node-z-merged[node-z]
+        end
+
+
+        R0-GammaDiffuse-dec1 --> |r0_to_dl1| DL1-GammaDiffuse-dec1
+        R0-Protons-dec1 --> |r0_to_dl1| DL1-Protons-dec1
+        R0-GammaTest --> |r0_to_dl1| DL1-GammaTest
+
+
+        node-ga --> |train-test_split| node-tra
+        node-ga --> |train-test_split| dl1-gammadiffuse-node-a
+        dl1-gammadiffuse-node-a ---> |merge_dl1| dl1-gammadiffuse-merged-node-a
+
+
+        node-tra --> |merge_dl1| DL1-GammaDiffuse-dec1-merged[DL1-$$\gamma$$-diffuse train]
+        node-trb --> |merge_dl1| DL1-GammaDiffuse-dec1-merged
+        node-trc --> |merge_dl1| DL1-GammaDiffuse-dec1-merged
+
+        DL1-Protons-dec1 ---> |merge_dl1| DL1-Protons-dec1-merged[DL1-$$p^+$$-dec1]
+        
+        DL1-GammaDiffuse-dec1-merged & DL1-Protons-dec1-merged --> train_pipe((train_pipe))
+
+        train_pipe --> models .-> real_data[Real Data]
+
+        %% models --> DL2-GammaTest
+        models & dl1-gamma-node-x-merged ---> |dl1_to_dl2| dl2-gamma-node-x
+
+
+        DL1-GammaTest -----> |merge_dl1| DL1-GammaTestMerged
+
+        subgraph  DL2-GammaDiffuseTest
+            direction TB
+            dl2-gammadiffuse-node-a
+            dl2-gammadiffuse-node-b
+            dl2-gammadiffuse-node-c
+        end
+
+        subgraph  IRF-GammaDiffuseTest
+            direction TB
+            irf-gammadiffuse-node-a
+            irf-gammadiffuse-node-b
+            irf-gammadiffuse-node-c
+        end
+
+        subgraph DL2-GammaTest
+            direction TB
+            dl2-gamma-node-x
+            dl2-gamma-node-y
+            dl2-gamma-node-z
+        end
+
+        subgraph IRF-GammaTest
+            direction TB
+            irf-gamma-node-x
+            irf-gamma-node-y
+            irf-gamma-node-z
+        end
+
+        dl2-gamma-node-x --> |dl2_to_irf| irf-gamma-node-x
+
+        models & dl1-gammadiffuse-merged-node-a[node-a] ..-> dl2-gammadiffuse-node-a .-> |dl2_to_irf| irf-gammadiffuse-node-a
+    
+
+To use, you may run:
+
+.. code-block::
+
+    lstmcpipe_generate_config PathConfigAllSkyFullSplitDiffuse --dec_list dec_2276 --prod_id MY_NEW_PROD 
+
+
