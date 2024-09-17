@@ -465,12 +465,6 @@ class PathConfigAllSkyBase(PathConfig):
             dec=dec,
         )
 
-    # def dl2_dir(self, particle, pointing, dataset_type):
-    #     raise NotImplementedError("Should be implemented in child class if necessary")
-
-    # def irf_dir(self, pointing, dataset_type):
-    #     raise NotImplementedError("Should be implemented in child class if necessary")
-
     def models_dir(self):
         p = self.base_dir.format(
             data_level='models', particle='', pointing='', prod_id=self.prod_id, dataset_type='', dec=self.dec
