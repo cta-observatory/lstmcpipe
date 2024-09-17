@@ -805,7 +805,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         # no declination for DL1 for TestingDataset
         return super().dl1_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=dec)
 
-
     def dl2_dir(self, pointing):
         # no declination for DL2 for TestingDataset
         return super().dl2_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
