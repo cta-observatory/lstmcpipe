@@ -811,7 +811,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return super().dl2_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=dec)
 
     def irf_dir(self, pointing, dec=''):
-        # return super().irf_dir(particle='', pointing=pointing, dataset_type=self.dataset_type, dec=dec)
         return super().irf_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=dec)
 
 
