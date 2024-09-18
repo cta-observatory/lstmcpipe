@@ -27,9 +27,9 @@ def build_argparser():
     parser.add_argument("--nsb",
                         nargs="+", type=float, default=0, 
                         help="List of nsb tuning values in p.e. If not provided, no NSB tuning is applied.")
-    parser.add_argument("--lstchain_version", "-lv",
-                        type=str, default="", 
-                        help="The lstchain version. Optional")
+    parser.add_argument("--prod_id_prefix", "-pid",
+                        type=str, default=None,
+                        help="The PROD ID prefix. Example: '20240918_v0.10.12'")
 
     parser.add_argument(
         "--dec_list",
@@ -86,18 +86,18 @@ def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
     logger.info(f"Dumped lstchain configuration file: {json_filename}")
 
 
-def prod_id(nsb_tuning, lstchain_version=""):
+def prod_id(nsb_tuning, prefix=None):
     """
     Generate the prod ID based on the given nsb_tuning_ratio.
 
     Parameters:
         nsb_tuning_ratio (float): The nsb tuning ratio.
-        lstchain_version (str): The lstchain version.
+        prefix (str): The prefix of the prod ID. Example: "20240918_v0.10.12"
     Returns:
-        str: The product ID.
+        str: The prod ID.
     """
-    version_string = f"_{lstchain_version}" if lstchain_version else ""
-    return f"{date.today().strftime('%Y%m%d')}{version_string}_allsky_nsb_tuning_{nsb_tuning:.2f}"
+    prefix_string = f"{prefix}_" if prefix else ""
+    return f"{prefix_string}allsky_nsb_tuning_{nsb_tuning:.2f}"
 
 
 def lstmcpipe_config_filename(nsb_tuning, outdir="."):
@@ -122,7 +122,8 @@ def main():
 
     nsb_tuning_values = args.nsb
     config_class = args.config_class
-    lstchain_version = args.lstchain_version
+    prod_id_prefix = args.prod_id_prefix
+
     for nsb_tuning in nsb_tuning_values:
         logger.info(f"Working on NSB {nsb_tuning}")
         outdir = Path(f"NSB-{nsb_tuning:.2f}")
@@ -133,7 +134,7 @@ def main():
             "lstmcpipe_generate_config",
             config_class,
             "--prod_id",
-            prod_id(nsb_tuning, lstchain_version),
+            prod_id(nsb_tuning, prod_id_prefix),
             "-o",
             lstmcpipe_config_filename(nsb_tuning, outdir),
             "--lstchain_conf",
