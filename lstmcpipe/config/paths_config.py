@@ -445,11 +445,25 @@ class PathConfigAllSkyBase(PathConfig):
             dec=dec,
         )
 
-    def dl2_dir(self, particle, pointing, dataset_type):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+    def dl2_dir(self, particle, pointing, dataset_type, dec):
+        return self._data_level_dir(
+            data_level='DL2',
+            particle=particle,
+            pointing=pointing,
+            prod_id=self.prod_id,
+            dataset_type=dataset_type,
+            dec=dec,
+        )
 
-    def irf_dir(self, pointing, dataset_type):
-        raise NotImplementedError("Should be implemented in child class if necessary")
+    def irf_dir(self, particle, pointing, dataset_type, dec):
+        return self._data_level_dir(
+            data_level='IRF',
+            particle=particle,
+            pointing=pointing,
+            prod_id=self.prod_id,
+            dataset_type=dataset_type,
+            dec=dec,
+        )
 
     def models_dir(self):
         p = self.base_dir.format(
@@ -792,24 +806,12 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return super().dl1_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=dec)
 
     def dl2_dir(self, pointing):
-        return self._data_level_dir(
-            data_level='DL2',
-            particle='',
-            pointing=pointing,
-            prod_id=self.prod_id,
-            dataset_type=self.dataset_type,
-            dec=self.dec,
-        )
+        # no declination for DL2 for TestingDataset
+        return super().dl2_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
 
     def irf_dir(self, pointing):
-        return self._data_level_dir(
-            data_level='IRF',
-            particle='',
-            pointing=pointing,
-            prod_id=self.prod_id,
-            dataset_type=self.dataset_type,
-            dec=self.dec,
-        )
+        return super().irf_dir(particle=self.particle, pointing=pointing, dataset_type=self.dataset_type, dec=self.dec)
+
 
     @property
     def r0_to_dl1(self):
