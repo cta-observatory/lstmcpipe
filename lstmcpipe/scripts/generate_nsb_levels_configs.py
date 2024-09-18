@@ -4,7 +4,6 @@ import logging
 import argparse
 from lstchain.io.config import get_mc_config
 from pathlib import Path
-from datetime import date
 
 BASE_LSTCHAIN_MC_CONFIG = get_mc_config()
 
