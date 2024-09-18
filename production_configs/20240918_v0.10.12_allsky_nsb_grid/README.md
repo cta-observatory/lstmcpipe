@@ -19,9 +19,7 @@ Production for all declination bands with a NSB-wise grid using the following pa
 The GammaDiffuse dataset has been divided into training and test datasets with a 50-50% ratio.
 
 ```
-lstmcpipe_generate_nsb_levels_configs -c PathConfigAllSkyFullSplitDiffuse --nsb 0.0 0.07 0.14 0.22 0.38 0.50 0.81 1.25 1.76 2.34 
-
-find . -name 'lstmcpipe*.yml' -exec sed -i 's/2024-09-09/20240909/g' {} +
+lstmcpipe_generate_nsb_levels_configs -c PathConfigAllSkyFullSplitDiffuse --nsb 0.0 0.07 0.14 0.22 0.38 0.50 0.81 1.25 1.76 2.34 -pid 20240918_v0.10.12
 
 python add_slurm_options.py
 ```

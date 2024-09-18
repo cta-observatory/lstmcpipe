@@ -22,7 +22,7 @@ def add_slurm_options(config_file):
                 elif stage_name == 'train_pipe':
                     slurm_options['time'] = '02-00:00:00'
                 elif stage_name == 'dl1ab':
-                    slurm_options['time'] = '04:00:00'
+                    slurm_options['time'] = '08:00:00'
                 elif stage_name == 'merge_dl1' and ('GammaDiffuse' in step['input'] or 'Protons' in step['input']):
                     slurm_options['time'] = '08:00:00'
                 else:
