@@ -96,7 +96,8 @@ def prod_id(nsb_tuning, lstchain_version=""):
     Returns:
         str: The product ID.
     """
-    return f"{date.today().strftime('%Y%m%d')}_{lstchain_version}_allsky_nsb_tuning_{nsb_tuning:.2f}"
+    version_string = f"_{lstchain_version}" if lstchain_version else ""
+    return f"{date.today().strftime('%Y%m%d')}{version_string}_allsky_nsb_tuning_{nsb_tuning:.2f}"
 
 
 def lstmcpipe_config_filename(nsb_tuning, outdir="."):
