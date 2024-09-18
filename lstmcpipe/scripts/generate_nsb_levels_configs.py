@@ -27,6 +27,9 @@ def build_argparser():
     parser.add_argument("--nsb",
                         nargs="+", type=float, default=0, 
                         help="List of nsb tuning values in p.e. If not provided, no NSB tuning is applied.")
+    parser.add_argument("--lstchain_version", "-lv",
+                        type=str, default="", 
+                        help="The lstchain version. Optional")
 
     parser.add_argument(
         "--dec_list",
@@ -83,17 +86,17 @@ def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
     logger.info(f"Dumped lstchain configuration file: {json_filename}")
 
 
-def prod_id(nsb_tuning):
+def prod_id(nsb_tuning, lstchain_version=""):
     """
     Generate the prod ID based on the given nsb_tuning_ratio.
 
     Parameters:
         nsb_tuning_ratio (float): The nsb tuning ratio.
-
+        lstchain_version (str): The lstchain version.
     Returns:
         str: The product ID.
     """
-    return f"{date.today()}_allsky_nsb_tuning_{nsb_tuning:.2f}"
+    return f"{date.today().strftime('%Y%m%d')}_{lstchain_version}_allsky_nsb_tuning_{nsb_tuning:.2f}"
 
 
 def lstmcpipe_config_filename(nsb_tuning, outdir="."):
@@ -118,7 +121,7 @@ def main():
 
     nsb_tuning_values = args.nsb
     config_class = args.config_class
-    
+    lstchain_version = args.lstchain_version
     for nsb_tuning in nsb_tuning_values:
         logger.info(f"Working on NSB {nsb_tuning}")
         outdir = Path(f"NSB-{nsb_tuning:.2f}")
@@ -129,7 +132,7 @@ def main():
             "lstmcpipe_generate_config",
             config_class,
             "--prod_id",
-            prod_id(nsb_tuning),
+            prod_id(nsb_tuning, lstchain_version),
             "-o",
             lstmcpipe_config_filename(nsb_tuning, outdir),
             "--lstchain_conf",
