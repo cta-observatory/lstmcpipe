@@ -194,11 +194,11 @@ def main():
         update_scancel_file(scancel_file, jobs_from_splitting)
         all_job_ids.update({"train_test_split": jobs_from_splitting})
     else:
-        jobs_from_splitting = ""
+        jobs_from_splitting = None
 
     # 2.2 STAGE --> Merge DL1 files
-    if jobs_from_splitting != "":
-        merge_wait_jobs = ",".join([jobs_from_dl1_processing, jobs_from_splitting])
+    if jobs_from_splitting:
+        merge_wait_jobs = jobs_from_splitting
     else:
         merge_wait_jobs = jobs_from_dl1_processing
 
