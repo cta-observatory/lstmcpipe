@@ -23,3 +23,5 @@ lstmcpipe_generate_nsb_levels_configs -c PathConfigAllSkyFullSplitDiffuse --nsb 
 
 python add_slurm_options.py
 ```
+
+The `n_estimators` value has been changed to 50 following recommendations from https://github.com/cta-observatory/cta-lstchain/pull/1294 in all config except NSB-0.00
