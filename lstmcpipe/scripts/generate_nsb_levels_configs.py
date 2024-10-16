@@ -2,8 +2,10 @@ import subprocess
 import json
 import logging
 import argparse
-from lstchain.io.config import get_mc_config
 from pathlib import Path
+from packaging import version
+from lstchain.io.config import get_mc_config
+from lstchain import __version__ as lstchain_version
 
 BASE_LSTCHAIN_MC_CONFIG = get_mc_config()
 
@@ -78,7 +80,9 @@ def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = False
     else:
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = True
-        new_config["waveform_nsb_tuning"]["nsb_tuning_rate_GHz"] = nsb_tuning
+        # The parameter name changed in lstchain v0.10.12 !
+        parameter_name = "nsb_tuning_rate_GHz" if version.parse(lstchain_version) >= version.parse("0.10.12") else "nsb_tuning_ratio"
+        new_config["waveform_nsb_tuning"][parameter_name] = nsb_tuning
     json_filename = Path(outdir) / lstchain_config_name(nsb_tuning)
     with open(json_filename, 'w') as f:
         json.dump(new_config, f, indent=4)
