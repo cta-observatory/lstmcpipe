@@ -55,10 +55,10 @@ def build_argparser():
 
 def lstchain_config_name(nsb_tuning):
     """
-    Generate the name of the lstchain configuration file based on the given nsb_tuning_ratio.
+    Generate the name of the lstchain configuration file based on the given nsb_tuning_rate_GHz.
 
     Parameters:
-        nsb_tuning_ratio (float): The nsb tuning ratio.
+        nsb_tuning_rate_GHz (float): The nsb tuning rate in GHz.
 
     Returns:
         str: The name of the lstchain configuration file.
@@ -68,17 +68,17 @@ def lstchain_config_name(nsb_tuning):
 
 def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
     """
-    Dump the lstchain configuration file with the given nsb_tuning_ratio.
+    Dump the lstchain configuration file with the given nsb_tuning_rate_GHz.
 
     Parameters:
-        nsb_tuning_ratio (float): The nsb tuning ratio.
+        nsb_tuning_rate_GHz (float): The nsb tuning rate in GHz.
     """
     new_config = BASE_LSTCHAIN_MC_CONFIG.copy()
     if nsb_tuning == 0 or nsb_tuning is None:
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = False
     else:
         new_config["waveform_nsb_tuning"]["nsb_tuning"] = True
-        new_config["waveform_nsb_tuning"]["nsb_tuning_ratio"] = nsb_tuning
+        new_config["waveform_nsb_tuning"]["nsb_tuning_rate_GHz"] = nsb_tuning
     json_filename = Path(outdir) / lstchain_config_name(nsb_tuning)
     with open(json_filename, 'w') as f:
         json.dump(new_config, f, indent=4)
@@ -87,10 +87,10 @@ def dump_lstchain_nsb_config(nsb_tuning, outdir="."):
 
 def prod_id(nsb_tuning, prefix=None):
     """
-    Generate the prod ID based on the given nsb_tuning_ratio.
+    Generate the prod ID based on the given nsb_tuning_rate_GHz.
 
     Parameters:
-        nsb_tuning_ratio (float): The nsb tuning ratio.
+        nsb_tuning_rate_GHz (float): The nsb tuning rate in GHz.
         prefix (str): The prefix of the prod ID. Example: "20240918_v0.10.12"
     Returns:
         str: The prod ID.
@@ -101,10 +101,10 @@ def prod_id(nsb_tuning, prefix=None):
 
 def lstmcpipe_config_filename(nsb_tuning, outdir="."):
     """
-    Generate the name of the lstmcpipe configuration file based on the given nsb_tuning_ratio.
+    Generate the name of the lstmcpipe configuration file based on the given nsb_tuning_rate_GHz.
 
     Parameters:
-        nsb_tuning_ratio (float): The nsb tuning ratio.
+        nsb_tuning_rate_GHz (float): The nsb tuning rate in GHz.
 
     Returns:
         str: The name of the lstmcpipe configuration file.
@@ -114,7 +114,7 @@ def lstmcpipe_config_filename(nsb_tuning, outdir="."):
 
 def main():
     """
-    Dump the lstchain and lstmcpipe configuration files for the given nsb_tuning_ratios.
+    Dump the lstchain and lstmcpipe configuration files for the given nsb_tuning_rate_GHz.
     """
     parser = build_argparser()
     args = parser.parse_args()
