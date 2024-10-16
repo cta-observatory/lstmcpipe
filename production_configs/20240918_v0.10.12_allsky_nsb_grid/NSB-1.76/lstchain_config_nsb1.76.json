@@ -300,10 +300,9 @@
     },
     "waveform_nsb_tuning": {
         "nsb_tuning": true,
-        "nsb_tuning_rate_GHz": 0.15,
+        "nsb_tuning_rate_GHz": 1.76,
         "spe_location": null,
-        "pre_computed_multiplicity": 10,
-        "nsb_tuning_ratio": 1.76
+        "pre_computed_multiplicity": 10
     },
     "write_interleaved_events": {
         "DataWriter": {
