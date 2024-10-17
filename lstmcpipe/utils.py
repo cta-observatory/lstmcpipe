@@ -12,6 +12,8 @@ from pprint import pprint
 from copy import deepcopy
 from deepdiff import DeepDiff
 
+from . import prod_logs
+
 log = logging.getLogger(__name__)
 
 
@@ -109,7 +111,7 @@ def batch_mc_production_check(
     return jobid
 
 
-def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_kwargs):
+def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures=prod_logs/"failed_outputs", **run_kwargs):
     """
     Rerun the command up to max_ntry times.
     If all attempts fail, raise an exception.
@@ -144,7 +146,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_
         if outfile.exists():
             failed_jobs_subdir.mkdir(exist_ok=True)
             outfile_target = failed_jobs_subdir.joinpath(outfile.name)
-            print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
+            print(f"Try #{ntry} - move failed output file from {outfile} to {outfile_target}")
             shutil.move(outfile, outfile_target)
 
         # If this was the last try, raise an exception
