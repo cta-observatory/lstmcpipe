@@ -21,7 +21,7 @@ def main():
     parser.add_argument(
         "--output_dir",
         "-o",
-        type=str,
+        type=Path,
         dest="output_dir",
         help="lstchain_mc_r0_to_dl1 output directory argument.",
         required=True,
@@ -29,7 +29,7 @@ def main():
     parser.add_argument(
         "--config_file",
         "-c",
-        type=str,
+        type=Path,
         dest="config_file",
         help="lstchain_mc_r0_to_dl1 configuration file argument.",
         required=True,
@@ -57,7 +57,7 @@ def main():
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            outfile = file.parent.joinpath('dl1_' + file.name.replace('.simtel.gz', '.h5')).as_posix()
+            outfile = args.output_dir.joinpath('dl1_' + file.name.replace('.simtel.gz', '.h5')).as_posix()
             rerun_cmd(cmd, outfile, max_ntry=2)
 
 
