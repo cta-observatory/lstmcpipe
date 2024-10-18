@@ -34,23 +34,24 @@ def test_rerun_cmd():
     with tempfile.TemporaryDirectory() as tmp_dir:
         file, filename = tempfile.mkstemp(dir=tmp_dir)
         cmd = f'echo "1" >> {filename}; rm nonexistingfile'
+        
+        filename = Path(filename)
 
         # first test: the cmd fails 3 times but the outfile stays in place
-        subdir_failures = ""
+        failed_jobs_dir = Path(tmp_dir) / ""
         try:
-            n_tries = rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
-            filename = Path(filename)
-            filename = Path(tmp_dir).joinpath(subdir_failures, filename.name)
+            n_tries = rerun_cmd(cmd, filename, max_ntry=3, failed_jobs_dir=failed_jobs_dir, shell=True)
+            filename = failed_jobs_dir.joinpath(filename.name)
             assert open(filename).read() == "1\n1\n1\n"
             assert n_tries == 3
         except Exception as e:
             assert isinstance(e, RuntimeError)
 
         # 2nd test: the cmd fails and the outfile is moved in subdir
-        subdir_failures = "fail"
+        failed_jobs_dir = filename.parent.joinpath("fail")
         try:
-            rerun_cmd(cmd, filename, max_ntry=3, subdir_failures=subdir_failures, shell=True)
-            filename = filename.parent.joinpath(subdir_failures).joinpath(filename.name)
+            rerun_cmd(cmd, filename, max_ntry=3, failed_jobs_dir=failed_jobs_dir, shell=True)
+            filename = failed_jobs_dir.joinpath(filename.name)
             assert open(filename).read() == "1\n"
             assert filename.exists()
         except Exception as e:
@@ -66,7 +67,7 @@ def test_rerun_cmd_lstchain_mc_r0_to_dl1(mc_gamma_testfile):
         ntry = rerun_cmd(cmd, outfile, max_ntry=3)
         assert ntry == 1
         # second try should fail because the outfile already exists
-        ntry = rerun_cmd(cmd, outfile, max_ntry=3, subdir_failures='failed_outputs')
+        ntry = rerun_cmd(cmd, outfile, max_ntry=3, failed_jobs_dir=Path(tmp_dir) / 'failed_outputs')
         assert ntry == 2
         assert Path(tmp_dir, 'failed_outputs', outfilename).exists()
 
