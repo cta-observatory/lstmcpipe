@@ -264,7 +264,10 @@ In this case, you should produce your own lstchain config file using lstchain to
 
 The workflow then starts from a base production (the `source_prod_id`), produces new tuned DL1 (dl1ab steps) and trains a new set of models.
 
-To prepare the lstmcpipe config, you typically want to run **on the cluster**:
+To prepare the lstmcpipe config, you want to:
+
+- find a base production to start with (see the list of productions in the `documentation <productions>` and look for the latest "base" or "unuted" one) 
+- run **on the cluster**:
 
 .. code-block::
 
