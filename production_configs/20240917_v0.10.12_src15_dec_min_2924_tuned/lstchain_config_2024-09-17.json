@@ -304,16 +304,6 @@
         "spe_location": null,
         "pre_computed_multiplicity": 10
     },
-<<<<<<< HEAD
-=======
-    "image_modifier": {
-    "increase_nsb": true,
-    "extra_noise_in_dim_pixels": 3.843,
-    "extra_bias_in_dim_pixels": 1.07,
-    "transition_charge": 8,
-    "extra_noise_in_bright_pixels": 5.178
-  },
->>>>>>> 8c85c8a6cd11e8bbaf70eebfbb9ae4ab9215c1ed
     "write_interleaved_events": {
         "DataWriter": {
             "overwrite": true,
@@ -325,7 +315,6 @@
             "waveform_offset": 400,
             "waveform_scale": 80
         }
-<<<<<<< HEAD
     },
     "image_modifier": {
     "increase_nsb": true,
@@ -333,9 +322,5 @@
     "extra_bias_in_dim_pixels": 1.07,
     "transition_charge": 8,
     "extra_noise_in_bright_pixels": 5.178
-  }
-}
-=======
     }
 }
->>>>>>> 8c85c8a6cd11e8bbaf70eebfbb9ae4ab9215c1ed
