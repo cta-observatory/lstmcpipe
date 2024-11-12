@@ -1,4 +1,4 @@
-# lstmcpipe generated config from PathConfigAllSkyFullDL1ab - 2024-09-17
+# lstmcpipe generated config from PathConfigAllSkyFullDL1ab - 2024-10-25
 
 workflow_kind: lstchain
 
@@ -12,7 +12,7 @@ source_environment:
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
   user_account: dpps
-lstmcpipe_version: 0.11.0
+lstmcpipe_version: 0.11.3
 prod_type: PathConfigAllSkyFullDL1ab
 stages_to_run:
 - dl1ab
@@ -23,155 +23,155 @@ stages_to_run:
 stages:
   dl1ab:
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_142.697_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_142.697_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_142.697_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_217.303_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_217.303_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_69.813_az_217.303_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_145.947_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_145.947_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_145.947_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_214.053_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_214.053_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_67.624_az_214.053_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_149.38_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_149.38_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_149.38_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_210.62_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_210.62_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_65.615_az_210.62_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_152.996_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_152.996_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_152.996_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_207.004_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_207.004_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_63.806_az_207.004_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_156.789_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_156.789_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_156.789_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_203.211_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_203.211_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_62.212_az_203.211_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_160.748_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_160.748_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_160.748_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_199.252_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_199.252_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_60.852_az_199.252_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_164.856_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_164.856_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_164.856_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_195.144_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_195.144_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_59.742_az_195.144_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_169.087_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_169.087_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_169.087_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_190.913_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_190.913_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.895_az_190.913_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_173.413_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_173.413_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_173.413_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_186.587_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_186.587_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.324_az_186.587_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.036_az_177.798_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.036_az_177.798_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/GammaDiffuse/dec_min_2924/node_corsika_theta_58.036_az_177.798_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_142.697_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_142.697_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_142.697_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_217.303_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_217.303_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_69.813_az_217.303_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_145.947_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_145.947_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_145.947_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_214.053_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_214.053_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_67.624_az_214.053_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_149.38_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_149.38_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_149.38_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_210.62_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_210.62_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_65.615_az_210.62_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_152.996_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_152.996_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_152.996_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_207.004_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_207.004_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_63.806_az_207.004_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_156.789_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_156.789_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_156.789_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_203.211_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_203.211_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_62.212_az_203.211_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_160.748_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_160.748_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_160.748_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_199.252_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_199.252_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_60.852_az_199.252_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_164.856_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_164.856_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_164.856_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_195.144_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_195.144_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_59.742_az_195.144_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_169.087_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_169.087_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_169.087_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_190.913_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_190.913_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.895_az_190.913_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_173.413_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_173.413_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_173.413_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_186.587_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_186.587_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.324_az_186.587_
   - input: 
-      /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.036_az_177.798_
+      /fefs/aswg/data/mc/DL1/AllSky/20240131_allsky_v0.10.5_all_dec_base/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.036_az_177.798_
     output: 
       /fefs/aswg/data/mc/DL1/AllSky/20240917_v0.10.12_src15_dec_min_2924_tuned/TrainingDataset/Protons/dec_min_2924/node_corsika_theta_58.036_az_177.798_
   merge_dl1:
