@@ -116,7 +116,7 @@ To request a MC analysis:
 
 * a lstchain config file (please provide an exhaustive config that will help others and provide a more explicit provenance information)
 * a lstmcpipe config file (to generate it, please refer to the documentation)
-* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/wiki/index.php/MC_analysis_and_IRF_production#lstmcpipe_productions>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
+* a readme with a short description of why you require this analysis to be run. **Do not add information that should not appear publicly** (such as source names) here. If you are requesting a production for a specific new source, please edit `this table on LST wiki <https://www.lst1.iac.es/mediawiki/index.php?title=MC_analysis_and_IRF_production>`_. Also add the command line to generate the lstmcpipe config, that will help debugging.
 
 The proposed configuration will be tested for validity by the continuous integration tests and we will interact with you to run the analysis on the cluster at La Palma.
 

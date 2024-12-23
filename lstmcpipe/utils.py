@@ -12,6 +12,8 @@ from pprint import pprint
 from copy import deepcopy
 from deepdiff import DeepDiff
 
+from . import prod_logs
+
 log = logging.getLogger(__name__)
 
 
@@ -109,7 +111,7 @@ def batch_mc_production_check(
     return jobid
 
 
-def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_kwargs):
+def rerun_cmd(cmd, outfile, max_ntry=2, failed_jobs_dir=prod_logs/"failed_outputs", **run_kwargs):
     """
     Rerun the command up to max_ntry times.
     If all attempts fail, raise an exception.
@@ -122,7 +124,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_
         Path to the cmd output file
     max_ntry: int
         Maximum number of attempts to run the command
-    subdir_failures: str
+    failed_jobs_dir: Path or str
         Subdirectory to move failed output files to
     run_kwargs: kwargs
         Additional keyword arguments for subprocess.run
@@ -133,6 +135,7 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_
         If the command fails after all retry attempts
     """
     outfile = Path(outfile)
+    failed_jobs_dir = Path(failed_jobs_dir)
     for ntry in range(1, max_ntry + 1):
         result = sp.run(cmd, **run_kwargs, capture_output=True, text=True, check=False)
 
@@ -140,11 +143,10 @@ def rerun_cmd(cmd, outfile, max_ntry=2, subdir_failures="failed_outputs", **run_
             return ntry  # Success, return the number of tries it took
 
         # Command failed, handle the error
-        failed_jobs_subdir = outfile.parent.joinpath(subdir_failures)
         if outfile.exists():
-            failed_jobs_subdir.mkdir(exist_ok=True)
-            outfile_target = failed_jobs_subdir.joinpath(outfile.name)
-            print(f"Move failed output file from {outfile} to {outfile_target}. try #{ntry}")
+            failed_jobs_dir.mkdir(exist_ok=True)
+            outfile_target = failed_jobs_dir.joinpath(outfile.name)
+            print(f"Try #{ntry} - move failed output file from {outfile} to {outfile_target}")
             shutil.move(outfile, outfile_target)
 
         # If this was the last try, raise an exception
