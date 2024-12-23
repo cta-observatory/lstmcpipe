@@ -20,8 +20,71 @@ The GammaDiffuse dataset has been divided into training and test datasets with a
 
 ```
 lstmcpipe_generate_nsb_levels_configs -c PathConfigAllSkyFullSplitDiffuse --nsb 0.0 0.07 0.14 0.22 0.38 0.50 0.81 1.25 1.76 2.34 -pid 20240918_v0.10.12
+```
 
+## Modifications applied afterwards
+
+- slurm options have been modified to accomodate for the usage of the cluster, adding the `nice` option so that lstmcpipe jobs are sent after lstosa ones and managing jobs times to reduce the time they are hanging
+```
 python add_slurm_options.py
 ```
 
-The `n_estimators` value has been changed to 50 following recommendations from https://github.com/cta-observatory/cta-lstchain/pull/1294 in all config except NSB-0.00
+- The `n_estimators` value has been changed to 50 following recommendations from https://github.com/cta-observatory/cta-lstchain/pull/1294 in all config except NSB-0.00. 
+```
+python change_estimators.py
+```
+
+- The lstchain configs have been modified to include the IRF production config from https://github.com/cta-observatory/cta-lstchain/blob/v0.10.12/docs/examples/irf_dl3_tool_config.json 
+
+
+
+### Tree structure
+
+Finale tree structures for trained models and IRFs are the following:
+
+```
+/fefs/aswg/data/mc/IRF/AllSky/
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.00
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.07
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.14
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.22
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.38
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.50
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.81
+├── 20240918_v0.10.12_allsky_nsb_tuning_1.25
+├── 20240918_v0.10.12_allsky_nsb_tuning_1.76
+├── 20240918_v0.10.12_allsky_nsb_tuning_2.34
+│   └── TestingDataset
+│   ├── Gamma
+│   │   ├── dec_2276
+│   │   ├── dec_3476
+│   │   ├── dec_4822
+│   │   ├── dec_6166
+│   │   ├── dec_6676
+│   │   ├── dec_931
+│   │   ├── dec_min_1802
+│   │   ├── dec_min_2924
+│   │   └── dec_min_413
+│   └── GammaDiffuse
+│        ├── dec_2276
+│        ├── dec_3476
+│        ├── dec_4822
+│        ├── dec_6166
+│   	 ├── dec_6676
+│   	 ├── dec_931
+│   	 ├── dec_min_1802
+│   	 ├── dec_min_2924
+│   	 └── dec_min_413
+
+/fefs/aswg/data/models/AllSky
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.00
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.07
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.14
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.22
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.38
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.50
+├── 20240918_v0.10.12_allsky_nsb_tuning_0.81
+├── 20240918_v0.10.12_allsky_nsb_tuning_1.25
+├── 20240918_v0.10.12_allsky_nsb_tuning_1.76
+├── 20240918_v0.10.12_allsky_nsb_tuning_2.34
+```
