@@ -70,8 +70,8 @@ jobs:
         id: verify-changed-files
         with:
           files: |
-            production_configs/*/*.yml
-            production_configs/*/*.yaml
+            production_configs/**/*.yml
+            production_configs/**/*.yaml
             # production_configs/*/*.json
             # TODO: solve issue in github actions extracting sublist of yaml files, see below
 
