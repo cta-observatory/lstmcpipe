@@ -1,0 +1,85 @@
+# lstmcpipe generated config from PathConfigAllSkyFullSplitDiffuse - 2024-09-18
+
+workflow_kind: lstchain
+
+# prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: 20240918_v0.10.12_allsky_nsb_tuning_0.38
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.10.12
+
+slurm_config:
+# dpps is the default account for lstanalyzer - other users should use aswg
+  user_account: dpps
+lstmcpipe_version: 0.11.1
+prod_type: PathConfigAllSkyFullSplitDiffuse
+stages_to_run:
+    # - r0_to_dl1
+    # - train_test_split
+- merge_dl1
+- train_pipe
+# - dl1_to_dl2
+# - dl2_to_irfs
+stages:
+  merge_dl1:
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_min_413
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_min_413/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_min_413_Protons_merged.h5
+  #   options: --pattern */*.h5 --no-image
+  #   extra_slurm_options:
+  #     partition: long
+  #     time: 06:00:00
+  #     nice: 10
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_3476
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_3476/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_3476_Protons_merged.h5
+  #   options: --pattern */*.h5 --no-image
+  #   extra_slurm_options:
+  #     partition: long
+  #     time: 06:00:00
+  #     nice: 10
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/GammaDiffuse/dec_6166
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/GammaDiffuse/dec_6166/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_6166_GammaDiffuse_merged.h5
+  #   options: --pattern */*/*.h5 --no-image
+  #   extra_slurm_options:
+  #     partition: long
+  #     time: 06:00:00
+  #     nice: 10
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/GammaDiffuse/dec_min_413
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/GammaDiffuse/dec_min_413/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_min_413_GammaDiffuse_merged.h5
+  #   options: --pattern */*/*.h5 --no-image
+  #   extra_slurm_options:
+  #     partition: long
+  #     time: 06:00:00
+  #     nice: 10
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_6166
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_6166/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_6166_Protons_merged.h5
+  #   options: --pattern */*.h5 --no-image
+  #   extra_slurm_options:
+  #     partition: long
+  #     time: 06:00:00
+  #     nice: 10
+  # - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/Gamma/node_theta_73.142_az_28.021_
+  #   output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/Gamma/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_Gamma_test_node_theta_73.142_az_28.021__merged.h5
+  #   options: --no-image
+  #   extra_slurm_options:
+  #     partition: short
+  #     nice: 10
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_2276
+    output: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_2276/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_2276_Protons_merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 11:00:00
+      nice: 10
+  train_pipe:
+  - input:
+      gamma: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/GammaDiffuse/dec_2276/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_2276_GammaDiffuse_merged.h5
+      proton: /fefs/aswg/data/mc/DL1/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/TrainingDataset/Protons/dec_2276/dl1_20240918_v0.10.12_allsky_nsb_tuning_0.38_train_dec_2276_Protons_merged.h5
+    output: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.38/dec_2276
+    extra_slurm_options:
+      partition: xxl
+      mem: 160G
+      cpus-per-task: 16
+      time: 03-00:00:00
+      nice: 10
+
