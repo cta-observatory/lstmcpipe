@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
+
       - name: Setup env
         uses: mamba-org/setup-micromamba@v2
         with:
@@ -20,12 +21,13 @@ jobs:
           miniforge-version: latest
           activate-environment: lstmcpipe
           use-mamba: true
+          environment-file: environment.yml
+          cache-environment: true
 
-      - name: Update environment
+      - name: Install additional packages
+        shell: bash -el {0}
         run: |
-          mamba env update -n lstmcpipe -f environment.yml
-          mamba install -n lstmcpipe -c conda-forge make pandoc
-        if: steps.cache.outputs.cache-hit != 'true'
+          micromamba install -n lstmcpipe -c conda-forge make pandoc
 
       - name: Build docs
         run: |
