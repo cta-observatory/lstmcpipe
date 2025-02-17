@@ -46,6 +46,10 @@ def build_html_table_with_card(rows, headers=None):
       a:hover {
           text-decoration: underline;
       }
+    /* Reduce the size of h1 titles */
+      h1 {
+          font-size: 24px;
+      }
     </style>
     """
 
