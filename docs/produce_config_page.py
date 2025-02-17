@@ -62,14 +62,10 @@ def build_html_table_with_card(rows, headers=None):
 
     table_html.append("  <tbody>")
     for row in rows:
-        commit_date, prod_markdown, prod_id, readme_markdown = row
+        commit_date, prod_markdown, readme_markdown = row
         table_html.append("    <tr>")
-        # Date cell
         table_html.append(f"      <td>{commit_date}</td>")
-        # Product cell (with markdown link)
         table_html.append(f"      <td>{convert_markdown(prod_markdown)}</td>")
-        # Product ID cell
-        table_html.append(f"      <td>{prod_id}</td>")
         # Readme cell with card styling
         readme_html = f'<div class="readme-card">{convert_markdown(readme_markdown)}</div>'
         table_html.append(f"      <td>{readme_html}</td>")
@@ -115,11 +111,10 @@ def add_prod_table(
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir))[-1]
 
         yml_list = [f for f in prod_dir.iterdir() if f.name.endswith(".yml") or f.name.endswith(".yaml")]
-        prod_id = ""
+
         if yml_list:
             try:
                 conf = load_config(yml_list[0])
-                prod_id = conf["prod_id"]
             except:  # noqa
                 print(f"Could not load prod id for {prod_dir.name}")
         else:
@@ -132,7 +127,6 @@ def add_prod_table(
             [
             commit.authored_datetime.date(),
             f"[{prod_dir.name}]({lstmcpipe_repo_prod_config_url + prod_dir.name})",
-            prod_id,
             readme,
             ]
         )
@@ -143,7 +137,7 @@ def add_prod_table(
 
     prod_list.reverse()  # Reverse the ordering to have the most recent first
 
-    headers = ["Production date", "Directory name", "Prod ID", "Readme"]
+    headers = ["Production date", "Prod ID", "Readme"]
 
     # Generate the HTML table.
     html_table = build_html_table_with_card(prod_list, headers=headers)
