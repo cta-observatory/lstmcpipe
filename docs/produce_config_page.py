@@ -33,13 +33,13 @@ def add_prod_table(
         commit = list(git.Repo(root_dir).iter_commits(paths=prod_dir, max_count=1))[0]
 
         yml_list = [f for f in prod_dir.iterdir() if f.name.endswith('.yml') or f.name.endswith('.yaml')]
+        prod_id = ''
         if yml_list:
             try:
                 conf = load_config(yml_list[0])
                 prod_id = conf['prod_id']
             except:  # noqa
                 print(f"Could not load prod id for {prod_dir.name}")
-                prod_id = ''
         else:
             print(f"No yml file in {prod_dir}")
 
