@@ -13,6 +13,7 @@ def add_prod_table(
     production_dir,
     prod_file='productions.rst',
     lstmcpipe_repo_prod_config_url='https://github.com/cta-observatory/lstmcpipe/tree/master/production_configs/',
+    root_dir=None,
 ):
     """
 
@@ -69,5 +70,5 @@ def add_prod_table(
 if __name__ == '__main__':
     root_dir = Path(__file__).parent.joinpath('..').resolve()
     prod_dir = root_dir.joinpath('production_configs')
-
+    add_prod_table(prod_dir, root_dir=root_dir)
     add_prod_table(prod_dir)
