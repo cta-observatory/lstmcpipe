@@ -71,4 +71,3 @@ if __name__ == '__main__':
     root_dir = Path(__file__).parent.joinpath('..').resolve()
     prod_dir = root_dir.joinpath('production_configs')
     add_prod_table(prod_dir, root_dir=root_dir)
-    add_prod_table(prod_dir)
