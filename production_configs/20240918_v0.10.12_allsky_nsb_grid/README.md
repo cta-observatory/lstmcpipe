@@ -40,42 +40,9 @@ python change_estimators.py
 
 ### Tree structure
 
-Finale tree structures for trained models and IRFs are the following:
+Trained models for analysis can be found under:
 
 ```
-/fefs/aswg/data/mc/IRF/AllSky/
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.00
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.07
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.14
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.22
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.38
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.50
-├── 20240918_v0.10.12_allsky_nsb_tuning_0.81
-├── 20240918_v0.10.12_allsky_nsb_tuning_1.25
-├── 20240918_v0.10.12_allsky_nsb_tuning_1.76
-├── 20240918_v0.10.12_allsky_nsb_tuning_2.34
-│   └── TestingDataset
-│   ├── Gamma
-│   │   ├── dec_2276
-│   │   ├── dec_3476
-│   │   ├── dec_4822
-│   │   ├── dec_6166
-│   │   ├── dec_6676
-│   │   ├── dec_931
-│   │   ├── dec_min_1802
-│   │   ├── dec_min_2924
-│   │   └── dec_min_413
-│   └── GammaDiffuse
-│        ├── dec_2276
-│        ├── dec_3476
-│        ├── dec_4822
-│        ├── dec_6166
-│   	 ├── dec_6676
-│   	 ├── dec_931
-│   	 ├── dec_min_1802
-│   	 ├── dec_min_2924
-│   	 └── dec_min_413
-
 /fefs/aswg/data/models/AllSky
 ├── 20240918_v0.10.12_allsky_nsb_tuning_0.00
 ├── 20240918_v0.10.12_allsky_nsb_tuning_0.07
@@ -88,3 +55,5 @@ Finale tree structures for trained models and IRFs are the following:
 ├── 20240918_v0.10.12_allsky_nsb_tuning_1.76
 ├── 20240918_v0.10.12_allsky_nsb_tuning_2.34
 ```
+
+Please **DO NOT** use IRFs under `/fefs/aswg/data/IRFs/AllSky/20240918_v0.10.12_allsky_nsb_tuning_*` but refer to production 20250212_v0.10.17_allsky_interp_dl2_irfs for the correct IRFs to use for data analysis.
