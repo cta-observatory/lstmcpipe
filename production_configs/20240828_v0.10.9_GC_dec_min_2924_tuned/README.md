@@ -2,6 +2,7 @@
 
 ## Description of the config
 
+```
 "image_modifier": {
     "increase_nsb": true,
     "extra_noise_in_dim_pixels": 2.98,
@@ -9,6 +10,7 @@
     "transition_charge": 8,
     "extra_noise_in_bright_pixels": 3.989
     }
+```
 
 ## lstchain_tune_nsb command
 
