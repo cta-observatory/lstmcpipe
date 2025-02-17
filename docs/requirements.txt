@@ -1,4 +1,5 @@
 GitPython
+markdown
 myst_parser
 nbsphinx
 sphinx
@@ -9,4 +10,3 @@ sphinx-book-theme
 sphinxcontrib-autoprogram
 sphinxcontrib-napoleon
 sphinxcontrib-mermaid
-tabulate
