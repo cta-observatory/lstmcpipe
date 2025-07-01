@@ -84,38 +84,44 @@
         "threshold": 267,
         "fraction_cleaning_intensity": 0.03
     },
+    "random_forest_weight_settings": {
+        "pointing_wise_weights": true
+    },
+    "random_forest_zd_interpolation": {
+        "interpolate_energy": true,
+        "interpolate_gammaness": true,
+        "interpolate_direction": true
+    },
     "random_forest_energy_regressor_args": {
         "max_depth": 30,
         "min_samples_leaf": 10,
         "n_jobs": -1,
-        "n_estimators": 150,
+        "n_estimators": 50,
         "bootstrap": true,
         "criterion": "squared_error",
-        "max_features": "auto",
+        "max_features": 1.0,
         "max_leaf_nodes": null,
         "min_impurity_decrease": 0.0,
         "min_samples_split": 10,
         "min_weight_fraction_leaf": 0.0,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0,
         "warm_start": false
     },
     "random_forest_disp_regressor_args": {
         "max_depth": 30,
         "min_samples_leaf": 10,
         "n_jobs": -1,
-        "n_estimators": 150,
+        "n_estimators": 50,
         "bootstrap": true,
         "criterion": "squared_error",
-        "max_features": "auto",
+        "max_features": 1.0,
         "max_leaf_nodes": null,
         "min_impurity_decrease": 0.0,
         "min_samples_split": 10,
         "min_weight_fraction_leaf": 0.0,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0,
         "warm_start": false
     },
     "random_forest_disp_classifier_args": {
@@ -126,13 +132,12 @@
         "criterion": "gini",
         "min_samples_split": 10,
         "min_weight_fraction_leaf": 0.0,
-        "max_features": "auto",
+        "max_features": 1.0,
         "max_leaf_nodes": null,
         "min_impurity_decrease": 0.0,
         "bootstrap": true,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0.0,
         "warm_start": false,
         "class_weight": null
     },
@@ -144,13 +149,12 @@
         "criterion": "gini",
         "min_samples_split": 10,
         "min_weight_fraction_leaf": 0.0,
-        "max_features": "auto",
+        "max_features": 1.0,
         "max_leaf_nodes": null,
         "min_impurity_decrease": 0.0,
         "bootstrap": true,
         "oob_score": false,
         "random_state": 42,
-        "verbose": 0.0,
         "warm_start": false,
         "class_weight": null
     },
@@ -164,7 +168,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "sin_az_tel",
+        "alt_tel"
     ],
     "disp_method": "disp_norm_sign",
     "disp_regression_features": [
@@ -175,7 +181,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "sin_az_tel",
+        "alt_tel"
     ],
     "disp_classification_features": [
         "log_intensity",
@@ -185,7 +193,9 @@
         "skewness",
         "kurtosis",
         "time_gradient",
-        "leakage_intensity_width_2"
+        "leakage_intensity_width_2",
+        "sin_az_tel",
+        "alt_tel"
     ],
     "particle_classification_features": [
         "log_intensity",
@@ -200,7 +210,9 @@
         "leakage_intensity_width_2",
         "log_reco_energy",
         "reco_disp_norm",
-        "reco_disp_sign"
+        "reco_disp_sign",
+        "sin_az_tel",
+        "alt_tel"
     ],
     "allowed_tels": [
         1
@@ -238,6 +250,10 @@
     "calibration_product": "LSTCalibrationCalculator",
     "LSTCalibrationCalculator": {
         "systematic_correction_path": null,
+        "npe_median_cut_outliers": [
+            -5,
+            5
+        ],
         "squared_excess_noise_factor": 1.222,
         "flatfield_product": "FlasherFlatFieldCalculator",
         "pedestal_product": "PedestalIntegrator",
@@ -269,8 +285,8 @@
             "time_sampling_correction_path": null,
             "charge_product": "LocalPeakWindowSum",
             "charge_median_cut_outliers": [
-                -0.5,
-                0.5
+                -0.9,
+                2
             ],
             "charge_std_cut_outliers": [
                 -10,
@@ -289,21 +305,34 @@
     },
     "waveform_nsb_tuning": {
         "nsb_tuning": true,
-        "nsb_tuning_ratio": 0.81,
-        "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
+        "nsb_tuning_rate_GHz": 0.81,
+        "spe_location": null,
+        "pre_computed_multiplicity": 10
+    },
+    "write_interleaved_events": {
+        "DataWriter": {
+            "overwrite": true,
+            "write_images": false,
+            "write_parameters": false,
+            "write_waveforms": true,
+            "transform_waveform": true,
+            "waveform_dtype": "uint16",
+            "waveform_offset": 400,
+            "waveform_scale": 80
+        }
     },
     "EventSelector": {
         "filters": {
-          "intensity": [50, Infinity],
-          "width": [0, Infinity],
-          "length": [0, Infinity],
-          "r": [0, 1],
-          "wl": [0.01, 1],
-          "leakage_intensity_width_2": [0, 1],
-          "event_type": [32, 32]
+            "intensity": [50, Infinity],
+            "width": [0, Infinity],
+            "length": [0, Infinity],
+            "r": [0, 1],
+            "wl": [0.01, 1],
+            "leakage_intensity_width_2": [0, 1],
+            "event_type": [32, 32]
         }
-      },
-      "DL3Cuts": {
+    },
+    "DL3Cuts": {
         "min_event_p_en_bin": 100,
         "global_gh_cut": 0.7,
         "gh_efficiency": 0.7,
@@ -319,9 +348,11 @@
         "min_alpha_cut": 1,
         "max_alpha_cut": 20,
         "fill_alpha_cut": 20,
-        "allowed_tels": [1]
-      },
-      "DataBinning": {
+        "allowed_tels": [
+            1
+        ]
+    },
+    "DataBinning": {
         "true_energy_min": 0.005,
         "true_energy_max": 500,
         "true_energy_n_bins": 25,
@@ -341,5 +372,5 @@
         "source_offset_min": 0,
         "source_offset_max": 1,
         "source_offset_n_edges": 101
-      }
+    }
 }
