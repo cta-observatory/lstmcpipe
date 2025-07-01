@@ -5,7 +5,7 @@ See issue https://github.com/cta-observatory/cta-lstchain/issues/1366
 
 
 Here we only do the training and testing again.
-Configs generated with `make.sh`
+Configs generated with `make.sh`. lstchain version in configs changed manually to v0.11.0
 
 author: Thomas V.
 

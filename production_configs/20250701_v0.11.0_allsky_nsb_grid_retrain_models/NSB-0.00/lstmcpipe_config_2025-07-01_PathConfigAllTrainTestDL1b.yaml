@@ -7,7 +7,7 @@ prod_id: 20250701_v0.11.0_allsky_models_nsb_0.00
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.10.7
+  conda_env: lstchain-v0.11.0
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
