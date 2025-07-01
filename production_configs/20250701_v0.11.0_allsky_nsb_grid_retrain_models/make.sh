@@ -20,7 +20,7 @@ NSB_LEVELS=(
 
 # Define the common lstmcpipe_generate_config command parts
 DEC_LIST="dec_2276 dec_3476 dec_4822 dec_6166 dec_6676 dec_931 dec_min_1802 dec_min_2924 dec_min_413"
-LSTMCPIPE_COMMAND_BASE="lstmcpipe_generate_config PathConfigAllTrainTestDL1b --dec_list $DEC_LIST --prod_id 20250601_v0.11.0_allsky_models_nsb_X.XX --kwargs source_prod_id=PROD_ID --overwrite"
+LSTMCPIPE_COMMAND_BASE="lstmcpipe_generate_config PathConfigAllTrainTestDL1b --dec_list $DEC_LIST --prod_id 20250701_v0.11.0_allsky_models_nsb_X.XX --kwargs source_prod_id=PROD_ID --overwrite"
 
 # Loop through each NSB level
 for nsb_level in "${NSB_LEVELS[@]}"; do
