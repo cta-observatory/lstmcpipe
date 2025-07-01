@@ -288,8 +288,8 @@
         }
     },
     "waveform_nsb_tuning": {
-        "nsb_tuning": false,
-        "nsb_tuning_ratio": 0.52,
+        "nsb_tuning": true,
+        "nsb_tuning_ratio": 0.22,
         "spe_location": "lstchain/data/SinglePhE_ResponseInPhE_expo2Gaus.dat"
     }
 }
