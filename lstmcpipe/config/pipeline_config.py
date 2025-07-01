@@ -45,6 +45,28 @@ def load_config(config_path):
     return config
 
 
+def _stage_validator(stage_config, stage_name=None):
+    """
+    Validate the stage configuration.
+
+    Parameters:
+    -----------
+    stage_config: dict
+        Dictionary with the stage configuration
+
+    Returns:
+    --------
+    True if the stage configuration is valid
+    """
+    for ii, step in enumerate(stage_config):
+        if 'input' not in step:
+            raise ValueError(f"The 'input' key is missing in the step {ii} of stage {stage_name}.")
+        if 'output' not in step:
+            raise ValueError(f"The 'output' key is missing in the step {ii} of stage {stage_name}.")
+    print(f"Stage {stage_name} configuration is valid.")
+    return True
+
+
 def config_valid(loaded_config):
     """
     Test if the given dictionary contains valid values for the
@@ -89,6 +111,13 @@ def config_valid(loaded_config):
     for stage in stages_to_run:
         if stage not in loaded_config['stages']:
             raise KeyError(f"Missing paths for stage {stage} provided in stages_to_run")
+
+    for stage_name, stage_config in loaded_config['stages'].items():
+        if stage_name not in stages_to_run:
+            log.warning(f"Stage {stage_name} is not in stages_to_run, it will be ignored.")
+            continue
+        if not _stage_validator(stage_config, stage_name=stage_name):
+            raise ValueError(f"Invalid configuration for stage {stage_name}")
 
     dl1_noise_tune_data_run = loaded_config.get("dl1_noise_tune_data_run")
     dl1_noise_tune_mc_run = loaded_config.get("dl1_noise_tune_mc_run")
