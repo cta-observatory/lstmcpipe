@@ -4,7 +4,7 @@ prod_id: 20250616_v0.11.0_LZA_investigation
 
 source_environment:
   source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
-  conda_env: lstchain-v0.11.3
+  conda_env: lstchain-v0.11.0
 
 slurm_config:
 # dpps is the default account for lstanalyzer - other users should use aswg
@@ -30,14 +30,14 @@ stages:
   merge_dl1:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Summer/node_corsika_theta_68.068_az_231.243_
     output: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Summer/dl1_20250616_v0.11.0_LZA_investigation_summer_nsb_tuning_0.00_test_node_corsika_theta_68.068_az_231.243_GammaDiffuse_merged.h5
-    options: --pattern */*.h5 --no-image
+    options: --pattern *.h5 --no-image
     extra_slurm_options:
       partition: long
       time: 06:00:00
       nice: 10
   - input: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Winter/node_corsika_theta_68.068_az_231.243_
     output: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Winter/dl1_20250616_v0.11.0_LZA_investigation_winter_nsb_tuning_0.00_test_node_corsika_theta_68.068_az_231.243_GammaDiffuse_merged.h5
-    options: --pattern */*.h5 --no-image
+    options: --pattern *.h5 --no-image
     extra_slurm_options:
       partition: long
       time: 06:00:00
@@ -45,14 +45,14 @@ stages:
   dl1_to_dl2:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Summer/dl1_20250616_v0.11.0_LZA_investigation_winter_nsb_tuning_0.00_test_node_corsika_theta_68.068_az_231.243_GammaDiffuse_merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.00/dec_931
-    output: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Summer/dec_931/
+    output: /fefs/aswg/data/mc/DL2/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Summer/dec_931/
     extra_slurm_options:
       mem: 80GB
       partition: short
       nice: 10
   - input: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Winter/dl1_20250616_v0.11.0_LZA_investigation_winter_nsb_tuning_0.00_test_node_corsika_theta_68.068_az_231.243_GammaDiffuse_merged.h5
     path_model: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.00/dec_931
-    output: /fefs/aswg/data/mc/DL1/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Winter/dec_931/
+    output: /fefs/aswg/data/mc/DL2/AllSky/20250616_v0.11.0_LZA_investigation/TestingDataset/GammaDiffuse/Winter/dec_931/
     extra_slurm_options:
       mem: 80GB
       partition: short
