@@ -1,7 +1,7 @@
 lstMCpipe
 =========
 
-|code| |documentation| |slack| |CI| |coverage| |conda| |pypi| |zenodo| |fair|
+|code| |documentation| |slack| |CI| |coverage| |conda| |pypi| |zenodo| |fair| |fairsoftwarechecklist|
 
 .. |code| image:: https://img.shields.io/badge/lstmcpipe-code-green
   :target: https://github.com/cta-observatory/lstmcpipe/
@@ -21,6 +21,9 @@ lstMCpipe
    :target: https://fair-software.eu
 .. |slack| image:: https://img.shields.io/badge/CTA_North_slack-lstmcpipe_prods_channel-darkgreen?logo=slack&link=https%3A%2F%2Fcta-north.slack.com%2Farchives%2FC035H3C2HAS
    :alt: Static Badge
+.. |fairsoftwarechecklist| image:: https://fairsoftwarechecklist.net/badge.svg
+   :target: https://fairsoftwarechecklist.net/v0.2?f=21&a=32113&i=32300&r=133
+   :alt: FAIR checklist badge
 
 
 
