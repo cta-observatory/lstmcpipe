@@ -47,11 +47,13 @@ def main():
     # lstchain takes the output dir and constructs filenanmes itself
     with open(file_for_this_job, "r") as filelist:
         for file in filelist:
-            file = Path(file.strip("\n"))
+            file = file.strip("\n")
 
-            cmd = [
+            cmd = ["cta-data", "get", file, ";"]
+
+            cmd += [
                 "lstchain_mc_r0_to_dl1",
-                f"--input-file={file}",
+                f"--input-file={file.split('/')[-1]}",
                 f"--output-dir={args.output_dir}",
             ]
             if args.config_file:
