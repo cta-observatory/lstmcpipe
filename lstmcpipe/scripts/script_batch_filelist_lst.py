@@ -50,9 +50,12 @@ def main():
             file = file.strip("\n")
             filename = Path(file).name
 
-            cmd = ["cta-data", "get", file, ";"]
+            print("Downloading file: ", file)
+            cmd = ["cta-data", "get", file]
+            rerun_cmd(cmd, filename, max_ntry=2)
 
-            cmd += [
+            print("Processing file: ", filename)
+            cmd = [
                 "lstchain_mc_r0_to_dl1",
                 f"--input-file={filename}",
                 f"--output-dir={args.output_dir}",
@@ -62,6 +65,9 @@ def main():
 
             outfile = args.output_dir.joinpath('dl1_' + filename.replace('.simtel.gz', '.h5')).as_posix()
             rerun_cmd(cmd, outfile, max_ntry=2)
+            if Path(outfile).is_file():
+                print(f"Removing input file: {filename}")
+                Path(filename).unlink()
 
 
 if __name__ == "__main__":
