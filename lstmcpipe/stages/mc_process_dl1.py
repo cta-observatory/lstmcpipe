@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 from ..utils import save_log_to_file, SbatchLstMCStage
 from ..io.data_management import check_data_path, get_input_filelist
+from ..io.cscs import list_simtel_files_in_dir
 
 log = logging.getLogger(__name__)
 
@@ -151,7 +152,8 @@ def r0_to_dl1(
         jobtype_id = ''
         log.critical("Please, select an allowed workflow kind.")
         exit(-1)
-    raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
+    # raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
+    raw_files_list = list_simtel_files_in_dir(input_dir)
     dl1_files_per_job = 20 if len(raw_files_list) < 50 else 50
     with open("r0_to_dl1.list", "w+") as newfile:
         for f in raw_files_list:
