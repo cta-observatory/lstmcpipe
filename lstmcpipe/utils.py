@@ -139,8 +139,18 @@ def rerun_cmd(cmd, outfile, max_ntry=2, failed_jobs_dir=prod_logs/"failed_output
     for ntry in range(1, max_ntry + 1):
         result = sp.run(cmd, **run_kwargs, capture_output=True, text=True, check=False)
 
+        # Check if command succeeded and output file is valid
         if result.returncode == 0:
-            return ntry  # Success, return the number of tries it took
+            # Verify output file exists and is not empty
+            if outfile.exists() and outfile.stat().st_size > 0:
+                return ntry  # Success, return the number of tries it took
+            else:
+                # File is missing or empty, treat as failure
+                if outfile.exists():
+                    print(f"Try #{ntry} - output file {outfile} is empty, treating as failed")
+                else:
+                    print(f"Try #{ntry} - output file {outfile} does not exist, treating as failed")
+                result.returncode = 1  # Force failure for the error handling below
 
         # Command failed, handle the error
         if outfile.exists():
