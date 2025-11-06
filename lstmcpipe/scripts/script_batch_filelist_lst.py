@@ -48,18 +48,19 @@ def main():
     with open(file_for_this_job, "r") as filelist:
         for file in filelist:
             file = file.strip("\n")
+            filename = Path(file).name
 
             cmd = ["cta-data", "get", file, ";"]
 
             cmd += [
                 "lstchain_mc_r0_to_dl1",
-                f"--input-file={file.split('/')[-1]}",
+                f"--input-file={filename}",
                 f"--output-dir={args.output_dir}",
             ]
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            outfile = args.output_dir.joinpath('dl1_' + file.name.replace('.simtel.gz', '.h5')).as_posix()
+            outfile = args.output_dir.joinpath('dl1_' + filename.replace('.simtel.gz', '.h5')).as_posix()
             rerun_cmd(cmd, outfile, max_ntry=2)
 
 
