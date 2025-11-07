@@ -201,43 +201,31 @@ def list_dl2_files_in_dir(directory):
 
 
 @ensure_agent_running
-def get_file(remote_path, local_path):
+def get_file(remote_path):
     """
-    Download a file from dCache to local path with automatic caching.
+    Download a file from dCache to SCRATCH cache.
     
     First checks if the file exists in the SCRATCH cache. If found and valid,
-    uses the cached version. Otherwise, downloads from dCache and caches it.
+    returns the cached path. Otherwise, downloads from dCache and caches it.
 
     Parameters
     ----------
     remote_path: str
         path to the file on dCache
-    local_path: str
-        path to save the file locally
-    use_cache: bool, optional
-        If True (default), check cache before downloading
-    force_download: bool, optional
-        If True, bypass cache and force re-download (default: False)
         
     Returns
     -------
     str
-        Path to the downloaded file (either from cache or freshly downloaded)
+        Path to the file in SCRATCH cache
     """
-    local_path = Path(local_path)
     cache_path = _remote_to_cache_path(remote_path)
     
     # Check if file is already in cache
     if _is_cached_file_valid(cache_path):
-        log.info(f"Cache HIT: Using cached file from {cache_path}")
-        # Copy from cache to requested local path if different
-        if cache_path != local_path:
-            _ensure_cache_dir(local_path)
-            import shutil
-            shutil.copy2(cache_path, local_path)
-        return str(local_path)
+        log.info(f"Cache HIT: Using cached file at {cache_path}")
+        return str(cache_path)
     
-    # Cache MISS - download to cache first
+    # Cache MISS - download to cache
     log.info(f"Cache MISS: Downloading {remote_path} to cache")
     _ensure_cache_dir(cache_path)
     
@@ -248,14 +236,8 @@ def get_file(remote_path, local_path):
         if not _is_cached_file_valid(cache_path):
             raise RuntimeError(f"Downloaded file {cache_path} is invalid (empty or missing)")
         
-        # Copy from cache to requested local path if different
-        if cache_path != local_path:
-            _ensure_cache_dir(local_path)
-            import shutil
-            shutil.copy2(cache_path, local_path)
-        
-        log.info(f"Successfully cached and saved to {local_path}")
-        return str(local_path)
+        log.info(f"Successfully cached at {cache_path}")
+        return str(cache_path)
     
     except Exception as e:
         log.error(f"Failed to download {remote_path}: {e}")
@@ -266,60 +248,40 @@ def get_file(remote_path, local_path):
 
 
 @ensure_agent_running
-def get_dir(remote_dir, local_dir):
+def get_dir(remote_dir):
     """
-    Download all files from a remote directory to a local directory with caching.
+    Download all files from a remote directory to SCRATCH cache.
     
-    First checks if files exist in the SCRATCH cache. Downloads only missing files.
+    First checks if directory exists in the SCRATCH cache. Downloads only if missing.
 
     Parameters
     ----------
     remote_dir: str
         path to the remote directory on dCache
-    local_dir: str
-        path to the local directory
-    force_download: bool, optional
-        If True, bypass cache and force re-download (default: False)
         
     Returns
     -------
     str
-        Path to the local directory
+        Path to the cached directory in SCRATCH
     """
-    local_dir = Path(local_dir)
     cache_dir = _remote_to_cache_path(remote_dir)
     
     # Check if directory is already cached
     if cache_dir.exists() and cache_dir.is_dir():
         cached_files = list(cache_dir.rglob("*"))
         if cached_files:
-            log.info(f"Cache HIT: Using cached directory from {cache_dir}")
-            # Copy from cache to requested local directory
-            if cache_dir != local_dir:
-                import shutil
-                _ensure_cache_dir(local_dir)
-                if local_dir.exists():
-                    shutil.rmtree(local_dir)
-                shutil.copytree(cache_dir, local_dir)
-            return str(local_dir)
+            log.info(f"Cache HIT: Using cached directory at {cache_dir}")
+            return str(cache_dir)
     
-    # Cache MISS - download to cache first
+    # Cache MISS - download to cache
     log.info(f"Cache MISS: Downloading directory {remote_dir} to cache")
     _ensure_cache_dir(cache_dir)
     
     try:
         ctadata.fetch_and_save_dir(remote_dir, save_to_fn=str(cache_dir), recursive=True)
         
-        # Copy from cache to requested local directory if different
-        if cache_dir != local_dir:
-            import shutil
-            _ensure_cache_dir(local_dir)
-            if local_dir.exists():
-                shutil.rmtree(local_dir)
-            shutil.copytree(cache_dir, local_dir)
-        
-        log.info(f"Successfully cached and saved directory to {local_dir}")
-        return str(local_dir)
+        log.info(f"Successfully cached directory at {cache_dir}")
+        return str(cache_dir)
     
     except Exception as e:
         log.error(f"Failed to download directory {remote_dir}: {e}")
