@@ -153,7 +153,7 @@ def complete_lstmcpipe_config(loaded_config):
     # Parse source environment correctly
     src_env = (
         f"source {loaded_config['source_environment']['source_file']}; "
-        f"conda activate {loaded_config['source_environment']['conda_env']}; "
+        f"micromamba activate {loaded_config['source_environment']['conda_env']}; "
     )
     # 1 - Parse slurm user config account
     slurm_account = loaded_config.get("slurm_config", {}).get("user_account", "")
