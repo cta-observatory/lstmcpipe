@@ -386,31 +386,38 @@ class SbatchLstMCStage:
 
     @property
     def dl1ab_default_options(self):
-        return {'job-name': 'dl1ab', 'array': '0-0%100', 'partition': 'long'}
+        # return {'job-name': 'dl1ab', 'array': '0-0%100', 'partition': 'long'}
+        return {'job-name': 'dl1ab', 'array': '0-0%100'}
 
     @property
     def merge_dl1_default_options(self):
-        return {'job-name': 'merge', 'partition': 'long'}
+        # return {'job-name': 'merge', 'partition': 'long'}
+        return {'job-name': 'merge'}
 
     @property
     def train_test_splitting_default_options(self):
-        return {'job-name': 'train_test_split', 'partition': 'short'}
+        # return {'job-name': 'train_test_split', 'partition': 'short'}
+        return {'job-name': 'train_test_split'}
 
     @property
     def trainpipe_default_options(self):
-        return {'job-name': 'train_pipe', 'partition': 'xxl', 'mem': '100GB', 'cpus-per-task': 16}
+        # return {'job-name': 'train_pipe', 'partition': 'xxl', 'mem': '100GB', 'cpus-per-task': 16}
+        return {'job-name': 'train_pipe', 'mem': '100GB', 'cpus-per-task': 16}
 
     @property
     def train_plot_rf_feat_default_options(self):
-        return {'job-name': 'RF_importance', 'partition': 'short', 'mem': '16GB'}
+        # return {'job-name': 'RF_importance', 'partition': 'short', 'mem': '16GB'}
+        return {'job-name': 'RF_importance', 'mem': '16GB'}
 
     @property
     def dl1_dl2_default_options(self):
-        return {'job-name': 'dl1_dl2', 'partition': 'short', 'mem': '32GB'}
+        # return {'job-name': 'dl1_dl2', 'partition': 'short', 'mem': '32GB'}
+        return {'job-name': 'dl1_dl2', 'mem': '32GB'}
 
     @property
     def dl2_irfs_default_options(self):
-        return {'job-name': 'dl2_irfs', 'partition': 'short'}
+        # return {'job-name': 'dl2_irfs', 'partition': 'short'}
+        return {'job-name': 'dl2_irfs'}
 
     @property
     def dl2_sens_default_options(self):
@@ -418,4 +425,5 @@ class SbatchLstMCStage:
 
     @property
     def dl2_sens_plot_default_options(self):
-        return {'job-name': 'dl2_sens_plot', 'partition': 'short'}
+        # return {'job-name': 'dl2_sens_plot', 'partition': 'short'}
+        return {'job-name': 'dl2_sens_plot'}

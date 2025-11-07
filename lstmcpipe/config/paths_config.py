@@ -651,7 +651,8 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
                     'input': dl1,
                     'output': merged_dl1,
                     'options': '--pattern */*.h5 --no-image',
-                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                    # 'extra_slurm_options': {'partition': 'long', 'time': '8:00:00'}
+                    'extra_slurm_options': {'time': '8:00:00'}
                 }
             )
         return paths
@@ -708,7 +709,8 @@ class PathConfigAllSkyTrainingWithSplit(PathConfigAllSkyTraining):
                     'input': dl1,
                     'output': merged_dl1,
                     'options': f'--pattern {pattern} --no-image',
-                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                    # 'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                    'extra_slurm_options': {'time': '06:00:00'},
                 }
             )
         return paths
@@ -915,7 +917,8 @@ class PathConfigAllSkyTestingGammaDiffuse(PathConfigAllSkyTesting):
                     'input': dl1, 
                     'output': merged_dl1, 
                     'options': '--pattern */*.h5 --no-image',
-                    'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                    # 'extra_slurm_options': {'partition': 'long', 'time': '06:00:00'},
+                    'extra_slurm_options': {'time': '06:00:00'},
                 }
             )
         return paths

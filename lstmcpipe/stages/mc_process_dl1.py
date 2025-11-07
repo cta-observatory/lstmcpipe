@@ -333,7 +333,8 @@ def submit_dl1_jobs(
 
     sublist_names = [f.as_posix() for f in Path(job_logs_dir).glob("*.sublist")]
     cmd = f'{base_cmd} -f {" ".join(sublist_names)} --output_dir {output_dir}'
-    extra_slurm_default_options = {'partition': 'long', 'array': f"0-{len(sublist_names) - 1}%{n_jobs_parallel}"}
+    # extra_slurm_default_options = {'partition': 'long', 'array': f"0-{len(sublist_names) - 1}%{n_jobs_parallel}"}
+    extra_slurm_default_options = {'array': f"0-{len(sublist_names) - 1}%{n_jobs_parallel}"}
 
     if extra_slurm_options is not None:
         extra_slurm_default_options.update(extra_slurm_options)
