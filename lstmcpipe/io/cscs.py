@@ -20,7 +20,7 @@ CACHE_ROOT = Path(os.environ.get("SCRATCH", "/tmp")) / "lstmcpipe_cache"
 CACHE_ROOT.mkdir(parents=True, exist_ok=True)
 
 
-def _remote_to_cache_path(remote_path):
+def remote_to_cache_path(remote_path):
     """
     Convert a remote dCache path to a local cache path.
     
@@ -218,7 +218,7 @@ def get_file(remote_path):
     str
         Path to the file in SCRATCH cache
     """
-    cache_path = _remote_to_cache_path(remote_path)
+    cache_path = remote_to_cache_path(remote_path)
     
     # Check if file is already in cache
     if _is_cached_file_valid(cache_path):
@@ -264,7 +264,7 @@ def get_dir(remote_dir):
     str
         Path to the cached directory in SCRATCH
     """
-    cache_dir = _remote_to_cache_path(remote_dir)
+    cache_dir = remote_to_cache_path(remote_dir)
     
     # Check if directory is already cached
     if cache_dir.exists() and cache_dir.is_dir():
@@ -319,7 +319,7 @@ def clear_cache(remote_path=None):
         return False
     else:
         # Clear specific path
-        cache_path = _remote_to_cache_path(remote_path)
+        cache_path = remote_to_cache_path(remote_path)
         if cache_path.exists():
             log.info(f"Clearing cache for {remote_path}")
             if cache_path.is_file():
@@ -401,7 +401,7 @@ def put_file(local_path, remote_path, update_cache=True):
         
         # Update cache if requested
         if update_cache:
-            cache_path = _remote_to_cache_path(remote_path)
+            cache_path = remote_to_cache_path(remote_path)
             _ensure_cache_dir(cache_path)
             import shutil
             shutil.copy2(local_path, cache_path)
@@ -448,7 +448,7 @@ def put_dir(local_dir, remote_dir, update_cache=True):
         
         # Update cache if requested
         if update_cache:
-            cache_dir = _remote_to_cache_path(remote_dir)
+            cache_dir = remote_to_cache_path(remote_dir)
             _ensure_cache_dir(cache_dir)
             import shutil
             if cache_dir.exists():

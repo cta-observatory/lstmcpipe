@@ -52,22 +52,25 @@ def main():
             filename = Path(file).name
 
             print("Downloading file: ", file)
-            cscs.get_file(file, filename)
+            local_file = cscs.get_file(file)
+            output_dir = cscs.remote_to_cache_path(args.output_dir.as_posix())
 
             print("Processing file: ", filename)
             cmd = [
                 "lstchain_mc_r0_to_dl1",
-                f"--input-file={filename}",
-                f"--output-dir={args.output_dir}",
+                f"--input-file={local_file}",
+                f"--output-dir={output_dir}",
             ]
             if args.config_file:
                 cmd.append("--config={}".format(args.config_file))
 
-            outfile = args.output_dir.joinpath('dl1_' + filename.replace('.simtel.gz', '.h5')).as_posix()
+            outfile = output_dir.joinpath('dl1_' + filename.replace('.simtel.gz', '.h5')).as_posix()
             rerun_cmd(cmd, outfile, max_ntry=2)
-            if Path(outfile).is_file():
-                print(f"Removing input file: {filename}")
-                Path(filename).unlink()
+            # if Path(outfile).is_file():
+            #     print(f"Removing input file: {filename}")
+            #     Path(filename).unlink()
+
+            # TODO: put output file to dCache
 
 
 if __name__ == "__main__":

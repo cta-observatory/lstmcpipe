@@ -5,6 +5,7 @@ from os import environ
 from os.path import basename
 from pathlib import Path
 from lstmcpipe.utils import rerun_cmd
+from lstmcpipe.io import cscs
 
 
 def main():
@@ -50,11 +51,12 @@ def main():
     with open(file_for_this_job, "r") as filelist:
         for file in filelist:
             file = file.strip("\n")
-            output = args.output_dir.joinpath(basename(file))
+            local_file = cscs.get_file(file)
+            output = args.output_dir.joinpath(basename(local_file))
             cmd = [
                 "lstchain_dl1ab",
                 "--no-image",
-                f"--input-file={file}",
+                f"--input-file={local_file}",
                 f"--output-file={output}",
             ]
             if args.config_file:
