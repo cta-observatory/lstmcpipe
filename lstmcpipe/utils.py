@@ -323,7 +323,8 @@ class SbatchLstMCStage:
         if self.stage not in self._valid_stages:
             raise ValueError(f"Please select a valid stage: \n{', '.join(self._valid_stages)}")
 
-        default_options = {'partition': 'short'}
+        # default_options = {'partition': 'short'}
+        default_options = {}
 
         stage_options_dict = {
             "r0_to_dl1": getattr(self, "r0_dl1_default_options"),
