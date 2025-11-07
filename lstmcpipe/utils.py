@@ -381,7 +381,8 @@ class SbatchLstMCStage:
 
     @property
     def r0_dl1_default_options(self):
-        return {'job-name': 'r0_dl1', 'partition': 'long', 'array': '0-0%100'}
+        # return {'job-name': 'r0_dl1', 'partition': 'long', 'array': '0-0%100'}
+        return {'job-name': 'r0_dl1', 'array': '0-0%100'}
 
     @property
     def dl1ab_default_options(self):
