@@ -21,7 +21,7 @@ def start_agent():
     Start the CTA data agent if not already running
     """
     api = APIClient(dev_instance=False)
-    api.start_agent_daemon()
+    api.init_agent()
 
 
 @ensure_agent_running
