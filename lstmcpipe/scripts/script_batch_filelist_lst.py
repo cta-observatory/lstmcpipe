@@ -4,6 +4,7 @@ import argparse
 from os import environ
 from pathlib import Path
 from lstmcpipe.utils import rerun_cmd
+from lstmcpipe.io import cscs
 
 def main():
     parser = argparse.ArgumentParser(
@@ -51,8 +52,7 @@ def main():
             filename = Path(file).name
 
             print("Downloading file: ", file)
-            cmd = ["cta-data", "get", file]
-            rerun_cmd(cmd, filename, max_ntry=2)
+            cscs.get_file(file, filename)
 
             print("Processing file: ", filename)
             cmd = [
