@@ -5,7 +5,7 @@ import sys
 import shutil
 from pathlib import Path
 from distutils.util import strtobool
-
+from . import cscs
 
 def query_yes_no(question, default="yes"):
     """
@@ -77,10 +77,12 @@ def check_data_path(data_path, glob=None):
     glob: str
         Glob pattern to be passed
     """
-    if not Path(data_path).exists():
-        raise ValueError(f"The input directory {data_path} must exist")
-    if not get_input_filelist(data_path, glob_pattern=glob):
+    if cscs.list_files_in_dir(data_path, pattern=glob) == []:
         raise ValueError(f"The input directory {data_path} is empty")
+    # if not Path(data_path).exists():
+    #     raise ValueError(f"The input directory {data_path} must exist")
+    # if not get_input_filelist(data_path, glob_pattern=glob):
+    #     raise ValueError(f"The input directory {data_path} is empty")
 
 
 def get_input_filelist(data_path, glob_pattern=None):
