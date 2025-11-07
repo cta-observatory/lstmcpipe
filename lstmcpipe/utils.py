@@ -102,6 +102,7 @@ def batch_mc_production_check(
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += f" --dependency=afterok:{all_pipeline_jobs} -J prod_check" f' --wrap="{source_env} {cmd_wrap}"'
 
+    print(batch_cmd)
     jobid = os.popen(batch_cmd).read().strip("\n")
     log.info(f"Submitted batch CHECK-job {jobid}")
     debug_log[f"prod_check_{jobid}"] = batch_cmd
