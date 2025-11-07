@@ -97,7 +97,7 @@ def batch_mc_production_check(
         f"mv slurm-* IRFFITSWriter.provenance.log {log_directory.absolute().as_posix()} "
     )
 
-    batch_cmd = "sbatch -p short --parsable"
+    batch_cmd = "sbatch --parsable"  # -p short
     if slurm_account != "":
         batch_cmd += f" -A {slurm_account}"
     batch_cmd += f" --dependency=afterok:{all_pipeline_jobs} -J prod_check" f' --wrap="{source_env} {cmd_wrap}"'
