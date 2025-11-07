@@ -1,7 +1,7 @@
 import ctadata
 import fnmatch
 from functools import wraps
-from ctadata.api_client import APIClient
+from ctadata.api import APIClient
 
 
 def ensure_agent_running(func):
