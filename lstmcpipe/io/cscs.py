@@ -4,6 +4,10 @@ from functools import wraps
 from ctadata.api import APIClient
 
 
+api = APIClient(dev_instance=False)
+api.token_update_interval = 360000
+api.init_agent()
+
 def ensure_agent_running(func):
     """
     Decorator to ensure the ctadata agent is running before executing a function.
@@ -11,7 +15,8 @@ def ensure_agent_running(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        start_agent()
+        # start_agent()
+        pass
         return func(*args, **kwargs)
     return wrapper
 
