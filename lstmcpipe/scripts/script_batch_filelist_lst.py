@@ -55,7 +55,7 @@ def main():
             local_file = cscs.get_file(file)
             output_dir = cscs.remote_to_cache_path(args.output_dir.as_posix())
 
-            print("Processing file: ", filename)
+            print(f"Processing file: {local_file} to output dir: {output_dir}")
             cmd = [
                 "lstchain_mc_r0_to_dl1",
                 f"--input-file={local_file}",
