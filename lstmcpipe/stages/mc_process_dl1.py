@@ -152,15 +152,16 @@ def r0_to_dl1(
         jobtype_id = ''
         log.critical("Please, select an allowed workflow kind.")
         exit(-1)
-    # raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
-    raw_files_list = cscs.list_simtel_files_in_dir(input_dir)
+    raw_files_list = get_input_filelist(input_dir, glob_pattern="*.simtel.gz")
+    # raw_files_list = cscs.list_simtel_files_in_dir(input_dir)
     dl1_files_per_job = 20 if len(raw_files_list) < 50 else 50
     with open("r0_to_dl1.list", "w+") as newfile:
         for f in raw_files_list:
             newfile.write(f)
             newfile.write("\n")
     log.info(f"{len(raw_files_list)} raw R0 files")
-    output_dir = Path(cscs.remote_to_cache_path(output_dir))
+    # output_dir = Path(cscs.remote_to_cache_path(output_dir))
+    output_dir = Path(output_dir)
     if output_dir.exists() and any(output_dir.iterdir()):
         shutil.rmtree(output_dir)
     job_logs_dir = output_dir.joinpath("job_logs_r0dl1")
