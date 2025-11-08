@@ -25,11 +25,12 @@ def remote_to_cache_path(remote_path):
     Convert a remote dCache path to a local cache path.
     
     Removes leading slashes and preserves the directory structure.
+    If the path already starts with CACHE_ROOT, returns it as-is to avoid duplication.
     
     Parameters
     ----------
     remote_path : str
-        Remote path on dCache
+        Remote path on dCache or local path
         
     Returns
     -------
@@ -38,11 +39,24 @@ def remote_to_cache_path(remote_path):
         
     Examples
     --------
-    >>> _remote_to_cache_path("/dCache/prod5/simtel/run_001.h5")
+    >>> remote_to_cache_path("/dCache/prod5/simtel/run_001.h5")
+    Path("$SCRATCH/lstmcpipe_cache/dCache/prod5/simtel/run_001.h5")
+    >>> remote_to_cache_path("$SCRATCH/lstmcpipe_cache/dCache/prod5/simtel/run_001.h5")
     Path("$SCRATCH/lstmcpipe_cache/dCache/prod5/simtel/run_001.h5")
     """
+    remote_path = Path(remote_path)
+    
+    # Check if path already starts with CACHE_ROOT to avoid duplication
+    try:
+        remote_path.relative_to(CACHE_ROOT)
+        # Path is already within CACHE_ROOT, return as-is
+        return remote_path
+    except ValueError:
+        # Path is not within CACHE_ROOT, convert it
+        pass
+    
     # Remove leading slashes to make path relative
-    relative_path = remote_path.lstrip("/")
+    relative_path = str(remote_path).lstrip("/")
     return CACHE_ROOT / relative_path
 
 

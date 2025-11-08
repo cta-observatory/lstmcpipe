@@ -53,7 +53,8 @@ def main():
 
             print("Downloading file: ", file)
             local_file = cscs.get_file(file)
-            output_dir = cscs.remote_to_cache_path(args.output_dir.as_posix())
+            # output_dir = cscs.remote_to_cache_path(args.output_dir.as_posix())
+            output_dir = args.output_dir
 
             print(f"Processing file: {local_file} to output dir: {output_dir}")
             cmd = [
