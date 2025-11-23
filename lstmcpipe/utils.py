@@ -270,6 +270,8 @@ class SbatchLstMCStage:
             "dl2_to_irfs",
             "dl2_sens",
             "dl2_sens_plot",
+            "dcache_download",
+            "dcache_upload",
         ]
 
     def compose_wrap_command(self, wrap_command=None, source_env="", backend=""):
@@ -325,6 +327,8 @@ class SbatchLstMCStage:
             "dl2_to_irfs": getattr(self, "dl2_irfs_default_options"),
             "dl2_sens": getattr(self, "dl2_sens_default_options"),
             "dl2_sens_plot": getattr(self, "dl2_sens_plot_default_options"),
+            "dcache_download": getattr(self, "dcache_download_default_options"),
+            "dcache_upload": getattr(self, "dcache_upload_default_options"),
         }
 
         default_options.update(stage_options_dict[stage])
@@ -407,3 +411,11 @@ class SbatchLstMCStage:
     @property
     def dl2_sens_plot_default_options(self):
         return {'job-name': 'dl2_sens_plot', 'partition': 'short'}
+
+    @property
+    def dcache_download_default_options(self):
+        return {'job-name': 'dcache_download', 'partition': 'short'}
+
+    @property
+    def dcache_upload_default_options(self):
+        return {'job-name': 'dcache_upload', 'partition': 'short'}
