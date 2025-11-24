@@ -3,13 +3,15 @@
 
 import pytest
 import subprocess
-import pkg_resources
+from importlib.metadata import entry_points
 
 
 def find_entry_points(package_name):
     """from: https://stackoverflow.com/a/47383763/3838691"""
     entrypoints = [
-        ep.name for ep in pkg_resources.iter_entry_points("console_scripts") if ep.module_name.startswith(package_name)
+        ep.name
+        for ep in entry_points(group="console_scripts")
+        if ep.module.startswith(package_name)
     ]
     return entrypoints
 
