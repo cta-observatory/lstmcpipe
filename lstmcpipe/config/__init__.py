@@ -1,6 +1,6 @@
 import os
 from shutil import which
-import pkg_resources
+from importlib.resources import files
 from ruamel.yaml import YAML
 
 from .pipeline_config import load_config
@@ -18,5 +18,5 @@ def export_env(outdir="."):
 
 
 def base_config():
-    base_config_path = pkg_resources.resource_filename('lstmcpipe', 'base_config_lstmcpipe.yaml')
-    return YAML().load(open(base_config_path).read())
+    base_config_path = files('lstmcpipe').joinpath('base_config_lstmcpipe.yaml')
+    return YAML().load(base_config_path.read_text())
