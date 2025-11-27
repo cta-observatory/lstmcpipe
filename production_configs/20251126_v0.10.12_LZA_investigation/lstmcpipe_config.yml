@@ -1,0 +1,40 @@
+workflow_kind: lstchain
+
+prod_id: 20251126_v0.10.12_LZA_investigation
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.10.12
+
+slurm_config:
+# dpps is the default account for lstanalyzer - other users should use aswg
+  user_account: dpps
+lstmcpipe_version: 0.11.3
+prod_type: PathConfigAllSkyFullSplitDiffuse
+stages_to_run:
+- r0_to_dl1
+- merge_dl1
+- dl1_to_dl2
+stages:
+  r0_to_dl1:
+  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_6166/sim_telarray/node_corsika_theta_60.66_az_32.517_/output_v1.4/
+    output: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/node_corsika_theta_60.66_az_32.517_
+    extra_slurm_options:
+      time: 11:30:00
+      nice: 10
+  merge_dl1:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/node_corsika_theta_60.66_az_32.517_
+    output: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dl1_20251126_v0.10.12_LZA_investigation_nsb_tuning_0.00_test_node_corsika_theta_60.66_az_32.517_GammaDiffuse_merged.h5
+    options: --pattern *.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+      nice: 10
+  dl1_to_dl2:
+  - input: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dl1_20251126_v0.10.12_LZA_investigation_nsb_tuning_0.00_test_node_corsika_theta_60.66_az_32.517_GammaDiffuse_merged.h5
+    path_model: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.00/dec_6676
+    output: /fefs/aswg/data/mc/DL2/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dec_6676/
+    extra_slurm_options:
+      mem: 80GB
+      partition: short
+      nice: 10
