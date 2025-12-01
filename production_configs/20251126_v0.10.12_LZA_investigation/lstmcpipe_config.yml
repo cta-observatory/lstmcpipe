@@ -17,7 +17,7 @@ stages_to_run:
 - dl1_to_dl2
 stages:
   r0_to_dl1:
-  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_6166/sim_telarray/node_corsika_theta_60.66_az_32.517_/output_v1.4/
+  - input: /fefs/aswg/data/mc/DL0/LSTProd2/TestDataset/seasonal_variations/std_Winter/sim_telarray/node_corsika_theta_60.66_az_32.517_/output
     output: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/node_corsika_theta_60.66_az_32.517_
     extra_slurm_options:
       time: 11:30:00
