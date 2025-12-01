@@ -32,8 +32,8 @@ stages:
       nice: 10
   dl1_to_dl2:
   - input: /fefs/aswg/data/mc/DL1/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dl1_20251126_v0.10.12_LZA_investigation_nsb_tuning_0.00_test_node_corsika_theta_60.66_az_32.517_GammaDiffuse_merged.h5
-    path_model: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.00/dec_6676
-    output: /fefs/aswg/data/mc/DL2/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dec_6676/
+    path_model: /fefs/aswg/data/models/AllSky/20240918_v0.10.12_allsky_nsb_tuning_0.00/dec_6166
+    output: /fefs/aswg/data/mc/DL2/AllSky/20251126_v0.10.12_LZA_investigation/TestingDataset/GammaDiffuse/dec_6166/
     extra_slurm_options:
       mem: 80GB
       partition: short
