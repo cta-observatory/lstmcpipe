@@ -32,5 +32,5 @@ jobs:
         conda activate ci
         pip install build
         pip install twine
-        python setup.py sdist
+        python -m build
         twine upload dist/* -u $TWINE_USERNAME -p $TWINE_PASSWORD

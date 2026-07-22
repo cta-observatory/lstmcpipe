@@ -4,7 +4,20 @@ import os
 import sys
 import shutil
 from pathlib import Path
-from distutils.util import strtobool
+
+_TRUE_VALUES = {"y", "yes", "t", "true", "on", "1"}
+_FALSE_VALUES = {"n", "no", "f", "false", "off", "0"}
+
+
+def strtobool(val):
+    """Convert a string representation of truth to True or False, like the removed distutils.util.strtobool."""
+    val = val.lower()
+    if val in _TRUE_VALUES:
+        return True
+    elif val in _FALSE_VALUES:
+        return False
+    else:
+        raise ValueError(f"invalid truth value {val!r}")
 
 
 def query_yes_no(question, default="yes"):
