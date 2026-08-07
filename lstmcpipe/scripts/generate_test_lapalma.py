@@ -13,33 +13,33 @@ from lstmcpipe.config import paths_config
 from lstmcpipe.utils import dump_lstchain_std_config
 
 
-def generate_tree(base_dir, working_dir, nfiles):
+def generate_tree(prod_dir, working_dir, nfiles):
     """
     Walk the base dir looking for simtels files
     When a directory contains simtels files, it's tree structure is duplicated into the working dir
     and nfiles are symlinked there
     """
-    base_dir = Path(base_dir)
+    prod_dir = Path(prod_dir)
     working_dir = Path(working_dir)
 
-    for root, dirs, files in tqdm(os.walk(base_dir)):
+    for root, dirs, files in tqdm(os.walk(prod_dir)):
         simtel_files = [os.path.join(root, file) for file in files if file.endswith('.simtel.gz')]
         if simtel_files:
             for file in simtel_files[:nfiles]:
-                target = working_dir.joinpath(Path(file).relative_to(base_dir))
+                target = working_dir.joinpath(Path(file).relative_to(prod_dir))
                 target.parent.mkdir(parents=True, exist_ok=True)
                 if not target.exists():
                     target.symlink_to(file)
 
 
 def generate_test_prod5trans80(working_dir, nfiles=5, path_to_config_file='.', overwrite=True):
-    base_dir = '/fefs/aswg/workspace/lstmcpipe/data/test_data/mc/DL0/20200629_prod5_trans_80/'
+    prod_dir = '/fefs/aswg/workspace/lstmcpipe/data/test_data/mc/DL0/20200629_prod5_trans_80/'
     working_dir = os.path.join(working_dir, 'DL0/20200629_prod5_trans_80/')
 
-    generate_tree(base_dir, working_dir, nfiles)
+    generate_tree(prod_dir, working_dir, nfiles)
 
     pc = paths_config.PathConfigProd5Trans80(f'test_prod_{date.today()}')
-    pc.base_dir = os.path.join(
+    pc.prod_dir = os.path.join(
         working_dir, '{data_level}/20200629_prod5_trans_80/{particle}/{zenith}/south_pointing/{prod_id}'
     )
     pc.generate()
@@ -53,12 +53,12 @@ def generate_test_allsky(
     decs=['dec_4822', 'dec_931'],
     overwrite=True,
 ):
-    allsky_base_dir = '/fefs/aswg/data/mc/'
-    allsky_train_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
-    # allsky_test_base_dir = os.path.join(allsky_base_dir, 'DL0/LSTProd2/')
+    allsky_prod_dir = '/fefs/aswg/data/mc/'
+    allsky_train_prod_dir = os.path.join(allsky_prod_dir, 'DL0/LSTProd2/')
+    # allsky_test_prod_dir = os.path.join(allsky_prod_dir, 'DL0/LSTProd2/')
     # working_dir_dl0 = os.path.join(working_dir, 'DL0/LSTProd2/')
 
-    generate_tree(allsky_train_base_dir, working_dir, nfiles)
+    generate_tree(allsky_train_prod_dir, working_dir, nfiles)
 
     pc = paths_config.PathConfigAllSkyFull(f'test_prod_{date.today()}', decs)
     pcdl1ab = paths_config.PathConfigAllSkyFullDL1ab(
@@ -67,26 +67,26 @@ def generate_test_allsky(
 
     # config training dir are replaced with local ones
     for dec in decs:
-        pc.train_configs[dec].base_dir = pc.train_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
-        pc.train_configs[dec].base_dir = pc.train_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
-        pc.test_configs[dec].base_dir = pc.test_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
-        pc.test_configs[dec].base_dir = pc.test_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
-        pc.train_configs[dec].training_dir = pc.train_configs[dec].training_dir.replace(allsky_base_dir, working_dir)
-        pc.test_configs[dec].testing_dir = pc.test_configs[dec].testing_dir.replace(allsky_base_dir, working_dir)
+        pc.train_configs[dec].prod_dir = pc.train_configs[dec].prod_dir.replace(allsky_prod_dir, working_dir)
+        pc.train_configs[dec].prod_dir = pc.train_configs[dec].prod_dir.replace('AllSky', 'LSTProd2')
+        pc.test_configs[dec].prod_dir = pc.test_configs[dec].prod_dir.replace(allsky_prod_dir, working_dir)
+        pc.test_configs[dec].prod_dir = pc.test_configs[dec].prod_dir.replace('AllSky', 'LSTProd2')
+        pc.train_configs[dec].training_dir = pc.train_configs[dec].training_dir.replace(allsky_prod_dir, working_dir)
+        pc.test_configs[dec].testing_dir = pc.test_configs[dec].testing_dir.replace(allsky_prod_dir, working_dir)
 
-        pcdl1ab.train_configs[dec].base_dir = pcdl1ab.train_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.train_configs[dec].base_dir = pcdl1ab.train_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
-        pcdl1ab.train_configs[dec].source_config.base_dir = pcdl1ab.train_configs[dec].source_config.base_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.train_configs[dec].source_config.base_dir = pcdl1ab.train_configs[dec].source_config.base_dir.replace('AllSky', 'LSTProd2')
-        pcdl1ab.test_configs[dec].base_dir = pcdl1ab.test_configs[dec].base_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.test_configs[dec].base_dir = pcdl1ab.test_configs[dec].base_dir.replace('AllSky', 'LSTProd2')
-        pcdl1ab.test_configs[dec].source_config.base_dir = pcdl1ab.test_configs[dec].source_config.base_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.test_configs[dec].source_config.base_dir = pcdl1ab.test_configs[dec].source_config.base_dir.replace('AllSky', 'LSTProd2')
-        pcdl1ab.train_configs[dec].training_dir = pcdl1ab.train_configs[dec].training_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.train_configs[dec].source_config.training_dir = pcdl1ab.train_configs[dec].source_config.training_dir.replace(allsky_base_dir, working_dir)
+        pcdl1ab.train_configs[dec].prod_dir = pcdl1ab.train_configs[dec].prod_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.train_configs[dec].prod_dir = pcdl1ab.train_configs[dec].prod_dir.replace('AllSky', 'LSTProd2')
+        pcdl1ab.train_configs[dec].source_config.prod_dir = pcdl1ab.train_configs[dec].source_config.prod_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.train_configs[dec].source_config.prod_dir = pcdl1ab.train_configs[dec].source_config.prod_dir.replace('AllSky', 'LSTProd2')
+        pcdl1ab.test_configs[dec].prod_dir = pcdl1ab.test_configs[dec].prod_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.test_configs[dec].prod_dir = pcdl1ab.test_configs[dec].prod_dir.replace('AllSky', 'LSTProd2')
+        pcdl1ab.test_configs[dec].source_config.prod_dir = pcdl1ab.test_configs[dec].source_config.prod_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.test_configs[dec].source_config.prod_dir = pcdl1ab.test_configs[dec].source_config.prod_dir.replace('AllSky', 'LSTProd2')
+        pcdl1ab.train_configs[dec].training_dir = pcdl1ab.train_configs[dec].training_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.train_configs[dec].source_config.training_dir = pcdl1ab.train_configs[dec].source_config.training_dir.replace(allsky_prod_dir, working_dir)
         
-        pcdl1ab.test_configs[dec].testing_dir =  pcdl1ab.test_configs[dec].testing_dir.replace(allsky_base_dir, working_dir)
-        pcdl1ab.test_configs[dec].source_config.testing_dir = pcdl1ab.test_configs[dec].source_config.testing_dir.replace(allsky_base_dir, working_dir)
+        pcdl1ab.test_configs[dec].testing_dir =  pcdl1ab.test_configs[dec].testing_dir.replace(allsky_prod_dir, working_dir)
+        pcdl1ab.test_configs[dec].source_config.testing_dir = pcdl1ab.test_configs[dec].source_config.testing_dir.replace(allsky_prod_dir, working_dir)
                 
     
     pc.generate()

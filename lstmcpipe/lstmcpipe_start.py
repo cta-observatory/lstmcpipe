@@ -37,7 +37,10 @@ from lstmcpipe.stages import (
     batch_dl1_to_dl2,
     batch_dl2_to_irfs,
     batch_dl2_to_sensitivity,
+    batch_dl2_to_sensitivity,
     batch_plot_rf_features,
+    batch_dcache_download,
+    batch_dcache_upload,
 )
 
 
@@ -145,6 +148,38 @@ def main():
     # Create log files and log directory
     logs_files, scancel_file, logs_dir = create_log_files(prod_id)
     all_job_ids = {}
+    
+    # 0 STAGE --> dCache download
+    if "dcache_download" in stages_to_run:
+        from lstmcpipe.io.data_management import query_yes_no
+        
+        # Check if files exist
+        # We assume the config structure for dcache_download is a list of steps
+        # Each step has 'output' directory
+        already_exists = False
+        for step in lstmcpipe_config["stages"]["dcache_download"]:
+             out_path = Path(step["output"])
+             if out_path.exists() and out_path.is_dir() and any(out_path.iterdir()):
+                 already_exists = True
+                 break
+        
+        should_download = True
+        if already_exists:
+            should_download = query_yes_no("Data seems to be already downloaded. Download again?", default="no")
+            
+        if should_download:
+            jobs_from_dcache_download = batch_dcache_download(
+                lstmcpipe_config,
+                batch_config=batch_config,
+                logs=logs_files,
+            )
+            update_scancel_file(scancel_file, jobs_from_dcache_download)
+            all_job_ids.update({"dcache_download": jobs_from_dcache_download})
+        else:
+            jobs_from_dcache_download = None
+            log.info("Skipping dCache download stage as requested by user")
+    else:
+        jobs_from_dcache_download = None
 
     # 1 STAGE --> R0/1 to DL1 or reprocessing of existing dl1a files
     r0_to_dl1 = "r0_to_dl1" in stages_to_run
@@ -289,7 +324,30 @@ def main():
         )
 
         update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
+        update_scancel_file(scancel_file, jobs_from_dl2_sensitivity)
         all_job_ids.update({"dl2_to_sensitivity": jobs_from_dl2_sensitivity})
+
+    # 7 STAGE --> dCache upload
+    if "dcache_upload" in stages_to_run:
+        # We wait for the last stage to finish
+        # Determine the last job ids to wait for
+        last_jobs = None
+        if jobs_from_dl2_sensitivity:
+            last_jobs = jobs_from_dl2_sensitivity
+        elif jobs_from_dl2_irf:
+            last_jobs = jobs_from_dl2_irf
+        elif jobs_from_dl1_dl2:
+            last_jobs = jobs_from_dl1_dl2
+        # Add more if needed
+        
+        jobs_from_dcache_upload = batch_dcache_upload(
+            lstmcpipe_config,
+            batch_config=batch_config,
+            logs=logs_files,
+            jobid_dependencies=last_jobs,
+        )
+        update_scancel_file(scancel_file, jobs_from_dcache_upload)
+        all_job_ids.update({"dcache_upload": jobs_from_dcache_upload})
 
     # Check DL2 jobs and the full workflow if it has finished correctly
     jobid_check = batch_mc_production_check(

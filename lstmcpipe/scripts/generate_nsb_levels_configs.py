@@ -50,6 +50,13 @@ def build_argparser():
         ]
     )
 
+    parser.add_argument(
+        "--base_dir",
+        type=str,
+        help="Base directory for data storage (default: /fefs/aswg/data/mc)",
+        default=None,
+    )
+
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files.")
 
     return parser
@@ -147,6 +154,8 @@ def main():
         command.extend(args.dec_list)
         if args.overwrite:
             command.append("--overwrite")
+        if args.base_dir:
+            command.extend(["--base_dir", args.base_dir])
         subprocess.run(command, check=True)
         # Delete tmp_lstchain_config (the lstchain configs with nsb tuning are already dumped)
         subprocess.run(["rm", tmp_lstchain_config], check=True)

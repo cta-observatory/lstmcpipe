@@ -89,6 +89,13 @@ def build_argparser():
         help="optional kwargs for the requested config class. Use as: --kwargs option1=foo option2=bar",
     )
 
+    parser.add_argument(
+        "--base_dir",
+        type=str,
+        help="Base directory for data storage (default: /fefs/aswg/data/mc)",
+        default=None,
+    )
+
     return parser
 
 
@@ -109,6 +116,8 @@ def main():
         kwargs.update({"source_prod_id": args.source_prod_id})
     if args.kwargs:
         kwargs.update(args.kwargs)
+    if args.base_dir:
+        kwargs.update({"base_dir": args.base_dir})
 
     # we get the class from its name and instantiate it with the required args
     cfg = getattr(paths_config, args.config_class)(prod_id, **kwargs)
@@ -116,7 +125,6 @@ def main():
     cfg.save_yml(output, overwrite=args.overwrite)
 
     print(f"lstmcpipe config saved in {output}")
-
     lstchain_file = f"lstchain_config_{date.today()}.json" if args.lstchain_conf is None else args.lstchain_conf
 
     if "AllSky" in args.config_class:
