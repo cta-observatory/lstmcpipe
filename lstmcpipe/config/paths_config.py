@@ -203,15 +203,9 @@ class PathConfigProd5Trans80(PathConfig):
     def merge_dl1(self):
         paths = []
         for particle in self.training_particles:
-            if particle == 'gamma':
-                for offset in self.point_src_offsets:
-                    train = self.train_dir(particle)
-                    output_file = self.merge_output_file(particle=particle, step='train', gamma_src_offset=offset)
-                    paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
-            else:
-                train = self.train_dir(particle)
-                output_file = self.merge_output_file(particle=particle, step='train')
-                paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
+            train = self.train_dir(particle)
+            output_file = self.merge_output_file(particle=particle, step='train')
+            paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
 
         for particle in self.testing_particles:
             if particle == 'gamma':
@@ -548,7 +542,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
         Returns
         -------
-        'astropy.table.QTable`
+        None. The pointings are stored in self._training_pointings as a QTable with columns: alt, az, dirname_{particle}
     
         """
         tabs = {}
@@ -598,7 +592,6 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
         Parameters
         ----------
-        pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
@@ -746,7 +739,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
         Returns
         -------
-        'astropy.table.QTable`
+        None. The pointings are stored in self._training_pointings as a QTable with columns: alt, az, dirname_{particle}
         """
         data = []
         for d in self._search_pointings():
@@ -778,7 +771,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
         Parameters
         ----------
-        pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
@@ -1215,7 +1207,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
                 # the output from merging must exist to train  the model
                 source_dl1 = Path(path['output'])
                 if not source_dl1.exists():
-                    warnings.warn(f"{source_dl1} does not exist" f"This training will be removed from production.")
+                    warnings.warn(f"{source_dl1} does not exist. This training will be removed from production.")
                     dec_to_remove.append(dec)
 
         self.dec_list = [dec for dec in self.dec_list if dec not in dec_to_remove]
