@@ -857,7 +857,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return os.path.join(self.dl2_dir(pointing), filename)
 
     def irf_output_file(self, pointing):
-        filename =  os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{self.particle}_{self.dec}_{pointing}.fits.gz')
+        filename = f'irf_{self.prod_id}_{self.particle}_{self.dec}_{pointing}.fits.gz'
         return os.path.join(self.irf_dir(pointing), filename)
 
     @property
@@ -1062,7 +1062,8 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
                         f"This node will be removed from production."
                     )
                     marked_for_removal.append(pidx)
-        self._training_pointings.remove_rows(pidx)
+        # a node may be missing for several particles, hence the set
+        self._training_pointings.remove_rows(sorted(set(marked_for_removal)))
 
     @property
     def dl1ab(self):
@@ -1165,7 +1166,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
         Note that in of source-dependent analysis,
         missing src-dep parameters are recomputed on the fly during the train stage by lstchain.
         """
-        super().__init__(prod_id, source_prod_id, dec_list)
+        super().__init__(prod_id, source_prod_id, dec_list, run_checker=run_checker)
         self.dec_list = dec_list
         self.source_prod_id = source_prod_id
         self.source_configs = PathConfigAllSkyFullDL1ab(
@@ -1217,7 +1218,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
                     warnings.warn(f"{source_dl1} does not exist" f"This training will be removed from production.")
                     dec_to_remove.append(dec)
 
-        self.dec_list = list(set(self.dec_list) - set(dec_to_remove))
+        self.dec_list = [dec for dec in self.dec_list if dec not in dec_to_remove]
 
 
 class PathConfigAllSkyFullSplitDiffuse(PathConfigAllSkyFull):
