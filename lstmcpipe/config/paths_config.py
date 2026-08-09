@@ -203,15 +203,9 @@ class PathConfigProd5Trans80(PathConfig):
     def merge_dl1(self):
         paths = []
         for particle in self.training_particles:
-            if particle == 'gamma':
-                for offset in self.point_src_offsets:
-                    train = self.train_dir(particle)
-                    output_file = self.merge_output_file(particle=particle, step='train', gamma_src_offset=offset)
-                    paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
-            else:
-                train = self.train_dir(particle)
-                output_file = self.merge_output_file(particle=particle, step='train')
-                paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
+            train = self.train_dir(particle)
+            output_file = self.merge_output_file(particle=particle, step='train')
+            paths.append({'input': train, 'output': output_file, 'options': '--no-image'})
 
         for particle in self.testing_particles:
             if particle == 'gamma':
@@ -548,7 +542,7 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
         Returns
         -------
-        'astropy.table.QTable`
+        None. The pointings are stored in self._training_pointings as a QTable with columns: alt, az, dirname_{particle}
     
         """
         tabs = {}
@@ -598,7 +592,6 @@ class PathConfigAllSkyTraining(PathConfigAllSkyBase):
 
         Parameters
         ----------
-        pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
@@ -746,7 +739,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
         Returns
         -------
-        'astropy.table.QTable`
+        None. The pointings are stored in self._training_pointings as a QTable with columns: alt, az, dirname_{particle}
         """
         data = []
         for d in self._search_pointings():
@@ -778,7 +771,6 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
 
         Parameters
         ----------
-        pointings: 2D array of `astropy.quantities` or numpy array in rad
         ax : `matplotlib.pyplot.Axis`
         projection: str or None
             '3d' | 'aitoff' | 'hammer' | 'lambert' | 'mollweide' | 'polar' | 'rectilinear'
@@ -857,7 +849,7 @@ class PathConfigAllSkyTesting(PathConfigAllSkyBase):
         return os.path.join(self.dl2_dir(pointing), filename)
 
     def irf_output_file(self, pointing):
-        filename =  os.path.join(self.irf_dir(pointing), f'irf_{self.prod_id}_{self.particle}_{self.dec}_{pointing}.fits.gz')
+        filename = f'irf_{self.prod_id}_{self.particle}_{self.dec}_{pointing}.fits.gz'
         return os.path.join(self.irf_dir(pointing), filename)
 
     @property
@@ -1062,7 +1054,8 @@ class PathConfigAllSkyTrainingDL1ab(PathConfigAllSkyTraining):
                         f"This node will be removed from production."
                     )
                     marked_for_removal.append(pidx)
-        self._training_pointings.remove_rows(pidx)
+        # a node may be missing for several particles, hence the set
+        self._training_pointings.remove_rows(sorted(set(marked_for_removal)))
 
     @property
     def dl1ab(self):
@@ -1165,7 +1158,7 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
         Note that in of source-dependent analysis,
         missing src-dep parameters are recomputed on the fly during the train stage by lstchain.
         """
-        super().__init__(prod_id, source_prod_id, dec_list)
+        super().__init__(prod_id, source_prod_id, dec_list, run_checker=run_checker)
         self.dec_list = dec_list
         self.source_prod_id = source_prod_id
         self.source_configs = PathConfigAllSkyFullDL1ab(
@@ -1214,10 +1207,10 @@ class PathConfigAllTrainTestDL1b(PathConfigAllSkyFullDL1ab):
                 # the output from merging must exist to train  the model
                 source_dl1 = Path(path['output'])
                 if not source_dl1.exists():
-                    warnings.warn(f"{source_dl1} does not exist" f"This training will be removed from production.")
+                    warnings.warn(f"{source_dl1} does not exist. This training will be removed from production.")
                     dec_to_remove.append(dec)
 
-        self.dec_list = list(set(self.dec_list) - set(dec_to_remove))
+        self.dec_list = [dec for dec in self.dec_list if dec not in dec_to_remove]
 
 
 class PathConfigAllSkyFullSplitDiffuse(PathConfigAllSkyFull):
