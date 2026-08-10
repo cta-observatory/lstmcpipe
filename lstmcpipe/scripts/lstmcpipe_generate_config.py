@@ -38,6 +38,28 @@ def list_config_classes():
     return all_attrs
 
 
+def is_allsky_config(config_class):
+    """
+    Tell if a `lstmcpipe.config.paths_config.PathConfig` class describes an AllSky production.
+
+    The pointing dependent RF features (`alt_tel`, `sin_az_tel`) are only meaningful for AllSky productions,
+    so this drives the lstchain config that is dumped along with the lstmcpipe one.
+    It is based on the class inheritance and not on the class name, because not all the AllSky classes have
+    `AllSky` in their name (see `PathConfigAllTrainTestDL1b`).
+
+    Parameters
+    ----------
+    config_class: class
+        a class inheriting from `lstmcpipe.config.paths_config.PathConfig`
+
+    Returns
+    -------
+    bool
+    """
+    # PathConfigAllSkyFull inherits from PathConfig and not from PathConfigAllSkyBase, hence the two roots
+    return issubclass(config_class, (paths_config.PathConfigAllSkyBase, paths_config.PathConfigAllSkyFull))
+
+
 def build_argparser():
     parser = argparse.ArgumentParser(description="Generate a lstmcpipe config.")
 
@@ -99,6 +121,8 @@ def main():
     if not hasattr(paths_config, args.config_class):
         raise NotImplementedError(f"Config class {args.config_class} not implemented in lstmcpipe.config.paths_config")
 
+    config_class = getattr(paths_config, args.config_class)
+
     output = f"lstmcpipe_config_{date.today()}_{args.config_class}.yaml" if args.output is None else args.output
     prod_id = "prod_00" if args.prod_id is None else args.prod_id
 
@@ -110,8 +134,8 @@ def main():
     if args.kwargs:
         kwargs.update(args.kwargs)
 
-    # we get the class from its name and instantiate it with the required args
-    cfg = getattr(paths_config, args.config_class)(prod_id, **kwargs)
+    # we instantiate the class with the required args
+    cfg = config_class(prod_id, **kwargs)
     cfg.generate()
     cfg.save_yml(output, overwrite=args.overwrite)
 
@@ -119,10 +143,7 @@ def main():
 
     lstchain_file = f"lstchain_config_{date.today()}.json" if args.lstchain_conf is None else args.lstchain_conf
 
-    if "AllSky" in args.config_class:
-        allsky = True
-    else:
-        allsky = False
+    allsky = is_allsky_config(config_class)
     dump_lstchain_std_config(filename=lstchain_file, allsky=allsky, overwrite=args.overwrite)
     print(f"To start the process with dumped configs, run:\n\nlstmcpipe -c {output} -conf_lst {lstchain_file}\n\n")
 
