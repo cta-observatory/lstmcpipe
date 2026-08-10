@@ -180,7 +180,6 @@ def dump_lstchain_std_config(filename='lstchain_config.json', allsky=True, overw
             'disp_classification_features',
             'particle_classification_features',
         ]:
-            cfg[rf_feature] = std_cfg[rf_feature]
             for feature in ['alt_tel', 'az_tel', 'sin_az_tel']:
                 if feature in cfg[rf_feature]:
                     cfg[rf_feature].remove(feature)

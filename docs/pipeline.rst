@@ -107,12 +107,10 @@ Known pitfalls with the arguments
   ``--kwargs run_checker=False`` passes the *string* ``"False"``, which is truthy, and the checker still runs.
   To disable a checker, use the `Python API`_.
 
-* **The flavour of the generated lstchain config is decided from the class name.** If ``AllSky`` appears in the
-  class name, the standard AllSky lstchain MC config is dumped; otherwise the pointing-dependent RF features
-  (``alt_tel``, ``az_tel``, ``sin_az_tel``) are removed from it. Note that
-  ``PathConfigAllTrainTestDL1b`` does **not** contain ``AllSky`` in its name and therefore gets the
-  non-AllSky config: for an AllSky production, take the lstchain config of the source production, or dump one
-  with ``lstchain_dump_config --mc``.
+* **The flavour of the generated lstchain config depends on the config class.** For an AllSky production, the
+  standard lstchain MC config is dumped as is (the same one you would get from ``lstchain_dump_config --mc``).
+  For the prod3/prod5 pipelines, which have a fixed pointing, the pointing dependent RF features
+  (``alt_tel``, ``sin_az_tel``) are removed from it.
 
 * **--prod_id has a default.** Forgetting it silently produces a production called ``prod_00``.
 
@@ -681,12 +679,8 @@ At generation time, the merged training DL1 files of the source production are c
 A declination whose files are missing is **silently dropped** (with a warning) from the production: check the
 generated config contains all the declinations you asked for.
 
-.. warning::
-
-    The class name does not contain ``AllSky``, so the automatically dumped lstchain config is the
-    *non-AllSky* one, i.e. the pointing dependent RF features (``alt_tel``, ``az_tel``, ``sin_az_tel``) have
-    been removed. For an AllSky production, reuse the lstchain config of the source production instead, or
-    dump one with ``lstchain_dump_config --mc``.
+Since this production retrains models, consider reusing the lstchain config of the source production, so that
+only the training options you meant to change actually differ.
 
 
 .. _allsky-split-diffuse:
