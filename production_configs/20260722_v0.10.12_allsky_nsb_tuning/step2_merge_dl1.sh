@@ -1,0 +1,6 @@
+python step_2_gen_config_merge_dl1.py
+lstmcpipe -c lstmcpipe_merge_dl1_20260722_v0.10.12_allsky_nsb_tuning_0.07_dec_6166.yaml -conf_lst lstchain_config.json
+lstmcpipe -c lstmcpipe_merge_dl1_20260722_v0.10.12_allsky_nsb_tuning_0.14_dec_6166.yaml -conf_lst lstchain_config.json
+lstmcpipe -c lstmcpipe_merge_dl1_20260722_v0.10.12_allsky_nsb_tuning_0.22_dec_6166.yaml -conf_lst lstchain_config.json
+lstmcpipe -c lstmcpipe_merge_dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_dec_6166.yaml -conf_lst lstchain_config.json
+lstmcpipe -c lstmcpipe_merge_dl1_20260722_v0.10.12_allsky_nsb_tuning_0.50_dec_6166.yaml -conf_lst lstchain_config.json
