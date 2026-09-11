@@ -84,23 +84,4 @@ history:
   correct from-scratch definition now that both stages are confirmed
   complete.
 
-## history/
 
-Record of closing the initial testing gap (32-48 / 51 pointings) after the
-`path_model` fix above:
-
-- `lstmcpipe_config_20260722_test_nsbX_missing.yaml` (X = 0.07, 0.22, 0.38,
-  0.50) — configs trimmed to only the pointings missing on disk at the time.
-  0.07/0.22/0.38 were missing the same 19 pointings each (a systematic gap,
-  not random failures) and needed both `dl1_to_dl2` + `dl2_to_irfs`; 0.50
-  only needed 3 `dl2_to_irfs` at first.
-- `clean_partial_dl2.sh` — the first attempt at the 0.07 fill-in ran before
-  the `path_model` fix above and failed on a missing `reg_energy.sav`, but
-  still left a bogus small `.h5` per node. This script removed those before
-  the corrected `*_missing.yaml` could be re-run. Similarly, the 3 DL2 files
-  backing 0.50's missing IRFs turned out bad and were deleted manually, so
-  the 0.50 `_missing.yaml` was updated to redo `dl1_to_dl2` for those 3
-  pointings too, not just `dl2_to_irfs`.
-
-These are historical record only — not part of the reproducible pipeline in
-`run.sh`, which regenerates the full, complete configs directly.
