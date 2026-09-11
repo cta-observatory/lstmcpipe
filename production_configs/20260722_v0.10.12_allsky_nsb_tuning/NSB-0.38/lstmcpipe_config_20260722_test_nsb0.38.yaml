@@ -1,0 +1,1350 @@
+# lstmcpipe generated config from PathConfigAllSkyTestingGammaDiffuse - 2026-08-31
+
+workflow_kind: lstchain
+
+# prod_id ex: local_no_n_islands. Default; v00 (if key left empty or None)
+prod_id: 20260722_v0.10.12_allsky_nsb_tuning_0.38
+
+source_environment:
+  source_file: /fefs/aswg/software/conda/etc/profile.d/conda.sh
+  conda_env: lstchain-v0.12.3
+
+slurm_config:
+# dpps is the default account for lstanalyzer - other users should use aswg
+  user_account: dpps
+lstmcpipe_version: 0.11.5
+prod_type: PathConfigAllSkyTestingGammaDiffuse
+stages_to_run:
+# - merge_dl1
+- dl1_to_dl2
+- dl2_to_irfs
+stages:
+  merge_dl1:
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_75.522_az_26.462_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_26.462__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_75.522_az_333.538_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_333.538__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_74.336_az_27.273_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_27.273__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_74.336_az_332.727_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_332.727__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_73.142_az_28.021_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_28.021__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_73.142_az_331.979_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_331.979__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_71.94_az_28.709_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_28.709__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_71.94_az_331.291_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_331.291__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_70.732_az_29.341_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_29.341__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_70.732_az_330.659_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_330.659__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_69.512_az_29.92_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_29.92__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_69.512_az_330.08_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_330.08__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_68.284_az_30.445_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_30.445__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_68.284_az_329.555_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_329.555__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_67.045_az_30.92_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_30.92__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_67.045_az_329.08_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_329.08__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_65.796_az_31.344_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_31.344__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_65.796_az_328.656_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_328.656__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_64.533_az_31.717_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_31.717__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_64.533_az_328.283_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_328.283__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_63.255_az_32.039_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_32.039__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_63.255_az_327.961_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_327.961__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_62.749_az_32.15_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_32.15__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_62.749_az_327.85_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_327.85__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_61.965_az_32.306_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_32.306__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_61.965_az_327.694_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_327.694__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_60.66_az_32.517_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_32.517__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_60.66_az_327.483_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_327.483__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_59.336_az_32.671_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_32.671__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_59.336_az_327.329_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_327.329__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_58.286_az_32.748_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_32.748__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_58.286_az_327.252_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_327.252__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_56.633_az_32.786_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_32.786__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_56.633_az_327.214_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_327.214__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_55.944_az_32.77_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_32.77__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_55.944_az_327.23_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_327.23__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_53.795_az_32.599_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_32.599__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_53.795_az_327.401_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_327.401__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_49.374_az_31.575_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_31.575__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_49.374_az_328.425_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_328.425__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_45.141_az_29.518_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_29.518__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_45.141_az_330.482_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_330.482__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_41.244_az_26.248_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_26.248__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_41.244_az_333.752_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_333.752__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_37.861_az_21.6_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_21.6__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_37.861_az_338.4_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_338.4__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_35.204_az_15.508_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_15.508__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_35.204_az_344.492_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_344.492__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_33.491_az_8.14_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_8.14__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_33.491_az_351.86_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_351.86__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_32.896_az_0.0_
+    output: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_32.896_az_0.0__merged.h5
+    options: --pattern */*.h5 --no-image
+    extra_slurm_options:
+      partition: long
+      time: 06:00:00
+  dl1_to_dl2:
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_26.462__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_75.522_az_26.462_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_333.538__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_75.522_az_333.538_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_27.273__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_74.336_az_27.273_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_332.727__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_74.336_az_332.727_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_28.021__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_73.142_az_28.021_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_331.979__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_73.142_az_331.979_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_28.709__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_71.94_az_28.709_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_331.291__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_71.94_az_331.291_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_29.341__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_70.732_az_29.341_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_330.659__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_70.732_az_330.659_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_29.92__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_69.512_az_29.92_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_330.08__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_69.512_az_330.08_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_30.445__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_68.284_az_30.445_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_329.555__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_68.284_az_329.555_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_30.92__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_67.045_az_30.92_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_329.08__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_67.045_az_329.08_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_31.344__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_65.796_az_31.344_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_328.656__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_65.796_az_328.656_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_31.717__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_64.533_az_31.717_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_328.283__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_64.533_az_328.283_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_32.039__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_63.255_az_32.039_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_327.961__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_63.255_az_327.961_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_32.15__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_62.749_az_32.15_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_327.85__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_62.749_az_327.85_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_32.306__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_61.965_az_32.306_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_327.694__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_61.965_az_327.694_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_32.517__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_60.66_az_32.517_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_327.483__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_60.66_az_327.483_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_32.671__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_59.336_az_32.671_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_327.329__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_59.336_az_327.329_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_32.748__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_58.286_az_32.748_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_327.252__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_58.286_az_327.252_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_32.786__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_56.633_az_32.786_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_327.214__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_56.633_az_327.214_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_32.77__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_55.944_az_32.77_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_327.23__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_55.944_az_327.23_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_32.599__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_53.795_az_32.599_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_327.401__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_53.795_az_327.401_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_31.575__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_49.374_az_31.575_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_328.425__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_49.374_az_328.425_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_29.518__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_45.141_az_29.518_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_330.482__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_45.141_az_330.482_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_26.248__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_41.244_az_26.248_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_333.752__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_41.244_az_333.752_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_21.6__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_37.861_az_21.6_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_338.4__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_37.861_az_338.4_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_15.508__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_35.204_az_15.508_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_344.492__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_35.204_az_344.492_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_8.14__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_33.491_az_8.14_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_351.86__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_33.491_az_351.86_
+    extra_slurm_options:
+      mem: 60GB
+  - input: 
+      /fefs/aswg/data/mc/DL1/AllSky/20260722_v0.10.12_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/dl1_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_32.896_az_0.0__merged.h5
+    path_model: 
+      /fefs/aswg/data/models/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/dec_6166_high_density
+    output: 
+      /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_32.896_az_0.0_
+    extra_slurm_options:
+      mem: 60GB
+  dl2_to_irfs:
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_75.522_az_26.462_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_26.462__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_75.522_az_26.462_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_75.522_az_26.462_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_75.522_az_333.538_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_75.522_az_333.538__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_75.522_az_333.538_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_75.522_az_333.538_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_74.336_az_27.273_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_27.273__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_74.336_az_27.273_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_74.336_az_27.273_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_74.336_az_332.727_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_74.336_az_332.727__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_74.336_az_332.727_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_74.336_az_332.727_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_73.142_az_28.021_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_28.021__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_73.142_az_28.021_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_73.142_az_28.021_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_73.142_az_331.979_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_73.142_az_331.979__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_73.142_az_331.979_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_73.142_az_331.979_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_71.94_az_28.709_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_28.709__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_71.94_az_28.709_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_71.94_az_28.709_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_71.94_az_331.291_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_71.94_az_331.291__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_71.94_az_331.291_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_71.94_az_331.291_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_70.732_az_29.341_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_29.341__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_70.732_az_29.341_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_70.732_az_29.341_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_70.732_az_330.659_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_70.732_az_330.659__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_70.732_az_330.659_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_70.732_az_330.659_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_69.512_az_29.92_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_29.92__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_69.512_az_29.92_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_69.512_az_29.92_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_69.512_az_330.08_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_69.512_az_330.08__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_69.512_az_330.08_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_69.512_az_330.08_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_68.284_az_30.445_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_30.445__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_68.284_az_30.445_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_68.284_az_30.445_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_68.284_az_329.555_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_68.284_az_329.555__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_68.284_az_329.555_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_68.284_az_329.555_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_67.045_az_30.92_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_30.92__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_67.045_az_30.92_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_67.045_az_30.92_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_67.045_az_329.08_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_67.045_az_329.08__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_67.045_az_329.08_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_67.045_az_329.08_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_65.796_az_31.344_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_31.344__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_65.796_az_31.344_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_65.796_az_31.344_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_65.796_az_328.656_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_65.796_az_328.656__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_65.796_az_328.656_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_65.796_az_328.656_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_64.533_az_31.717_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_31.717__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_64.533_az_31.717_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_64.533_az_31.717_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_64.533_az_328.283_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_64.533_az_328.283__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_64.533_az_328.283_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_64.533_az_328.283_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_63.255_az_32.039_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_32.039__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_63.255_az_32.039_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_63.255_az_32.039_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_63.255_az_327.961_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_63.255_az_327.961__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_63.255_az_327.961_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_63.255_az_327.961_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_62.749_az_32.15_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_32.15__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_62.749_az_32.15_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_62.749_az_32.15_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_62.749_az_327.85_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_62.749_az_327.85__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_62.749_az_327.85_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_62.749_az_327.85_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_61.965_az_32.306_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_32.306__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_61.965_az_32.306_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_61.965_az_32.306_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_61.965_az_327.694_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_61.965_az_327.694__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_61.965_az_327.694_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_61.965_az_327.694_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_60.66_az_32.517_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_32.517__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_60.66_az_32.517_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_60.66_az_32.517_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_60.66_az_327.483_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_60.66_az_327.483__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_60.66_az_327.483_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_60.66_az_327.483_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_59.336_az_32.671_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_32.671__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_59.336_az_32.671_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_59.336_az_32.671_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_59.336_az_327.329_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_59.336_az_327.329__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_59.336_az_327.329_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_59.336_az_327.329_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_58.286_az_32.748_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_32.748__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_58.286_az_32.748_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_58.286_az_32.748_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_58.286_az_327.252_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_58.286_az_327.252__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_58.286_az_327.252_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_58.286_az_327.252_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_56.633_az_32.786_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_32.786__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_56.633_az_32.786_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_56.633_az_32.786_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_56.633_az_327.214_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_56.633_az_327.214__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_56.633_az_327.214_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_56.633_az_327.214_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_55.944_az_32.77_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_32.77__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_55.944_az_32.77_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_55.944_az_32.77_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_55.944_az_327.23_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_55.944_az_327.23__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_55.944_az_327.23_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_55.944_az_327.23_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_53.795_az_32.599_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_32.599__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_53.795_az_32.599_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_53.795_az_32.599_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_53.795_az_327.401_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_53.795_az_327.401__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_53.795_az_327.401_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_53.795_az_327.401_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_49.374_az_31.575_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_31.575__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_49.374_az_31.575_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_49.374_az_31.575_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_49.374_az_328.425_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_49.374_az_328.425__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_49.374_az_328.425_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_49.374_az_328.425_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_45.141_az_29.518_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_29.518__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_45.141_az_29.518_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_45.141_az_29.518_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_45.141_az_330.482_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_45.141_az_330.482__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_45.141_az_330.482_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_45.141_az_330.482_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_41.244_az_26.248_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_26.248__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_41.244_az_26.248_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_41.244_az_26.248_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_41.244_az_333.752_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_41.244_az_333.752__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_41.244_az_333.752_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_41.244_az_333.752_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_37.861_az_21.6_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_21.6__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_37.861_az_21.6_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_37.861_az_21.6_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_37.861_az_338.4_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_37.861_az_338.4__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_37.861_az_338.4_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_37.861_az_338.4_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_35.204_az_15.508_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_15.508__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_35.204_az_15.508_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_35.204_az_15.508_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_35.204_az_344.492_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_35.204_az_344.492__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_35.204_az_344.492_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_35.204_az_344.492_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_33.491_az_8.14_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_8.14__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_33.491_az_8.14_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_33.491_az_8.14_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_33.491_az_351.86_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_33.491_az_351.86__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_33.491_az_351.86_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_33.491_az_351.86_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
+  - input:
+      gamma_file: 
+        /fefs/aswg/data/mc/DL2/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_theta_32.896_az_0.0_/dl2_20260722_v0.10.12_allsky_nsb_tuning_0.38_GammaDiffuse_test_node_corsika_theta_32.896_az_0.0__merged.h5
+      proton_file:
+      electron_file:
+    output: 
+      /fefs/aswg/data/mc/IRF/AllSky/20260722_v0.12.3_allsky_nsb_tuning_0.38/TestingDataset/GammaDiffuse/dec_6166/node_corsika_theta_32.896_az_0.0_/irf_20260722_v0.12.3_allsky_nsb_tuning_0.38_GammaDiffuse_dec_6166_node_theta_32.896_az_0.0_.fits.gz
+    options: '--gh-efficiency 0.7 --theta-containment 0.7 --energy-dependent-gh --energy-dependent-theta '
+    extra_slurm_options:
+      mem: 6GB
