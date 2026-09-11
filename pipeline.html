@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pipelines &amp; configs generation &#8212; lstmcpipe 0.11.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="_static/documentation_options.js?v=0e61e42f"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'pipeline';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Find and display pointing nodes using lstmcpipe" href="examples/configs_pointings.html" />
+    <link rel="prev" title="Production list" href="productions.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">lstmcpipe 0.11.5 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="lstmcpipe_user_doc.html">Analyzers documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="productions.html">Production list</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Pipelines &amp; configs generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/configs_pointings.html">Find and display pointing nodes using lstmcpipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">lstmcpipe commands</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/lstmcpipe.html">lstmcpipe package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lstmcpipe.benchmarks.html">lstmcpipe.benchmarks package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/lstmcpipe.config.html">lstmcpipe.config package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lstmcpipe.config.tests.html">lstmcpipe.config.tests package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lstmcpipe.hiperta.html">lstmcpipe.hiperta package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/lstmcpipe.io.html">lstmcpipe.io package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lstmcpipe.io.tests.html">lstmcpipe.io.tests package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lstmcpipe.plots.html">lstmcpipe.plots package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/lstmcpipe.scripts.html">lstmcpipe.scripts package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lstmcpipe.scripts.tests.html">lstmcpipe.scripts.tests package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lstmcpipe.stages.html">lstmcpipe.stages package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lstmcpipe.tests.html">lstmcpipe.tests package</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/pipeline.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Pipelines & configs generation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-config-the-tools">Generating a config: the tools</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-arguments">Command line arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#known-pitfalls-with-the-arguments">Known pitfalls with the arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-run-it">Where to run it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#after-generation-what-to-check">After generation: what to check</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-api">Python API</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#which-config-class-should-i-use">Which config class should I use?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prod3-prod5-pipelines">Prod3 &amp; Prod5 pipelines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prod5-dl1ab">Prod5 DL1ab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#allsky-production-pipeline">AllSky production pipeline</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#r0-to-irfs">R0 to IRFs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dl1ab">DL1ab</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#retrain-and-apply-a-model">Retrain and apply a model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-gammadiffuse-to-produce-full-enclosure-irfs">Using GammaDiffuse to produce full-enclosure IRFs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-blocks-partial-and-per-declination-configs">Building blocks: partial and per-declination configs</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pipelines-configs-generation">
+<h1>Pipelines &amp; configs generation<a class="headerlink" href="#pipelines-configs-generation" title="Link to this heading">#</a></h1>
+<p>A <em>pipeline</em> is described by a <code class="docutils literal notranslate"><span class="pre">lstmcpipe</span></code> config file: the list of stages to run and, for each stage,
+the list of input and output paths.
+Writing all these paths by hand is error prone, so <code class="docutils literal notranslate"><span class="pre">lstmcpipe</span></code> ships one <code class="docutils literal notranslate"><span class="pre">PathConfig</span></code> class per supported
+pipeline (in <a class="reference internal" href="api/lstmcpipe.config.html#module-lstmcpipe.config.paths_config" title="lstmcpipe.config.paths_config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lstmcpipe.config.paths_config</span></code></a>) that knows where the MC data live on the cluster and builds
+the whole directory tree for you.</p>
+<p>The command line tool <code class="docutils literal notranslate"><span class="pre">lstmcpipe_generate_config</span></code> instantiates one of these classes and dumps the resulting
+config file.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#generating-a-config-the-tools" id="id2">Generating a config: the tools</a></p>
+<ul>
+<li><p><a class="reference internal" href="#quickstart" id="id3">Quickstart</a></p></li>
+<li><p><a class="reference internal" href="#command-line-arguments" id="id4">Command line arguments</a></p></li>
+<li><p><a class="reference internal" href="#known-pitfalls-with-the-arguments" id="id5">Known pitfalls with the arguments</a></p></li>
+<li><p><a class="reference internal" href="#where-to-run-it" id="id6">Where to run it</a></p></li>
+<li><p><a class="reference internal" href="#after-generation-what-to-check" id="id7">After generation: what to check</a></p></li>
+<li><p><a class="reference internal" href="#python-api" id="id8">Python API</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#which-config-class-should-i-use" id="id9">Which config class should I use?</a></p></li>
+<li><p><a class="reference internal" href="#prod3-prod5-pipelines" id="id10">Prod3 &amp; Prod5 pipelines</a></p>
+<ul>
+<li><p><a class="reference internal" href="#prod5-dl1ab" id="id11">Prod5 DL1ab</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#allsky-production-pipeline" id="id12">AllSky production pipeline</a></p>
+<ul>
+<li><p><a class="reference internal" href="#r0-to-irfs" id="id13">R0 to IRFs</a></p></li>
+<li><p><a class="reference internal" href="#dl1ab" id="id14">DL1ab</a></p></li>
+<li><p><a class="reference internal" href="#retrain-and-apply-a-model" id="id15">Retrain and apply a model</a></p></li>
+<li><p><a class="reference internal" href="#using-gammadiffuse-to-produce-full-enclosure-irfs" id="id16">Using GammaDiffuse to produce full-enclosure IRFs</a></p></li>
+<li><p><a class="reference internal" href="#building-blocks-partial-and-per-declination-configs" id="id17">Building blocks: partial and per-declination configs</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="generating-a-config-the-tools">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Generating a config: the tools</a><a class="headerlink" href="#generating-a-config-the-tools" title="Link to this heading">#</a></h2>
+<section id="quickstart">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Quickstart</a><a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h3>
+<p><strong>On the cluster</strong> (see <a class="reference internal" href="#where-to-run-it">Where to run it</a>), in an environment with <code class="docutils literal notranslate"><span class="pre">lstchain</span></code> and <code class="docutils literal notranslate"><span class="pre">lstmcpipe</span></code> installed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyFull<span class="w"> </span>--prod_id<span class="w"> </span>20240101_v0.10.5_my_prod<span class="w"> </span>--dec_list<span class="w"> </span>dec_2276
+</pre></div>
+</div>
+<p>This writes two files in the current directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lstmcpipe_config_&lt;today&gt;_PathConfigAllSkyFull.yaml</span></code> — the lstmcpipe config</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lstchain_config_&lt;today&gt;.json</span></code> — a standard lstchain MC config</p></li>
+</ul>
+<p>Both <strong>must be reviewed and edited</strong> (see <a class="reference internal" href="#after-generation-what-to-check">After generation: what to check</a>) before running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe<span class="w"> </span>-c<span class="w"> </span>lstmcpipe_config_&lt;today&gt;_PathConfigAllSkyFull.yaml<span class="w"> </span>-conf_lst<span class="w"> </span>lstchain_config_&lt;today&gt;.json
+</pre></div>
+</div>
+</section>
+<section id="command-line-arguments">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Command line arguments</a><a class="headerlink" href="#command-line-arguments" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 22.0%" />
+<col style="width: 48.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">config_class</span></code></p></td>
+<td><p><strong>Positional and required.</strong> Name of the <code class="docutils literal notranslate"><span class="pre">PathConfig</span></code> class to use, e.g. <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyFull</span></code>.
+See <a class="reference internal" href="#which-config-class-should-i-use">Which config class should I use?</a>. Running the command with <code class="docutils literal notranslate"><span class="pre">--help</span></code> prints the list of
+implemented classes.</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code></p></td>
+<td><p>Production ID. It is used to name the directories and files of the production, so make it unique and
+explicit: date, lstchain version and a hint of what it is, e.g. <code class="docutils literal notranslate"><span class="pre">20240101_v0.10.5_dec2276_crab_tuned</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prod_00</span></code> (never keep it)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--output</span></code>, <code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
+<td><p>Path of the generated lstmcpipe config file.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lstmcpipe_config_&lt;date&gt;_&lt;config_class&gt;.yaml</span></code> in the current directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--lstchain_conf</span></code></p></td>
+<td><p>Path of the generated lstchain config file.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">lstchain_config_&lt;date&gt;.json</span></code> in the current directory</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--overwrite</span></code></p></td>
+<td><p>Overwrite the output files if they already exist. Without it, an existing file raises
+<code class="docutils literal notranslate"><span class="pre">FileExistsError</span></code>.</p></td>
+<td><p>off</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--dec_list</span></code></p></td>
+<td><p>One or several declination lines, space separated, e.g. <code class="docutils literal notranslate"><span class="pre">--dec_list</span> <span class="pre">dec_2276</span> <span class="pre">dec_931</span></code>.
+Only for classes whose constructor takes a <code class="docutils literal notranslate"><span class="pre">dec_list</span></code> (the <code class="docutils literal notranslate"><span class="pre">...Full...</span></code> ones).
+For single-declination classes, use <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=dec_2276</span></code> instead.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">prod_id</span></code> of an existing production to start from. Only for classes that restart from existing data
+(<code class="docutils literal notranslate"><span class="pre">...DL1ab</span></code>, <code class="docutils literal notranslate"><span class="pre">PathConfigAllTrainTestDL1b</span></code>).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--kwargs</span></code></p></td>
+<td><p>Any other argument of the config class constructor, as <code class="docutils literal notranslate"><span class="pre">key=value</span></code> pairs separated by spaces, e.g.
+<code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=dec_2276</span> <span class="pre">zenith=zenith_40deg</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--dec_list</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code> and <code class="docutils literal notranslate"><span class="pre">--kwargs</span></code> are all simply forwarded to the constructor of the
+requested class, so <strong>the arguments you may use depend on the class you asked for</strong>. Passing an argument a
+class does not accept raises <code class="docutils literal notranslate"><span class="pre">TypeError:</span> <span class="pre">__init__()</span> <span class="pre">got</span> <span class="pre">an</span> <span class="pre">unexpected</span> <span class="pre">keyword</span> <span class="pre">argument</span> <span class="pre">...</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># these two commands are strictly equivalent</span>
+lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyFullDL1ab<span class="w"> </span>--prod_id<span class="w"> </span>NEW<span class="w"> </span>--dec_list<span class="w"> </span>dec_2276<span class="w"> </span>--source_prod_id<span class="w"> </span>OLD
+lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyFullDL1ab<span class="w"> </span>--prod_id<span class="w"> </span>NEW<span class="w"> </span>--dec_list<span class="w"> </span>dec_2276<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">source_prod_id</span><span class="o">=</span>OLD
+</pre></div>
+</div>
+</section>
+<section id="known-pitfalls-with-the-arguments">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Known pitfalls with the arguments</a><a class="headerlink" href="#known-pitfalls-with-the-arguments" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>A single declination is not a declination list.</strong> Classes handling a single declination
+(<code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTraining</span></code>, <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTesting</span></code>, their <code class="docutils literal notranslate"><span class="pre">DL1ab</span></code> variants…) take <code class="docutils literal notranslate"><span class="pre">dec</span></code>, not
+<code class="docutils literal notranslate"><span class="pre">dec_list</span></code>, and there is no <code class="docutils literal notranslate"><span class="pre">--dec</span></code> option: pass <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=dec_2276</span></code>.</p></li>
+<li><p><strong>The values passed to –kwargs are always strings.</strong> They are parsed by splitting on <code class="docutils literal notranslate"><span class="pre">=</span></code> and no type
+conversion is done, so boolean arguments cannot be turned off from the command line:
+<code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">run_checker=False</span></code> passes the <em>string</em> <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code>, which is truthy, and the checker still runs.
+To disable a checker, use the <a class="reference internal" href="#python-api">Python API</a>.</p></li>
+<li><p><strong>The flavour of the generated lstchain config depends on the config class.</strong> For an AllSky production, the
+standard lstchain MC config is dumped as is (the same one you would get from <code class="docutils literal notranslate"><span class="pre">lstchain_dump_config</span> <span class="pre">--mc</span></code>).
+For the prod3/prod5 pipelines, which have a fixed pointing, the pointing dependent RF features
+(<code class="docutils literal notranslate"><span class="pre">alt_tel</span></code>, <code class="docutils literal notranslate"><span class="pre">sin_az_tel</span></code>) are removed from it.</p></li>
+<li><p><strong>–prod_id has a default.</strong> Forgetting it silently produces a production called <code class="docutils literal notranslate"><span class="pre">prod_00</span></code>.</p></li>
+</ul>
+</section>
+<section id="where-to-run-it">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Where to run it</a><a class="headerlink" href="#where-to-run-it" title="Link to this heading">#</a></h3>
+<p>All the <code class="docutils literal notranslate"><span class="pre">AllSky</span></code> classes discover the available pointing nodes by <strong>listing the directories</strong> of the
+simulations on the cluster (under <code class="docutils literal notranslate"><span class="pre">/fefs/aswg/data/mc/DL0/LSTProd2/</span></code>). They therefore must be run <strong>on the
+La Palma cluster</strong>, otherwise you get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">FileNotFoundError</span><span class="p">:</span> <span class="n">The</span> <span class="k">class</span><span class="w"> </span><span class="nc">must</span> <span class="n">be</span> <span class="n">run</span> <span class="n">on</span> <span class="n">the</span> <span class="n">cluster</span> <span class="n">to</span> <span class="n">load</span> <span class="n">available</span> <span class="n">pointing</span> <span class="n">nodes</span>
+</pre></div>
+</div>
+<p>Likewise, all the classes restarting from an existing production check that the source production exists
+(<code class="docutils literal notranslate"><span class="pre">run_checker</span></code>), which also requires access to <code class="docutils literal notranslate"><span class="pre">/fefs/aswg/data/</span></code>.</p>
+<p>Typically:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh<span class="w"> </span>cp02
+<span class="nb">source</span><span class="w"> </span>/fefs/aswg/software/conda/etc/profile.d/conda.sh
+conda<span class="w"> </span>activate<span class="w"> </span>lstchain-v0.10.5
+<span class="nb">cd</span><span class="w"> </span>lstmcpipe/production_configs
+mkdir<span class="w"> </span>20240101_my_prod_id<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>20240101_my_prod_id
+lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyFull<span class="w"> </span>--prod_id<span class="w"> </span>20240101_my_prod_id<span class="w"> </span>--dec_list<span class="w"> </span>dec_2276
+</pre></div>
+</div>
+<p>The available declination lines are the sub-directories of the training dataset, and can be listed with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/
+</pre></div>
+</div>
+<p>At the time of writing: <code class="docutils literal notranslate"><span class="pre">dec_931</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_2276</span></code> (Crab), <code class="docutils literal notranslate"><span class="pre">dec_3476</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_4822</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_5573</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dec_6166</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_6166_high_density</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_6676</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_min_413</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_min_1802</span></code>, <code class="docutils literal notranslate"><span class="pre">dec_min_2924</span></code>.
+To choose the one matching your source, see the pointings notebook in <a class="reference internal" href="examples/configs_pointings.html"><span class="doc">Find and display pointing nodes using lstmcpipe</span></a>.</p>
+</section>
+<section id="after-generation-what-to-check">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">After generation: what to check</a><a class="headerlink" href="#after-generation-what-to-check" title="Link to this heading">#</a></h3>
+<p>The generated lstmcpipe config looks like:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lstchain</span>
+<span class="nt">prod_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20240101_v0.10.5_my_prod</span>
+<span class="nt">source_environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">source_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/fefs/aswg/software/conda/etc/profile.d/conda.sh</span>
+<span class="w">  </span><span class="nt">conda_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lstchain-v0.10.7</span><span class="w">          </span><span class="c1"># &lt;-- edit: the env used to run the production</span>
+<span class="nt">slurm_config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">user_account</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dpps</span><span class="w">                   </span><span class="c1"># &lt;-- edit: `aswg` unless you are lstanalyzer</span>
+<span class="nt">lstmcpipe_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.11.0</span>
+<span class="nt">prod_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PathConfigAllSkyFull</span>
+<span class="nt">stages_to_run</span><span class="p">:</span><span class="w">                         </span><span class="c1"># &lt;-- you may remove stages you do not want to run</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r0_to_dl1</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">merge_dl1</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">train_pipe</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dl1_to_dl2</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dl2_to_irfs</span>
+<span class="nt">stages</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">r0_to_dl1</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/fefs/aswg/data/mc/DL0/LSTProd2/TrainingDataset/GammaDiffuse/dec_2276/sim_telarray/node_.../output_v1.4</span>
+<span class="w">      </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/fefs/aswg/data/mc/DL1/AllSky/20240101_v0.10.5_my_prod/TrainingDataset/dec_2276/GammaDiffuse/node_...</span>
+<span class="w">  </span><span class="nt">merge_dl1</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/fefs/aswg/data/mc/DL1/AllSky/.../GammaDiffuse</span>
+<span class="w">      </span><span class="nt">output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/fefs/aswg/data/mc/DL1/AllSky/.../dl1_..._merged.h5</span>
+<span class="w">      </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--pattern */*.h5 --no-image</span><span class="w">        </span><span class="c1"># &lt;-- options passed to the lstchain script</span>
+<span class="w">      </span><span class="nt">extra_slurm_options</span><span class="p">:</span><span class="w">                        </span><span class="c1"># &lt;-- slurm options for this job only</span>
+<span class="w">        </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">long</span>
+<span class="w">        </span><span class="nt">time</span><span class="p">:</span><span class="w"> </span><span class="s">'06:00:00'</span>
+</pre></div>
+</div>
+<p>Checklist:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">source_environment.conda_env</span></code>: the conda environment used to run the production (the generated value is
+only a default, it is <strong>not</strong> your current environment).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slurm_config.user_account</span></code>: <code class="docutils literal notranslate"><span class="pre">dpps</span></code> is the account of <code class="docutils literal notranslate"><span class="pre">lstanalyzer</span></code>; regular users should use <code class="docutils literal notranslate"><span class="pre">aswg</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stages_to_run</span></code>: remove the stages you do not want to run. The entries left in <code class="docutils literal notranslate"><span class="pre">stages</span></code> are ignored
+(with a warning). <code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code> and <code class="docutils literal notranslate"><span class="pre">dl1ab</span></code> cannot both be in <code class="docutils literal notranslate"><span class="pre">stages_to_run</span></code>.</p></li>
+<li><p>the paths themselves: number of pointing nodes, declinations, and the <code class="docutils literal notranslate"><span class="pre">prod_id</span></code> appearing in the output
+paths.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_slurm_options</span></code> of the stages, if you need more memory/time or different
+<code class="docutils literal notranslate"><span class="pre">lstchain</span></code> options (e.g. <code class="docutils literal notranslate"><span class="pre">--gh-efficiency</span></code> for the IRFs).</p></li>
+<li><p>the <strong>lstchain</strong> config, in particular the NSB tuning parameters (see <code class="docutils literal notranslate"><span class="pre">lstchain_tune_nsb</span></code>).</p></li>
+</ol>
+<p>The config can then be validated with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_validate_config<span class="w"> </span>lstmcpipe_config_&lt;date&gt;_&lt;config_class&gt;.yaml
+</pre></div>
+</div>
+<p>Note that the config file is a plain YAML file: it can be edited, or even written entirely by hand, if none of
+the classes below matches your use case.</p>
+</section>
+<section id="python-api">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Python API</a><a class="headerlink" href="#python-api" title="Link to this heading">#</a></h3>
+<p>Everything the command line does can be done in python, which is the way to go to pass non-string arguments
+(such as <code class="docutils literal notranslate"><span class="pre">run_checker=False</span></code>) or to inspect/plot the production before dumping it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lstmcpipe.config.paths_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathConfigAllSkyFull</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">PathConfigAllSkyFull</span><span class="p">(</span><span class="s1">'20240101_v0.10.5_my_prod'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'dec_2276'</span><span class="p">,</span> <span class="s1">'dec_931'</span><span class="p">])</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>                                    <span class="c1"># builds the paths dict</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="s1">'lstmcpipe_config.yaml'</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># useful checks before dumping</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">plot_pointings</span><span class="p">()</span>                              <span class="c1"># training and testing pointings</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="s1">'r0_to_dl1'</span><span class="p">])</span>                     <span class="c1"># paths of a given stage</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">run_checker=False</span></code> skips the verification that the source production exists, which is handy to prepare a
+config for a production that is not finished yet, or to work off-cluster:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lstmcpipe.config.paths_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathConfigAllSkyFullDL1ab</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">PathConfigAllSkyFullDL1ab</span><span class="p">(</span><span class="s1">'NEW_PROD'</span><span class="p">,</span> <span class="s1">'SOURCE_PROD'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'dec_2276'</span><span class="p">],</span> <span class="n">run_checker</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="which-config-class-should-i-use">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Which config class should I use?</a><a class="headerlink" href="#which-config-class-should-i-use" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 26.0%" />
+<col style="width: 20.0%" />
+<col style="width: 26.0%" />
+<col style="width: 28.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Starts from</p></th>
+<th class="head"><p>Stages</p></th>
+<th class="head"><p>Required arguments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#allsky-full"><span class="std std-ref">PathConfigAllSkyFull</span></a></p></td>
+<td><p>R0 (simtel)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--dec_list</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#allsky-dl1ab"><span class="std std-ref">PathConfigAllSkyFullDL1ab</span></a></p></td>
+<td><p>DL1 of an existing prod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dl1ab</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--dec_list</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#allsky-traintest-dl1b"><span class="std std-ref">PathConfigAllTrainTestDL1b</span></a></p></td>
+<td><p>merged DL1b of an existing prod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--dec_list</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#allsky-split-diffuse"><span class="std std-ref">PathConfigAllSkyFullSplitDiffuse</span></a></p></td>
+<td><p>R0 (simtel)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_test_split</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--dec_list</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTraining</span></a></p></td>
+<td><p>R0 (training particles)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTrainingWithSplit</span></a></p></td>
+<td><p>R0 (training particles)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_test_split</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTesting</span></a></p></td>
+<td><p>R0 (test gammas)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTestingGammaDiffuse</span></a></p></td>
+<td><p>DL1 diffuse test set produced by <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTrainingDL1ab</span></a></p></td>
+<td><p>training DL1 of an existing prod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dl1ab</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#allsky-blocks"><span class="std std-ref">PathConfigAllSkyTestingDL1ab</span></a></p></td>
+<td><p>testing DL1 of an existing prod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dl1ab</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--kwargs</span> <span class="pre">dec=</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#prod5"><span class="std std-ref">PathConfigProd5Trans80</span></a></p></td>
+<td><p>R0 (prod5 trans_80)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_test_split</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dl2_to_sensitivity</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#prod5-dl1ab"><span class="std std-ref">PathConfigProd5Trans80DL1ab</span></a></p></td>
+<td><p>DL1 of an existing prod5 prod</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dl1ab</span></code>, <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_sensitivity</span></code>, <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--prod_id</span></code>, <code class="docutils literal notranslate"><span class="pre">--source_prod_id</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In short:</p>
+<ul class="simple">
+<li><p>you want a <strong>complete AllSky production from the simulations</strong>: <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyFull</span></code>
+(or <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyFullSplitDiffuse</span></code> if you need full-enclosure IRFs);</p></li>
+<li><p>you want a <strong>tuned production</strong> (e.g. NSB matching a given field of view) from an existing one:
+<code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyFullDL1ab</span></code>;</p></li>
+<li><p>you only want to <strong>retrain models and re-apply them</strong> on existing DL1b: <code class="docutils literal notranslate"><span class="pre">PathConfigAllTrainTestDL1b</span></code>;</p></li>
+<li><p>you want to <strong>run only a part of the pipeline</strong>, one declination at a time, or to assemble a non standard
+production: the building blocks listed in <a class="reference internal" href="#allsky-blocks"><span class="std std-ref">Building blocks: partial and per-declination configs</span></a>.</p></li>
+</ul>
+</section>
+<section id="prod3-prod5-pipelines">
+<span id="prod5"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">Prod3 &amp; Prod5 pipelines</a><a class="headerlink" href="#prod3-prod5-pipelines" title="Link to this heading">#</a></h2>
+<p>Here is the typical MC pipeline for the prod3 and prod5 productions</p>
+<img alt="https://mermaid.ink/img/pako:eNqdVV1rwjAU_SshD0NBh_row57cYOD2oI9tKZmNGkiTkqQbYv3vy4dN01YtW0C4vfec9Nx7LvYMdzzDcAmBPnvKf3ZHJBRYb2IGrkeWXweBiiPYzJqkOQeU5yjazFyQtIuF4IozU3VRp4wp3inhAHUcQDDLYtY82heA6fQFVGKWKp5mdF65rAmj1XreE-Fe2yO5tGf1xNViesS64KmB7BvD0oh2xxkRGk_0zeFwfXfm2lsT7OdDIb2J3VYyVVgqK9oEyZ-FpZ5_3-o27qHpbeiw_e1WBCLM9WKi5K5kjxvS7IH9ZegO1V9v18MybSOpLChRo1E3Mx53F_IuuQF2KxbuWx_AtT0DT113Grq_MZBTkALXXZg41N9kLSHX_xtUNmX3DJ51SWBEpxlSKBxdaL69oLcNdyxf1Nu7-N_2LlLPf7gJAW5oewPo8PZeB-NMdM10TDBGtcshYNEAKvtqnhKxr8D75i3SP5kMgCVmkijyTdSpAtvXz220bTIB2ZQssaBcRQU72EAmcAJzLHJEMv2ZOBt8DNUR5ziGSx1meI9KqmIYs4uGloU2Hr9mRHEBl3tEJZ5AVCq-PbEdXCpR4hq0Ikh7nNdJbDkf7nNkv0qXX-IaAyQ?type=png)](https://mermaid.live/edit#pako:eNqdVV1rwjAU_SshD0NBh_row57cYOD2oI9tKZmNGkiTkqQbYv3vy4dN01YtW0C4vfec9Nx7LvYMdzzDcAmBPnvKf3ZHJBRYb2IGrkeWXweBiiPYzJqkOQeU5yjazFyQtIuF4IozU3VRp4wp3inhAHUcQDDLYtY82heA6fQFVGKWKp5mdF65rAmj1XreE-Fe2yO5tGf1xNViesS64KmB7BvD0oh2xxkRGk_0zeFwfXfm2lsT7OdDIb2J3VYyVVgqK9oEyZ-FpZ5_3-o27qHpbeiw_e1WBCLM9WKi5K5kjxvS7IH9ZegO1V9v18MybSOpLChRo1E3Mx53F_IuuQF2KxbuWx_AtT0DT113Grq_MZBTkALXXZg41N9kLSHX_xtUNmX3DJ51SWBEpxlSKBxdaL69oLcNdyxf1Nu7-N_2LlLPf7gJAW5oewPo8PZeB-NMdM10TDBGtcshYNEAKvtqnhKxr8D75i3SP5kMgCVmkijyTdSpAtvXz220bTIB2ZQssaBcRQU72EAmcAJzLHJEMv2ZOBt8DNUR5ziGSx1meI9KqmIYs4uGloU2Hr9mRHEBl3tEJZ5AVCq-PbEdXCpR4hq0Ikh7nNdJbDkf7nNkv0qXX-IaAyQ" src="https://mermaid.ink/img/pako:eNqdVV1rwjAU_SshD0NBh_row57cYOD2oI9tKZmNGkiTkqQbYv3vy4dN01YtW0C4vfec9Nx7LvYMdzzDcAmBPnvKf3ZHJBRYb2IGrkeWXweBiiPYzJqkOQeU5yjazFyQtIuF4IozU3VRp4wp3inhAHUcQDDLYtY82heA6fQFVGKWKp5mdF65rAmj1XreE-Fe2yO5tGf1xNViesS64KmB7BvD0oh2xxkRGk_0zeFwfXfm2lsT7OdDIb2J3VYyVVgqK9oEyZ-FpZ5_3-o27qHpbeiw_e1WBCLM9WKi5K5kjxvS7IH9ZegO1V9v18MybSOpLChRo1E3Mx53F_IuuQF2KxbuWx_AtT0DT113Grq_MZBTkALXXZg41N9kLSHX_xtUNmX3DJ51SWBEpxlSKBxdaL69oLcNdyxf1Nu7-N_2LlLPf7gJAW5oewPo8PZeB-NMdM10TDBGtcshYNEAKvtqnhKxr8D75i3SP5kMgCVmkijyTdSpAtvXz220bTIB2ZQssaBcRQU72EAmcAJzLHJEMv2ZOBt8DNUR5ziGSx1meI9KqmIYs4uGloU2Hr9mRHEBl3tEJZ5AVCq-PbEdXCpR4hq0Ikh7nNdJbDkf7nNkv0qXX-IaAyQ?type=png)](https://mermaid.live/edit#pako:eNqdVV1rwjAU_SshD0NBh_row57cYOD2oI9tKZmNGkiTkqQbYv3vy4dN01YtW0C4vfec9Nx7LvYMdzzDcAmBPnvKf3ZHJBRYb2IGrkeWXweBiiPYzJqkOQeU5yjazFyQtIuF4IozU3VRp4wp3inhAHUcQDDLYtY82heA6fQFVGKWKp5mdF65rAmj1XreE-Fe2yO5tGf1xNViesS64KmB7BvD0oh2xxkRGk_0zeFwfXfm2lsT7OdDIb2J3VYyVVgqK9oEyZ-FpZ5_3-o27qHpbeiw_e1WBCLM9WKi5K5kjxvS7IH9ZegO1V9v18MybSOpLChRo1E3Mx53F_IuuQF2KxbuWx_AtT0DT113Grq_MZBTkALXXZg41N9kLSHX_xtUNmX3DJ51SWBEpxlSKBxdaL69oLcNdyxf1Nu7-N_2LlLPf7gJAW5oewPo8PZeB-NMdM10TDBGtcshYNEAKvtqnhKxr8D75i3SP5kMgCVmkijyTdSpAtvXz220bTIB2ZQssaBcRQU72EAmcAJzLHJEMv2ZOBt8DNUR5ziGSx1meI9KqmIYs4uGloU2Hr9mRHEBl3tEJZ5AVCq-PbEdXCpR4hq0Ikh7nNdJbDkf7nNkv0qXX-IaAyQ" />
+<p>To generate a config for that pipeline, you may run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigProd5Trans80</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">whatagreatprod</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PathConfigProd5Trans80</span></code> also accepts a <code class="docutils literal notranslate"><span class="pre">zenith</span></code> argument (default <code class="docutils literal notranslate"><span class="pre">zenith_20deg</span></code>), which selects the
+zenith directory of the prod5 dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigProd5Trans80</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">whatagreatprod</span> <span class="o">--</span><span class="n">kwargs</span> <span class="n">zenith</span><span class="o">=</span><span class="n">zenith_40deg</span>
+</pre></div>
+</div>
+<p>Note that this pipeline is the only one running the <code class="docutils literal notranslate"><span class="pre">dl2_to_sensitivity</span></code> stage; the sensitivity plots
+(<code class="docutils literal notranslate"><span class="pre">.png</span></code> next to the <code class="docutils literal notranslate"><span class="pre">.fits.gz</span></code> files) are produced automatically as part of that stage.</p>
+<p><strong>IMPORTANT NOTE:</strong> prod5 MC files need the config to set “focal_length_choice”: “EQUIVALENT” to be analyzed with <code class="docutils literal notranslate"><span class="pre">lstchain</span> <span class="pre">&gt;=</span> <span class="pre">v0.9</span></code></p>
+<p>In the lstchain config, please set:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">"source_config"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"EventSource"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"focal_length_choice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EQUIVALENT"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="prod5-dl1ab">
+<span id="id1"></span><h3><a class="toc-backref" href="#id11" role="doc-backlink">Prod5 DL1ab</a><a class="headerlink" href="#prod5-dl1ab" title="Link to this heading">#</a></h3>
+<p>One can also start back from DL1, applying the dl1ab stage:</p>
+<img alt="https://mermaid.ink/img/pako:eNqVVMGKwjAQ_ZWQw6KgC_boYU-6sODuwR5tKbFNNZCmJU13Eeu_b5o0aVKt7BaE6Zs3M6_zYq4wLTMM1zCn5U96RlyA3T5iQD51czxxVJ3BZrdCGuqeEyoKdJCYjuIhU_FSlEyldOjkMMWp4H3WvPR5zLKI6VC1BMvlG2gzukLHViOJfLkbqWd4ZA1ZtqfCDPUKDGhLHGn3WzgO35MRLolEtjPrsvK7XuOl-Jg71VvB_cilwLVQyrog_rOAxNY9dsnnTNrl06Z98yVzRLTRKoofyrOcZ_osyXfSXZZtqXxVFUpwUleUiNlsjMzn7umZLNSkMaqo9hOfcHwfwMt467rUdnIkVKTCRnUXG70DosiF_NfSWqd0DF4lzDGiywwJZNbjGqkK75x9YGFgTl3wv1MXJLZu0lWH8-zUObTpU9d_uDZFi3YW2y3eT5lkMCRbNapMCM9b8LF_P8hfHT8h1pjVRJBvIi4tCLdf4SEckL6wg1VRRUtxqNhJBV1buIAF5gUimbxyrx07guKMCxzBtQwznKOGighG7CapTSWtxNuMiJLDdY5ojRcQNaIMLyyFa8EbbEgbgqR7hWVhVfSp73Z1xd9-AWAY62k?type=png)](https://mermaid.live/edit#pako:eNqVVMGKwjAQ_ZWQw6KgC_boYU-6sODuwR5tKbFNNZCmJU13Eeu_b5o0aVKt7BaE6Zs3M6_zYq4wLTMM1zCn5U96RlyA3T5iQD51czxxVJ3BZrdCGuqeEyoKdJCYjuIhU_FSlEyldOjkMMWp4H3WvPR5zLKI6VC1BMvlG2gzukLHViOJfLkbqWd4ZA1ZtqfCDPUKDGhLHGn3WzgO35MRLolEtjPrsvK7XuOl-Jg71VvB_cilwLVQyrog_rOAxNY9dsnnTNrl06Z98yVzRLTRKoofyrOcZ_osyXfSXZZtqXxVFUpwUleUiNlsjMzn7umZLNSkMaqo9hOfcHwfwMt467rUdnIkVKTCRnUXG70DosiF_NfSWqd0DF4lzDGiywwJZNbjGqkK75x9YGFgTl3wv1MXJLZu0lWH8-zUObTpU9d_uDZFi3YW2y3eT5lkMCRbNapMCM9b8LF_P8hfHT8h1pjVRJBvIi4tCLdf4SEckL6wg1VRRUtxqNhJBV1buIAF5gUimbxyrx07guKMCxzBtQwznKOGighG7CapTSWtxNuMiJLDdY5ojRcQNaIMLyyFa8EbbEgbgqR7hWVhVfSp73Z1xd9-AWAY62k" src="https://mermaid.ink/img/pako:eNqVVMGKwjAQ_ZWQw6KgC_boYU-6sODuwR5tKbFNNZCmJU13Eeu_b5o0aVKt7BaE6Zs3M6_zYq4wLTMM1zCn5U96RlyA3T5iQD51czxxVJ3BZrdCGuqeEyoKdJCYjuIhU_FSlEyldOjkMMWp4H3WvPR5zLKI6VC1BMvlG2gzukLHViOJfLkbqWd4ZA1ZtqfCDPUKDGhLHGn3WzgO35MRLolEtjPrsvK7XuOl-Jg71VvB_cilwLVQyrog_rOAxNY9dsnnTNrl06Z98yVzRLTRKoofyrOcZ_osyXfSXZZtqXxVFUpwUleUiNlsjMzn7umZLNSkMaqo9hOfcHwfwMt467rUdnIkVKTCRnUXG70DosiF_NfSWqd0DF4lzDGiywwJZNbjGqkK75x9YGFgTl3wv1MXJLZu0lWH8-zUObTpU9d_uDZFi3YW2y3eT5lkMCRbNapMCM9b8LF_P8hfHT8h1pjVRJBvIi4tCLdf4SEckL6wg1VRRUtxqNhJBV1buIAF5gUimbxyrx07guKMCxzBtQwznKOGighG7CapTSWtxNuMiJLDdY5ojRcQNaIMLyyFa8EbbEgbgqR7hWVhVfSp73Z1xd9-AWAY62k?type=png)](https://mermaid.live/edit#pako:eNqVVMGKwjAQ_ZWQw6KgC_boYU-6sODuwR5tKbFNNZCmJU13Eeu_b5o0aVKt7BaE6Zs3M6_zYq4wLTMM1zCn5U96RlyA3T5iQD51czxxVJ3BZrdCGuqeEyoKdJCYjuIhU_FSlEyldOjkMMWp4H3WvPR5zLKI6VC1BMvlG2gzukLHViOJfLkbqWd4ZA1ZtqfCDPUKDGhLHGn3WzgO35MRLolEtjPrsvK7XuOl-Jg71VvB_cilwLVQyrog_rOAxNY9dsnnTNrl06Z98yVzRLTRKoofyrOcZ_osyXfSXZZtqXxVFUpwUleUiNlsjMzn7umZLNSkMaqo9hOfcHwfwMt467rUdnIkVKTCRnUXG70DosiF_NfSWqd0DF4lzDGiywwJZNbjGqkK75x9YGFgTl3wv1MXJLZu0lWH8-zUObTpU9d_uDZFi3YW2y3eT5lkMCRbNapMCM9b8LF_P8hfHT8h1pjVRJBvIi4tCLdf4SEckL6wg1VRRUtxqNhJBV1buIAF5gUimbxyrx07guKMCxzBtQwznKOGighG7CapTSWtxNuMiJLDdY5ojRcQNaIMLyyFa8EbbEgbgqR7hWVhVfSp73Z1xd9-AWAY62k" />
+<p>The corresponding class is <code class="docutils literal notranslate"><span class="pre">PathConfigProd5Trans80DL1ab</span></code>. It replaces the <code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">train_test_split</span></code> and <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code> stages by a single <code class="docutils literal notranslate"><span class="pre">dl1ab</span></code> stage applied to the <strong>already merged</strong>
+DL1 files of the source production:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigProd5Trans80DL1ab</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">anothergreatprod</span> <span class="o">--</span><span class="n">source_prod_id</span> <span class="n">whatagreatprod</span>
+</pre></div>
+</div>
+<p>The class checks at generation time that all the merged DL1 files of <code class="docutils literal notranslate"><span class="pre">source_prod_id</span></code> exist, and raises
+<code class="docutils literal notranslate"><span class="pre">FileNotFoundError</span></code> on the first missing one. Use the <a class="reference internal" href="#python-api">Python API</a> with <code class="docutils literal notranslate"><span class="pre">run_checker=False</span></code> to bypass
+this check. The <code class="docutils literal notranslate"><span class="pre">zenith</span></code> argument is available here as well.</p>
+</section>
+</section>
+<section id="allsky-production-pipeline">
+<span id="allsky"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">AllSky production pipeline</a><a class="headerlink" href="#allsky-production-pipeline" title="Link to this heading">#</a></h2>
+<section id="r0-to-irfs">
+<span id="allsky-full"></span><h3><a class="toc-backref" href="#id13" role="doc-backlink">R0 to IRFs</a><a class="headerlink" href="#r0-to-irfs" title="Link to this heading">#</a></h3>
+<p>Standard AllSky production pipeline <strong>for one training declination</strong></p>
+<img alt="https://mermaid.ink/img/pako:eNqtVV1rgzAU_SshD6OFOloffdiT2xh0MNzemiJ3JrZCjCVGxmj735eoVTMjbN18Orkf5557c9UjTgrKcIBTXnwke5AKrSMiiEDtEy29F1moQpSbaIlaiIgO8JDQqQgG-H2Ak61F8gh5DmGWplXJDNPwfC3dGytVx4XM6adMPVe4XnUNanxth4bGatFw_aXHjrBusmP7ZZeTV4A87w6d5DJWRUz56jRqwLUBzqTW576d6TLGayv8rqDJzZncMbdEr_bRwXAu2okAzus5lFvnVTu5W9-Q9tKcTTituc1FNw7CuqaSkIn4kB3YbNbj-XxI2tvrlFxX5SW61VAy4DEFBZtIIxRqZMlpQ01WuPbtQTsXa3rGxjse8Gj7UBMyXMKxKWlNU-vdD8ihvM_wrRfC_y9JEyWa0VDum93NZHpCT9GDS5hl3ujTfwnDC6xxDhnV3-ejKUiw2rOcERxoSFkKFVcEE3HWodVBLwa7p5kqJA5S4CVbYKhU8fopEhwoWbFLUJjBTkLeRbE66bn5EdT_g_MXmSDsTg?type=png)](https://mermaid.live/edit#pako:eNqtVV1rgzAU_SshD6OFOloffdiT2xh0MNzemiJ3JrZCjCVGxmj735eoVTMjbN18Orkf5557c9UjTgrKcIBTXnwke5AKrSMiiEDtEy29F1moQpSbaIlaiIgO8JDQqQgG-H2Ak61F8gh5DmGWplXJDNPwfC3dGytVx4XM6adMPVe4XnUNanxth4bGatFw_aXHjrBusmP7ZZeTV4A87w6d5DJWRUz56jRqwLUBzqTW576d6TLGayv8rqDJzZncMbdEr_bRwXAu2okAzus5lFvnVTu5W9-Q9tKcTTituc1FNw7CuqaSkIn4kB3YbNbj-XxI2tvrlFxX5SW61VAy4DEFBZtIIxRqZMlpQ01WuPbtQTsXa3rGxjse8Gj7UBMyXMKxKWlNU-vdD8ihvM_wrRfC_y9JEyWa0VDum93NZHpCT9GDS5hl3ujTfwnDC6xxDhnV3-ejKUiw2rOcERxoSFkKFVcEE3HWodVBLwa7p5kqJA5S4CVbYKhU8fopEhwoWbFLUJjBTkLeRbE66bn5EdT_g_MXmSDsTg" src="https://mermaid.ink/img/pako:eNqtVV1rgzAU_SshD6OFOloffdiT2xh0MNzemiJ3JrZCjCVGxmj735eoVTMjbN18Orkf5557c9UjTgrKcIBTXnwke5AKrSMiiEDtEy29F1moQpSbaIlaiIgO8JDQqQgG-H2Ak61F8gh5DmGWplXJDNPwfC3dGytVx4XM6adMPVe4XnUNanxth4bGatFw_aXHjrBusmP7ZZeTV4A87w6d5DJWRUz56jRqwLUBzqTW576d6TLGayv8rqDJzZncMbdEr_bRwXAu2okAzus5lFvnVTu5W9-Q9tKcTTituc1FNw7CuqaSkIn4kB3YbNbj-XxI2tvrlFxX5SW61VAy4DEFBZtIIxRqZMlpQ01WuPbtQTsXa3rGxjse8Gj7UBMyXMKxKWlNU-vdD8ihvM_wrRfC_y9JEyWa0VDum93NZHpCT9GDS5hl3ujTfwnDC6xxDhnV3-ejKUiw2rOcERxoSFkKFVcEE3HWodVBLwa7p5kqJA5S4CVbYKhU8fopEhwoWbFLUJjBTkLeRbE66bn5EdT_g_MXmSDsTg?type=png)](https://mermaid.live/edit#pako:eNqtVV1rgzAU_SshD6OFOloffdiT2xh0MNzemiJ3JrZCjCVGxmj735eoVTMjbN18Orkf5557c9UjTgrKcIBTXnwke5AKrSMiiEDtEy29F1moQpSbaIlaiIgO8JDQqQgG-H2Ak61F8gh5DmGWplXJDNPwfC3dGytVx4XM6adMPVe4XnUNanxth4bGatFw_aXHjrBusmP7ZZeTV4A87w6d5DJWRUz56jRqwLUBzqTW576d6TLGayv8rqDJzZncMbdEr_bRwXAu2okAzus5lFvnVTu5W9-Q9tKcTTituc1FNw7CuqaSkIn4kB3YbNbj-XxI2tvrlFxX5SW61VAy4DEFBZtIIxRqZMlpQ01WuPbtQTsXa3rGxjse8Gj7UBMyXMKxKWlNU-vdD8ihvM_wrRfC_y9JEyWa0VDum93NZHpCT9GDS5hl3ujTfwnDC6xxDhnV3-ejKUiw2rOcERxoSFkKFVcEE3HWodVBLwa7p5kqJA5S4CVbYKhU8fopEhwoWbFLUJjBTkLeRbE66bn5EdT_g_MXmSDsTg" />
+<p>To produce a config to run such a pipeline, typically run <strong>on the cluster</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllSkyFull</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">whatagreatprod</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span>
+</pre></div>
+</div>
+<p>This will generate a lstmcpipe config file and a lstchain config file.</p>
+<dl class="simple">
+<dt>Please:</dt><dd><ul class="simple">
+<li><p>check thoroughly the lstmcpipe config</p></li>
+<li><p>modify the lstchain config as you wish</p></li>
+</ul>
+</dd>
+</dl>
+<p>Several declination lines can be trained in a single production. They are simply listed after <code class="docutils literal notranslate"><span class="pre">--dec_list</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllSkyFull</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">whatagreatprod</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span> <span class="n">dec_931</span> <span class="n">dec_min_413</span>
+</pre></div>
+</div>
+<p>In that case, one set of models is trained per declination, and the <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code> and <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code> stages
+are run once per declination on the (single, declination independent) test dataset. The <code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code> stages of the test dataset are generated only once, for the first declination of the list.</p>
+</section>
+<section id="dl1ab">
+<span id="allsky-dl1ab"></span><h3><a class="toc-backref" href="#id14" role="doc-backlink">DL1ab</a><a class="headerlink" href="#dl1ab" title="Link to this heading">#</a></h3>
+<p>The DL1ab workflow is very similar, only starting from an existing DL1 dataset.</p>
+<p>This workflow is typically used when a tuned production is needed for a given dataset.
+For example, a production specifically tuned to match the Crab FoV NSB level and analyse Crab data.
+In this case, you should produce your own lstchain config file using lstchain tools (see lstchain documentation).</p>
+<img alt="https://mermaid.ink/img/pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw?type=png)](https://mermaid.live/edit#pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw" src="https://mermaid.ink/img/pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw?type=png)](https://mermaid.live/edit#pako:eNqtVMtugzAQ_BXLhyqRQtVw5NATbVUplaq0t1BFCzaNJWMiY1RVIf9eY6A8bA5Jy2nZnR3PPuwTTnJCcYBTnn8lB5AKbbaRiATSX7hZe68yV7kodtpGrY0iHfaQ0IkIBnY8sJMPiyIecahSUHIp0xNkGYQsTcuCGrah4y9ksc12vcB3WqieD9W_V_PEU6KLZLmLRZ53jyrC1xBXdiesuVnwbp4OuQ1W3u1VvtcZ1aSYWtHMAJrMjMpPOslsEZ6JkUE_RpPSlQPnpvTCsXtO-jY4ZB6t54TTrbzNRjcOSnOqksDE_siOdLHo7eWyI-x9Bp7p03iBbrUpKXCPgIIO2sZqWLjx-8Za2ky351tah-1-zuwXaoDDNbNdSety7XDfDIfwBu2Pbo4_d3MuleKg77bZr1eUybRCz9vHqaCRa6f__ksQXmFtZ8CIfnJP9WERVgea0QgH2iQ0hZKrCEfirKHlUQ-fPhCmcomDFHhBVxhKlb99iwQHSpa0A4UMPiVkvyhqkl6at9088ecfuL_tWw" />
+<p>The workflow then starts from a base production (the <cite>source_prod_id</cite>), produces new tuned DL1 (dl1ab steps) and trains a new set of models.</p>
+<p>To prepare the lstmcpipe config, you want to:</p>
+<ul class="simple">
+<li><p>find a base production to start with (see the list of productions in the <cite>documentation &lt;productions&gt;</cite> and look for the latest “base” or “unuted” one)</p></li>
+<li><p>run <strong>on the cluster</strong>:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllSkyFullDL1ab</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">anothergreatprod</span> <span class="o">--</span><span class="n">kwargs</span> <span class="n">source_prod_id</span><span class="o">=</span><span class="n">whatagreatprod</span>
+</pre></div>
+</div>
+<p>or, equivalently, using the dedicated option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllSkyFullDL1ab</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">anothergreatprod</span> <span class="o">--</span><span class="n">source_prod_id</span> <span class="n">whatagreatprod</span>
+</pre></div>
+</div>
+<p>At generation time, the pointing nodes of the source production are checked one by one: a node that exists in
+the simulations but not in the source production triggers a warning and is dropped from the new production.
+Read the warnings, they tell you what will <em>not</em> be reprocessed.</p>
+</section>
+<section id="retrain-and-apply-a-model">
+<span id="allsky-traintest-dl1b"></span><h3><a class="toc-backref" href="#id15" role="doc-backlink">Retrain and apply a model</a><a class="headerlink" href="#retrain-and-apply-a-model" title="Link to this heading">#</a></h3>
+<img alt="https://mermaid.ink/img/pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA?type=png)](https://mermaid.live/edit#pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA" src="https://mermaid.ink/img/pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA?type=png)](https://mermaid.live/edit#pako:eNqVUstqwzAQ_BUhSEkgNsRHHwoNLr2ktKS5WaFsrI0jsB7IMqWE_HvXUkwa6KXyQePVzKxG0pk3ViIv-bGzX80JfGCbrTDCMBr9cGg9uBNzUL9v36rsaZ8WxiGVxyYoa9hufau2oDXU1WZ1YBp9izJVWPCgjDLtLwPnbbDmjptKf5Gji-sT-2qJfSCSECZjhkKw1Q2ygnCe51cHNHLKlLQPU6sse2SaFF0_EWYzRk3iFuJqRJ9OOZzPb3ixmPhJXaeJrfcsJ5FH6DIJAe5Z1PcaJFpXmyJ7Gf93FIWiFf9LNn58yensNChJd3geewkeTqhR8JKgxCMMXRBcmAtRB0d7wmepgvW8PELX45LDEOzHt2l4GfyAE6lSQHevpyJGzWt6K_HJXH4Ay4i5SA" />
+<p>The workflow starts from an existing PROD A with merged DL1b datasets, trains a new set of models and applies them to create a new set of DL2.
+<strong>Note: In case of source-dependent analysis, the missing parameters are computed on the fly by lstchain, allowing the use of this PathConfig to not recreate DL1 files.</strong></p>
+<p>Example of command to generate such a config:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllTrainTestDL1b</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span> <span class="n">dec_931</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">MY_NEW_PROD</span> <span class="o">--</span><span class="n">kwargs</span> <span class="n">source_prod_id</span><span class="o">=</span><span class="n">PROD</span><span class="o">-</span><span class="n">A</span>
+</pre></div>
+</div>
+<p>Only two stages are generated: <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code> (from the merged DL1b of PROD-A) and <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code>.
+No DL1 file is created, which makes it by far the cheapest way to test a new set of training options
+(RF parameters, features, source-dependent analysis…) on an existing production.</p>
+<p>At generation time, the merged training DL1 files of the source production are checked for each declination.
+A declination whose files are missing is <strong>silently dropped</strong> (with a warning) from the production: check the
+generated config contains all the declinations you asked for.</p>
+<p>Since this production retrains models, consider reusing the lstchain config of the source production, so that
+only the training options you meant to change actually differ.</p>
+</section>
+<section id="using-gammadiffuse-to-produce-full-enclosure-irfs">
+<span id="allsky-split-diffuse"></span><h3><a class="toc-backref" href="#id16" role="doc-backlink">Using GammaDiffuse to produce full-enclosure IRFs</a><a class="headerlink" href="#using-gammadiffuse-to-produce-full-enclosure-irfs" title="Link to this heading">#</a></h3>
+<p>The configs <cite>PathConfigAllSkyTrainingWithSplit</cite>, <cite>PathConfigAllSkyTestingGammaDiffuse</cite> and <cite>PathConfigAllSkyFullSplitDiffuse</cite> introduce the possibility to divide the GammaDiffuse dataset into training and testing datasets:</p>
+<img alt="https://mermaid.ink/img/pako:eNqdV9tq4zAQ_RUhaGkhCZbT5vawD0vYZaGFJZunbUJQbCU1-IassHGa_vsqll3XsseR6ydJ58zozIw0tt-wE7kMz_DOj_45r5QL9LRYhasQySc5bPecxq9oYfV_80hEYdJ3mUMUenlcjzNHeFGIlt_L1VC67POYvmQDuq4hW4Vs64ijECdHWOg2iflJg4DOvd3ukLAOivagoj2oaG-gaP5EvigJVAQKMtXTvV57SuD0EDg_xLxkS5YIIzFHbZ5q81OHYghOvdBoV8kEMiA4VA_Bv3JAhEEiXJ_I8yGN3NxISasrbCY2CG4mflV_P2B8z9zOYSgz82g-802C-szvEpt2OAu3ytFROTquQUaqGCnMOCnGyVTMcxbIS8Pa2jjpufo8KdeDqBDbYqkQtZDUpKlPo37_GzpzayOijfR4bmud2kun0bTe5T63Gng3VetCad6KFT1rF9kB3ySx74nzR28wIgO3VtkCoPR1cZZlVAltvzSacikC6Q4a81rUTIIoA1GOoiyOdcXntpPPiqnT0VQZ6_WsZ0VnVPYunUAboVvIQ6Y3y8Em9mJ2d1eO7-8LfeVaRg9krH6CBnLIGfU3LhX0ZSFHaC5H68Lq5qZgXozmT7bebHL0FrqzKg2ub1fA8ghUzvSFDOa-7B-1vlMKy_O2NHpB2fBRhwnbawQH7o_o1-JHZ50e37XrbCZsrxGctj5um3_x1GsLICmItHwPfWSsU6pqUjQkBZG6FD0-1R3k6qUvS-tzw7bQ3Wj9iNCuSq3JQrs2nAvcw3KLgHqu_Dd6uyytsHhlAVvhmRy6bEcPvljhVfguqfQgoj9p6OCZ4AfWw4dYdgM296gsQYBnO-oncjWm4d8oCgqSnOLZGz7iGSH2YDgcTh6mZPpo2RNCejiVy2MyGFnDkfUwehxJ0H7v4VPmwBqMp9ajPSZkPJ5Mh9PhqIeZ64mIP6u_ueyn7v0_3oNg4Q?type=png" src="https://mermaid.ink/img/pako:eNqdV9tq4zAQ_RUhaGkhCZbT5vawD0vYZaGFJZunbUJQbCU1-IassHGa_vsqll3XsseR6ydJ58zozIw0tt-wE7kMz_DOj_45r5QL9LRYhasQySc5bPecxq9oYfV_80hEYdJ3mUMUenlcjzNHeFGIlt_L1VC67POYvmQDuq4hW4Vs64ijECdHWOg2iflJg4DOvd3ukLAOivagoj2oaG-gaP5EvigJVAQKMtXTvV57SuD0EDg_xLxkS5YIIzFHbZ5q81OHYghOvdBoV8kEMiA4VA_Bv3JAhEEiXJ_I8yGN3NxISasrbCY2CG4mflV_P2B8z9zOYSgz82g-802C-szvEpt2OAu3ytFROTquQUaqGCnMOCnGyVTMcxbIS8Pa2jjpufo8KdeDqBDbYqkQtZDUpKlPo37_GzpzayOijfR4bmud2kun0bTe5T63Gng3VetCad6KFT1rF9kB3ySx74nzR28wIgO3VtkCoPR1cZZlVAltvzSacikC6Q4a81rUTIIoA1GOoiyOdcXntpPPiqnT0VQZ6_WsZ0VnVPYunUAboVvIQ6Y3y8Em9mJ2d1eO7-8LfeVaRg9krH6CBnLIGfU3LhX0ZSFHaC5H68Lq5qZgXozmT7bebHL0FrqzKg2ub1fA8ghUzvSFDOa-7B-1vlMKy_O2NHpB2fBRhwnbawQH7o_o1-JHZ50e37XrbCZsrxGctj5um3_x1GsLICmItHwPfWSsU6pqUjQkBZG6FD0-1R3k6qUvS-tzw7bQ3Wj9iNCuSq3JQrs2nAvcw3KLgHqu_Dd6uyytsHhlAVvhmRy6bEcPvljhVfguqfQgoj9p6OCZ4AfWw4dYdgM296gsQYBnO-oncjWm4d8oCgqSnOLZGz7iGSH2YDgcTh6mZPpo2RNCejiVy2MyGFnDkfUwehxJ0H7v4VPmwBqMp9ajPSZkPJ5Mh9PhqIeZ64mIP6u_ueyn7v0_3oNg4Q?type=png" />
+<p>To use, you may run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lstmcpipe_generate_config</span> <span class="n">PathConfigAllSkyFullSplitDiffuse</span> <span class="o">--</span><span class="n">dec_list</span> <span class="n">dec_2276</span> <span class="o">--</span><span class="n">prod_id</span> <span class="n">MY_NEW_PROD</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyFullSplitDiffuse</span></code> runs the whole thing at once. The two sub-configs it relies on can also be
+used separately (see <a class="reference internal" href="#allsky-blocks"><span class="std std-ref">Building blocks: partial and per-declination configs</span></a>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code> produces the DL1 and splits the GammaDiffuse dataset (50% train /
+50% test, node by node). The test half is written under <code class="docutils literal notranslate"><span class="pre">TestingDataset/</span></code> while the train half stays under
+<code class="docutils literal notranslate"><span class="pre">TrainingDataset/</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTestingGammaDiffuse</span></code> picks up that diffuse test half, merges it per node and runs
+<code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code> and <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code> on it. It <strong>must</strong> be run on a production generated with
+<code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code>, otherwise the input DL1 files do not exist.</p></li>
+</ul>
+<p>Because the gammas are diffuse, the IRFs produced here are full-enclosure (no <code class="docutils literal notranslate"><span class="pre">--point-like</span></code> option), while
+the point-source test gammas of the standard pipeline give point-like IRFs.</p>
+</section>
+<section id="building-blocks-partial-and-per-declination-configs">
+<span id="allsky-blocks"></span><h3><a class="toc-backref" href="#id17" role="doc-backlink">Building blocks: partial and per-declination configs</a><a class="headerlink" href="#building-blocks-partial-and-per-declination-configs" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">...Full...</span></code> classes above are assemblies of smaller classes, each handling <strong>a single declination</strong> and
+a part of the pipeline. They are directly usable and are the right tool when you want to run only a piece of a
+production, for instance to re-run the testing part of a production whose training is already done, or to add
+a declination to an existing production.</p>
+<p>They all take a <code class="docutils literal notranslate"><span class="pre">dec</span></code> argument (<strong>not</strong> <code class="docutils literal notranslate"><span class="pre">dec_list</span></code>), which must be passed through <code class="docutils literal notranslate"><span class="pre">--kwargs</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Example command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTraining</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTraining<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>MY_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTrainingWithSplit<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>MY_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTesting</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTesting<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>MY_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTestingGammaDiffuse</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTestingGammaDiffuse<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>MY_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingDL1ab</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTrainingDL1ab<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>NEW_PROD<span class="w"> </span>--source_prod_id<span class="w"> </span>OLD_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTestingDL1ab</span></code></p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lstmcpipe_generate_config<span class="w"> </span>PathConfigAllSkyTestingDL1ab<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prod_id<span class="w"> </span>NEW_PROD<span class="w"> </span>--source_prod_id<span class="w"> </span>OLD_PROD<span class="w"> </span>--kwargs<span class="w"> </span><span class="nv">dec</span><span class="o">=</span>dec_2276
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>What each of them does:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTraining</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code> and <code class="docutils literal notranslate"><span class="pre">train_pipe</span></code> for the training particles (<code class="docutils literal notranslate"><span class="pre">GammaDiffuse</span></code> and
+<code class="docutils literal notranslate"><span class="pre">Protons</span></code>) of one declination. Only the pointing nodes existing for <strong>both</strong> particles are kept
+(inner join on the pointings). It stops at the models: no DL2, no IRF.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code></dt><dd><p>same as above plus a <code class="docutils literal notranslate"><span class="pre">train_test_split</span></code> stage that splits the GammaDiffuse nodes into a train and a test
+dataset. Use it when you want full-enclosure IRFs (see the previous section).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTesting</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">merge_dl1</span></code>, <code class="docutils literal notranslate"><span class="pre">dl1_to_dl2</span></code> and <code class="docutils literal notranslate"><span class="pre">dl2_to_irfs</span></code> for the point-source test gammas.
+The DL1 of the test dataset are declination independent (and generated only once), but the DL2 and IRFs
+are produced with the models of the declination given by <code class="docutils literal notranslate"><span class="pre">dec</span></code>: the models of that declination must
+exist under the same <code class="docutils literal notranslate"><span class="pre">prod_id</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTestingGammaDiffuse</span></code></dt><dd><p>the same, for the diffuse gamma test dataset created by <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingWithSplit</span></code>. It has no
+<code class="docutils literal notranslate"><span class="pre">r0_to_dl1</span></code> stage, since its DL1 come from the split.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTrainingDL1ab</span></code> / <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTestingDL1ab</span></code></dt><dd><p>the <code class="docutils literal notranslate"><span class="pre">dl1ab</span></code> counterparts of the two above: instead of starting from the simulations, they re-run the DL1
+parameterisation on the DL1 of <code class="docutils literal notranslate"><span class="pre">source_prod_id</span></code> (typically with a tuned lstchain config). Pointing nodes
+missing in the source production are warned about and dropped.</p>
+</dd>
+</dl>
+<p>Since each class generates a valid, self-contained config, a production can also be run in several steps: for
+instance generate and run a <code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTraining</span></code> config for a new declination, then a
+<code class="docutils literal notranslate"><span class="pre">PathConfigAllSkyTesting</span></code> config with the same <code class="docutils literal notranslate"><span class="pre">prod_id</span></code> to produce the DL2 and IRFs.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="productions.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Production list</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="examples/configs_pointings.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Find and display pointing nodes using lstmcpipe</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-config-the-tools">Generating a config: the tools</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quickstart">Quickstart</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-arguments">Command line arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#known-pitfalls-with-the-arguments">Known pitfalls with the arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-run-it">Where to run it</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#after-generation-what-to-check">After generation: what to check</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-api">Python API</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#which-config-class-should-i-use">Which config class should I use?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prod3-prod5-pipelines">Prod3 &amp; Prod5 pipelines</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prod5-dl1ab">Prod5 DL1ab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#allsky-production-pipeline">AllSky production pipeline</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#r0-to-irfs">R0 to IRFs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dl1ab">DL1ab</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#retrain-and-apply-a-model">Retrain and apply a model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-gammadiffuse-to-produce-full-enclosure-irfs">Using GammaDiffuse to produce full-enclosure IRFs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-blocks-partial-and-per-declination-configs">Building blocks: partial and per-declination configs</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Thomas Vuillaume,Enrique Garcia,Lukas Nickel,Arnau Aguasca-Cabot,
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright Thomas Vuillaume,Enrique Garcia,Lukas Nickel,Arnau Aguasca-Cabot,.  Last updated 11 Sep 2026 22:33.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
