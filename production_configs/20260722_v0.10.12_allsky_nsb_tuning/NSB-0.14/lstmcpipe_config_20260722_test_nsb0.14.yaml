@@ -15,7 +15,7 @@ slurm_config:
 lstmcpipe_version: 0.11.5
 prod_type: PathConfigAllSkyTestingGammaDiffuse
 stages_to_run:
-    # - merge_dl1
+# - merge_dl1
 - dl1_to_dl2
 - dl2_to_irfs
 stages:

@@ -42,23 +42,15 @@ only used for the merge_dl1 step in (2), which is NSB-independent.
 
 ## Status (as of 2026-09-11)
 
-**Training is complete for all 5 NSB levels** — RF models
-(`reg_energy.sav`, `reg_disp_norm.sav`, `cls_gh.sav`, `cls_disp_sign.sav`)
-exist under `dec_6166_high_density` for each level.
+**Complete for all 5 NSB levels.** RF models (`reg_energy.sav`,
+`reg_disp_norm.sav`, `cls_gh.sav`, `cls_disp_sign.sav`) exist under
+`dec_6166_high_density` for each level, and all 5 levels now have 51/51 DL2
+test files and 51/51 IRFs. `NSB-X/lstmcpipe_config_20260722_test_nsbX.yaml`
+(stages `dl1_to_dl2` + `dl2_to_irfs`) is the canonical, from-scratch
+definition of the testing stage and reflects exactly what's on disk.
 
-**Testing (DL2 + IRF) is incomplete for 4 of 5 NSB levels.** Out of the 51
-pointings defined per NSB level in `lstmcpipe_config_20260722_test_nsbX.yaml`:
-
-| NSB  | IRFs produced |
-|------|---------------|
-| 0.07 | 32 / 51 |
-| 0.14 | 51 / 51 |
-| 0.22 | 32 / 51 |
-| 0.38 | 32 / 51 |
-| 0.50 | 48 / 51 |
-
-To complete testing, re-run step 6 above for the affected NSB levels —
-`lstmcpipe` will pick up only the missing/failed nodes.
+Testing was initially incomplete for 4 of 5 NSB levels (0.07/0.22/0.38 at
+32/51, 0.50 at 48/51) — see `history/` for how that gap was closed.
 
 ## Notes on this cleanup
 
@@ -80,3 +72,35 @@ history:
   (missing the `20260722_v0.12.3_` prefix) left over from before that
   convention was fixed; it has been corrected here to match the other 4 NSB
   levels and the actual location of the 0.07 models on disk.
+- `NSB-{0.07,0.22,0.38}/lstmcpipe_config_20260722_test_nsbX.yaml` had a stale
+  `path_model` (`.../20260722_v0.10.12_allsky_nsb_tuning_X/dec_6166`) baked
+  into all 51 entries. Every completed run in the provenance log actually
+  used `.../20260722_v0.12.3_allsky_nsb_tuning_X/dec_6166_high_density`
+  (matching NSB 0.14/0.50, which already had it right) — fixed here.
+- `stages_to_run` in `NSB-X/lstmcpipe_config_20260722_test_nsbX.yaml` had
+  drifted out of sync between NSB levels (some had `dl1_to_dl2` commented
+  out, reflecting whatever partial state the file was last saved in mid-run).
+  Normalized to `[dl1_to_dl2, dl2_to_irfs]` for all 5, since that's the
+  correct from-scratch definition now that both stages are confirmed
+  complete.
+
+## history/
+
+Record of closing the initial testing gap (32-48 / 51 pointings) after the
+`path_model` fix above:
+
+- `lstmcpipe_config_20260722_test_nsbX_missing.yaml` (X = 0.07, 0.22, 0.38,
+  0.50) — configs trimmed to only the pointings missing on disk at the time.
+  0.07/0.22/0.38 were missing the same 19 pointings each (a systematic gap,
+  not random failures) and needed both `dl1_to_dl2` + `dl2_to_irfs`; 0.50
+  only needed 3 `dl2_to_irfs` at first.
+- `clean_partial_dl2.sh` — the first attempt at the 0.07 fill-in ran before
+  the `path_model` fix above and failed on a missing `reg_energy.sav`, but
+  still left a bogus small `.h5` per node. This script removed those before
+  the corrected `*_missing.yaml` could be re-run. Similarly, the 3 DL2 files
+  backing 0.50's missing IRFs turned out bad and were deleted manually, so
+  the 0.50 `_missing.yaml` was updated to redo `dl1_to_dl2` for those 3
+  pointings too, not just `dl2_to_irfs`.
+
+These are historical record only — not part of the reproducible pipeline in
+`run.sh`, which regenerates the full, complete configs directly.
